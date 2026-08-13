@@ -190,7 +190,7 @@ export default function GivreEnhance() {
                       "saturate(0.42) brightness(0.6) contrast(0.85) blur(2.5px)",
                   }}
                 />
-                <div className="absolute inset-0 bg-[rgba(10,10,16,0.18)]" />
+                <div className="absolute inset-0 bg-[rgba(28,23,55,0.18)]" />
               </div>
 
               {/* La poignée — pilule de verre sur son fil de lumière,
@@ -208,7 +208,7 @@ export default function GivreEnhance() {
               >
                 <span
                   aria-hidden
-                  className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[linear-gradient(180deg,transparent,rgba(124,106,255,0.95)_22%,rgba(76,201,240,0.95)_78%,transparent)] shadow-[0_0_22px_rgba(124,106,255,0.6)]"
+                  className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[linear-gradient(180deg,transparent,rgba(164,139,232,0.95)_22%,rgba(239,184,148,0.95)_78%,transparent)] shadow-[0_0_22px_rgba(164,139,232,0.6)]"
                 />
                 <span className="pv-pill absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 gap-3 whitespace-nowrap px-4">
                   <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink">

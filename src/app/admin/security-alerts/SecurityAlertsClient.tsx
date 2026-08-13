@@ -27,10 +27,10 @@ const STATUS_LABELS: Record<SignupSecurityStatus, string> = {
 
 /* États système désaturés : warn = à traiter, err = refusé, ok = accordé. */
 const STATUS_BADGES: Record<SignupSecurityStatus, string> = {
-  allowed: "border-[#C4E3D2] bg-[#EFF7F2] text-[#3E7A5C]",
+  allowed: "border-[#C5DCD2] bg-[#EEF4F1] text-[#5E9B84]",
   blocked: "border-[#EFC9C6] bg-[#FBEFEE] text-[#9E4A45]",
   pending_review: "border-[#EAD9A8] bg-[#FBF6E9] text-[#8A6D1F]",
-  approved_by_admin: "border-[#C4E3D2] bg-[#EFF7F2] text-[#3E7A5C]",
+  approved_by_admin: "border-[#C5DCD2] bg-[#EEF4F1] text-[#5E9B84]",
   rejected_by_admin: "border-[#EFC9C6] bg-[#FBEFEE] text-[#9E4A45]",
 };
 
@@ -134,7 +134,7 @@ export function SecurityAlertsClient({ initialAlerts }: { initialAlerts: SignupS
             onClick={() => setFilter(status)}
             className={`h-10 rounded-full border px-4 font-mono text-[10px] font-medium uppercase tracking-[0.12em] transition-colors duration-300 ${
               filter === status
-                ? "border-[rgba(109,91,232,0.35)] bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]"
+                ? "border-[rgba(164,139,232,0.35)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
                 : "border-[color:var(--hairline)] text-steel hover:text-ink"
             }`}
           >

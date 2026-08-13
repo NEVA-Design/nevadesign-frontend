@@ -99,7 +99,7 @@ export default function GivreFAQ() {
               <Accordion.Item
                 key={item.q}
                 value={`item-${i}`}
-                className="group border-t border-[rgba(29,35,64,0.07)] last:border-b"
+                className="group border-t border-[rgba(43,36,80,0.07)] last:border-b"
               >
                 <Accordion.Header>
                   <Accordion.Trigger className="flex w-full cursor-pointer items-baseline gap-5 py-6 text-left sm:gap-7">

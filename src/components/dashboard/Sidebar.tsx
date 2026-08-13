@@ -76,7 +76,7 @@ export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?
   return (
     <aside className="pv-glass pv-edge flex h-full w-[264px] flex-col overflow-hidden rounded-[24px] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_2px_6px_rgba(96,84,140,0.08),0_24px_56px_rgba(96,84,140,0.14)]">
       {/* Marque — le monogramme noir signe le panneau */}
-      <div className="flex h-[68px] items-center justify-between border-b border-[rgba(29,35,64,0.06)] px-5">
+      <div className="flex h-[68px] items-center justify-between border-b border-[rgba(43,36,80,0.06)] px-5">
         <Link
           href="/dashboard"
           onClick={onClose}
@@ -88,7 +88,7 @@ export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?
             alt=""
             width={32}
             height={32}
-            className="h-8 w-8 rounded-lg object-cover shadow-[0_1px_2px_rgba(29,35,64,0.2)]"
+            className="h-8 w-8 rounded-lg object-cover shadow-[0_1px_2px_rgba(43,36,80,0.2)]"
           />
           <span className="flex flex-col leading-none">
             <span className="text-[15px] font-medium tracking-[-0.02em] text-ink">
@@ -112,7 +112,7 @@ export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?
       </div>
 
       {/* Créations — la pilule de verre au liseré spectral */}
-      <div className="border-b border-[rgba(29,35,64,0.06)] px-5 py-5">
+      <div className="border-b border-[rgba(43,36,80,0.06)] px-5 py-5">
         <div className="mb-3 flex items-baseline justify-between">
           <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
             Créations
@@ -138,7 +138,7 @@ export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?
       </div>
 
       {/* Navigation — scrollbar fine et transparente : rien ne raye le verre */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 [scrollbar-color:rgba(29,35,64,0.14)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-0 [&::-webkit-scrollbar-thumb]:bg-[rgba(29,35,64,0.14)] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-[5px]">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 [scrollbar-color:rgba(43,36,80,0.14)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-0 [&::-webkit-scrollbar-thumb]:bg-[rgba(43,36,80,0.14)] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-[5px]">
         {navGroups.map((group) => (
           <div key={group.label} className="mb-5">
             <div className="mb-2 px-2">
@@ -164,7 +164,7 @@ export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?
                     {active ? (
                       <motion.span
                         layoutId="sidebar-active"
-                        className="absolute inset-0 rounded-full bg-ink shadow-[0_1px_2px_rgba(29,35,64,0.18),0_6px_16px_rgba(29,35,64,0.2)]"
+                        className="absolute inset-0 rounded-full bg-ink shadow-[0_1px_2px_rgba(43,36,80,0.18),0_6px_16px_rgba(43,36,80,0.2)]"
                         transition={{ type: "spring", stiffness: 420, damping: 34 }}
                       />
                     ) : null}
@@ -186,7 +186,7 @@ export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?
       </nav>
 
       {/* Utilisateur */}
-      <div className="border-t border-[rgba(29,35,64,0.06)] p-3">
+      <div className="border-t border-[rgba(43,36,80,0.06)] p-3">
         <div className="flex items-center gap-3 rounded-[20px] border border-[color:var(--hairline-glass)] bg-white/60 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_8px_20px_rgba(96,84,140,0.08)]">
           <div className="h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-ink">
             {user.avatarUrl ? (

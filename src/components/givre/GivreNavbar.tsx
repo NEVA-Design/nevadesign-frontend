@@ -46,7 +46,7 @@ export default function GivreNavbar() {
       className={cn(
         "fixed inset-x-0 top-0 z-[90] transition-[background-color,border-color,box-shadow] duration-500",
         scrolled
-          ? "border-b border-[rgba(29,35,64,0.07)] bg-[rgba(246,245,251,0.66)] shadow-[0_1px_2px_rgba(96,84,140,0.05)] backdrop-blur-xl"
+          ? "border-b border-[rgba(43,36,80,0.07)] bg-[rgba(246,245,251,0.66)] shadow-[0_1px_2px_rgba(96,84,140,0.05)] backdrop-blur-xl"
           : "border-b border-transparent bg-transparent"
       )}
     >
@@ -103,7 +103,7 @@ export default function GivreNavbar() {
         <div className="fixed inset-0 z-[95] flex flex-col overflow-hidden lg:hidden">
           <div className="pv-scene-bg--dawn-calm absolute inset-0" />
           <div className="pv-windowlight absolute inset-0" />
-          <div className="relative flex h-[72px] items-center justify-between border-b border-[rgba(29,35,64,0.07)] px-6">
+          <div className="relative flex h-[72px] items-center justify-between border-b border-[rgba(43,36,80,0.07)] px-6">
             <Brand size={19} tone="ink" />
             <button
               className="rounded-full border border-[rgba(255,255,255,0.65)] bg-[rgba(255,255,255,0.6)] p-2 text-ink"
@@ -120,7 +120,7 @@ export default function GivreNavbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="pv-fade-up flex items-baseline justify-between border-b border-[rgba(29,35,64,0.07)] py-5"
+                  className="pv-fade-up flex items-baseline justify-between border-b border-[rgba(43,36,80,0.07)] py-5"
                   style={{ animationDelay: `${0.05 + index * 0.055}s` }}
                 >
                   <span className="pv-display text-[27px] text-slate">

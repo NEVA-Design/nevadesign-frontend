@@ -300,7 +300,7 @@ export default function AppMockup({ className }: { className?: string }) {
                   {label}
                   <span
                     data-demo-dot
-                    className="ml-auto h-1.5 w-1.5 rounded-full bg-[linear-gradient(115deg,#7C6AFF,#4CC9F0)] transition-opacity duration-500"
+                    className="ml-auto h-1.5 w-1.5 rounded-full bg-[linear-gradient(100deg,#A48BE8,#EFB894)] transition-opacity duration-500"
                     style={{ opacity: i === 0 ? 1 : 0 }}
                   />
                 </span>
@@ -346,7 +346,7 @@ export default function AppMockup({ className }: { className?: string }) {
                   <span
                     key={i}
                     data-demo-swatch
-                    className="h-8 w-8 rounded-full border border-ink/10 shadow-[0_1px_2px_rgba(29,35,64,0.08)]"
+                    className="h-8 w-8 rounded-full border border-ink/10 shadow-[0_1px_2px_rgba(43,36,80,0.08)]"
                   />
                 ))}
               </div>
@@ -366,7 +366,7 @@ export default function AppMockup({ className }: { className?: string }) {
           <div className="mt-auto pt-6">
             <span
               data-demo-btn
-              className="inline-flex h-9 cursor-default items-center gap-2 rounded-full bg-ink px-4 text-[12px] font-medium text-white shadow-[0_1px_2px_rgba(29,35,64,0.14),0_8px_22px_rgba(29,35,64,0.2)]"
+              className="inline-flex h-9 cursor-default items-center gap-2 rounded-full bg-ink px-4 text-[12px] font-medium text-white shadow-[0_1px_2px_rgba(43,36,80,0.14),0_8px_22px_rgba(43,36,80,0.2)]"
             >
               <span data-demo-btnlabel>{t("demo.compose", "Composer")}</span>
               <ArrowRight size={13} />

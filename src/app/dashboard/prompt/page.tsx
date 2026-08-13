@@ -40,7 +40,7 @@ export default function PromptPage() {
         eyebrow="Neva Prompt"
         title="Des prompts d'une précision chirurgicale"
         description="Décrivez votre intention : Neva Prompt la traduira en prompt taillé pour l'esthétique GTA RP et FiveM, prêt pour vos moteurs de génération."
-        accent="#7C6AFF"
+        accent="#A48BE8"
         meta="1 création / prompt"
         activeStep={0}
         steps={[
@@ -72,7 +72,7 @@ export default function PromptPage() {
                   disabled
                   className={`h-10 rounded-lg border px-3 text-[13px] transition-colors duration-300 disabled:cursor-not-allowed ${
                     index === 0
-                      ? "border-[rgba(109,91,232,0.5)] bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]"
+                      ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
                       : "border-[color:var(--hairline)] text-steel"
                   }`}
                 >
@@ -92,7 +92,7 @@ export default function PromptPage() {
                   disabled
                   className={`h-10 rounded-lg border px-3.5 font-mono text-[11px] tracking-[0.06em] transition-colors duration-300 disabled:cursor-not-allowed ${
                     index === 0
-                      ? "border-[rgba(109,91,232,0.5)] bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]"
+                      ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
                       : "border-[color:var(--hairline)] text-steel"
                   }`}
                 >

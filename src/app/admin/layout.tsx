@@ -37,7 +37,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
       {/* ── Sidebar desktop — panneau de verre flottant ────────── */}
       <aside className="pv-glass pv-glass--card pv-edge pv-shadow-mauve fixed bottom-4 left-4 top-4 z-50 hidden w-[264px] flex-col overflow-hidden lg:flex">
-        <div className="relative flex h-[72px] shrink-0 items-center border-b border-[rgba(29,35,64,0.06)] px-6">
+        <div className="relative flex h-[72px] shrink-0 items-center border-b border-[rgba(43,36,80,0.06)] px-6">
           <Brand href="/admin" size={20} tone="ink" sub="Console" />
         </div>
 
@@ -45,7 +45,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <AdminSidebarNav items={navItems} />
         </nav>
 
-        <div className="relative border-t border-[rgba(29,35,64,0.06)] p-3.5">
+        <div className="relative border-t border-[rgba(43,36,80,0.06)] p-3.5">
           <Link
             href="/dashboard"
             className="group flex h-10 items-center gap-3 rounded-[12px] px-3.5 text-[13px] text-slate transition-colors duration-[var(--dur-base)] hover:bg-[rgba(255,255,255,0.5)] hover:text-ink"
@@ -81,14 +81,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
         {/* ── Nav mobile — rail horizontal sur la scène ─────────── */}
         <nav
-          className="border-b border-[rgba(29,35,64,0.06)] px-4 pb-3 pt-4 lg:hidden"
+          className="border-b border-[rgba(43,36,80,0.06)] px-4 pb-3 pt-4 lg:hidden"
           aria-label="Navigation de la console"
         >
           <div className="flex gap-2 overflow-x-auto pb-1">
             <AdminRailNav items={navItems} />
             <Link
               href="/dashboard"
-              className="flex h-10 shrink-0 items-center gap-2 rounded-[12px] border border-[rgba(29,35,64,0.1)] px-4 text-xs text-slate transition-colors duration-[var(--dur-base)] hover:bg-[rgba(255,255,255,0.45)] hover:text-ink"
+              className="flex h-10 shrink-0 items-center gap-2 rounded-[12px] border border-[rgba(43,36,80,0.1)] px-4 text-xs text-slate transition-colors duration-[var(--dur-base)] hover:bg-[rgba(255,255,255,0.45)] hover:text-ink"
             >
               <ArrowLeft size={12} strokeWidth={1.8} />
               Retour au produit

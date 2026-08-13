@@ -28,7 +28,7 @@ export function Switch({
       className={cn(
         "relative h-6 w-11 shrink-0 cursor-pointer rounded-full border transition-colors duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--focus-ring)] disabled:cursor-not-allowed disabled:opacity-40",
         checked
-          ? "border-transparent bg-[linear-gradient(115deg,rgba(124,106,255,0.8),rgba(76,201,240,0.8))]"
+          ? "border-transparent bg-[linear-gradient(115deg,rgba(164,139,232,0.8),rgba(239,184,148,0.8))]"
           : "border-[color:var(--hairline-strong)] bg-ink/8",
         className
       )}
@@ -38,8 +38,8 @@ export function Switch({
         className={cn(
           "absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-white transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
           checked
-            ? "left-[24px] shadow-[0_1px_2px_rgba(29,35,64,0.2)]"
-            : "left-[3px] shadow-[0_1px_2px_rgba(29,35,64,0.14)]"
+            ? "left-[24px] shadow-[0_1px_2px_rgba(43,36,80,0.2)]"
+            : "left-[3px] shadow-[0_1px_2px_rgba(43,36,80,0.14)]"
         )}
       />
     </button>

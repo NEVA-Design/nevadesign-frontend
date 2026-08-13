@@ -104,7 +104,7 @@ export default function DownloadsClient({ ownedPacks, successPack }: Props) {
                     <a
                       href={pack.downloadUrl}
                       download
-                      className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg border border-[color:var(--hairline-strong)] px-5 text-sm font-medium text-ink transition-colors duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] hover:border-[rgba(109,91,232,0.5)] hover:text-[color:var(--num-color)]"
+                      className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg border border-[color:var(--hairline-strong)] px-5 text-sm font-medium text-ink transition-colors duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] hover:border-[rgba(164,139,232,0.5)] hover:text-[color:var(--num-color)]"
                     >
                       <Download size={14} />
                       Télécharger

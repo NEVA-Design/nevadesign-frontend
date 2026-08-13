@@ -81,10 +81,10 @@ export default function PrismLoader() {
           preload
           className="h-[30px] w-auto"
         />
-        <span className="block h-px w-full overflow-hidden bg-[rgba(29,35,64,0.12)]">
+        <span className="block h-px w-full overflow-hidden bg-[rgba(43,36,80,0.12)]">
           <span
             ref={barRef}
-            className="block h-full w-0 bg-[linear-gradient(115deg,#7C6AFF,#4CC9F0)]"
+            className="block h-full w-0 bg-[linear-gradient(115deg,#A48BE8,#EFB894)]"
           />
         </span>
         <span

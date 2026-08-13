@@ -215,7 +215,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="group flex min-h-[72px] w-full items-center gap-4 rounded-lg border border-dashed border-[color:var(--hairline-strong)] bg-abyss p-3 text-left transition-colors duration-300 hover:border-[rgba(109,91,232,0.45)]"
+                className="group flex min-h-[72px] w-full items-center gap-4 rounded-lg border border-dashed border-[color:var(--hairline-strong)] bg-abyss p-3 text-left transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)]"
               >
                 {sourceImage ? (
                   <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-[color:var(--hairline)]">
@@ -261,7 +261,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
                       aria-pressed={isActive}
                       className={`w-full rounded-lg border px-4 py-3 text-left transition-colors duration-300 ${
                         isActive
-                          ? "border-[rgba(109,91,232,0.5)] bg-[rgba(124,106,255,0.08)]"
+                          ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)]"
                           : "border-[color:var(--hairline)] hover:border-[#C9C9C0]"
                       }`}
                     >
@@ -306,7 +306,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
                       aria-pressed={isActive}
                       className={`min-h-[56px] rounded-lg border px-3 py-2.5 text-left transition-colors duration-300 ${
                         isActive
-                          ? "border-[rgba(109,91,232,0.5)] bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]"
+                          ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
                           : "border-[color:var(--hairline)] text-steel hover:text-ink"
                       }`}
                     >
@@ -339,7 +339,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
                       aria-pressed={isActive}
                       className={`min-h-[40px] rounded-lg border px-3 py-2 text-xs transition-colors duration-300 ${
                         isActive
-                          ? "border-[rgba(109,91,232,0.5)] bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]"
+                          ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
                           : "border-[color:var(--hairline)] text-steel hover:text-ink"
                       }`}
                     >
@@ -464,7 +464,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
                   <span className="absolute left-4 top-4 rounded-full border border-[color:var(--hairline-strong)] bg-ink/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink/80">
                     Avant
                   </span>
-                  <span className="absolute right-4 top-4 rounded-full border border-[rgba(109,91,232,0.35)] bg-ink/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-[color:var(--num-color)]">
+                  <span className="absolute right-4 top-4 rounded-full border border-[rgba(164,139,232,0.35)] bg-ink/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-[color:var(--num-color)]">
                     Après
                   </span>
                 </div>
@@ -538,7 +538,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
       {/* Plein écran */}
       {fullscreen ? (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(7,7,13,0.94)] p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(28,23,55,0.94)] p-4"
           onClick={() => setFullscreen(null)}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}

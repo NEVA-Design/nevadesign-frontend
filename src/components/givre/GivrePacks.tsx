@@ -163,7 +163,7 @@ export default function GivrePacks() {
 
                   <ul
                     className={cn(
-                      "mt-6 grid flex-1 content-start gap-2.5 border-t border-[rgba(29,35,64,0.07)] pt-6",
+                      "mt-6 grid flex-1 content-start gap-2.5 border-t border-[rgba(43,36,80,0.07)] pt-6",
                       isHighlight && "sm:grid-cols-2"
                     )}
                   >

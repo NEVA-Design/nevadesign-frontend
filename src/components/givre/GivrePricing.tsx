@@ -72,7 +72,7 @@ export default function GivrePricing() {
                   ) : index > 0 ? (
                     <span
                       aria-hidden
-                      className="block h-px bg-[rgba(29,35,64,0.07)]"
+                      className="block h-px bg-[rgba(43,36,80,0.07)]"
                     />
                   ) : null}
 
@@ -115,7 +115,7 @@ export default function GivrePricing() {
                         >
                           <span
                             aria-hidden
-                            className="mt-[0.6em] h-px w-3.5 shrink-0 bg-[rgba(29,35,64,0.32)]"
+                            className="mt-[0.6em] h-px w-3.5 shrink-0 bg-[rgba(43,36,80,0.32)]"
                           />
                           {t(`pricing.plan.${planId}.f${fi + 1}`, feature)}
                         </li>

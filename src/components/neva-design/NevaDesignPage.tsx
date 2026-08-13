@@ -154,7 +154,7 @@ export default function NevaDesignPage({
       <div id="top" className="relative bg-frost text-ink">
         {/* ── En-tête — pilule de verre ───────────────────────── */}
         <header className="fixed inset-x-0 top-0 z-[90] flex flex-col items-center px-4 pt-4 sm:px-6">
-          <nav className="relative flex h-[56px] w-full max-w-[1080px] items-center justify-between rounded-full border border-[color:var(--hairline-glass)] bg-[rgba(248,249,252,0.66)] px-3 pl-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(29,35,64,0.05),0_12px_36px_rgba(29,35,64,0.1)] backdrop-blur-xl">
+          <nav className="relative flex h-[56px] w-full max-w-[1080px] items-center justify-between rounded-full border border-[color:var(--hairline-glass)] bg-[rgba(248,249,252,0.66)] px-3 pl-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(43,36,80,0.05),0_12px_36px_rgba(43,36,80,0.1)] backdrop-blur-xl">
             <Brand size={20} tone="ink" sub="Studio graphique" />
             <div className="hidden items-center gap-7 lg:flex">
               {NAV_ANCHORS.map((anchor) => (
@@ -231,7 +231,7 @@ export default function NevaDesignPage({
 
             <div className="relative mx-auto flex w-full max-w-[1200px] flex-1 flex-col items-center justify-center px-5 text-center sm:px-8">
               <RevealBlock className="mb-8">
-                <span className="inline-flex min-h-[32px] items-center gap-2.5 rounded-full border border-[color:var(--hairline-glass)] bg-[rgba(255,255,255,0.6)] px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(29,35,64,0.05),0_10px_24px_rgba(29,35,64,0.06)]">
+                <span className="inline-flex min-h-[32px] items-center gap-2.5 rounded-full border border-[color:var(--hairline-glass)] bg-[rgba(255,255,255,0.6)] px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(43,36,80,0.05),0_10px_24px_rgba(43,36,80,0.06)]">
                   <span className="pv-breathe h-[5px] w-[5px] rounded-full bg-periwinkle" />
                   <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
                     Studio graphique · FiveM & GTA RP
@@ -354,7 +354,7 @@ export default function NevaDesignPage({
                       className={cn(
                         "cursor-pointer rounded-full border px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] transition-all duration-300",
                         activeFilter === filter
-                          ? "border-transparent bg-ink text-white shadow-[0_1px_2px_rgba(29,35,64,0.18),0_8px_20px_rgba(29,35,64,0.2)]"
+                          ? "border-transparent bg-ink text-white shadow-[0_1px_2px_rgba(43,36,80,0.18),0_8px_20px_rgba(43,36,80,0.2)]"
                           : "border-[color:var(--hairline-glass)] bg-[rgba(255,255,255,0.6)] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] hover:bg-white/80 hover:text-ink"
                       )}
                     >
@@ -394,7 +394,7 @@ export default function NevaDesignPage({
                           />
                           <span
                             aria-hidden
-                            className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(255,255,255,0.7)] bg-[rgba(255,255,255,0.85)] opacity-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_2px_6px_rgba(29,35,64,0.12)] transition-opacity duration-300 group-hover:opacity-100"
+                            className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(255,255,255,0.7)] bg-[rgba(255,255,255,0.85)] opacity-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_2px_6px_rgba(43,36,80,0.12)] transition-opacity duration-300 group-hover:opacity-100"
                           >
                             <ArrowUpRight size={14} className="text-ink" />
                           </span>
@@ -565,7 +565,7 @@ export default function NevaDesignPage({
             aria-label={fullscreenItem.title}
           >
             <div
-              className="absolute inset-0 bg-[rgba(12,14,28,0.9)] backdrop-blur-md"
+              className="absolute inset-0 bg-[rgba(36,31,69,0.9)] backdrop-blur-md"
               onClick={() => setFullscreenItem(null)}
               aria-hidden
             />
@@ -579,7 +579,7 @@ export default function NevaDesignPage({
               </button>
               <div
                 className={cn(
-                  "pv-edge relative overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.12)] bg-abyss shadow-[0_6px_14px_rgba(0,0,0,0.4),0_52px_120px_rgba(0,0,0,0.6)]",
+                  "pv-edge relative overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.12)] bg-abyss shadow-[0_6px_14px_rgba(16,12,36,0.4),0_52px_120px_rgba(16,12,36,0.6)]",
                   isLogoPreview ? "aspect-square sm:aspect-[4/3]" : "aspect-video"
                 )}
               >

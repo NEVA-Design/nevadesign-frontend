@@ -84,7 +84,7 @@ function statusLabel(item: SiteAnnouncement) {
   if (!item.is_active) return { label: "Inactif", color: "rgba(255,255,255,0.4)" };
   if (starts && starts > now) return { label: "Programmé", color: "#E5C36E" };
   if (ends && ends < now) return { label: "Expiré", color: "#F08A85" };
-  return { label: "Visible", color: "#7ED4A6" };
+  return { label: "Visible", color: "#8FC7B2" };
 }
 
 export function AdminAnnouncementsClient({
@@ -239,7 +239,7 @@ export function AdminAnnouncementsClient({
                     onClick={() => updateForm("kind", kind)}
                     className={`flex min-h-10 items-center justify-center rounded-lg border px-2 py-2 text-xs transition-colors duration-300 ${
                       form.kind === kind
-                        ? "border-[rgba(109,91,232,0.35)] bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]"
+                        ? "border-[rgba(164,139,232,0.35)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
                         : "border-[color:var(--hairline)] text-steel hover:border-[#C9C9C0] hover:text-ink"
                     }`}
                   >
@@ -438,7 +438,7 @@ export function AdminAnnouncementsClient({
                         <button
                           onClick={() => toggleActive(item)}
                           disabled={loading}
-                          className="flex h-10 items-center rounded-full border border-[color:var(--hairline)] px-4 font-mono text-[10px] uppercase tracking-[0.12em] text-steel transition-colors duration-300 hover:border-[rgba(109,91,232,0.45)] hover:text-ink disabled:pointer-events-none disabled:opacity-45"
+                          className="flex h-10 items-center rounded-full border border-[color:var(--hairline)] px-4 font-mono text-[10px] uppercase tracking-[0.12em] text-steel transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)] hover:text-ink disabled:pointer-events-none disabled:opacity-45"
                         >
                           {item.is_active ? "Masquer" : "Activer"}
                         </button>

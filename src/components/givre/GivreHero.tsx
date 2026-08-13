@@ -269,7 +269,7 @@ export default function GivreHero() {
                     }
                   >
                     {item.active ? (
-                      <span className="h-px w-5 bg-[rgba(29,35,64,0.55)]" aria-hidden />
+                      <span className="h-px w-5 bg-[rgba(43,36,80,0.55)]" aria-hidden />
                     ) : null}
                     {label}
                   </a>

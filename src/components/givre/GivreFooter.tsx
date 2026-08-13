@@ -118,7 +118,7 @@ export default function GivreFooter() {
       </section>
 
       {/* ── Le registre — marque et colonnes sur la brume claire ── */}
-      <div className="border-t border-[rgba(29,35,64,0.07)] bg-[#F0EEE8]">
+      <div className="border-t border-[rgba(43,36,80,0.07)] bg-[#F0EEE8]">
         <div className="mx-auto max-w-[1140px] px-5 sm:px-8">
           <div className="grid gap-12 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-16">
             <div>
@@ -162,7 +162,7 @@ export default function GivreFooter() {
         </div>
 
         {/* Rangée basse — copyright, heure du studio, réseaux */}
-        <div className="border-t border-[rgba(29,35,64,0.07)]">
+        <div className="border-t border-[rgba(43,36,80,0.07)]">
           <div className="mx-auto flex max-w-[1140px] flex-col items-start justify-between gap-4 px-5 py-7 sm:flex-row sm:items-center sm:px-8">
             <p className="font-mono text-[11px] tracking-[0.1em] text-mist">
               © {year} Neva Design · {t("footer.rights", "Tous droits réservés.")}

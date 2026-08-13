@@ -247,7 +247,7 @@ export default function SettingsClient({
                   {avatarUrl ? (
                     <Image src={avatarUrl} alt="Photo de profil" fill sizes="64px" className="object-cover" />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-[rgba(124,106,255,0.08)]">
+                    <div className="flex h-full w-full items-center justify-center bg-[rgba(164,139,232,0.08)]">
                       <span className="pv-display text-2xl text-[color:var(--num-color)]">{initials}</span>
                     </div>
                   )}
@@ -476,8 +476,8 @@ export default function SettingsClient({
             </p>
 
             <div className="mt-7 grid gap-4 sm:grid-cols-3">
-              <div className="rounded-xl border border-[rgba(109,91,232,0.35)] bg-[rgba(124,106,255,0.06)] p-4">
-                <div className="h-12 rounded-lg border border-[color:var(--hairline)] bg-[#07070D]" />
+              <div className="rounded-xl border border-[rgba(164,139,232,0.35)] bg-[rgba(164,139,232,0.06)] p-4">
+                <div className="h-12 rounded-lg border border-[color:var(--hairline)] bg-[#241F45]" />
                 <p className="mt-3 text-[13px] font-medium text-ink">Prisme</p>
                 <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-[color:var(--num-color)]">
                   Actif

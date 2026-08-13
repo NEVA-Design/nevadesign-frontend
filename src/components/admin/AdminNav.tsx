@@ -92,7 +92,7 @@ function RailLink({ item }: { item: AdminNavItem }) {
         "flex h-10 shrink-0 items-center rounded-[12px] border px-4 text-xs transition-colors duration-[var(--dur-base)]",
         active
           ? "border-[rgba(255,255,255,0.62)] bg-[rgba(255,255,255,0.6)] font-medium text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_8px_20px_rgba(96,84,140,0.14)]"
-          : "border-[rgba(29,35,64,0.1)] text-slate hover:bg-[rgba(255,255,255,0.4)] hover:text-ink"
+          : "border-[rgba(43,36,80,0.1)] text-slate hover:bg-[rgba(255,255,255,0.4)] hover:text-ink"
       )}
     >
       {item.label}

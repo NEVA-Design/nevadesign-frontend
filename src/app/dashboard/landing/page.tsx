@@ -43,7 +43,7 @@ export default function LandingPage() {
         eyebrow="Neva Landing"
         title="La page de présentation qui recrute pour vous"
         description="Renseignez votre serveur : Neva Landing composera la structure et les textes d'une page d'atterrissage complète, prête à convaincre."
-        accent="#7C6AFF"
+        accent="#A48BE8"
         meta="3 créations / page"
         activeStep={0}
         steps={[
@@ -93,7 +93,7 @@ export default function LandingPage() {
                     <span
                       className={`flex h-4.5 w-4.5 items-center justify-center rounded-full border ${
                         selected
-                          ? "border-[rgba(109,91,232,0.5)] bg-violet/15 text-[color:var(--num-color)]"
+                          ? "border-[rgba(164,139,232,0.5)] bg-violet/15 text-[color:var(--num-color)]"
                           : "border-[color:var(--hairline-strong)] text-transparent"
                       }`}
                       aria-hidden

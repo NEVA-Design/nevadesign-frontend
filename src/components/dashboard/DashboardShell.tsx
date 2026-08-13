@@ -113,7 +113,7 @@ export default function DashboardShell({
 
       <main className="relative z-10 flex min-h-screen w-full flex-1 flex-col overflow-x-hidden lg:ml-[288px]">
         {/* Barre mobile — voile nav : filet bas encré, aucune ombre */}
-        <div className="sticky top-0 z-20 flex h-14 flex-shrink-0 items-center gap-3 border-b border-[rgba(29,35,64,0.06)] bg-[rgba(244,245,250,0.6)] px-4 backdrop-blur-xl lg:hidden">
+        <div className="sticky top-0 z-20 flex h-14 flex-shrink-0 items-center gap-3 border-b border-[rgba(43,36,80,0.06)] bg-[rgba(244,245,250,0.6)] px-4 backdrop-blur-xl lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
             className="cursor-pointer rounded-lg p-2 text-slate transition-colors duration-[var(--dur-base)] hover:bg-ink/5 hover:text-ink"

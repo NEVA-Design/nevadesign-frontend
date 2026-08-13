@@ -43,7 +43,7 @@ function watermarkSvg(width: number, height: number) {
           letter-spacing: 0;
           fill: rgba(255,255,255,0.27);
           paint-order: stroke;
-          stroke: rgba(0,0,0,0.34);
+          stroke: rgba(16,12,36,0.34);
           stroke-width: ${Math.max(2, Math.round(fontSize * 0.12))}px;
           stroke-linejoin: round;
         }

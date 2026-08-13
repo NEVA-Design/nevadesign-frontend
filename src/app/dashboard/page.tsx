@@ -201,7 +201,7 @@ export default async function DashboardPage() {
           </p>
         </div>
         <Link href="/dashboard/design" className="shrink-0">
-          <span className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-ink shadow-[0_0_0_1px_rgba(124,106,255,0.4),0_4px_24px_rgba(124,106,255,0.28)] transition-colors hover:bg-[#272E52]">
+          <span className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-ink shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] transition-colors hover:bg-[#35305E]">
             Création rapide
             <ArrowRight size={15} />
           </span>
@@ -244,7 +244,7 @@ export default async function DashboardPage() {
                 href={action.href}
                 className="pv-glass pv-edge pv-ignite group flex flex-col gap-3 rounded-xl p-5"
               >
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] bg-linen text-steel transition-colors duration-300 group-hover:border-[rgba(109,91,232,0.35)] group-hover:text-[color:var(--num-color)]">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] bg-linen text-steel transition-colors duration-300 group-hover:border-[rgba(164,139,232,0.35)] group-hover:text-[color:var(--num-color)]">
                   <action.icon size={16} strokeWidth={1.8} />
                 </span>
                 <span>
@@ -272,7 +272,7 @@ export default async function DashboardPage() {
             <div className="relative overflow-hidden rounded-xl border border-dashed border-[color:var(--hairline-strong)] px-6 py-12 text-center">
               <div
                 aria-hidden
-                className="pointer-events-none absolute left-1/2 top-0 h-32 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(124,106,255,0.12),transparent_70%)]"
+                className="pointer-events-none absolute left-1/2 top-0 h-32 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(164,139,232,0.12),transparent_70%)]"
               />
               <p className="text-lg font-semibold text-ink/85">Le registre est encore vierge.</p>
               <p className="mt-3 font-mono text-xs tracking-[0.06em] text-dusk">
@@ -331,12 +331,12 @@ export default async function DashboardPage() {
                   sizes="(max-width: 768px) 100vw, 30vw"
                   className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
                 />
-                <span className="absolute right-3 top-3 z-10 rounded-full border border-[color:var(--hairline-strong)] bg-[rgba(5,5,10,0.6)] px-2 py-1 font-mono text-[9px] uppercase tracking-[0.14em] text-ink/80 backdrop-blur-sm">
+                <span className="absolute right-3 top-3 z-10 rounded-full border border-[color:var(--hairline-strong)] bg-[rgba(28,23,55,0.6)] px-2 py-1 font-mono text-[9px] uppercase tracking-[0.14em] text-ink/80 backdrop-blur-sm">
                   {project.metric}
                 </span>
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute inset-0 rounded-xl shadow-[inset_0_0_0_1px_rgba(29,35,64,0.05)]"
+                  className="pointer-events-none absolute inset-0 rounded-xl shadow-[inset_0_0_0_1px_rgba(43,36,80,0.05)]"
                 />
               </div>
               <figcaption className="mt-3 flex items-baseline justify-between">

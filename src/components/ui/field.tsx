@@ -69,7 +69,7 @@ function FormMessage({
         "rounded-lg border px-4 py-3 text-sm",
         {
           "border-[#EFC9C6] bg-[#FBEFEE] text-[#9E4A45]": tone === "error",
-          "border-[#C4E3D2] bg-[#EFF7F2] text-[#3E7A5C]": tone === "success",
+          "border-[#C5DCD2] bg-[#EEF4F1] text-[#5E9B84]": tone === "success",
           "border-[#EAD9A8] bg-[#FBF6E9] text-[#8A6D1F]": tone === "warning",
           "border-[#C4DAEC] bg-[#EFF5FB] text-[#3E6C94]": tone === "info",
         },

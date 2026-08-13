@@ -74,7 +74,7 @@ export default function Home() {
       {/* Givre impose sa lumière à la route : l'ivoire de
           l'atelier jusque sous l'overscroll, scrollbars et
           contrôles natifs clairs. */}
-      <style>{`html{color-scheme:light}body{background-color:#F1EFE9;color:#1D2340}`}</style>
+      <style>{`html{color-scheme:light}body{background-color:#F1EFE9;color:#2B2450}`}</style>
       <main className="pv-light min-h-screen bg-paper text-ink">
         <script
           type="application/ld+json"

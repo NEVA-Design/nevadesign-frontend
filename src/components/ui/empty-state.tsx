@@ -26,7 +26,7 @@ export function EmptyState({
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 h-40 w-72 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(124,106,255,0.08),transparent_70%)]"
+        className="pointer-events-none absolute left-1/2 top-0 h-40 w-72 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(164,139,232,0.08),transparent_70%)]"
       />
       <Image
         src="/brand/logo-noir.png"

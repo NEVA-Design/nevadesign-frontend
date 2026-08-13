@@ -49,7 +49,7 @@ export function Modal({
       aria-modal="true"
     >
       <div
-        className="absolute inset-0 bg-[rgba(29,35,64,0.38)] backdrop-blur-[8px]"
+        className="absolute inset-0 bg-[rgba(43,36,80,0.38)] backdrop-blur-[8px]"
         onClick={onClose}
         aria-hidden
       />

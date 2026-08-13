@@ -89,13 +89,13 @@ export default function GivreType() {
             /* Base encre sous la mosaïque : les lettres restent encrées
                sur la brume, les miniatures vivent par transparence. */
             backgroundImage:
-              "linear-gradient(rgba(29,35,64,0.44), rgba(29,35,64,0.44)), url(/showcase/cliquez-fill.webp)",
+              "linear-gradient(rgba(43,36,80,0.44), rgba(43,36,80,0.44)), url(/showcase/cliquez-fill.webp)",
             backgroundSize: "cover, cover",
             backgroundPosition: "50% 50%, 50% 50%",
             WebkitBackgroundClip: "text",
             backgroundClip: "text",
             color: "transparent",
-            WebkitTextStroke: "1px rgba(29,35,64,0.24)",
+            WebkitTextStroke: "1px rgba(43,36,80,0.24)",
           }}
         >
           {word}
