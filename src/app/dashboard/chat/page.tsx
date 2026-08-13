@@ -83,7 +83,7 @@ function formatInline(text: string): React.ReactNode[] {
         <a
           key={i}
           href={link[2]}
-          className="text-[color:var(--num-color)] underline decoration-violet/40 underline-offset-2 transition-colors duration-300 hover:text-cyan"
+          className="text-[color:var(--num-color)] underline decoration-violet/40 underline-offset-2 transition-colors duration-300 hover:text-ink"
         >
           {link[1]}
         </a>
@@ -529,7 +529,7 @@ export default function ChatPage() {
       <header className="relative z-20 flex h-[60px] shrink-0 items-center justify-between gap-3 border-b border-[color:var(--hairline)] px-4 sm:px-6">
         <div className="flex min-w-0 items-center gap-3.5">
           <h1 className="pv-display truncate text-[17px] text-ink sm:text-lg">
-            Creative <span className="pv-beam-text">Director</span>
+            Creative <span className="pv-beam-underline font-medium text-ink">Director</span>
           </h1>
           <span aria-hidden className="hidden h-4 w-px shrink-0 bg-[color:var(--hairline-strong)] md:block" />
           <p className="hidden truncate font-mono text-[10px] uppercase tracking-[0.14em] text-dusk md:block">
@@ -619,6 +619,8 @@ export default function ChatPage() {
 
       {/* ── Fil de messages éditorial ─────────────────────────── */}
       <div className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-6 sm:px-6">
+        {/* filigrane ΛV — le vide de l'accueil est composé (D40) */}
+        <svg aria-hidden viewBox="0 0 1441 1000" className="pointer-events-none absolute left-1/2 top-1/2 w-[420px] -translate-x-1/2 -translate-y-1/2 fill-[rgba(43,36,80,0.03)]"><path d="M440.2 0 L864.6 1000 L694.6 1000 L441 379 L180.1 1000 L0 1000 Z" /><path d="M439.5 710 L559.2 1000 L320 1000 Z" /><path d="M575 0 L755.1 0 L1013 618 L1266.6 0 L1438.1 0 L1015.2 990 Z" /><path d="M893.4 0 L1134.1 0 L1013.7 292 Z" /></svg>
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-7">
           {messages.map((msg, i) =>
             msg.role === "user" ? (
@@ -671,7 +673,7 @@ export default function ChatPage() {
                             a.download = `neva-${Date.now()}.webp`;
                             a.click();
                           }}
-                          className="flex min-h-[40px] items-center gap-1.5 rounded-lg px-2.5 font-mono text-[10px] uppercase tracking-[0.1em] text-[color:var(--num-color)] transition-colors duration-300 hover:text-cyan"
+                          className="flex min-h-[40px] items-center gap-1.5 rounded-lg px-2.5 font-mono text-[10px] uppercase tracking-[0.1em] text-[color:var(--num-color)] transition-colors duration-300 hover:text-ink"
                         >
                           <Download size={11} />
                           Télécharger
@@ -810,7 +812,7 @@ export default function ChatPage() {
                   : "Demandez une direction artistique, un prompt ou une idée de campagne…"
               }
               rows={1}
-              className="max-h-[120px] min-h-[24px] flex-1 resize-none bg-transparent py-2 text-sm leading-relaxed text-ink outline-none placeholder:text-ink/25"
+              className="max-h-[120px] min-h-[24px] flex-1 resize-none bg-transparent py-2 text-sm leading-relaxed text-[#F6F3EE] outline-none placeholder:text-[rgba(246,243,238,0.42)]"
             />
             {(pendingAttachments.length > 0 || hasImageIntent(input)) && (
               <button

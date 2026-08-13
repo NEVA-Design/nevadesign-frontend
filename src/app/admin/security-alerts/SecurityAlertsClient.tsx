@@ -96,7 +96,7 @@ export function SecurityAlertsClient({ initialAlerts }: { initialAlerts: SignupS
         eyebrow="Prévention des abus"
         title={
           <>
-            Alertes de <span className="pv-beam-text">sécurité.</span>
+            Alertes de <span className="pv-beam-underline font-medium text-ink">sécurité.</span>
           </>
         }
         description="Contrôlez l'attribution des créations gratuites suspectes sans bloquer les comptes."

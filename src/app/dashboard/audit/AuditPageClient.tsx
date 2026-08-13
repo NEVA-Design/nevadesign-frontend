@@ -168,7 +168,7 @@ export default function AuditPageClient() {
             type="button"
             onClick={() => inputRef.current?.click()}
             aria-label="Téléverser le visuel à auditer"
-            className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-[color:var(--hairline-strong)] bg-abyss text-left transition-colors duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] hover:border-[rgba(164,139,232,0.45)]"
+            className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-[rgba(246,243,238,0.22)] bg-abyss text-left transition-colors duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] hover:border-[rgba(164,139,232,0.45)]"
           >
             {sourceImage ? (
               <Image src={sourceImage.preview} alt="Visuel téléversé" fill sizes="380px" className="object-contain" />
@@ -200,7 +200,7 @@ export default function AuditPageClient() {
                   onClick={() => setAssetType(type.id)}
                   className={`min-h-[40px] rounded-lg border px-3 py-2 text-[13px] transition-colors duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] ${
                     assetType === type.id
-                      ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
+                      ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
                       : "border-[color:var(--hairline)] text-steel hover:border-[#C9C9C0] hover:text-ink"
                   }`}
                 >
@@ -220,7 +220,7 @@ export default function AuditPageClient() {
                   onClick={() => setReportLanguage(language.id)}
                   className={`min-h-[40px] rounded-lg border px-3 py-2 text-[13px] transition-colors duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] ${
                     reportLanguage === language.id
-                      ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
+                      ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
                       : "border-[color:var(--hairline)] text-steel hover:border-[#C9C9C0] hover:text-ink"
                   }`}
                 >

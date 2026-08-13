@@ -134,7 +134,7 @@ export function AdminNewsletterClient({
         eyebrow="Newsletter"
         title={
           <>
-            Campagne de <span className="pv-beam-text">conversion.</span>
+            Campagne de <span className="pv-beam-underline font-medium text-ink">conversion.</span>
           </>
         }
         description="Préparez un e-mail, testez-le sur votre boîte, puis envoyez-le à une audience précise."

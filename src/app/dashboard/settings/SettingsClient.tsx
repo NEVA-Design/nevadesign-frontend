@@ -225,7 +225,7 @@ export default function SettingsClient({
               >
                 <span
                   className={`font-mono text-[10px] tracking-[0.12em] ${
-                    active ? "text-[color:var(--num-color)]" : "text-ink/25"
+                    active ? "text-[color:var(--num-color)]" : "text-ink/40"
                   }`}
                 >
                   0{index + 1}
@@ -300,12 +300,21 @@ export default function SettingsClient({
                     />
                   </div>
                   <div>
-                    <Label htmlFor="settings-email">Adresse e-mail</Label>
+                    <div className="mb-2 flex items-baseline justify-between">
+                      <Label htmlFor="settings-email" className="mb-0">
+                        Adresse e-mail
+                      </Label>
+                      <span className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-dusk">
+                        Identifiant du compte
+                      </span>
+                    </div>
+                    {/* valeur réelle : encre pleine, jamais l'allure
+                        d'un placeholder (D42) */}
                     <Input
                       id="settings-email"
                       value={email}
                       readOnly
-                      className="cursor-default select-all text-steel"
+                      className="cursor-default select-all bg-[rgba(43,36,80,0.03)] text-ink"
                     />
                   </div>
                 </div>
@@ -336,7 +345,8 @@ export default function SettingsClient({
               </div>
 
               <StatusMessage status={profileStatus} />
-              <div className="mt-6 flex justify-end">
+              {/* barre d'action ancrée à la carte du formulaire (D42) */}
+              <div className="mt-8 flex justify-end border-t border-[color:var(--hairline)] pt-5">
                 <Button onClick={saveProfile} disabled={profileSaving}>
                   {profileSaving ? (
                     <><Loader2 size={13} className="animate-spin" />Enregistrement…</>

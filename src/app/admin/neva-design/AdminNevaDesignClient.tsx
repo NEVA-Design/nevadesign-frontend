@@ -264,7 +264,7 @@ export function AdminNevaDesignClient({
         eyebrow="Portfolio"
         title={
           <>
-            <span className="pv-beam-text">Vitrine</span> Neva Design.
+            <span className="pv-beam-underline font-medium text-ink">Vitrine</span> Neva Design.
           </>
         }
         description="Les visuels et projets publics affichés sur la page Neva Design."

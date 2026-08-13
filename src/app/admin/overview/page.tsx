@@ -122,7 +122,7 @@ export default async function AdminOverviewPage() {
         eyebrow="Console"
         title={
           <>
-            Vue <span className="pv-beam-text">d&apos;ensemble.</span>
+            Vue <span className="pv-beam-underline font-medium text-ink">d&apos;ensemble.</span>
           </>
         }
         description="Revenu, croissance, usage et abus de crédits gratuits — l'activité du studio sur un seul écran."

@@ -72,8 +72,8 @@ export default function PromptPage() {
                   disabled
                   className={`h-10 rounded-lg border px-3 text-[13px] transition-colors duration-300 disabled:cursor-not-allowed ${
                     index === 0
-                      ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
-                      : "border-[color:var(--hairline)] text-steel"
+                      ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
+                      : "border-carte-brd bg-carte text-slate"
                   }`}
                 >
                   {engine}
@@ -92,8 +92,8 @@ export default function PromptPage() {
                   disabled
                   className={`h-10 rounded-lg border px-3.5 font-mono text-[11px] tracking-[0.06em] transition-colors duration-300 disabled:cursor-not-allowed ${
                     index === 0
-                      ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
-                      : "border-[color:var(--hairline)] text-steel"
+                      ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
+                      : "border-carte-brd bg-carte text-slate"
                   }`}
                 >
                   {preset}
@@ -113,29 +113,32 @@ export default function PromptPage() {
           </div>
         </div>
 
-        {/* Sortie */}
+        {/* Sortie — panneau encre structuré (D22) */}
         <div className="pv-glass pv-edge rounded-2xl flex min-h-[420px] flex-col overflow-hidden">
-          <div className="flex items-center justify-between border-b border-[color:var(--hairline)] bg-abyss px-5 py-3">
-            <span className="pv-label">Prompt généré</span>
+          <div className="pv-encre-panel flex items-center justify-between border-b border-[rgba(246,243,238,0.1)] px-5 py-3">
+            <span className="pv-label relative">Prompt généré</span>
             <button
               type="button"
               disabled
-              className="inline-flex h-10 items-center gap-1.5 rounded-lg px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-dusk disabled:cursor-not-allowed"
+              className="relative inline-flex h-10 items-center gap-1.5 rounded-lg px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[rgba(246,243,238,0.45)] disabled:cursor-not-allowed"
             >
               <Copy size={11} />
               Copier
             </button>
           </div>
 
-          <div className="relative flex-1 bg-abyss p-5 font-mono text-[13px] leading-relaxed sm:p-6">
-            <div aria-hidden className="pv-halo--violet pv-halo right-8 top-10 h-40 w-40 opacity-60" />
-            <p className="text-dusk">Votre prompt s&apos;affichera ici après la génération…</p>
-            <div className="mt-8 flex flex-col gap-2.5" aria-hidden>
-              <div className="pv-skeleton h-3 w-full" />
-              <div className="pv-skeleton h-3 w-5/6" />
-              <div className="pv-skeleton h-3 w-2/3" />
-              <div className="pv-skeleton h-3 w-1/2" />
-            </div>
+          <div className="pv-encre-panel relative flex-1 p-5 font-mono text-[13px] leading-relaxed sm:p-6">
+            <div aria-hidden className="pv-halo--violet pv-halo right-8 top-10 h-40 w-40 opacity-40" />
+            <p className="relative text-[rgba(246,243,238,0.82)]">
+              Choisissez un moteur et une ambiance — le prompt complet se
+              compose ici, prêt à copier.
+            </p>
+            <p className="relative mt-6 text-[rgba(246,243,238,0.4)]">Exemple de sortie :</p>
+            <p className="relative mt-2 text-[12px] leading-[1.8] text-[rgba(246,243,238,0.58)]">
+              cinematic portrait of a masked street racer, neon rain,
+              midnight rooftop, volumetric light, 85mm, hyperdetailed,
+              --ar 16:9 --style raw
+            </p>
           </div>
 
           <div className="flex flex-col gap-2 border-t border-[color:var(--hairline)] p-4 sm:flex-row">

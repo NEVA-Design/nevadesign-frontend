@@ -215,7 +215,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="group flex min-h-[72px] w-full items-center gap-4 rounded-lg border border-dashed border-[color:var(--hairline-strong)] bg-abyss p-3 text-left transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)]"
+                className="group flex min-h-[72px] w-full items-center gap-4 rounded-lg border border-dashed border-[rgba(246,243,238,0.22)] bg-abyss p-3 text-left transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)]"
               >
                 {sourceImage ? (
                   <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-[color:var(--hairline)]">
@@ -261,7 +261,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
                       aria-pressed={isActive}
                       className={`w-full rounded-lg border px-4 py-3 text-left transition-colors duration-300 ${
                         isActive
-                          ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)]"
+                          ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)]"
                           : "border-[color:var(--hairline)] hover:border-[#C9C9C0]"
                       }`}
                     >
@@ -306,7 +306,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
                       aria-pressed={isActive}
                       className={`min-h-[56px] rounded-lg border px-3 py-2.5 text-left transition-colors duration-300 ${
                         isActive
-                          ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
+                          ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
                           : "border-[color:var(--hairline)] text-steel hover:text-ink"
                       }`}
                     >
@@ -339,7 +339,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
                       aria-pressed={isActive}
                       className={`min-h-[40px] rounded-lg border px-3 py-2 text-xs transition-colors duration-300 ${
                         isActive
-                          ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
+                          ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
                           : "border-[color:var(--hairline)] text-steel hover:text-ink"
                       }`}
                     >
@@ -575,7 +575,7 @@ function PreviewPanel({
 }) {
   if (!image) {
     return (
-      <div className="flex aspect-[4/3] min-h-[260px] items-center justify-center rounded-xl border border-dashed border-[color:var(--hairline-strong)] bg-abyss">
+      <div className="flex aspect-[4/3] min-h-[260px] items-center justify-center rounded-xl border border-dashed border-[rgba(246,243,238,0.22)] bg-abyss">
         <div className="flex flex-col items-center gap-3 px-6 text-center">
           {loading ? (
             <Spinner />

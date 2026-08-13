@@ -115,7 +115,7 @@ export function AdminMaintenanceClient({
         eyebrow="Console"
         title={
           <>
-            Fermer le <span className="pv-beam-text">rideau.</span>
+            Fermer le <span className="pv-beam-underline font-medium text-ink">rideau.</span>
           </>
         }
         description="Coupez l'accès public au site, personnalisez le message affiché et programmez une fenêtre d'intervention."

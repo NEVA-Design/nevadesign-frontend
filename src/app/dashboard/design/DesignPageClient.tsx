@@ -600,7 +600,7 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
       disabled
         ? "cursor-not-allowed border-[color:var(--hairline)] text-ink/15"
         : active
-          ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
+          ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
           : "border-[color:var(--hairline-strong)] bg-white/70 text-steel hover:border-[#C9C9C0] hover:text-ink"
     }`;
 
@@ -637,7 +637,7 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
             <div
               className={`pv-glass overflow-hidden !rounded-2xl transition-colors duration-300 ${
                 isDraggingReference
-                  ? "!border-[rgba(164,139,232,0.5)] !bg-[rgba(164,139,232,0.06)]"
+                  ? "!border-[color:var(--color-ink)] !bg-[rgba(164,139,232,0.12)]"
                   : ""
               }`}
               onDragEnter={(event) => {
@@ -881,7 +881,7 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
                                 {m.name}
                                 {locked && <Lock size={10} className="text-ink/25" />}
                               </span>
-                              <span className="mt-0.5 block truncate text-[11px] text-dusk">{m.description}</span>
+                              <span className="mt-0.5 line-clamp-2 block text-[11px] leading-snug text-dusk">{m.description}</span>
                             </span>
                             <span className="shrink-0 font-mono text-[10px] text-steel">
                               {m.creditCost} cr
@@ -974,7 +974,7 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
                           aria-label={`Format ${r.label}`}
                           className={`flex h-10 w-11 items-center justify-center rounded-lg border transition-colors duration-300 ${
                             active
-                              ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)]"
+                              ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)]"
                               : "border-[color:var(--hairline-strong)] hover:border-[#C9C9C0]"
                           }`}
                         >
@@ -1389,7 +1389,7 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
                     )}
                     <ArrowUpRight
                       size={14}
-                      className="translate-y-0.5 text-ink/25 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-cyan"
+                      className="translate-y-0.5 text-ink/25 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-ink"
                     />
                   </span>
                 </span>
@@ -1423,7 +1423,7 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
                 </span>
                 <ArrowUpRight
                   size={14}
-                  className="shrink-0 text-ink/25 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-cyan"
+                  className="shrink-0 text-ink/25 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-ink"
                 />
               </button>
             ))}

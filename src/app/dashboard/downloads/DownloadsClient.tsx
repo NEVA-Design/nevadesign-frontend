@@ -35,7 +35,7 @@ export default function DownloadsClient({ ownedPacks, successPack }: Props) {
       <div className="relative mb-10">
         <p className="pv-label text-[color:var(--num-color)]">Ressources</p>
         <h1 className="pv-display mt-4 text-[clamp(1.9rem,3.4vw,2.6rem)] text-ink">
-          Vos <span className="pv-beam-text">ressources.</span>
+          Vos <span className="pv-beam-underline font-medium text-ink">ressources.</span>
         </h1>
         <p className="mt-3 max-w-xl text-sm leading-relaxed text-steel">
           Vos packs achetés, disponibles en téléchargement.

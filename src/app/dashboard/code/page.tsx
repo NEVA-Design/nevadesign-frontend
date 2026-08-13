@@ -62,8 +62,8 @@ export default function CodePage() {
                   disabled
                   className={`h-10 flex-1 rounded-lg border px-3 font-mono text-[11px] uppercase tracking-[0.1em] transition-colors duration-300 disabled:cursor-not-allowed ${
                     index === 0
-                      ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
-                      : "border-[color:var(--hairline)] text-steel"
+                      ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
+                      : "border-carte-brd bg-carte text-slate"
                   }`}
                 >
                   {framework}
@@ -118,34 +118,41 @@ export default function CodePage() {
           </section>
         </div>
 
-        {/* Sortie — éditeur en veilleuse */}
+        {/* Sortie — le panneau encre du studio (D22) : en-tête
+            structuré, grain léger, état vide dessiné (une invite
+            et un vrai exemple — plus de faux code fantôme) */}
         <div className="pv-glass pv-edge rounded-2xl flex min-h-[420px] flex-col overflow-hidden lg:col-span-3">
-          <div className="flex items-center justify-between border-b border-[color:var(--hairline)] bg-abyss px-5 py-3">
-            <div className="flex gap-1.5" aria-hidden>
-              <span className="h-2.5 w-2.5 rounded-full bg-ink/10" />
-              <span className="h-2.5 w-2.5 rounded-full bg-ink/10" />
-              <span className="h-2.5 w-2.5 rounded-full bg-ink/10" />
+          <div className="pv-encre-panel flex items-center justify-between border-b border-[rgba(246,243,238,0.1)] px-5 py-3">
+            <div className="relative flex gap-1.5" aria-hidden>
+              <span className="h-2.5 w-2.5 rounded-full bg-[rgba(246,243,238,0.16)]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[rgba(246,243,238,0.16)]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[rgba(246,243,238,0.16)]" />
             </div>
-            <span className="font-mono text-[11px] tracking-[0.06em] text-dusk">output.lua</span>
+            <span className="relative font-mono text-[11px] tracking-[0.06em] text-[rgba(246,243,238,0.72)]">
+              output.lua
+            </span>
             <button
               type="button"
               disabled
-              className="inline-flex h-10 items-center gap-1.5 rounded-lg px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-dusk disabled:cursor-not-allowed"
+              className="relative inline-flex h-10 items-center gap-1.5 rounded-lg px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[rgba(246,243,238,0.45)] disabled:cursor-not-allowed"
             >
               <Copy size={11} />
               Copier
             </button>
           </div>
-          <div className="relative flex-1 bg-abyss p-5 font-mono text-[13px] leading-relaxed sm:p-6">
-            <div aria-hidden className="pv-halo--violet pv-halo right-6 top-8 h-40 w-40 opacity-60" />
-            <p className="text-dusk">-- Votre code généré s&apos;affichera ici.</p>
-            <p className="mt-2 text-ink/20">-- Structure, événements et configuration inclus.</p>
-            <div className="mt-8 flex flex-col gap-2.5" aria-hidden>
-              <div className="pv-skeleton h-3 w-3/4" />
-              <div className="pv-skeleton h-3 w-1/2" />
-              <div className="pv-skeleton h-3 w-2/3" />
-              <div className="pv-skeleton h-3 w-2/5" />
-            </div>
+          <div className="pv-encre-panel relative flex-1 p-5 font-mono text-[13px] leading-relaxed sm:p-6">
+            <div aria-hidden className="pv-halo--violet pv-halo right-6 top-8 h-40 w-40 opacity-40" />
+            <p className="relative text-[rgba(246,243,238,0.82)]">
+              Décrivez votre script à gauche — le code complet arrive ici,
+              prêt à coller dans votre ressource.
+            </p>
+            <p className="relative mt-6 text-[rgba(246,243,238,0.4)]">-- Exemple de sortie :</p>
+            <pre className="relative mt-2 text-[12px] leading-[1.8] text-[rgba(246,243,238,0.58)]">{`RegisterCommand("annonce", function(src, args)
+  local message = table.concat(args, " ")
+  TriggerClientEvent("chat:addMessage", -1, {
+    args = { "[Staff]", message }
+  })
+end, true)`}</pre>
           </div>
         </div>
       </div>

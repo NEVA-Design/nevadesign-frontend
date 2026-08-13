@@ -208,7 +208,7 @@ export function AdminAnnouncementsClient({
         eyebrow="Communication"
         title={
           <>
-            Affichages du <span className="pv-beam-text">produit.</span>
+            Affichages du <span className="pv-beam-underline font-medium text-ink">produit.</span>
           </>
         }
         description="Image de marque, codes promo, nouveautés et messages de mise à jour visibles dans le tableau de bord."

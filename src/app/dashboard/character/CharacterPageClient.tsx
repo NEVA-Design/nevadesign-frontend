@@ -231,9 +231,9 @@ export default function CharacterPageClient() {
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
           {/* ── Table d'examen — le dossier ─────────────────────── */}
-          <section className="pv-glass pv-edge rounded-2xl min-h-[560px] overflow-hidden xl:min-h-[640px]">
+          <section className="pv-glass pv-edge rounded-2xl min-h-[380px] overflow-hidden xl:min-h-[420px]">
             {!result ? (
-              <div className="flex h-full min-h-[560px] flex-col items-center justify-center px-5 py-10 text-center xl:min-h-[640px]">
+              <div className="flex h-full min-h-[380px] flex-col items-center justify-center px-5 py-10 text-center xl:min-h-[420px]">
                 {sourceImage ? (
                   <div className="relative mb-6 aspect-[4/5] w-full max-w-[480px] overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-abyss">
                     <Image src={sourceImage.preview} alt="Personnage téléversé" fill sizes="620px" className="object-contain" />
@@ -301,7 +301,7 @@ export default function CharacterPageClient() {
                   </div>
                 ) : null}
 
-                <div className="relative m-5 min-h-[480px] flex-1 overflow-hidden rounded-xl bg-abyss">
+                <div className="relative m-5 min-h-[360px] flex-1 overflow-hidden rounded-xl bg-abyss">
                   <Image src={result} alt="Dossier de personnage généré" fill sizes="1000px" className="object-contain" />
                 </div>
               </div>
@@ -324,7 +324,7 @@ export default function CharacterPageClient() {
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="group relative flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-lg border border-dashed border-[color:var(--hairline-strong)] bg-abyss transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)]"
+                className="group relative flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-lg border border-dashed border-[rgba(246,243,238,0.22)] bg-abyss transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)]"
               >
                 {sourceImage ? (
                   <Image src={sourceImage.preview} alt="Personnage téléversé" fill sizes="430px" className="object-contain" />
@@ -425,7 +425,7 @@ export default function CharacterPageClient() {
                       aria-pressed={isActive}
                       className={`flex min-h-[64px] items-start gap-2.5 rounded-lg border px-3 py-2.5 text-left transition-colors duration-300 ${
                         isActive
-                          ? "border-[rgba(164,139,232,0.5)] bg-[rgba(164,139,232,0.08)]"
+                          ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)]"
                           : "border-[color:var(--hairline)] hover:border-[#C9C9C0]"
                       }`}
                     >

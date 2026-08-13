@@ -12,20 +12,22 @@
    ════════════════════════════════════════════════════════════════════ */
 
 @theme {
-  /* ── Fonds de scène — brumes glacées ──────────────────────── */
-  --color-frost: #EEF0F7;       /* base de page, brume bleutée */
-  --color-pearl: #E4E6EF;       /* perle : creux des scènes */
+  /* ── Fonds de scène — l'ivoire de l'atelier partout (D21) :
+     plus aucune base bleutée, le marketing et le produit vivent
+     dans la même lumière chaude. ─────────────────────────────── */
+  --color-frost: #F1EFE9;       /* base de page — ivoire atelier */
+  --color-pearl: #E9E7E1;       /* creux des scènes, ivoire posé */
   --color-lavender: #C9C6E8;    /* pôle lavande des dégradés */
   --color-periwinkle: #AFC2EC;  /* pôle froid des dégradés */
   --color-glacier: #CBDCF2;     /* hautes lumières de scène */
   --color-aurora: #E9D5E4;      /* aurore rosée, coins ≤ 12 % */
   --color-blush: #F0D6DC;       /* rose des bords — scène dawn */
 
-  /* Alias legacy (composants existants) — remappés Givre */
-  --color-paper: #EEF0F7;       /* = frost */
-  --color-porcelain: #F7F8FC;   /* surfaces posées, blanc froid */
-  --color-linen: #E4E6EF;       /* = pearl */
-  --color-atelier: #ECEEF6;     /* fond produit (dashboard) */
+  /* Alias legacy (composants existants) — remappés atelier */
+  --color-paper: #F1EFE9;       /* = frost */
+  --color-porcelain: #FAF8F4;   /* surfaces posées, blanc chaud */
+  --color-linen: #E9E7E1;       /* = pearl */
+  --color-atelier: #F0EEEA;     /* fond produit — ivoire, pointe lilas */
 
   /* ── Encres — violet nuit teinté, jamais de noir ni de bleu
      froid (passe « encre aurore » 13/08) ─────────────────────── */
@@ -52,12 +54,15 @@
   --color-carte-brd: #D8D5CE;
   --color-sauge: #5E9B84;       /* unique couleur de validation */
 
-  /* ── Texte sur îlots sombres ──────────────────────────────── */
-  --color-steel: #A6ABC4;
-  --color-dusk: #767C99;
+  /* ── Texte secondaire produit (fond clair) — violets-gris ;
+     sur surface encre, la règle D36 les remappe en ivoire ─────── */
+  --color-steel: #6B647F;       /* secondaire — 5:1 sur ivoire */
+  --color-dusk: #837C95;        /* métadonnées décor — 3,8:1 */
 
-  /* ── États système (fond clair) ───────────────────────────── */
-  --color-ok: #5E9B84;
+  /* ── États système (fond clair) ───────────────────────────────
+     ok en TEXTE = sauge encrée (AA 4,7:1) ; la sauge du brief
+     (#5E9B84, --color-sauge) reste celle des coches et fonds. */
+  --color-ok: #3A7560;
   --color-err: #9E4A45;
   --color-warn: #8A6D1F;
   --color-info: #3E6C94;
@@ -1057,6 +1062,53 @@ html {
   transform-origin: left;
 }
 
+/* ═══ Surfaces encre — la règle D36 ══════════════════════════
+   Sur toute surface encre (bg-abyss / bg-void), le texte est
+   ivoire : primaire #F6F3EE, secondaire 58 %. Les classes d'encre
+   sombre posées par habitude y sont neutralisées — plus jamais
+   d'encre sur encre, où que ce soit dans le produit. */
+.bg-abyss,
+.bg-void {
+  color: #F6F3EE;
+}
+.bg-abyss :is(.text-ink, .text-slate),
+.bg-void :is(.text-ink, .text-slate) {
+  color: #F6F3EE;
+}
+.bg-abyss :is(.text-mist, .text-dusk),
+.bg-void :is(.text-mist, .text-dusk),
+.pv-encre-panel :is(.text-mist, .text-dusk) {
+  color: rgba(246, 243, 238, 0.58);
+}
+.bg-abyss .text-steel,
+.bg-void .text-steel,
+.pv-encre-panel .text-steel {
+  color: rgba(246, 243, 238, 0.72);
+}
+.bg-abyss .pv-label,
+.bg-void .pv-label,
+.pv-encre-panel .pv-label {
+  color: rgba(246, 243, 238, 0.72);
+}
+
+/* Panneau encre — la surface de sortie (code, prompt, aperçus) :
+   l'encre #241F45 sous un grain léger, structurée par son en-tête. */
+.pv-encre-panel {
+  position: relative;
+  background: var(--color-void);
+  color: #F6F3EE;
+}
+.pv-encre-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  opacity: 0.05;
+  mix-blend-mode: screen;
+}
+
 /* ═══ Structure ══════════════════════════════════════════════ */
 
 .pv-hairline {
@@ -1073,6 +1125,47 @@ html {
   height: 1px;
   border: none;
   background: linear-gradient(90deg, transparent, rgba(164, 139, 232, 0.4) 30%, rgba(239, 184, 148, 0.4) 70%, transparent);
+}
+
+/* ═══ Chips de réglage — l'état se lit sans effort (D26/D39) ══
+   off : carte ivoire, liseré défini, texte encre-texte.
+   on : fond lilas 12 %, liseré encre 1 px, coche. */
+.pv-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid var(--color-carte-brd);
+  background: var(--color-carte);
+  color: var(--color-slate);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: border-color 0.3s var(--ease-smooth), background-color 0.3s var(--ease-smooth),
+    color 0.3s var(--ease-smooth);
+}
+.pv-chip:hover:not(:disabled):not(.pv-chip--on) {
+  border-color: var(--color-mist);
+  color: var(--color-ink);
+}
+.pv-chip:disabled {
+  cursor: not-allowed;
+}
+.pv-chip--on {
+  background: rgba(164, 139, 232, 0.12);
+  border-color: var(--color-ink);
+  color: var(--color-ink);
+}
+.pv-chip--on::before {
+  content: "✓";
+  font-size: 10px;
+  line-height: 1;
+  color: var(--color-ink);
 }
 
 /* ═══ Champs ═════════════════════════════════════════════════ */

@@ -177,7 +177,7 @@ export default async function DashboardPage() {
                   <div className="truncate text-sm text-ink">{item.title}</div>
                   <div className="truncate text-xs text-steel">{item.message}</div>
                 </div>
-                {item.cta_label ? <ArrowRight size={14} className="shrink-0 text-cyan" /> : null}
+                {item.cta_label ? <ArrowRight size={14} className="shrink-0 text-mist" /> : null}
               </div>
             );
             return item.href ? (
@@ -194,7 +194,7 @@ export default async function DashboardPage() {
         <div>
           <p className="pv-label text-[color:var(--num-color)]">Atelier</p>
           <h1 className="pv-display mt-4 text-[clamp(2.2rem,4.5vw,3.4rem)] text-ink">
-            {greeting()}, <span className="pv-beam-text">{firstName}.</span>
+            {greeting()}, <span className="pv-beam-underline font-medium text-ink">{firstName}.</span>
           </h1>
           <p className="mt-3 max-w-xl text-sm leading-relaxed text-steel">
             Vos créations, vos crédits et votre pipeline visuel, réunis sur un seul plan de travail.
@@ -252,7 +252,7 @@ export default async function DashboardPage() {
                     {action.label}
                     <ArrowUpRight
                       size={13}
-                      className="text-dusk transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-cyan"
+                      className="text-dusk transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink"
                     />
                   </span>
                   <span className="mt-1 block text-xs leading-relaxed text-steel">{action.detail}</span>
@@ -317,7 +317,7 @@ export default async function DashboardPage() {
           <h2 className="text-xl font-semibold tracking-[-0.01em] text-ink">Bibliothèque de création</h2>
           <Link href="/neva-design#portfolio" className="pv-link inline-flex items-center gap-2 text-[13px]">
             Ouvrir la galerie
-            <ArrowRight size={13} className="text-cyan" />
+            <ArrowRight size={13} className="text-mist" />
           </Link>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
