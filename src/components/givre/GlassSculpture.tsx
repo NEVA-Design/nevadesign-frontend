@@ -133,13 +133,25 @@ const BACK_WALL_Z = 14;
    minces. Une tache principale derrière la sculpture, un rai
    secondaire discret à droite. Le centre du plateau reste PROPRE :
    aucune brume, aucune lueur diffuse. */
-const SLANT = 0.42;
+/* Angle unique des lames : 22,0° exactement (tan 22° = 0,404). */
+const SLANT = 0.404;
 const paneU = (wx: number, wy: number) => wx - (wy - FLOOR_Y) * SLANT;
 
-/* Tache principale : u ∈ [-0.7, 1.9], du congé à y = 6.1 */
-const PANE_A = { u0: -0.7, u1: 1.9, yTop: 6.1 };
-/* Rai secondaire : u ∈ [6.1, 7.5], plus bas et discret */
-const PANE_B = { u0: 6.1, u1: 7.5, yTop: 3.4 };
+/* Trois lames — bords adoucis ≥ 40 px (0,35 unité à 116 px/unité) */
+const PANE_A = { u0: -0.9, u1: 1.15, yTop: 6.3 }; /* principale */
+const PANE_A2 = { u0: 1.75, u1: 2.6, yTop: 5.2 }; /* fine compagne */
+const PANE_B = { u0: 6.1, u1: 7.5, yTop: 3.4 }; /* discrète, droite */
+const PANE_SOFT = 0.35;
+
+/* Derrière la sculpture, les lames s'effacent (−50 % de gain) : le
+   verre garde son propre modelé au lieu d'être lavé par la lumière. */
+function sculptShield(wx: number, wy: number): number {
+  return (
+    1 -
+    0.5 *
+      smoothstep(1.0, 0.3, Math.hypot((wx - MONO_X) / 2.35, (wy - 1.35) / 1.95))
+  );
+}
 
 /* Retourne [lumière, ombre-de-croisillon] sur le mur. */
 function paneWall(wx: number, wy: number): [number, number] {
@@ -147,25 +159,27 @@ function paneWall(wx: number, wy: number): [number, number] {
   /* les rais meurent avant le congé : le creux du cyc reste vierge */
   const aboveCove = smoothstep(FLOOR_Y + 0.45, FLOOR_Y + 1.05, wy);
   const a =
-    slab(u, PANE_A.u0, PANE_A.u1, 0.08) *
-    slab(wy, FLOOR_Y + 0.5, PANE_A.yTop, 0.14) *
+    slab(u, PANE_A.u0, PANE_A.u1, PANE_SOFT) *
+    slab(wy, FLOOR_Y + 0.5, PANE_A.yTop, 0.6) *
+    aboveCove;
+  const a2 =
+    slab(u, PANE_A2.u0, PANE_A2.u1, PANE_SOFT) *
+    slab(wy, FLOOR_Y + 0.5, PANE_A2.yTop, 0.6) *
     aboveCove;
   const b =
-    slab(u, PANE_B.u0, PANE_B.u1, 0.08) *
-    slab(wy, FLOOR_Y + 0.5, PANE_B.yTop, 0.14) *
+    slab(u, PANE_B.u0, PANE_B.u1, PANE_SOFT) *
+    slab(wy, FLOOR_Y + 0.5, PANE_B.yTop, 0.6) *
     aboveCove;
-  /* la tache respire vers sa source (haut-gauche) */
-  const srcA = 0.7 + 0.42 * smoothstep(1.9, -0.7, u) * smoothstep(-0.6, 4.4, wy);
-  const gain = a * srcA * 0.038 + b * 0.018;
-  /* croisillons fins : deux montants + une traverse (il passe
-     toujours un carreau derrière chaque pièce de verre), un
-     montant dans le rai secondaire */
+  /* falloff vertical : la lame respire vers sa source (haut-gauche) */
+  const srcA = 0.66 + 0.4 * smoothstep(1.9, -0.9, u) * smoothstep(-0.6, 4.6, wy);
+  const shield = sculptShield(wx, wy);
+  const gain = (a * srcA * 0.052 + a2 * 0.028 + b * 0.018) * shield;
+  /* croisillons : deux montants + une traverse, adoucis */
   let shade = 0;
-  shade += bandf(u, -0.05, 0.05, 0.032) * a;
-  shade += bandf(u, 1.15, 0.05, 0.032) * a;
-  shade += bandf(wy, 2.3, 0.045, 0.03) * a;
-  shade += bandf(u, 6.8, 0.055, 0.036) * b;
-  return [gain, shade * 0.042];
+  shade += bandf(u, -0.12, 0.05, 0.06) * a;
+  shade += bandf(wy, 2.3, 0.045, 0.06) * a;
+  shade += bandf(u, 6.8, 0.055, 0.06) * b;
+  return [gain, shade * 0.038 * shield];
 }
 
 /* ── L'accent Neva — la lame d'aube spectrale ───────────────────
@@ -175,8 +189,10 @@ function paneWall(wx: number, wy: number): [number, number] {
    la réfracte : elle réapparaît pliée dans le monogramme. */
 const ACCENT_X = 4.35;
 const ACCENT_TOP = 3.05;
-const VIOLET: readonly number[] = [0.486, 0.416, 1.0];
-const CYAN: readonly number[] = [0.298, 0.788, 0.941];
+/* La lame d'aube parle désormais la langue du site : lilas en
+   tête → pêche au sol (le spectre violet→cyan est banni). */
+const VIOLET: readonly number[] = [0.643, 0.545, 0.91];
+const CYAN: readonly number[] = [0.937, 0.722, 0.58];
 
 function accentWall(wx: number, wy: number): [number, number, number] {
   const inY = slab(wy, FLOOR_Y - 0.1, ACCENT_TOP, 0.55);
@@ -209,34 +225,39 @@ const cycBlend = (dist: number) => smoothstep(CYC_R + 0.35, 0.0, dist);
 const cycOcc = (dist: number) =>
   Math.pow(smoothstep(CYC_R, 0.0, dist), 1.4);
 
-/* Le halo aurore — l'unique couleur d'ambiance : une lueur d'aube
-   derrière la sculpture, pêche vers le sol, lilas en tête, fondue
-   dans l'ivoire sur les bords. */
-const AUR_CX = MONO_X + 0.1;
-const AUR_CY = 1.6;
-const PEACH: readonly number[] = [0.968, 0.848, 0.762];
-const LILAC: readonly number[] = [0.802, 0.768, 0.918];
+/* Le halo aurore v2 — DEUX lobes gaussiens : lilas haut-gauche du
+   monogramme, pêche bas-droite, fondus dans l'ivoire. Cibles
+   mesurées (rapports/baseline) : au cœur des lobes ΔE OKLab ≥ 8 et
+   chroma ≥ 0,035 vs mur nu ; retour au nu à 1,6 × le rayon.
+   Rayon d'ensemble ≈ 38 % de la largeur viewport (~4,6 unités
+   monde à 1440). Le dither du grain (paintCanvas) tue le banding. */
+const LOBE_LILAC = { cx: MONO_X - 1.7, cy: 2.85, rx: 3.2, ry: 2.3 };
+const LOBE_PEACH = { cx: MONO_X + 1.75, cy: 0.7, rx: 2.55, ry: 2.1 };
+const PEACH: readonly number[] = [0.98, 0.762, 0.598];
+const LILAC: readonly number[] = [0.755, 0.702, 0.918];
+
+/* Gaussienne réelle (fondu sans bord) — nulle au-delà de 1,6 r */
+function lobe(wx: number, wy: number, L: { cx: number; cy: number; rx: number; ry: number }) {
+  const rr = Math.hypot((wx - L.cx) / L.rx, (wy - L.cy) / L.ry);
+  if (rr >= 1.6) return 0;
+  return Math.exp(-rr * rr * 2.6) * smoothstep(1.6, 1.15, rr);
+}
 
 function auroraWall(wx: number, wy: number): [number, number, number] {
-  const rr = Math.hypot((wx - AUR_CX) / 3.4, (wy - AUR_CY) / 3.0);
-  const glow = smoothstep(1.0, 0.1, rr);
-  if (glow <= 0.001) return [0, 0, 0];
-  const tv = smoothstep(AUR_CY - 2.6, AUR_CY + 2.4, wy);
-  const tint = lerp3(PEACH, LILAC, tv);
-  /* cœur d'aube plus chaud, bas, juste derrière le monogramme */
-  const core = smoothstep(1.0, 0.0, Math.hypot((wx - AUR_CX) / 1.6, (wy - 0.3) / 1.15));
+  const gl = lobe(wx, wy, LOBE_LILAC);
+  const gp = lobe(wx, wy, LOBE_PEACH);
+  if (gl + gp <= 0.002) return [0, 0, 0];
+  const wl = gl * 0.78;
+  const wp = gp * 0.88;
   return [
-    tint[0] * glow * 0.58 + PEACH[0] * core * 0.3,
-    tint[1] * glow * 0.58 + PEACH[1] * core * 0.3,
-    tint[2] * glow * 0.58 + PEACH[2] * core * 0.3,
+    LILAC[0] * wl + PEACH[0] * wp,
+    LILAC[1] * wl + PEACH[1] * wp,
+    LILAC[2] * wl + PEACH[2] * wp,
   ];
 }
 /* Poids du halo (0–1) au même point — pour fondre l'ivoire dessous */
 function auroraMask(wx: number, wy: number): number {
-  const rr = Math.hypot((wx - AUR_CX) / 3.4, (wy - AUR_CY) / 3.0);
-  const glow = smoothstep(1.0, 0.1, rr);
-  const core = smoothstep(1.0, 0.0, Math.hypot((wx - AUR_CX) / 1.6, (wy - 0.3) / 1.15));
-  return clamp01(glow * 0.58 + core * 0.3);
+  return clamp01(lobe(wx, wy, LOBE_LILAC) * 0.78 + lobe(wx, wy, LOBE_PEACH) * 0.88);
 }
 
 function wallColor(wx: number, wy: number): [number, number, number] {
@@ -299,39 +320,46 @@ function wallColor(wx: number, wy: number): [number, number, number] {
    verticaux discrets, une caustique au pied du monogramme. */
 function floorColor(wx: number, wz: number): [number, number, number] {
   const nearJ: readonly number[] = [0.952, 0.946, 0.93];
-  const farC: readonly number[] = [0.899, 0.892, 0.872];
+  const farC: readonly number[] = [0.912, 0.905, 0.886];
 
   const d = wz - WALL_Z; /* profondeur depuis le mur */
   const col: number[] = lerp3(nearJ, farC, smoothstep(0.8, 9.0, d));
-  /* vignette studio : l'avant-scène et les bords se referment
-     doucement, en neutre chaud */
-  mix3(col, [0.848, 0.84, 0.822], smoothstep(9.0, 16.5, d) * 0.55);
-  mix3(col, [0.872, 0.865, 0.848], smoothstep(6.2, 10.8, Math.abs(wx)) * 0.4);
+  /* vignette latérale seulement : les BORDS se referment ; la
+     profondeur, elle, remonte vers le mur (voir fondu d'horizon en
+     fin de fonction) — l'ancienne vignette de fond créait la
+     marche claire mesurée à la ligne d'horizon (57 niv/px). */
+  mix3(col, [0.872, 0.865, 0.848], smoothstep(6.2, 10.8, Math.abs(wx)) * 0.4 * (1 - smoothstep(6.0, 14.0, d) * 0.85));
 
-  /* reflet du halo aurore — la lueur d'aube se pose sur le sol,
-     pêche près du mur, fondue en ~2,5 unités */
-  const glowR = smoothstep(1.0, 0.08, Math.hypot((wx - AUR_CX) / 3.1, d / 2.4));
-  if (glowR > 0.001) {
-    const tint = lerp3(PEACH, LILAC, smoothstep(2.2, 0.0, d) * 0.35);
-    const k = glowR * 0.24;
-    col[0] = col[0] * (1 - k) + tint[0] * k;
-    col[1] = col[1] * (1 - k) + tint[1] * k;
-    col[2] = col[2] * (1 - k) + tint[2] * k;
+  /* reflet du halo aurore — le lobe pêche se pose sur le sol,
+     fondu en ~2,5 unités ; une trace lilas plus discrète à gauche */
+  const glowP = smoothstep(1.0, 0.08, Math.hypot((wx - LOBE_PEACH.cx) / 3.0, d / 2.5));
+  if (glowP > 0.001) {
+    const k = glowP * 0.3;
+    col[0] = col[0] * (1 - k) + PEACH[0] * k;
+    col[1] = col[1] * (1 - k) + PEACH[1] * k;
+    col[2] = col[2] * (1 - k) + PEACH[2] * k;
+  }
+  const glowL = smoothstep(1.0, 0.1, Math.hypot((wx - LOBE_LILAC.cx) / 2.6, d / 1.9));
+  if (glowL > 0.001) {
+    const k = glowL * 0.14;
+    col[0] = col[0] * (1 - k) + LILAC[0] * k;
+    col[1] = col[1] * (1 - k) + LILAC[1] * k;
+    col[2] = col[2] * (1 - k) + LILAC[2] * k;
   }
 
-  /* retombée des rais — fine, mourant avant le congé et avant
+  /* retombée des lames — fine, mourant avant le congé et avant
      l'avant-scène */
   const uf = wx - d * SLANT * 0.55;
   const depthFade =
     slab(d, 0.75, 4.4, 0.5) * (1 - smoothstep(2.4, 4.4, d) * 0.6);
-  const fa = slab(uf, PANE_A.u0, PANE_A.u1, 0.12) * depthFade;
-  const fb = slab(uf, PANE_B.u0, PANE_B.u1, 0.12) * depthFade;
-  const gain = fa * 0.042 + fb * 0.022;
+  const fa = slab(uf, PANE_A.u0, PANE_A.u1, PANE_SOFT) * depthFade;
+  const fa2 = slab(uf, PANE_A2.u0, PANE_A2.u1, PANE_SOFT) * depthFade;
+  const fb = slab(uf, PANE_B.u0, PANE_B.u1, PANE_SOFT) * depthFade;
+  const gain = fa * 0.042 + fa2 * 0.02 + fb * 0.022;
   let shade = 0;
-  shade += bandf(uf, -0.28, 0.08, 0.05) * fa;
-  shade += bandf(uf, 0.78, 0.08, 0.05) * fa;
-  shade += bandf(uf, 1.84, 0.08, 0.05) * fa;
-  shade += bandf(uf, 6.9, 0.08, 0.05) * fb;
+  shade += bandf(uf, -0.28, 0.08, 0.09) * fa;
+  shade += bandf(uf, 1.84, 0.08, 0.09) * fa2;
+  shade += bandf(uf, 6.9, 0.08, 0.09) * fb;
   col[0] += gain - shade * 0.04;
   col[1] += gain * 0.99 - shade * 0.038;
   col[2] += gain * 0.985 - shade * 0.032;
@@ -368,16 +396,15 @@ function floorColor(wx: number, wz: number): [number, number, number] {
       Math.hypot((wx - RING_X - 0.13) / 0.55, (wz - RING_Z - 0.24) / 0.4)
     ) * 0.5
   );
-  /* ombre douce de la sphère en lévitation */
-  mix3(
-    col,
-    [0.748, 0.738, 0.795],
-    smoothstep(
-      0.85,
-      0.1,
-      Math.hypot((wx - SPHERE_X - 0.1) / 0.6, (wz - SPHERE_Z - 0.1) / 0.45)
-    ) * 0.2
-  );
+  /* ombre de contact de la sphère en lévitation — elliptique,
+     décalée bas-droite (la clé vient du haut-gauche), cœur alpha
+     0,22 et bord fondu ≈ 24 px : elle POSE la sphère dans la scène */
+  const sphD = Math.hypot((wx - SPHERE_X - 0.22) / 0.52, (wz - SPHERE_Z - 0.16) / 0.36);
+  mix3(col, [0.598, 0.585, 0.668], smoothstep(1.0, 0.3, sphD) * 0.22);
+  mix3(col, [0.665, 0.652, 0.728], smoothstep(1.9, 0.85, sphD) * 0.1);
+  /* la bille haute : une ombre plus diffuse (elle flotte à 3,3) */
+  const beadD = Math.hypot((wx - BEAD_X - 0.16) / 0.32, (wz + 0.7 - 0.12) / 0.23);
+  mix3(col, [0.7, 0.688, 0.755], smoothstep(1.0, 0.3, beadD) * 0.09);
 
   /* ── reflets — un cyc peint est mat : traces verticales à peine
      suggérées */
@@ -422,6 +449,17 @@ function floorColor(wx: number, wz: number): [number, number, number] {
   const dist = wz - WALL_Z;
   mix3(col, CYC_SEAT, cycBlend(dist) * 0.85);
   mix3(col, CYC_HOLLOW, cycOcc(dist) * 0.5);
+
+  /* Fondu d'horizon (anti-seam) : en perspective rasante, l'écran
+     colle le sol LOINTAIN contre le bas du mur — les deux doivent
+     porter la même valeur AU MÊME x. Le sol converge donc vers la
+     couleur exacte de la base du mur (halo compris). Preuve visée :
+     dérivée verticale < 2 niveaux/px sur toute colonne. */
+  const horizon = smoothstep(6.5, FLOOR_D - 1.6, d);
+  if (horizon > 0.001) {
+    const wc = wallColor(wx, FLOOR_Y + 0.02);
+    mix3(col, wc as unknown as readonly number[], horizon * 0.97);
+  }
 
   return [
     Math.min(0.985, Math.max(0.14, col[0])),
@@ -471,7 +509,7 @@ function paintCanvas(
    vectoriel 2D sur le canvas AVANT la création de la texture :
    elle vit dans la scène, derrière le verre — le monogramme la
    réfracte. Tout est en positions FIXES : déterministe au pixel. */
-const INK_R = 46, INK_G = 50, INK_B = 86; /* encre ardoise-violet */
+const INK_R = 43, INK_G = 36, INK_B = 80; /* encre aurore #2B2450 */
 
 function drawAtelierLayer(canvas: HTMLCanvasElement) {
   const W = canvas.width;
@@ -504,12 +542,16 @@ function drawAtelierLayer(canvas: HTMLCanvasElement) {
     ctx.stroke();
   }
 
-  /* 2 — la lettre fantôme : le logomark géant en filigrane,
-     décalé derrière/à droite de la sculpture, posé au sol */
-  const GH_H = 5.3;
+  /* 2 — la lettre fantôme : le logomark géant en filigrane, un
+     gaufrage — plus grand et plus doux que v28 (ink ≤ 0,03 desktop,
+     ≤ 0,022 mobile), centré derrière la sculpture, posé au sol.
+     La texture est peinte côté client : l'opacité suit le device. */
+  const GH_H = 6.4;
   const GH_W = GH_H * LOGO_RATIO;
-  const ghCx = MONO_X + 1.35;
-  ctx.fillStyle = ink(0.036);
+  const ghCx = MONO_X + 1.15;
+  const ghInk =
+    typeof window !== "undefined" && window.innerWidth < 640 ? 0.022 : 0.03;
+  ctx.fillStyle = ink(ghInk);
   ctx.beginPath();
   for (const poly of LOGO_POLYS) {
     poly.forEach(([nx, ny], i) => {
@@ -565,17 +607,19 @@ function drawAtelierLayer(canvas: HTMLCanvasElement) {
   ctx.moveTo(X(bx1), dimY - unit * 0.05);
   ctx.lineTo(X(bx1), dimY + unit * 0.05);
   ctx.stroke();
-  /* annotations mono minuscules — jamais dans l'axe des colonnes
-     UI (Terrains vit à droite au-dessus du congé) */
-  ctx.fillStyle = ink(0.1);
+  /* annotations mono — lisibilité de décor assumée (ink 0,42 ≈
+     contraste 2,4:1, cible ≥ 2,2:1) et positions hors de TOUTE
+     colonne de texte : le folio vit haut-gauche (wx −8…−6,
+     wy 6…7,5), le bloc titre à gauche (wy 1,5…5), TERRAINS à
+     droite (wx 5,5…8, wy 2…3,5) — les annotations occupent le
+     haut-centre et le haut-droit, jamais ces zones. */
+  ctx.fillStyle = ink(0.42);
   ctx.font = `${Math.round(unit * 0.13)}px Consolas, monospace`;
   ctx.textAlign = "center";
   ctx.fillText("2260", X((bx0 + bx1) / 2), dimY - unit * 0.07);
   ctx.textAlign = "left";
-  ctx.fillStyle = ink(0.08);
-  ctx.fillText("ΛV — EXTRUSION 0.40", X(6.45), Y(FLOOR_Y + 0.34));
-  ctx.fillText("R 0.05", X(6.45), Y(FLOOR_Y + 0.12));
-  ctx.fillStyle = ink(0.1);
+  ctx.fillText("ΛV — EXTRUSION 0.40", X(6.3), Y(7.0));
+  ctx.fillText("R 0.05", X(6.3), Y(6.76));
   ctx.fillText("BASELINE 0.55", X(-6.85), Y(6.88));
   ctx.fillText("NV—27", X(-6.85), Y(7.12));
 }
@@ -678,16 +722,53 @@ function getAccentCoverTexture() {
   return accentCoverTexture;
 }
 
+/* Le reflet du monogramme sur le sol — la silhouette ΛV couchée
+   vers la caméra, roughness élevée (blur), opacité 0,12 au pied,
+   éteinte en ≈ 120 px (1,05 unité). Le détail que les jurés
+   zooment : il pose la pièce dans la matière du studio. */
+function drawMonogramReflection(canvas: HTMLCanvasElement) {
+  const W = canvas.width;
+  const H = canvas.height;
+  const ctx = canvas.getContext("2d")!;
+  const X = (wx: number) => ((wx - WALL_X0) / WALL_W) * W;
+  const ZP = (wz: number) => (1 - (wz - WALL_Z) / FLOOR_D) * H;
+  /* la rasance de la caméra compresse l'avant-scène : le reflet
+     s'ÉTIRE (×1,4) pour rester lisible à l'écran (~120 px) */
+  const STRETCH = 1.4;
+  const grad = ctx.createLinearGradient(0, ZP(0.32), 0, ZP(0.32 + LOGO_H * STRETCH));
+  grad.addColorStop(0, "rgba(43,36,80,0.16)");
+  grad.addColorStop(0.45, "rgba(52,44,96,0.07)");
+  grad.addColorStop(1, "rgba(43,36,80,0)");
+  ctx.save();
+  ctx.filter = "blur(5px)";
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  for (const poly of LOGO_POLYS) {
+    poly.forEach(([nx, ny], i) => {
+      /* miroir : le pied (ny = 1) reste au contact, le sommet part
+         vers la caméra ; léger écrasement (pose tournée −0,3 rad) */
+      const wxp = MONO_X + 0.06 + (nx - 0.5) * LOGO_H * LOGO_RATIO * 0.95;
+      const wzp = 0.32 + (1 - ny) * LOGO_H * STRETCH;
+      const px = X(wxp);
+      const py = ZP(wzp);
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    });
+    ctx.closePath();
+  }
+  ctx.fill();
+  ctx.restore();
+}
+
 let floorTexture: THREE.CanvasTexture | null = null;
 function getFloorTexture() {
   if (!floorTexture) {
-    floorTexture = makeTexture(
-      paintCanvas(FLOOR_TEX_W, FLOOR_TEX_H, (u, v) =>
-        /* v=1 ↔ fond du sol (contre le mur, z = WALL_Z) */
-        floorColor(WALL_X0 + u * WALL_W, WALL_Z + (1 - v) * FLOOR_D)
-      ),
-      8
+    const canvas = paintCanvas(FLOOR_TEX_W, FLOOR_TEX_H, (u, v) =>
+      /* v=1 ↔ fond du sol (contre le mur, z = WALL_Z) */
+      floorColor(WALL_X0 + u * WALL_W, WALL_Z + (1 - v) * FLOOR_D)
     );
+    drawMonogramReflection(canvas);
+    floorTexture = makeTexture(canvas, 8);
   }
   return floorTexture;
 }
@@ -777,6 +858,80 @@ function DawnBreath() {
         opacity={0}
         toneMapped={false}
         depthWrite={false}
+      />
+    </mesh>
+  );
+}
+
+/* ── Caustiques au sol — la lumière ressort du verre ────────────
+   Trois arcs très dilués au pied du monogramme, en dérive f(t)
+   absolue ultra lente (offset de texture + opacité sinusoïdale).
+   Gain ≤ 0,05 : une vibration de matière, pas un effet. */
+function FloorCaustics() {
+  const matRef = useRef<THREE.MeshBasicMaterial>(null);
+
+  const texture = useMemo(() => {
+    const w = 512;
+    const h = 320;
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d")!;
+    /* arcs elliptiques emboîtés, flous — la signature caustique */
+    ctx.filter = "blur(7px)";
+    const arcs: [number, number, number, number, number, number, number][] = [
+      /* cx, cy, rx, ry, a0, a1, alpha */
+      [w * 0.46, h * 0.5, 92, 40, -0.4, 2.6, 0.5],
+      [w * 0.52, h * 0.56, 132, 55, 2.9, 5.6, 0.36],
+      [w * 0.38, h * 0.44, 58, 26, 0.6, 3.4, 0.42],
+      [w * 0.62, h * 0.5, 70, 30, 3.6, 6.1, 0.3],
+    ];
+    for (const [cx, cy, rx, ry, a0, a1, al] of arcs) {
+      ctx.strokeStyle = `rgba(255, 250, 242, ${al})`;
+      ctx.lineWidth = 7;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rx, ry, 0.2, a0, a1);
+      ctx.stroke();
+    }
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.wrapS = THREE.ClampToEdgeWrapping;
+    tex.wrapT = THREE.ClampToEdgeWrapping;
+    return tex;
+  }, []);
+
+  useEffect(() => () => texture.dispose(), [texture]);
+
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    if (matRef.current) {
+      /* opacité : jamais nulle, jamais > 0,05 d'apport perçu ;
+         s'éveille avec l'assemblage (fenêtre 1,2 → 3,6 s) */
+      matRef.current.opacity =
+        (0.032 + 0.016 * Math.sin((t * Math.PI * 2) / 38)) *
+        easeOutCubic(progress(t, 1.2, 2.4));
+    }
+    /* la nappe dérive en f(t) absolu — offset de texture, pas de
+       transform de mesh : le pattern glisse dans son cadre */
+    texture.offset.x = 0.012 * Math.sin((t * Math.PI * 2) / 71);
+    texture.offset.y = 0.01 * Math.sin((t * Math.PI * 2) / 53 + 1.7);
+  });
+
+  return (
+    <mesh
+      position={[MONO_X + 0.15, FLOOR_Y + 0.012, 1.05]}
+      rotation={[-Math.PI / 2, 0, 0.12]}
+      renderOrder={-8}
+    >
+      <planeGeometry args={[4.6, 2.6]} />
+      <meshBasicMaterial
+        ref={matRef}
+        map={texture}
+        transparent
+        opacity={0}
+        toneMapped={false}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
       />
     </mesh>
   );
@@ -1236,22 +1391,24 @@ function SceneLights() {
           scale={[11, 6, 1]}
           target={[0, 0, 0]}
         />
-        {/* rebonds de scène : lavande à gauche, rosé à droite */}
+        {/* rebonds du halo : les deux lobes du mur existent aussi
+            dans l'environnement — la sphère satinée et les chanfreins
+            attrapent le lilas haut-gauche et la pêche bas-droite */}
         <Lightformer
           form="rect"
-          intensity={0.35}
-          color="#cabdf0"
-          position={[-6.8, 1.2, 0.6]}
-          scale={[4, 5, 1]}
-          target={[0, 0, 0]}
+          intensity={0.55}
+          color="#c3b0f0"
+          position={[-5.4, 4.6, -1.2]}
+          scale={[4.5, 4, 1]}
+          target={[0, 1.5, 0]}
         />
         <Lightformer
           form="rect"
-          intensity={0.3}
-          color="#f4ccd9"
-          position={[6.8, 0.4, 2.2]}
-          scale={[3, 4, 1]}
-          target={[0, 0, 0]}
+          intensity={0.5}
+          color="#f6c9a2"
+          position={[6.4, 0.5, 0.8]}
+          scale={[3.5, 3, 1]}
+          target={[0.5, 0.5, 0]}
         />
       </Environment>
     </>
@@ -1428,6 +1585,7 @@ export default function GlassSculpture({
         <CameraRig />
         <DawnRoom />
         <DawnBreath />
+        <FloorCaustics />
         <AccentReveal />
         <SceneLights />
         <Sculpture />
