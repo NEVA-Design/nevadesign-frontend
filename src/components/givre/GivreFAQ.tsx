@@ -66,10 +66,14 @@ export default function GivreFAQ() {
           la finale */}
       <div aria-hidden className="pv-scene-bg pv-scene-bg--dawn-calm" />
       <div className="relative mx-auto grid max-w-[1140px] gap-14 px-5 py-24 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20 lg:py-28">
-        {/* Colonne sticky — titre et appel */}
+        {/* Colonne sticky — folio, titre et appel */}
         <RevealBlock>
           <div className="lg:sticky lg:top-28">
-            <p className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
+            <div className="pv-page-num [&>b]:text-[44px]">
+              <b>10</b>
+              <span>/10</span>
+            </div>
+            <p className="mt-7 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
               {t("faq.label", "Questions")}
             </p>
             <h2 className="mt-5 font-display text-[clamp(2rem,4.4vw,3.3rem)] font-light leading-[1.12] tracking-[-0.015em] text-slate">

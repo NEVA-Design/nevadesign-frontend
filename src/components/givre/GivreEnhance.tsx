@@ -109,7 +109,7 @@ export default function GivreEnhance() {
   );
 
   return (
-    <section className="pv-scene pb-16 pt-20 sm:pb-24 sm:pt-24">
+    <section id="enhance" className="pv-scene pb-16 pt-20 sm:pb-24 sm:pt-24">
       <div aria-hidden className="pv-scene-bg--dawn-calm absolute inset-0" />
       <div aria-hidden className="pv-caustics" />
 
@@ -120,7 +120,7 @@ export default function GivreEnhance() {
           <RevealBlock>
             <div className="pv-page-num justify-center [&>b]:text-[44px]">
               <b>04</b>
-              <span>/08</span>
+              <span>/10</span>
             </div>
           </RevealBlock>
           <RevealBlock delay={0.06}>

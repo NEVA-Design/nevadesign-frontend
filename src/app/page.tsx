@@ -13,6 +13,7 @@ import GivrePricing from "@/components/givre/GivrePricing";
 import GivrePacks from "@/components/givre/GivrePacks";
 import GivreFAQ from "@/components/givre/GivreFAQ";
 import GivreFooter from "@/components/givre/GivreFooter";
+import SectionRail from "@/components/givre/SectionRail";
 import LocaleKeyed from "@/components/prisme/LocaleKeyed";
 import { defaultSeo, siteName, siteUrl } from "@/lib/seo";
 
@@ -82,6 +83,7 @@ export default function Home() {
         />
         <PrismLoader />
         <GivreNavbar />
+        <SectionRail />
         <LocaleKeyed>
           <GivreHero />
           <GivreStudio />

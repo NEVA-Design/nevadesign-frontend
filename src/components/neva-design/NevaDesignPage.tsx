@@ -314,7 +314,7 @@ export default function NevaDesignPage({
                           alt={hidden ? "" : logo.alt}
                           width={96}
                           height={36}
-                          className="max-h-9 w-auto object-contain opacity-40 [filter:brightness(0)] transition-opacity duration-300 hover:opacity-70"
+                          className="max-h-9 w-auto object-contain opacity-40 transition-opacity duration-300 hover:opacity-70"
                         />
                       </span>
                     ))}

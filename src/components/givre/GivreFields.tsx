@@ -6,7 +6,7 @@ import { RevealBlock, RevealMask, RevealMedia } from "@/components/prisme/Motion
 
 /*
  * Les terrains, réécrits Givre — le registre éditorial. Fini la
- * mosaïque : un en-tête paginé à gauche (05/08), puis quatre
+ * mosaïque : un en-tête paginé à gauche (05/10), puis quatre
  * grandes rangées entre filets, kicker mono à gauche, un média
  * de preuve à droite. Les rangées 2 et 4 s'inversent pour le
  * rythme ; le chrome YouTube factice reste sur la première —
@@ -117,7 +117,7 @@ export default function GivreFields() {
   const titleTail = cut === -1 ? "" : title.slice(cut + 2);
 
   return (
-    <section id="creations" className="pv-scene">
+    <section id="terrains" className="pv-scene">
       <div aria-hidden className="pv-scene-bg pv-scene-bg--dawn-calm" />
       <div aria-hidden className="pv-caustics" />
 
@@ -127,7 +127,7 @@ export default function GivreFields() {
           <RevealBlock>
             <div className="pv-page-num [&>b]:text-[44px]">
               <b>05</b>
-              <span>/08</span>
+              <span>/10</span>
             </div>
           </RevealBlock>
           <RevealBlock delay={0.08}>
@@ -157,7 +157,7 @@ export default function GivreFields() {
         <div className="mt-14 sm:mt-16">
           {/* ── 01 · Miniatures — la scène YouTube + deux tuiles ── */}
           <FieldRow
-            kicker={t("fields.thumbs.kicker", "01 — Miniatures YouTube")}
+            kicker={t("fields.thumbs.kicker", "( 01 ) Miniatures YouTube")}
             title={t("fields.thumbs.title", "Le visage, le titre, le clic.")}
             desc={t(
               "fields.thumbs.desc",
@@ -206,7 +206,7 @@ export default function GivreFields() {
           {/* ── 02 · Logos — la planche Kova, média à gauche ── */}
           <FieldRow
             reversed
-            kicker={t("fields.logos.kicker", "02 — Logos & branding")}
+            kicker={t("fields.logos.kicker", "( 02 ) Logos & branding")}
             title={t("fields.logos.title", "Des marques qui tiennent debout.")}
             desc={t(
               "fields.logos.desc",
@@ -229,7 +229,7 @@ export default function GivreFields() {
 
           {/* ── 03 · Chartes — la planche documentée Méridien ── */}
           <FieldRow
-            kicker={t("fields.charts.kicker", "03 — Chartes graphiques")}
+            kicker={t("fields.charts.kicker", "( 03 ) Chartes graphiques")}
             title={t("fields.charts.title", "La cohérence, documentée.")}
             desc={t(
               "fields.charts.desc",
@@ -253,7 +253,7 @@ export default function GivreFields() {
           {/* ── 04 · Gaming — la campagne Larya, média à gauche ── */}
           <FieldRow
             reversed
-            kicker={t("fields.gaming.kicker", "04 — Gaming & FiveM")}
+            kicker={t("fields.gaming.kicker", "( 04 ) Gaming & FiveM")}
             title={t("fields.gaming.title", "Le terrain d'origine.")}
             desc={t(
               "fields.gaming.desc",

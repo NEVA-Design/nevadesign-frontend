@@ -3,7 +3,7 @@
 /*
  * Hero Givre — la scène de la ref, habitée par Neva.
  * Un rendu 3D temps réel (sculpture de verre) sous un cadre
- * éditorial en filets d'un pixel : pagination 01/08, rail de
+ * éditorial en filets d'un pixel : pagination 01/10, rail de
  * points, titre Outfit léger en encre ardoise, colonne des
  * terrains à droite, tarif d'appel en pied. L'UI chuchote,
  * la scène parle.
@@ -92,6 +92,7 @@ export default function GivreHero() {
   return (
     <section
       ref={scope}
+      id="top"
       className="pv-scene pv-scene--canvas relative min-h-[100svh] overflow-hidden"
     >
       {/* Poster baké de la même scène (par cadrage) — visible pendant
@@ -118,29 +119,10 @@ export default function GivreHero() {
       {/* Aucun cadre au-dessus de la scène : le canvas est nu, seule
           la vraie interface (texte, boutons, rails) se pose dessus. */}
 
-      {/* Rail gauche — points de navigation, grille de pastilles */}
-      <div
-        className="pointer-events-auto absolute bottom-0 z-10 hidden w-[84px] flex-col items-center justify-between lg:flex"
-        style={{
-          left: "var(--frame-inset)",
-          top: "calc(var(--frame-inset) + 120px)",
-          paddingBottom: "calc(var(--frame-inset) + 28px)",
-        }}
-      >
-        <nav className="pv-dot-rail gh-dots" aria-label="Sections">
-          <a href="#top" className="is-active" aria-label="Haut de page" />
-          <a href="#creations" aria-label="Créations" />
-          <a href="#modules" aria-label="Modules" />
-          <a href="#pricing" aria-label="Tarifs" />
-          <a href="#packs" aria-label="Packs" />
-        </nav>
-        <div className="pv-dot-grid gh-dots" aria-hidden>
-          <span />
-          <span />
-          <span />
-          <span />
-        </div>
-      </div>
+      {/* Le rail de sections vit désormais en fixed (SectionRail,
+          monté par la page) : synchronisé au scroll, cliquable.
+          La grille de pastilles décorative est retirée (D05 : un
+          ornement sans rôle est du bruit). */}
 
       {/* Contenu principal — en dessous de lg : le texte en haut,
           une FENÊTRE réservée à la sculpture au centre (elle y est
@@ -160,7 +142,7 @@ export default function GivreHero() {
             {/* Pagination — 8 moments réels sur la page */}
             <div className="gh-num pv-page-num">
               <b>01</b>
-              <span>/08</span>
+              <span>/10</span>
             </div>
 
             {/* Micro-label — l'eyebrow descend de sa pilule */}
@@ -210,6 +192,18 @@ export default function GivreHero() {
                 {t("hero.cta.secondary", "Voir les créations")}
               </a>
             </div>
+
+            {/* La preuve tarifaire — intégrée sous les CTA (D05),
+                plus jamais orpheline en bord de cadre */}
+            <a
+              href="#pricing"
+              className="gh-price pv-pill mt-5 hidden font-mono text-[10px] uppercase tracking-[0.14em] text-slate transition-colors duration-300 hover:text-ink lg:inline-flex"
+            >
+              <span className="font-display text-[15px] font-medium normal-case tracking-normal text-ink">
+                0&nbsp;€
+              </span>
+              {t("hero.proof", "5 créations offertes · Sans carte bancaire")}
+            </a>
           </div>
         </div>
 
@@ -261,7 +255,7 @@ export default function GivreHero() {
               return (
                 <li key={item.key} className="gh-side-item">
                   <a
-                    href="#creations"
+                    href="#terrains"
                     className={
                       item.active
                         ? "flex items-center gap-3 text-[14.5px] font-medium text-ink"
@@ -279,26 +273,6 @@ export default function GivreHero() {
           </ul>
         </aside>
 
-        {/* Tarif d'appel — le « prix » de la ref, en vrai contenu */}
-        <div
-          className="gh-price absolute bottom-0 right-0 hidden text-right lg:block"
-          style={{
-            right: "calc(var(--frame-inset) + 48px)",
-            bottom: "calc(var(--frame-inset) + 34px)",
-          }}
-        >
-          <a href="#pricing" className="group block">
-            <p className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
-              {t("nav.pricing", "Tarifs")}
-            </p>
-            <p className="mt-1 font-display text-[34px] font-light leading-none text-ink">
-              0<span className="ml-1 text-[22px] text-slate">€</span>
-            </p>
-            <p className="mt-2 max-w-[210px] font-mono text-[10px] uppercase leading-[1.7] tracking-[0.14em] text-mist">
-              {t("hero.proof", "5 créations offertes · Sans carte bancaire")}
-            </p>
-          </a>
-        </div>
       </div>
     </section>
   );

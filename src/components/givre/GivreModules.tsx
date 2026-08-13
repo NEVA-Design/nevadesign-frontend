@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 /*
  * Modules Givre — le sixième moment de la page. L'en-tête passe à
- * droite (miroir du hero), pagination 06/08 en Outfit léger, puis
+ * droite (miroir du hero), pagination 06/10 en Outfit léger, puis
  * la grille bento reprend ses six preuves : le brief qui devient
  * miniature, l'identité en construction, le détail 8K, le
  * moodboard qui répond, la carte d'identité, le verdict chiffré.
@@ -70,7 +70,9 @@ function DesignStudioScene() {
           </span>
         </div>
       </div>
-      <figure className="pv-media min-h-[220px] flex-1">
+      {/* Mobile : ratio 16/9 exact — le visuel d'exemple s'affiche
+          ENTIER (D48) ; desktop : la tuile remplit sa hauteur. */}
+      <figure className="pv-media aspect-video w-full lg:aspect-auto lg:min-h-[220px] lg:flex-1">
         <Image
           src="/showcase/thumb-pc.webp"
           alt=""
@@ -331,7 +333,7 @@ export default function GivreModules() {
           <RevealBlock>
             <div className="pv-page-num justify-end [&>b]:text-[44px]">
               <b>06</b>
-              <span>/08</span>
+              <span>/10</span>
             </div>
             <p className="mt-6 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
               {t("bento.label", "Modules")}

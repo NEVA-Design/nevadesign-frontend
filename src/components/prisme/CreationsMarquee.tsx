@@ -53,7 +53,7 @@ function Row({
             alt={ariaHidden ? "" : piece.alt}
             fill
             sizes="320px"
-            loading={i < 4 && !ariaHidden ? "eager" : "lazy"}
+            loading={i < 6 && !ariaHidden ? "eager" : "lazy"}
             className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
           />
         </figure>
@@ -81,10 +81,11 @@ export default function CreationsMarquee({
     <div
       className="relative w-full overflow-hidden"
       style={{
+        /* fondu latéral fixe : 80 px à toutes les largeurs (D03) */
         maskImage:
-          "linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%)",
+          "linear-gradient(90deg, transparent 0, black 80px, black calc(100% - 80px), transparent 100%)",
         WebkitMaskImage:
-          "linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%)",
+          "linear-gradient(90deg, transparent 0, black 80px, black calc(100% - 80px), transparent 100%)",
       }}
     >
       <Row pieces={ROW_A} duration={duration} />

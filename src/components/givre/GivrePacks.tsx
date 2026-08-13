@@ -93,8 +93,8 @@ export default function GivrePacks() {
         <RevealBlock>
           <div className="max-w-[700px]">
             <div className="pv-page-num [&>b]:text-[44px]">
-              <b>08</b>
-              <span>/08</span>
+              <b>09</b>
+              <span>/10</span>
             </div>
             <p className="mt-6 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
               {t("resources.label", "Packs du studio")}

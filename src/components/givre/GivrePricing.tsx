@@ -33,8 +33,8 @@ export default function GivrePricing() {
         <div className="text-center">
           <RevealBlock>
             <div className="pv-page-num justify-center [&>b]:text-[44px]">
-              <b>07</b>
-              <span>/08</span>
+              <b>08</b>
+              <span>/10</span>
             </div>
             <p className="mt-6 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
               {t("pricing.label", "Tarifs")}

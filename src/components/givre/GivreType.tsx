@@ -48,13 +48,15 @@ export default function GivreType() {
         }
       );
 
-      /* Le remplissage — la mécanique d'origine, conservée */
+      /* Le mot monte sous son masque — amplitude courte (D02) :
+         l'état de base est PLEIN. À toute position de scroll, le
+         mot reste ≥ 80 % visible ; sans JS, le DOM nu l'affiche
+         entier. Plus jamais d'écran vide en rendu statique. */
       gsap.fromTo(
         q("[data-word]"),
-        { yPercent: 88, opacity: 0.4 },
+        { yPercent: 18 },
         {
           yPercent: 0,
-          opacity: 1,
           ease: "none",
           scrollTrigger: {
             trigger: scope.current,

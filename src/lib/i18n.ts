@@ -90,22 +90,22 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "fields.title": "Un studio, quatre terrains de jeu.",
     "fields.subtitle":
       "Le même directeur artistique, quatre métiers. Chaque pièce ci-dessous est un livrable du studio, dans son format de travail.",
-    "fields.thumbs.kicker": "01 — Miniatures YouTube",
+    "fields.thumbs.kicker": "( 01 ) Miniatures YouTube",
     "fields.thumbs.title": "Le visage, le titre, le clic.",
     "fields.thumbs.desc":
       "Compositions pensées pour la vignette : expression, hiérarchie, lisibilité — même à 120 pixels de large.",
     "fields.thumbs.meta": "1280 × 720 · pensées CTR",
-    "fields.logos.kicker": "02 — Logos & branding",
+    "fields.logos.kicker": "( 02 ) Logos & branding",
     "fields.logos.title": "Des marques qui tiennent debout.",
     "fields.logos.desc":
       "Monogrammes, wordmarks et symboles livrés en vectoriel — du favicon à l'enseigne.",
     "fields.logos.meta": "SVG · toutes déclinaisons",
-    "fields.charts.kicker": "03 — Chartes graphiques",
+    "fields.charts.kicker": "( 03 ) Chartes graphiques",
     "fields.charts.title": "La cohérence, documentée.",
     "fields.charts.desc":
       "Palette, typographies, usages : la planche qui aligne tous vos supports, réseaux compris.",
     "fields.charts.meta": "palette · typos · déclinaisons",
-    "fields.gaming.kicker": "04 — Gaming & FiveM",
+    "fields.gaming.kicker": "( 04 ) Gaming & FiveM",
     "fields.gaming.title": "Le terrain d'origine.",
     "fields.gaming.desc":
       "Affiches, packs serveur et identités d'équipe — l'univers où le studio a fait ses armes.",
@@ -163,6 +163,8 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "bento.audit.verdict": "Solide",
     "bento.audit.imageLabel": "Visuel audité",
 
+    "wall.title.a": "Les créations sortent",
+    "wall.title.b": "d'ici.",
     "wall.cta": "Le portfolio complet du studio",
 
     "stats.label": "Le studio tourne déjà",
@@ -347,22 +349,22 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "fields.title": "One studio, four playing fields.",
     "fields.subtitle":
       "The same art director, four crafts. Every piece below is a studio deliverable, shown in its working format.",
-    "fields.thumbs.kicker": "01 — YouTube thumbnails",
+    "fields.thumbs.kicker": "( 01 ) YouTube thumbnails",
     "fields.thumbs.title": "The face, the title, the click.",
     "fields.thumbs.desc":
       "Compositions built for the tile: expression, hierarchy, readability — even at 120 pixels wide.",
     "fields.thumbs.meta": "1280 × 720 · CTR-first",
-    "fields.logos.kicker": "02 — Logos & branding",
+    "fields.logos.kicker": "( 02 ) Logos & branding",
     "fields.logos.title": "Brands that stand on their own.",
     "fields.logos.desc":
       "Monograms, wordmarks and symbols delivered as vectors — from favicon to storefront.",
     "fields.logos.meta": "SVG · every variant",
-    "fields.charts.kicker": "03 — Brand guidelines",
+    "fields.charts.kicker": "( 03 ) Brand guidelines",
     "fields.charts.title": "Consistency, documented.",
     "fields.charts.desc":
       "Palette, typography, usage rules: the board that aligns every surface, socials included.",
     "fields.charts.meta": "palette · type · variants",
-    "fields.gaming.kicker": "04 — Gaming & FiveM",
+    "fields.gaming.kicker": "( 04 ) Gaming & FiveM",
     "fields.gaming.title": "Home turf.",
     "fields.gaming.desc":
       "Posters, server packs and team identities — the world where the studio earned its stripes.",
@@ -420,6 +422,8 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "bento.audit.verdict": "Solid",
     "bento.audit.imageLabel": "Audited visual",
 
+    "wall.title.a": "The work ships",
+    "wall.title.b": "from here.",
     "wall.cta": "The studio's full portfolio",
 
     "stats.label": "The studio is already running",

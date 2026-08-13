@@ -61,6 +61,50 @@ export default function GivreFooter() {
         <div aria-hidden className="pv-windowlight" />
         <div aria-hidden className="pv-caustics" />
 
+        {/* Le halo aurore de la finale — les deux lobes du hero,
+            revenus au calme derrière le titre (D07) */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(34% 42% at 38% 30%, rgba(164,139,232,0.34) 0%, rgba(164,139,232,0) 70%), radial-gradient(30% 38% at 64% 62%, rgba(239,184,148,0.32) 0%, rgba(239,184,148,0) 72%)",
+          }}
+        />
+
+        {/* La sphère satinée — en périphérie de l'appel, elle
+            attrape les deux lobes ; ombre de contact dessous.
+            CSS pur : la matière du hero, au poids d'un gradient. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute hidden lg:block"
+          style={{
+            right: "7%",
+            top: "11%",
+            width: 168,
+            height: 168,
+            borderRadius: "999px",
+            background:
+              "radial-gradient(58% 52% at 33% 26%, #FFFFFF 0%, rgba(255,255,255,0) 62%), radial-gradient(70% 66% at 68% 74%, rgba(239,184,148,0.5) 0%, rgba(239,184,148,0) 74%), radial-gradient(80% 76% at 26% 62%, rgba(164,139,232,0.42) 0%, rgba(164,139,232,0) 76%), radial-gradient(120% 120% at 50% 40%, #F7F4F0 0%, #E9E4DE 78%, #DCD6CF 100%)",
+            boxShadow:
+              "inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -14px 26px rgba(96,84,140,0.16), 0 26px 40px -18px rgba(43,36,80,0.28)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute hidden lg:block"
+          style={{
+            right: "6.4%",
+            top: "calc(11% + 160px)",
+            width: 186,
+            height: 40,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(50% 50% at 50% 50%, rgba(43,36,80,0.2) 0%, rgba(43,36,80,0) 70%)",
+            filter: "blur(10px)",
+          }}
+        />
+
         {/* Cadre éditorial — les mêmes filets blancs que le hero */}
         <div
           aria-hidden
@@ -118,8 +162,22 @@ export default function GivreFooter() {
       </section>
 
       {/* ── Le registre — marque et colonnes sur la brume claire ── */}
-      <div className="border-t border-[rgba(43,36,80,0.07)] bg-[#F0EEE8]">
-        <div className="mx-auto max-w-[1140px] px-5 sm:px-8">
+      <div className="relative overflow-hidden border-t border-[rgba(43,36,80,0.07)] bg-[#F0EEE8]">
+        {/* Filigrane ΛV géant en ligne de base (D08) — le gaufrage
+            de la maison, coupé par le bord bas comme une marque à
+            chaud. Ink 0,04 : présence, jamais salissure. */}
+        <svg
+          aria-hidden
+          viewBox="0 0 1441 1000"
+          className="pointer-events-none absolute left-1/2 w-[min(860px,86vw)] -translate-x-1/2 fill-[rgba(43,36,80,0.04)]"
+          style={{ bottom: "-34%" }}
+        >
+          <path d="M440.2 0 L864.6 1000 L694.6 1000 L441 379 L180.1 1000 L0 1000 Z" />
+          <path d="M439.5 710 L559.2 1000 L320 1000 Z" />
+          <path d="M575 0 L755.1 0 L1013 618 L1266.6 0 L1438.1 0 L1015.2 990 Z" />
+          <path d="M893.4 0 L1134.1 0 L1013.7 292 Z" />
+        </svg>
+        <div className="relative mx-auto max-w-[1140px] px-5 sm:px-8">
           <div className="grid gap-12 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-16">
             <div>
               <Image
@@ -162,7 +220,7 @@ export default function GivreFooter() {
         </div>
 
         {/* Rangée basse — copyright, heure du studio, réseaux */}
-        <div className="border-t border-[rgba(43,36,80,0.07)]">
+        <div className="relative border-t border-[rgba(43,36,80,0.07)]">
           <div className="mx-auto flex max-w-[1140px] flex-col items-start justify-between gap-4 px-5 py-7 sm:flex-row sm:items-center sm:px-8">
             <p className="font-mono text-[11px] tracking-[0.1em] text-mist">
               © {year} Neva Design · {t("footer.rights", "Tous droits réservés.")}

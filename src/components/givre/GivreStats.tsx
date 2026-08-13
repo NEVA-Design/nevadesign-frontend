@@ -23,7 +23,7 @@ export default function GivreStats() {
   ];
 
   return (
-    <section className="pv-scene">
+    <section id="chiffres" className="pv-scene">
       <div aria-hidden className="pv-scene-bg pv-scene-bg--dawn-calm" />
       <div aria-hidden className="pv-caustics" />
 
@@ -32,8 +32,8 @@ export default function GivreStats() {
         <RevealBlock>
           <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
             <div className="pv-page-num [&>b]:text-[44px]">
-              <b>06</b>
-              <span>/08</span>
+              <b>07</b>
+              <span>/10</span>
             </div>
             <p className="pb-1 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
               {t("stats.label", "Le studio tourne déjà")}
@@ -94,9 +94,9 @@ export default function GivreStats() {
                       key={`${logo.src}-${hidden ? "b" : "a"}`}
                       src={logo.src}
                       alt={hidden ? "" : logo.alt}
-                      width={92}
-                      height={36}
-                      className="h-8 w-auto opacity-55 [filter:brightness(0)] transition-opacity duration-300 hover:opacity-100"
+                      width={88}
+                      height={22}
+                      className="h-[22px] w-auto opacity-55 transition-opacity duration-300 hover:opacity-90"
                     />
                   ))}
                 </div>

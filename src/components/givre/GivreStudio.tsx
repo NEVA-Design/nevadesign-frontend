@@ -63,7 +63,7 @@ export default function GivreStudio() {
   );
 
   return (
-    <section ref={scope} className="pv-scene pb-24 pt-16 sm:pb-32 sm:pt-20">
+    <section ref={scope} id="studio" className="pv-scene pb-24 pt-16 sm:pb-32 sm:pt-20">
       <div aria-hidden className="pv-scene-bg--dawn-calm absolute inset-0" />
       <div aria-hidden className="pv-caustics" />
 
@@ -79,7 +79,7 @@ export default function GivreStudio() {
             <RevealBlock>
               <div className="pv-page-num [&>b]:text-[44px]">
                 <b>02</b>
-                <span>/08</span>
+                <span>/10</span>
               </div>
             </RevealBlock>
             <RevealBlock delay={0.08}>
