@@ -8,7 +8,7 @@ import PrismShell from "@/components/prisme/Shell";
 import { Brand } from "@/components/prisme/Brand";
 import CreationsMarquee from "@/components/prisme/CreationsMarquee";
 import { RevealBlock } from "@/components/prisme/Motion";
-import SilverSilk from "@/components/prisme/SilverSilk";
+
 import GlassLens from "@/components/prisme/GlassLens";
 import { CLIENT_LOGOS } from "@/lib/client-logos";
 import {
@@ -206,7 +206,8 @@ export default function NevaDesignPage({
                 "linear-gradient(180deg, black 0%, black 55%, transparent 88%)",
             }}
           >
-            <SilverSilk variant="hero" className="opacity-80" />
+            {/* le halo aurore de l'atelier — la vitrine parle la même lumière que la maison (D29) */}
+            <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(38% 46% at 30% 24%, rgba(164,139,232,0.3) 0%, rgba(164,139,232,0) 70%), radial-gradient(34% 42% at 72% 60%, rgba(239,184,148,0.28) 0%, rgba(239,184,148,0) 72%)" }} />
           </div>
           <div aria-hidden className="pv-windowlight" />
           <div aria-hidden className="pv-caustics" />
@@ -500,7 +501,7 @@ export default function NevaDesignPage({
                 "radial-gradient(88% 76% at 50% 54%, black 40%, transparent 100%)",
             }}
           >
-            <SilverSilk variant="finale" />
+            <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(36% 44% at 36% 30%, rgba(164,139,232,0.26) 0%, rgba(164,139,232,0) 70%), radial-gradient(32% 40% at 66% 66%, rgba(239,184,148,0.24) 0%, rgba(239,184,148,0) 72%)" }} />
           </div>
           <div aria-hidden className="pv-windowlight opacity-60" />
           <div aria-hidden className="pv-caustics" />

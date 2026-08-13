@@ -55,7 +55,24 @@ export const metadata: Metadata = {
 
 const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
 
+/* D51 — les pièces portent un vrai nom de projet, plus jamais un
+   nom de fichier brut. Table éditoriale (nommée d'après l'œuvre) ;
+   titleFromFilename ne sert que de filet aux fichiers inconnus. */
+const PIECE_TITLES: Record<string, string> = {
+  "EFINAL.png": "E Final — emblème esport",
+  "krlogo.png": "KR — monogramme chrome",
+  "logo.png": "EV — wordmark esport",
+  "logobg.png": "S Dragon — emblème doré",
+  "logotbnnn.png": "TBN — écusson New York",
+  "ocen.png": "Ocen — emblème floral",
+  "vulcainlogo.png": "Vulcain — V ailé",
+  "worldlogo.png": "World — anneau cinétique",
+  "Xlogo.png": "X — monogramme chrome",
+};
+
 function titleFromFilename(filename: string) {
+  const named = PIECE_TITLES[filename];
+  if (named) return named;
   return filename
     .replace(/\.[^.]+$/, "")
     .replace(/[_-]+/g, " ")
@@ -113,7 +130,7 @@ async function readPublicPortfolioFolder(folder: PublicPortfolioFolder): Promise
       .map((file, index) => {
         return {
           id: `public-${folder}-${file}`,
-          title: folder === "packs" ? `PACK#${index + 1}` : titleFromFilename(file),
+          title: folder === "packs" ? `Pack serveur ${String(index + 1).padStart(2, "0")}` : titleFromFilename(file),
           category: config.category,
           tag: config.tag,
           image_path: `/neva-design/${folder}/${encodeURIComponent(file)}`,
@@ -197,7 +214,7 @@ export default function Page() {
     <>
       {/* Givre impose sa lumière à la route : fond clair jusque
           sous l'overscroll, scrollbars et contrôles natifs clairs. */}
-      <style>{`html{color-scheme:light}body{background-color:#EEF0F7;color:#2B2450}`}</style>
+      <style>{`html{color-scheme:light}body{background-color:#F1EFE9;color:#2B2450}`}</style>
       <main className="pv-light min-h-screen bg-paper text-ink">
         <script
           type="application/ld+json"
