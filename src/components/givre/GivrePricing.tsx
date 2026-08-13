@@ -60,40 +60,40 @@ export default function GivrePricing() {
 
         {/* LE panneau — quatre plans en rangées, filets encre entre eux */}
         <RevealBlock delay={0.15} className="mt-12">
-          <div className="pv-glass pv-chrome-edge relative mx-auto max-w-[940px] rounded-[22px] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_2px_6px_rgba(96,84,140,0.1),0_16px_40px_rgba(96,84,140,0.13)] sm:px-5 sm:py-4">
+          <div className="pv-glass relative mx-auto max-w-[940px] rounded-[22px] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_2px_6px_rgba(96,84,140,0.1),0_16px_40px_rgba(96,84,140,0.13)] sm:px-5 sm:py-4">
             {PLAN_ORDER.map((planId, index) => {
               const plan = PLANS[planId];
               const featured = planId === FEATURED_PLAN;
               return (
                 <div key={planId}>
-                  {featured ? (
-                    /* Le filet chrome fin annonce la rangée vedette */
-                    <span aria-hidden className="pv-chrome-line mx-[14px]" />
-                  ) : index > 0 ? (
+                  {index > 0 ? (
+                    /* filet encre entre rangées (desktop) — l'anneau
+                       aurore porte seul l'emphase de la vedette */
                     <span
                       aria-hidden
-                      className="block h-px bg-[rgba(43,36,80,0.07)]"
+                      className="hidden h-px bg-[rgba(43,36,80,0.07)] lg:block"
                     />
                   ) : null}
 
                   <article
                     className={cn(
+                      /* Mobile : chaque offre est une carte du même
+                         gabarit (D13) ; desktop : les rangées du
+                         panneau, la leçon ORIGINE. */
                       "pv-ignite relative grid items-center gap-x-8 gap-y-5 rounded-[16px] px-4 py-5 sm:px-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.3fr)_auto]",
+                      "mb-3 border border-carte-brd bg-carte lg:mb-0 lg:border-0 lg:bg-transparent",
                       featured &&
-                        "bg-[rgba(255,255,255,0.55)] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_22px_rgba(96,84,140,0.12)]"
+                        "pv-aurora-ring border-transparent bg-[rgba(255,255,255,0.72)] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_22px_rgba(96,84,140,0.14)] lg:bg-[rgba(255,255,255,0.55)]"
                     )}
                   >
-                    {featured ? (
-                      <Badge
-                        variant="popular"
-                        className="absolute -top-[11px] left-7 z-10"
-                      >
-                        {t("pricing.popular", "Le plus choisi")}
-                      </Badge>
-                    ) : null}
-
-                    {/* Identité du plan : nom, tagline, quota exact */}
+                    {/* Identité du plan : badge DANS le flux (D11),
+                        nom, tagline, quota exact */}
                     <div>
+                      {featured ? (
+                        <Badge variant="popular" className="mb-3">
+                          {t("pricing.popular", "Le plus choisi")}
+                        </Badge>
+                      ) : null}
                       <h3 className="font-display text-[19px] font-medium leading-snug text-ink">
                         {t(`pricing.plan.${planId}.name`, plan.name)}
                       </h3>
@@ -106,37 +106,45 @@ export default function GivrePricing() {
                       </p>
                     </div>
 
-                    {/* Features en deux colonnes mono, tirets fins */}
+                    {/* Features en deux colonnes, coches sauge (D15) */}
                     <ul className="grid gap-x-6 gap-y-2.5 sm:grid-cols-2">
                       {plan.features.map((feature, fi) => (
                         <li
                           key={feature}
-                          className="flex items-start gap-2.5 font-mono text-[12px] leading-[1.55] text-slate"
+                          className="flex items-start gap-2.5 font-mono text-[12px] leading-[1.55] text-slate [text-wrap:pretty]"
                         >
-                          <span
+                          <svg
                             aria-hidden
-                            className="mt-[0.6em] h-px w-3.5 shrink-0 bg-[rgba(43,36,80,0.32)]"
-                          />
+                            viewBox="0 0 24 24"
+                            className="mt-[0.28em] h-[13px] w-[13px] shrink-0 stroke-[color:var(--color-sauge)]"
+                            fill="none"
+                            strokeWidth={2.4}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M4.5 12.8 9.6 18 19.5 6.5" />
+                          </svg>
                           {t(`pricing.plan.${planId}.f${fi + 1}`, feature)}
                         </li>
                       ))}
                     </ul>
 
-                    {/* Prix à droite, pilule CTA dessous */}
-                    <div className="flex flex-wrap items-center gap-x-6 gap-y-4 lg:flex-col lg:items-end lg:gap-4">
+                    {/* Prix sur sa ligne, CTA pleine largeur dessous
+                        en mobile (D11) ; à droite en desktop */}
+                    <div className="flex flex-col items-stretch gap-3 lg:items-end lg:gap-4">
                       <p className="flex items-baseline gap-2 whitespace-nowrap">
                         <span className="font-display text-[32px] font-light leading-none text-ink">
                           {plan.price}
                         </span>
                         <span className="font-mono text-[11px] tracking-[0.08em] text-mist">
-                          € {t("pricing.perMonth", "/ mois")}
+                          €&nbsp;{t("pricing.perMonth", "/ mois")}
                         </span>
                       </p>
                       <Link
                         href="/signup"
                         className={cn(
-                          "pv-btn h-10 min-h-0 whitespace-nowrap px-5 text-[13px]",
-                          !featured && "pv-btn--ghost [backdrop-filter:none]"
+                          "pv-btn h-11 min-h-0 whitespace-nowrap px-5 text-[13px] lg:h-10",
+                          !featured && "pv-btn--ghost"
                         )}
                       >
                         {planId === "free"

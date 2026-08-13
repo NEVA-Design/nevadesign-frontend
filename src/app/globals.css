@@ -624,6 +624,24 @@ html {
   --color-frost: var(--color-atelier);
 }
 
+/* Liseré aurore — l'emphase du système : un anneau dégradé
+   lilas→pêche de 1,5 px qui épouse le rayon de son porteur. */
+.pv-aurora-ring {
+  position: relative;
+}
+.pv-aurora-ring::before {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: var(--beam);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
 /* Pilule de crédits — verre serti d'un liseré spectral fin */
 .pv-credit-pill {
   position: relative;

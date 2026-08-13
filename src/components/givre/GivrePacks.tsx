@@ -126,9 +126,12 @@ export default function GivrePacks() {
               >
                 <article
                   className={cn(
+                    /* plus de chrome-edge : son ::before rectangulaire
+                       débordait des coins arrondis (l'artefact D14) —
+                       l'anneau aurore porte l'emphase, clippé au rayon */
                     "pv-card-hover relative flex h-full flex-col rounded-[22px] p-6 sm:p-7",
                     isHighlight
-                      ? "pv-glass pv-chrome-edge shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_2px_6px_rgba(96,84,140,0.1),0_16px_40px_rgba(96,84,140,0.13)] lg:p-8"
+                      ? "pv-glass pv-aurora-ring shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_2px_6px_rgba(96,84,140,0.1),0_16px_40px_rgba(96,84,140,0.13)] lg:p-8"
                       : "pv-glass pv-glass--still shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_2px_5px_rgba(96,84,140,0.08),0_12px_30px_rgba(96,84,140,0.1)]"
                   )}
                 >
@@ -142,8 +145,8 @@ export default function GivrePacks() {
                       </h3>
                     </div>
                     {pack.badge ? (
-                      <span className="rounded-full bg-ink px-3 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white">
-                        {pack.badge}
+                      <span className="rounded-full bg-[linear-gradient(100deg,#A48BE8,#EFB894)] px-3 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[color:var(--surface-text)]">
+                        {t("resources.badge.complete", "Le plus complet")}
                       </span>
                     ) : null}
                   </div>
@@ -173,9 +176,9 @@ export default function GivrePacks() {
                         className="flex items-start gap-3 text-[13px] leading-[1.5] text-slate"
                       >
                         <Check
-                          size={14}
-                          strokeWidth={1.6}
-                          className="mt-[2px] shrink-0 text-[color:var(--num-color)]"
+                          size={13}
+                          strokeWidth={2.4}
+                          className="mt-[2.5px] shrink-0 text-[color:var(--color-sauge)]"
                         />
                         {feature}
                       </li>

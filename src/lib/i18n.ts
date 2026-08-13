@@ -216,6 +216,7 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "pricing.plan.pro.f5": "Support prioritaire",
 
     "resources.label": "Packs du studio",
+    "resources.badge.complete": "Le plus complet",
     "resources.title.a": "Les outils du studio,",
     "resources.title.beam": "dans vos mains.",
     "resources.subtitle":
@@ -475,6 +476,7 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "pricing.plan.pro.f5": "Priority support",
 
     "resources.label": "Studio packs",
+    "resources.badge.complete": "The most complete",
     "resources.title.a": "The studio's tools,",
     "resources.title.beam": "in your hands.",
     "resources.subtitle":
