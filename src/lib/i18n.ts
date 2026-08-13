@@ -35,11 +35,11 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "hero.line2.beam": "cliquer",
     "hero.line2.post": ".",
     "hero.subtitle":
-      "Miniatures YouTube, logos, identités de marque, assets gaming. Décrivez ce que vous voulez — le studio IA compose des rendus prêts à publier, jusqu'en 8K.",
+      "Miniatures YouTube, logos, identités de marque, assets gaming. Décrivez ce que vous voulez — le studio IA compose des rendus prêts à publier, jusqu’en 8K.",
     "hero.cta.primary": "Créer mon premier visuel",
     "hero.cta.secondary": "Voir les créations",
     "hero.proof": "5 créations offertes · Sans carte bancaire",
-    "hero.marquee": "Produites par le studio — publiées par 2 400+ créateurs",
+    "hero.marquee": "Produites par le studio — publiées par 2 400+ créateurs",
 
     "demo.label": "Design Studio — en direct",
     "demo.window": "Design Studio — Neva",
@@ -66,7 +66,7 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "demo.b2.format": "SVG + PNG",
     "demo.b2.meta": "Rendu 02 · vectoriel",
     "demo.b3.text":
-      "Affiche d'ouverture pour un serveur GTA RP — rue de nuit, néons violets, typographie chrome.",
+      "Affiche d’ouverture pour un serveur GTA RP — rue de nuit, néons violets, typographie chrome.",
     "demo.b3.chip": "Affiche · 9:16",
     "demo.b3.typo": "Chrome Extended",
     "demo.b3.format": "2304 × 4096",
@@ -75,12 +75,12 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "enhance.label": "Enhance",
     "enhance.title": "La même création. Deux niveaux de finition.",
     "enhance.subtitle":
-      "Saisissez la poignée et faites-la glisser : netteté, lumière, étalonnage — vos anciens visuels repassent au studio, jusqu'au 8K.",
+      "Saisissez la poignée et faites-la glisser : netteté, lumière, étalonnage — vos anciens visuels repassent au studio, jusqu’au 8K.",
     "enhance.alt": "Rendu plage retravaillé par le module Enhance",
     "enhance.before": "Avant",
     "enhance.after": "Après · 8K",
     "enhance.handle": "Comparer avant et après",
-    "enhance.meta": "Rendu 5504 × 3072 · Netteté +64 % · Étalonnage froid Neva",
+    "enhance.meta": "Rendu 5504 × 3072 · Netteté +64 % · Étalonnage froid Neva",
 
     "typemoment.word": "Cliquez",
     "typemoment.caption":
@@ -93,31 +93,31 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "fields.thumbs.kicker": "( 01 ) Miniatures YouTube",
     "fields.thumbs.title": "Le visage, le titre, le clic.",
     "fields.thumbs.desc":
-      "Compositions pensées pour la vignette : expression, hiérarchie, lisibilité — même à 120 pixels de large.",
+      "Compositions pensées pour la vignette : expression, hiérarchie, lisibilité — même à 120 pixels de large.",
     "fields.thumbs.meta": "1280 × 720 · pensées CTR",
     "fields.logos.kicker": "( 02 ) Logos & branding",
     "fields.logos.title": "Des marques qui tiennent debout.",
     "fields.logos.desc":
-      "Monogrammes, wordmarks et symboles livrés en vectoriel — du favicon à l'enseigne.",
+      "Monogrammes, wordmarks et symboles livrés en vectoriel — du favicon à l’enseigne.",
     "fields.logos.meta": "SVG · toutes déclinaisons",
     "fields.charts.kicker": "( 03 ) Chartes graphiques",
     "fields.charts.title": "La cohérence, documentée.",
     "fields.charts.desc":
-      "Palette, typographies, usages : la planche qui aligne tous vos supports, réseaux compris.",
+      "Palette, typographies, usages : la planche qui aligne tous vos supports, réseaux compris.",
     "fields.charts.meta": "palette · typos · déclinaisons",
     "fields.gaming.kicker": "( 04 ) Gaming & FiveM",
-    "fields.gaming.title": "Le terrain d'origine.",
+    "fields.gaming.title": "Le terrain d’origine.",
     "fields.gaming.desc":
-      "Affiches, packs serveur et identités d'équipe — l'univers où le studio a fait ses armes.",
+      "Affiches, packs serveur et identités d'équipe — l’univers où le studio a fait ses armes.",
     "fields.gaming.meta": "8K · campagnes complètes",
 
     "bento.label": "Modules",
     "bento.title": "Six modules. Une seule direction artistique.",
     "bento.subtitle":
-      "Chaque module travaille la même matière : votre image. De la miniature à la charte complète, sans jamais perdre la ligne.",
+      "Chaque module travaille la même matière : votre image. De la miniature à la charte complète, sans jamais perdre la ligne.",
     "bento.design.title": "Design Studio",
     "bento.design.desc":
-      "Miniatures, affiches, bannières : un brief, des rendus prêts à publier.",
+      "Miniatures, affiches, bannières : un brief, des rendus prêts à publier.",
     "bento.design.brief": "Brief",
     "bento.design.prompt":
       "« Miniature pour un test PC — visage choqué, prix énorme en rouge, fond sombre. »",
@@ -127,7 +127,7 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "bento.design.campaign": "Miniature livrée · 2560 × 1440",
     "bento.brand.title": "Brand",
     "bento.brand.desc":
-      "Logos et chartes complètes : palette, typographies, déclinaisons.",
+      "Logos et chartes complètes : palette, typographies, déclinaisons.",
     "bento.brand.wordmark": "Wordmark",
     "bento.brand.palette": "Palette",
     "bento.brand.usage": "Déclinaisons",
@@ -143,7 +143,7 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
       "Le directeur artistique qui répond, propose et lance la génération.",
     "bento.director.user": "Il me faut une identité pour ma chaîne tech.",
     "bento.director.answer":
-      "Trois pistes, moodboards à l'appui. Je compose la première ?",
+      "Trois pistes, moodboards à l’appui. Je compose la première ?",
     "bento.director.typing": "compose un moodboard…",
     "bento.character.title": "Character",
     "bento.character.desc":
@@ -164,20 +164,20 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "bento.audit.imageLabel": "Visuel audité",
 
     "wall.title.a": "Les créations sortent",
-    "wall.title.b": "d'ici.",
+    "wall.title.b": "d’ici.",
     "wall.cta": "Le portfolio complet du studio",
 
     "stats.label": "Le studio tourne déjà",
     "stats.creators": "créateurs actifs",
     "stats.modules": "modules spécialisés",
-    "stats.exports": "définition d'export max",
+    "stats.exports": "définition d’export max",
     "stats.speed": "du brief au rendu",
 
     "pricing.label": "Tarifs",
-    "pricing.title.a": "Moins cher qu'un logo.",
+    "pricing.title.a": "Moins cher qu’un logo.",
     "pricing.title.beam": "Pour toute une identité.",
     "pricing.subtitle":
-      "Commencez avec 5 créations offertes. Montez en volume quand vos publications s'enchaînent — sans engagement.",
+      "Commencez avec 5 créations offertes. Montez en volume quand vos publications s’enchaînent — sans engagement.",
     "pricing.note":
       "Sans engagement · Annulation en deux clics · Packs de créations additionnels depuis votre espace",
     "pricing.perMonth": "/ mois",
@@ -220,36 +220,36 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "resources.title.a": "Les outils du studio,",
     "resources.title.beam": "dans vos mains.",
     "resources.subtitle":
-      "Les ressources que le studio utilise en production gaming : brushes, templates, systèmes graphiques. Un paiement, un téléchargement, aucune limite.",
+      "Les ressources que le studio utilise en production gaming : brushes, templates, systèmes graphiques. Un paiement, un téléchargement, aucune limite.",
     "resources.oneShot": "achat unique",
     "resources.buy": "Acheter",
     "resources.redirecting": "Redirection…",
     "resources.trust":
       "Paiement sécurisé Stripe · Téléchargement immédiat · Accès à vie depuis votre espace",
     "resources.included": "Tout est inclus dans le Neva Pack",
-    "resources.error.checkout": "Le paiement n'a pas pu démarrer. Réessayez dans un instant.",
+    "resources.error.checkout": "Le paiement n’a pas pu démarrer. Réessayez dans un instant.",
     "resources.error.network": "Connexion interrompue. Vérifiez votre réseau et réessayez.",
 
     "faq.label": "Questions",
-    "faq.title.a": "Tout ce qu'on nous demande",
+    "faq.title.a": "Tout ce qu’on nous demande",
     "faq.title.beam": "avant de se lancer.",
-    "faq.subtitle": "Une question plus précise ? Le Discord répond dans la journée.",
-    "faq.q1": "Neva Design, c'est quoi exactement ?",
+    "faq.subtitle": "Une question plus précise ? Le Discord répond dans la journée.",
+    "faq.q1": "Neva Design, c’est quoi exactement ?",
     "faq.a1":
-      "Un studio créatif complet piloté par IA : vous décrivez une intention, il compose miniatures YouTube, logos, chartes graphiques et visuels gaming prêts à publier — avec une vraie direction artistique, pas une génération au hasard.",
-    "faq.q2": "Que vaut vraiment le plan gratuit ?",
+      "Un studio créatif complet piloté par IA : vous décrivez une intention, il compose miniatures YouTube, logos, chartes graphiques et visuels gaming prêts à publier — avec une vraie direction artistique, pas une génération au hasard.",
+    "faq.q2": "Que vaut vraiment le plan gratuit ?",
     "faq.a2":
-      "5 créations pour tester le flux complet, brief compris. Les rendus sortent en prévisualisation filigranée ; les plans payants débloquent les exports HD, l'usage commercial et la priorité de génération.",
-    "faq.q3": "Puis-je vendre ce que je crée ?",
+      "5 créations pour tester le flux complet, brief compris. Les rendus sortent en prévisualisation filigranée ; les plans payants débloquent les exports HD, l’usage commercial et la priorité de génération.",
+    "faq.q3": "Puis-je vendre ce que je crée ?",
     "faq.a3":
-      "Oui. Dès le premier plan payant, chaque création vous appartient commercialement : chaîne, boutique, réseaux, serveur, livrables clients.",
-    "faq.q4": "Le Creative Director, encore un chatbot ?",
+      "Oui. Dès le premier plan payant, chaque création vous appartient commercialement : chaîne, boutique, réseaux, serveur, livrables clients.",
+    "faq.q4": "Le Creative Director, encore un chatbot ?",
     "faq.a4":
       "Non. Il connaît vos références, votre historique et les codes de votre terrain — miniature YouTube, identité de marque ou serveur GTA RP. Il propose des concepts, structure des briefs et peut lancer une génération depuis la conversation.",
-    "faq.q5": "Je ne sais pas designer. C'est un problème ?",
+    "faq.q5": "Je ne sais pas designer. C’est un problème ?",
     "faq.a5":
-      "C'est exactement pour ça que Neva existe. Décrivez le résultat voulu ; la composition, la typographie et l'étalonnage sont pris en charge. Le module Audit vous dit même quoi améliorer.",
-    "faq.q6": "Et si je veux arrêter ?",
+      "C’est exactement pour ça que Neva existe. Décrivez le résultat voulu ; la composition, la typographie et l'étalonnage sont pris en charge. Le module Audit vous dit même quoi améliorer.",
+    "faq.q6": "Et si je veux arrêter ?",
     "faq.a6":
       "Deux clics depuis votre espace. Le plan reste actif jusqu'à la fin de la période en cours — rien de caché, rien de retenu.",
     "faq.cta": "Rejoindre le Discord",
@@ -273,7 +273,7 @@ export const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "footer.link.discord": "Discord",
     "footer.link.contact": "Contact",
     "footer.link.privacy": "Confidentialité",
-    "footer.link.terms": "Conditions d'utilisation",
+    "footer.link.terms": "Conditions d’utilisation",
     "footer.link.cookies": "Cookies",
     "footer.rights": "Tous droits réservés.",
   },

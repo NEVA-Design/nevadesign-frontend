@@ -38,14 +38,14 @@ export default function NotFound() {
         </p>
         <h1 className="pv-display mt-4 text-[clamp(2rem,5.6vw,3.2rem)]">
           Perdu dans{" "}
-          <span className="pv-display-strong">l&apos;atelier.</span>
+          <span className="pv-display-strong">l’atelier.</span>
         </h1>
         <p className="mx-auto mt-4 max-w-[380px] text-[15px] leading-[1.7] text-slate">
-          Cette page n&apos;existe pas — ou plus. La lumière, elle, est
+          Cette page n’existe pas — ou plus. La lumière, elle, est
           toujours là.
         </p>
         <Link href="/" className="pv-btn mt-9">
-          Revenir à l&apos;accueil
+          Revenir à l’accueil
         </Link>
       </main>
     </div>
