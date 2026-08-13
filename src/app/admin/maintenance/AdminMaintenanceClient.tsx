@@ -299,22 +299,28 @@ export function AdminMaintenanceClient({
                 Mis à jour en direct
               </span>
             </div>
-            <div className="relative flex min-h-[340px] flex-col items-center justify-center overflow-hidden bg-abyss px-6 py-16 text-center">
-              <div aria-hidden className="pv-blueprint absolute inset-0" />
+            {/* L'aperçu reflète la VRAIE page publique : le rideau
+                ivoire de l'atelier, plus jamais un aplat sombre (D45) */}
+            <div className="relative flex min-h-[300px] flex-col items-center justify-center overflow-hidden bg-[#F1EFE9] px-6 py-14 text-center">
+              <div aria-hidden className="pv-scene-bg--dawn-calm absolute inset-0" />
               <div
                 aria-hidden
-                className="pv-halo left-1/2 top-[-80px] h-[300px] w-[480px] -translate-x-1/2 opacity-80"
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "radial-gradient(40% 50% at 34% 24%, rgba(164,139,232,0.2) 0%, rgba(164,139,232,0) 70%), radial-gradient(36% 46% at 68% 70%, rgba(239,184,148,0.18) 0%, rgba(239,184,148,0) 72%)",
+                }}
               />
               <div className="relative flex flex-col items-center">
-                <BrandMark size={30} />
-                <p className="pv-label mt-7 text-[color:var(--num-color)]">Neva Design</p>
+                <BrandMark size={30} tone="ink" />
+                <p className="pv-label mt-7">Neva Design</p>
                 <h3 className="pv-display mt-4 max-w-lg text-[clamp(1.6rem,3.2vw,2.3rem)] text-ink">
                   {form.title}
                 </h3>
-                <p className="mt-5 max-w-md text-sm leading-[1.8] text-steel">{form.message}</p>
+                <p className="mt-5 max-w-md text-sm leading-[1.8] text-slate">{form.message}</p>
                 <div className="mt-10 flex items-center gap-4">
                   <span aria-hidden className="pv-rule--beam h-px w-12" />
-                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-dusk">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-mist">
                     Le studio revient très vite
                   </span>
                   <span aria-hidden className="pv-rule--beam h-px w-12" />

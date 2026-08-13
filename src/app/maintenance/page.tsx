@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { DEFAULT_MAINTENANCE, isMaintenanceActive, type MaintenanceMode } from '@/lib/maintenance'
 import { createServiceClient } from '@/lib/supabase/server'
 import { BrandMark } from '@/components/prisme/Brand'
+import SatinSphere from '@/components/givre/SatinSphere'
 import { Button } from '@/components/ui/button'
 
 async function getMaintenance() {
@@ -32,10 +33,25 @@ export default async function MaintenancePage() {
 
   return (
     <main className="pv-scene relative flex min-h-[100svh] flex-col text-ink">
-      {/* La scène — aube calme, caustiques, rais de fenêtre discrets */}
+      {/* La scène — aube calme, caustiques, rais de fenêtre discrets,
+          le halo aurore et la sphère satinée : la composition du
+          rideau, identique que la maintenance soit en cours ou
+          terminée (D45). */}
       <div aria-hidden className="pv-scene-bg--dawn-calm absolute inset-0" />
       <div aria-hidden className="pv-caustics" />
       <div aria-hidden className="pv-windowlight absolute inset-0 opacity-60" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(34% 42% at 36% 28%, rgba(164,139,232,0.22) 0%, rgba(164,139,232,0) 70%), radial-gradient(30% 38% at 64% 66%, rgba(239,184,148,0.2) 0%, rgba(239,184,148,0) 72%)',
+        }}
+      />
+      <SatinSphere
+        size={140}
+        className="pointer-events-none absolute right-[10%] top-[14%] hidden lg:block"
+      />
 
       {/* Cadre éditorial — la page comme objet imprimé */}
       <div
