@@ -103,10 +103,10 @@ const WALL_W = 22;
 const WALL_TOP = FLOOR_Y + 11; // 9.28
 const FLOOR_D = 17.5; // z ∈ [WALL_Z, WALL_Z + 17.5]
 
-const WALL_TEX_W = 2560;
-const WALL_TEX_H = Math.round((WALL_TEX_W * 11) / WALL_W); // 1280
-const FLOOR_TEX_W = 1792;
-const FLOOR_TEX_H = Math.round((FLOOR_TEX_W * FLOOR_D) / WALL_W); // ≈ 1425
+const WALL_TEX_W = 2048;
+const WALL_TEX_H = Math.round((WALL_TEX_W * 11) / WALL_W); // 1024
+const FLOOR_TEX_W = 1536;
+const FLOOR_TEX_H = Math.round((FLOOR_TEX_W * FLOOR_D) / WALL_W); // ≈ 1222
 
 /* La sculpture vit autour de x = SCULPT_X, posée au sol. Les
    positions des satellites sont partagées avec le peintre du sol
@@ -452,13 +452,25 @@ function floorColor(wx: number, wz: number): [number, number, number] {
 
   /* Fondu d'horizon (anti-seam) : en perspective rasante, l'écran
      colle le sol LOINTAIN contre le bas du mur — les deux doivent
-     porter la même valeur AU MÊME x. Le sol converge donc vers la
-     couleur exacte de la base du mur (halo compris). Preuve visée :
-     dérivée verticale < 2 niveaux/px sur toute colonne. */
+     porter la même valeur AU MÊME x. Le sol converge vers la
+     couleur exacte de la base du mur (halo compris), lue dans la
+     ligne PRÉ-CALCULÉE (un appel wallColor par pixel gelait le
+     main thread ~9 s). Preuve : dérivée < 2 niveaux/px. */
   const horizon = smoothstep(6.5, FLOOR_D - 1.6, d);
-  if (horizon > 0.001) {
-    const wc = wallColor(wx, FLOOR_Y + 0.02);
-    mix3(col, wc as unknown as readonly number[], horizon * 0.97);
+  if (horizon > 0.001 && wallBottomRow) {
+    const i =
+      Math.max(
+        0,
+        Math.min(
+          FLOOR_TEX_W - 1,
+          Math.round(((wx - WALL_X0) / WALL_W) * (FLOOR_TEX_W - 1))
+        )
+      ) * 3;
+    mix3(
+      col,
+      [wallBottomRow[i], wallBottomRow[i + 1], wallBottomRow[i + 2]],
+      horizon * 0.97
+    );
   }
 
   return [
@@ -760,9 +772,26 @@ function drawMonogramReflection(canvas: HTMLCanvasElement) {
   ctx.restore();
 }
 
+/* La ligne de base du mur, pré-calculée colonne par colonne : le
+   fondu d'horizon du sol la lit par index. */
+let wallBottomRow: Float32Array | null = null;
+function buildWallBottomRow() {
+  if (wallBottomRow) return;
+  const row = new Float32Array(FLOOR_TEX_W * 3);
+  for (let i = 0; i < FLOOR_TEX_W; i++) {
+    const wx = WALL_X0 + (i / (FLOOR_TEX_W - 1)) * WALL_W;
+    const c = wallColor(wx, FLOOR_Y + 0.02);
+    row[i * 3] = c[0];
+    row[i * 3 + 1] = c[1];
+    row[i * 3 + 2] = c[2];
+  }
+  wallBottomRow = row;
+}
+
 let floorTexture: THREE.CanvasTexture | null = null;
 function getFloorTexture() {
   if (!floorTexture) {
+    buildWallBottomRow();
     const canvas = paintCanvas(FLOOR_TEX_W, FLOOR_TEX_H, (u, v) =>
       /* v=1 ↔ fond du sol (contre le mur, z = WALL_Z) */
       floorColor(WALL_X0 + u * WALL_W, WALL_Z + (1 - v) * FLOOR_D)
