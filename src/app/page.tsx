@@ -1,12 +1,19 @@
-import Navbar from "@/components/landing/Navbar";
-import Hero from "@/components/landing/Hero";
-import LandingShowcase from "@/components/landing/LandingShowcase";
-import Features from "@/components/landing/Features";
-import Pricing from "@/components/landing/Pricing";
-import Showcase from "@/components/landing/Showcase";
-import SocialProof from "@/components/landing/SocialProof";
-import FAQ from "@/components/landing/FAQ";
-import Footer from "@/components/landing/Footer";
+import PrismShell from "@/components/prisme/Shell";
+import GivreNavbar from "@/components/givre/GivreNavbar";
+import PrismLoader from "@/components/prisme/PrismLoader";
+import GivreHero from "@/components/givre/GivreHero";
+import GivreStudio from "@/components/givre/GivreStudio";
+import GivreEnhance from "@/components/givre/GivreEnhance";
+import GivreType from "@/components/givre/GivreType";
+import GivreFields from "@/components/givre/GivreFields";
+import GivreModules from "@/components/givre/GivreModules";
+import GivreStats from "@/components/givre/GivreStats";
+import GivreCreations from "@/components/givre/GivreCreations";
+import GivrePricing from "@/components/givre/GivrePricing";
+import GivrePacks from "@/components/givre/GivrePacks";
+import GivreFAQ from "@/components/givre/GivreFAQ";
+import GivreFooter from "@/components/givre/GivreFooter";
+import LocaleKeyed from "@/components/prisme/LocaleKeyed";
 import { defaultSeo, siteName, siteUrl } from "@/lib/seo";
 
 export default function Home() {
@@ -18,7 +25,7 @@ export default function Home() {
         "@id": `${siteUrl}/#organization`,
         name: "Neva Design",
         url: siteUrl,
-        logo: `${siteUrl}/nevalogooo.png`,
+        logo: `${siteUrl}/brand/logo-noir-large.png`,
         sameAs: [siteUrl],
       },
       {
@@ -26,7 +33,7 @@ export default function Home() {
         "@id": `${siteUrl}/#website`,
         url: siteUrl,
         name: siteName,
-        alternateName: ["Neva Design", "Neva AI FiveM", "FiveM IA"],
+        alternateName: ["Neva Design", "Neva Design Studio", "Neva AI"],
         description: defaultSeo.description,
         inLanguage: "fr-FR",
         publisher: {
@@ -41,7 +48,7 @@ export default function Home() {
         applicationCategory: "DesignApplication",
         operatingSystem: "Web",
         url: siteUrl,
-        image: `${siteUrl}/bglanding.png`,
+        image: `${siteUrl}/brand/og.png`,
         description: defaultSeo.description,
         keywords: defaultSeo.keywords.join(", "),
         brand: {
@@ -55,27 +62,41 @@ export default function Home() {
         },
         audience: {
           "@type": "Audience",
-          audienceType: "Createurs FiveM, serveurs GTA RP, designers et entrepreneurs gaming",
+          audienceType:
+            "Youtubeurs et créateurs de contenu, entrepreneurs et marques, équipes esport, serveurs GTA RP et communautés gaming",
         },
       },
     ],
   };
 
   return (
-    <main className="min-h-screen bg-[#050505] overflow-x-hidden">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <Navbar />
-      <Hero />
-      <LandingShowcase />
-      <SocialProof />
-      <Features />
-      <Pricing />
-      <Showcase />
-      <FAQ />
-      <Footer />
-    </main>
+    <PrismShell>
+      {/* Givre impose sa lumière à la route : l'ivoire de
+          l'atelier jusque sous l'overscroll, scrollbars et
+          contrôles natifs clairs. */}
+      <style>{`html{color-scheme:light}body{background-color:#F1EFE9;color:#1D2340}`}</style>
+      <main className="pv-light min-h-screen bg-paper text-ink">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <PrismLoader />
+        <GivreNavbar />
+        <LocaleKeyed>
+          <GivreHero />
+          <GivreStudio />
+          <GivreCreations />
+          <GivreEnhance />
+          <GivreType />
+          <GivreFields />
+          <GivreModules />
+          <GivreStats />
+          <GivrePricing />
+          <GivrePacks />
+          <GivreFAQ />
+          <GivreFooter />
+        </LocaleKeyed>
+      </main>
+    </PrismShell>
   );
 }

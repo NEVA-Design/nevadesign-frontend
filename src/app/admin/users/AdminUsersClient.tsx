@@ -1,11 +1,32 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import {
-  Search, ChevronLeft, ChevronRight, X, Check,
-  Loader2, Zap, CreditCard, RefreshCw, Trash2,
-  Plus, ArrowUpDown, Crown,
+  ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
+  CreditCard,
+  Crown,
+  Plus,
+  RefreshCw,
+  Search,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Input, Label, FormMessage } from "@/components/ui/field";
+import { Modal } from "@/components/ui/modal";
+import { Switch } from "@/components/ui/switch";
+import { LoadingBlock } from "@/components/ui/spinner";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Table, TableHeader, TableRow } from "@/components/ui/table";
+import { useToasts, ToastViewport } from "@/components/ui/toast";
+import { PageHeader, HeaderMeta } from "@/components/admin/PageHeader";
+
+/*
+ * Registre des utilisateurs — recherche débouncée, registre de verre,
+ * fiche de gestion en modale (plan, abonnement, créations).
+ */
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -21,18 +42,13 @@ interface AdminUser {
   subscription_status: string | null;
 }
 
-interface Toast { id: number; message: string; type: "success" | "error" }
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PLAN_LABELS: Record<Plan, string> = { free: "Free", creator: "Creator", studio: "Studio", pro: "Pro" };
-const PLAN_COLORS: Record<Plan, string> = {
-  free: "#9A9A9A",
-  creator: "#FFD166",
-  studio: "#FF7B4B",
-  pro: "#A78BFA",
-};
 const PLAN_CREDITS: Record<Plan, number> = { free: 5, creator: 100, studio: 350, pro: 900 };
+
+const TABLE_GRID =
+  "min-w-[680px] grid-cols-[minmax(240px,1fr)_90px_110px_100px_90px]";
 
 function timeAgo(date: string) {
   const diff = Date.now() - new Date(date).getTime();
@@ -44,29 +60,7 @@ function timeAgo(date: string) {
   return `${Math.floor(months / 12)}an`;
 }
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
-
-function Toasts({ items }: { items: Toast[] }) {
-  return (
-    <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
-      {items.map(t => (
-        <div
-          key={t.id}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium shadow-xl backdrop-blur-sm ${
-            t.type === "success"
-              ? "bg-[#4ADE80]/10 border-[#4ADE80]/30 text-[#4ADE80]"
-              : "bg-[#FF6B7D]/10 border-[#FF6B7D]/30 text-[#FF6B7D]"
-          }`}
-        >
-          {t.type === "success" ? <Check size={13} /> : <X size={13} />}
-          {t.message}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ─── User Modal ───────────────────────────────────────────────────────────────
+// ─── Fiche utilisateur (modale) ───────────────────────────────────────────────
 
 function UserModal({
   user,
@@ -82,11 +76,11 @@ function UserModal({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Plan tab
+  // Onglet Plan
   const [selectedPlan, setSelectedPlan] = useState<Plan>(user.plan);
   const [resetOnChange, setResetOnChange] = useState(false);
 
-  // Creations tab
+  // Onglet Créations
   const [addAmount, setAddAmount] = useState("");
   const [setAmount, setSetAmount] = useState("");
 
@@ -157,213 +151,213 @@ function UserModal({
   }
 
   async function handleRemoveSub() {
-    if (!confirm(`Supprimer l'abonnement de ${user.email} et repasser en Free ?`)) return;
+    if (!confirm(`Résilier l'abonnement de ${user.email} et revenir au plan Free ?`)) return;
     const data = await callAdmin(`/api/admin/users/${user.id}/plan`, {
       plan: "free",
       resetCredits: false,
       cancelSubscription: true,
     });
     if (data) {
-      setSuccess("Abonnement supprimé · plan Free");
+      setSuccess("Abonnement résilié · retour au plan Free");
       onUpdated({ ...user, plan: "free", credits: data.credits, stripe_subscription_id: null, subscription_status: null });
       setSelectedPlan("free");
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
-      <div
-        className="bg-[#0c0c0c] border border-white/[0.08] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden"
-        onClick={e => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-start justify-between px-5 pt-5 pb-4 border-b border-white/[0.06]">
+    <Modal
+      open
+      onClose={onClose}
+      eyebrow="Fiche utilisateur"
+      title={<span className="break-all text-lg sm:text-xl">{user.email}</span>}
+      widthClassName="max-w-md"
+    >
+      {/* Signalétique du compte */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <Badge variant={user.plan === "free" ? "subtle" : "neva"}>{PLAN_LABELS[user.plan]}</Badge>
+        <span className="font-mono text-[11px] tracking-[0.08em] text-[color:var(--num-color)]">
+          {user.credits.toLocaleString("fr-FR")} créations
+        </span>
+        <span className="font-mono text-[10px] tracking-[0.08em] text-dusk">
+          Inscription : {timeAgo(user.created_at)}
+        </span>
+      </div>
+
+      {/* Onglets */}
+      <div className="mt-5 grid grid-cols-2 gap-2">
+        {(["plan", "creations"] as const).map((t) => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => { setTab(t); clearMessages(); }}
+            className={`h-10 rounded-lg border font-mono text-[10px] font-medium uppercase tracking-[0.12em] transition-colors duration-300 ${
+              tab === t
+                ? "border-[rgba(109,91,232,0.35)] bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]"
+                : "border-[color:var(--hairline)] text-steel hover:text-ink"
+            }`}
+          >
+            {t === "plan" ? "Plan & Abonnement" : "Créations"}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Onglet Plan & Abonnement ── */}
+      {tab === "plan" && (
+        <div className="mt-5 space-y-5">
           <div>
-            <div className="text-sm font-semibold text-[#F5F0E8] mb-0.5 truncate max-w-[280px]">{user.email}</div>
-            <div className="flex items-center gap-2 text-[11px] text-[#555]">
-              <span
-                className="px-1.5 py-0.5 rounded text-[10px] font-bold border"
-                style={{ color: PLAN_COLORS[user.plan], borderColor: `${PLAN_COLORS[user.plan]}40`, background: `${PLAN_COLORS[user.plan]}12` }}
-              >
-                {PLAN_LABELS[user.plan].toUpperCase()}
-              </span>
-              <span className="flex items-center gap-1"><Zap size={9} className="text-[#FFD166]" /> {user.credits.toLocaleString()} créations</span>
-              <span>· inscrit {timeAgo(user.created_at)}</span>
+            <Label>Changer le plan</Label>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {(["free", "creator", "studio", "pro"] as Plan[]).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setSelectedPlan(p)}
+                  className={`min-h-[56px] rounded-lg border px-2 py-2.5 text-center transition-colors duration-300 ${
+                    selectedPlan === p
+                      ? "border-[rgba(109,91,232,0.35)] bg-[rgba(124,106,255,0.08)]"
+                      : "border-[color:var(--hairline)] hover:border-[#C9C9C0]"
+                  }`}
+                >
+                  <span className={`block text-[13px] font-medium ${selectedPlan === p ? "text-[color:var(--num-color)]" : "text-ink/70"}`}>
+                    {PLAN_LABELS[p]}
+                  </span>
+                  <span className="mt-0.5 block font-mono text-[10px] tracking-[0.06em] text-dusk">
+                    {PLAN_CREDITS[p].toLocaleString("fr-FR")} créations
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
-          <button onClick={onClose} className="text-[#444] hover:text-[#888] transition-colors mt-0.5">
-            <X size={16} />
-          </button>
-        </div>
 
-        {/* Tabs */}
-        <div className="flex border-b border-white/[0.06]">
-          {(["plan", "creations"] as const).map(t => (
-            <button
-              key={t}
-              onClick={() => { setTab(t); clearMessages(); }}
-              className={`flex-1 py-2.5 text-xs font-medium transition-colors ${
-                tab === t ? "text-[#F5F0E8] border-b-2 border-[#FF7B4B]" : "text-[#555] hover:text-[#888]"
-              }`}
-            >
-              {t === "plan" ? "Plan & Abonnement" : "Créations"}
-            </button>
-          ))}
-        </div>
+          <div className="flex items-center gap-3">
+            <Switch
+              checked={resetOnChange}
+              onChange={setResetOnChange}
+              aria-label="Réinitialiser les créations au nouveau plan"
+            />
+            <span className="text-[13px] text-steel">Réinitialiser les créations au nouveau plan</span>
+          </div>
 
-        <div className="px-5 py-4">
-          {/* ── Plan tab ── */}
-          {tab === "plan" && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-[11px] text-[#666] mb-2">Changer le plan</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {(["free", "creator", "studio", "pro"] as Plan[]).map(p => (
-                    <button
-                      key={p}
-                      onClick={() => setSelectedPlan(p)}
-                      className={`py-2.5 rounded-xl border text-xs font-semibold transition-all ${
-                        selectedPlan === p
-                          ? `border-2 text-[${PLAN_COLORS[p]}]`
-                          : "border-white/[0.06] text-[#555] hover:text-[#888] hover:border-white/[0.12]"
-                      }`}
-                      style={selectedPlan === p ? {
-                        borderColor: PLAN_COLORS[p],
-                        color: PLAN_COLORS[p],
-                        background: `${PLAN_COLORS[p]}10`,
-                      } : {}}
-                    >
-                      {PLAN_LABELS[p]}
-                      <div className="text-[9px] font-normal mt-0.5 opacity-60">{PLAN_CREDITS[p].toLocaleString()} créations</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
+          <Button
+            className="w-full"
+            onClick={handleChangePlan}
+            disabled={loading || selectedPlan === user.plan}
+          >
+            {loading ? "Mise à jour…" : (
+              <>
+                <Crown size={14} strokeWidth={1.8} />
+                Appliquer le plan {PLAN_LABELS[selectedPlan]}
+              </>
+            )}
+          </Button>
 
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <div
-                  onClick={() => setResetOnChange(v => !v)}
-                  className={`w-8 h-4 rounded-full transition-colors relative flex-shrink-0 ${resetOnChange ? "bg-[#FF7B4B]" : "bg-white/[0.08]"}`}
+          {user.stripe_subscription_id && (
+            <div className="border-t border-[color:var(--hairline)] pt-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <CreditCard size={13} strokeWidth={1.8} className="text-dusk" />
+                <span className="text-[13px] text-steel">Abonnement Stripe actif</span>
+                <span
+                  className={`inline-flex items-center rounded-full border px-2 py-[3px] font-mono text-[10px] font-medium uppercase tracking-[0.14em] ${
+                    user.subscription_status === "active"
+                      ? "border-[#C4E3D2] bg-[#EFF7F2] text-[#3E7A5C]"
+                      : "border-[#EFC9C6] bg-[#FBEFEE] text-[#9E4A45]"
+                  }`}
                 >
-                  <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${resetOnChange ? "translate-x-4" : "translate-x-0.5"}`} />
-                </div>
-                <span className="text-[11px] text-[#666]">Réinitialiser les créations au nouveau plan</span>
-              </label>
-
-              <Button
-                variant="gradient"
-                size="sm"
-                className="w-full"
-                onClick={handleChangePlan}
-                disabled={loading || selectedPlan === user.plan}
+                  {user.subscription_status ?? "inconnu"}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleRemoveSub}
+                disabled={loading}
+                className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full border border-err/30 text-[13px] text-err transition-colors duration-300 hover:bg-err/10 disabled:pointer-events-none disabled:opacity-45"
               >
-                {loading ? <><Loader2 size={12} className="animate-spin" /> Mise à jour…</> : <><Crown size={12} /> Appliquer le plan {PLAN_LABELS[selectedPlan]}</>}
-              </Button>
-
-              {user.stripe_subscription_id && (
-                <div className="pt-2 border-t border-white/[0.04]">
-                  <div className="text-[11px] text-[#555] mb-2 flex items-center gap-1.5">
-                    <CreditCard size={10} />
-                    Abonnement Stripe actif
-                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${
-                      user.subscription_status === 'active' ? 'border-[#4ADE80]/30 text-[#4ADE80] bg-[#4ADE80]/10' : 'border-[#FF6B7D]/30 text-[#FF6B7D] bg-[#FF6B7D]/10'
-                    }`}>
-                      {user.subscription_status ?? 'unknown'}
-                    </span>
-                  </div>
-                  <button
-                    onClick={handleRemoveSub}
-                    disabled={loading}
-                    className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl border border-red-500/20 text-xs text-red-400 hover:bg-red-500/8 transition-all"
-                  >
-                    <Trash2 size={11} />
-                    Supprimer l'abonnement &amp; passer en Free
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ── Creations tab ── */}
-          {tab === "creations" && (
-            <div className="space-y-3">
-              {/* Add */}
-              <div className="p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-                <div className="text-[11px] text-[#666] mb-2 flex items-center gap-1.5"><Plus size={10} /> Ajouter des créations</div>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    value={addAmount}
-                    onChange={e => setAddAmount(e.target.value)}
-                    placeholder="ex: 500"
-                    min={1}
-                    className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-[#F5F0E8] placeholder-[#333] outline-none focus:border-white/[0.15] transition-colors"
-                  />
-                  <Button size="sm" variant="gradient" onClick={handleAddCredits} disabled={loading || !addAmount}>
-                    {loading ? <Loader2 size={12} className="animate-spin" /> : "Ajouter"}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Set */}
-              <div className="p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-                <div className="text-[11px] text-[#666] mb-2 flex items-center gap-1.5"><ArrowUpDown size={10} /> Définir à une valeur précise</div>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    value={setAmount}
-                    onChange={e => setSetAmount(e.target.value)}
-                    placeholder="ex: 3000"
-                    min={0}
-                    className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-[#F5F0E8] placeholder-[#333] outline-none focus:border-white/[0.15] transition-colors"
-                  />
-                  <Button size="sm" variant="outline" onClick={handleSetCredits} disabled={loading || !setAmount}>
-                    {loading ? <Loader2 size={12} className="animate-spin" /> : "Définir"}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Reset */}
-              <div className="p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-                <div className="text-[11px] text-[#666] mb-2 flex items-center gap-1.5"><RefreshCw size={10} /> Réinitialiser au plan</div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#888]">
-                    Plan <span style={{ color: PLAN_COLORS[user.plan] }}>{PLAN_LABELS[user.plan]}</span> → {PLAN_CREDITS[user.plan].toLocaleString()} créations
-                  </span>
-                  <button
-                    onClick={handleResetCredits}
-                    disabled={loading}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-[#888] border border-white/[0.08] hover:text-[#CCCCC0] hover:border-white/[0.15] transition-all"
-                  >
-                    {loading ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
-                    Reset
-                  </button>
-                </div>
-              </div>
-
-              {/* Current balance */}
-              <div className="text-[11px] text-center text-[#444]">
-                Solde actuel : <span className="text-[#FFD166] font-semibold">{user.credits.toLocaleString()} créations</span>
-              </div>
-            </div>
-          )}
-
-          {/* Feedback */}
-          {(error || success) && (
-            <div className={`mt-3 px-3 py-2 rounded-lg text-xs flex items-center gap-2 ${
-              error ? "bg-red-500/8 border border-red-500/20 text-red-400" : "bg-[#4ADE80]/8 border border-[#4ADE80]/20 text-[#4ADE80]"
-            }`}>
-              {error ? <X size={11} /> : <Check size={11} />}
-              {error ?? success}
+                <Trash2 size={13} strokeWidth={1.8} />
+                Résilier l&apos;abonnement et revenir au plan Free
+              </button>
             </div>
           )}
         </div>
-      </div>
-    </div>
+      )}
+
+      {/* ── Onglet Créations ── */}
+      {tab === "creations" && (
+        <div className="mt-5 space-y-3">
+          {/* Ajouter */}
+          <div className="rounded-xl border border-[color:var(--hairline)] bg-white/[0.02] p-4">
+            <p className="pv-label mb-3 flex items-center gap-2 text-[10px]">
+              <Plus size={11} strokeWidth={1.8} aria-hidden />
+              Ajouter des créations
+            </p>
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                value={addAmount}
+                onChange={(e) => setAddAmount(e.target.value)}
+                placeholder="ex. 500"
+                min={1}
+                aria-label="Nombre de créations à ajouter"
+                className="flex-1"
+              />
+              <Button onClick={handleAddCredits} disabled={loading || !addAmount}>
+                Ajouter
+              </Button>
+            </div>
+          </div>
+
+          {/* Définir */}
+          <div className="rounded-xl border border-[color:var(--hairline)] bg-white/[0.02] p-4">
+            <p className="pv-label mb-3 flex items-center gap-2 text-[10px]">
+              <ArrowUpDown size={11} strokeWidth={1.8} aria-hidden />
+              Définir à une valeur précise
+            </p>
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                value={setAmount}
+                onChange={(e) => setSetAmount(e.target.value)}
+                placeholder="ex. 3000"
+                min={0}
+                aria-label="Nouveau solde de créations"
+                className="flex-1"
+              />
+              <Button variant="outline" onClick={handleSetCredits} disabled={loading || !setAmount}>
+                Définir
+              </Button>
+            </div>
+          </div>
+
+          {/* Réinitialiser */}
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[color:var(--hairline)] bg-white/[0.02] p-4">
+            <div className="min-w-0">
+              <p className="pv-label mb-1.5 flex items-center gap-2 text-[10px]">
+                <RefreshCw size={11} strokeWidth={1.8} aria-hidden />
+                Réinitialiser au plan
+              </p>
+              <p className="text-xs text-steel">
+                Plan <span className="text-[color:var(--num-color)]">{PLAN_LABELS[user.plan]}</span> → {PLAN_CREDITS[user.plan].toLocaleString("fr-FR")} créations
+              </p>
+            </div>
+            <Button variant="outline" size="sm" className="h-10" onClick={handleResetCredits} disabled={loading}>
+              Réinitialiser
+            </Button>
+          </div>
+
+          {/* Solde actuel */}
+          <p className="pt-1 text-center font-mono text-[11px] tracking-[0.08em] text-dusk">
+            Solde actuel : <span className="text-[color:var(--num-color)]">{user.credits.toLocaleString("fr-FR")} créations</span>
+          </p>
+        </div>
+      )}
+
+      {/* Retour d'état */}
+      {error ? <FormMessage tone="error" className="mt-4">{error}</FormMessage> : null}
+      {success ? <FormMessage tone="success" className="mt-4">{success}</FormMessage> : null}
+    </Modal>
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function AdminUsersClient() {
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -373,20 +367,14 @@ export function AdminUsersClient() {
   const [debouncedQ, setDebouncedQ] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
-  const [toasts, setToasts] = useState<Toast[]>([]);
+  const { toasts, push } = useToasts();
   const PER_PAGE = 20;
 
-  // Debounce search
+  // Recherche débouncée
   useEffect(() => {
     const t = setTimeout(() => { setDebouncedQ(query); setPage(1); }, 300);
     return () => clearTimeout(t);
   }, [query]);
-
-  const addToast = useCallback((message: string, type: Toast["type"]) => {
-    const id = Date.now();
-    setToasts(prev => [...prev, { id, message, type }]);
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500);
-  }, []);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -409,120 +397,120 @@ export function AdminUsersClient() {
   function handleUpdated(updated: AdminUser) {
     setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
     if (selectedUser?.id === updated.id) setSelectedUser(updated);
-    addToast("Utilisateur mis à jour", "success");
+    push("Utilisateur mis à jour", "success");
   }
 
   const totalPages = Math.ceil(total / PER_PAGE);
 
   return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-bold text-[#F5F0E8]">Utilisateurs</h1>
-          <p className="text-sm text-[#555] mt-0.5">{total.toLocaleString()} compte{total !== 1 ? "s" : ""} au total</p>
-        </div>
-      </div>
+    <div className="relative overflow-x-clip">
+      <div aria-hidden className="pv-halo right-[-10%] top-[-140px] h-[380px] w-[520px] opacity-50" />
 
-      {/* Search */}
-      <div className="relative mb-4">
-        <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#444]" />
-        <input
+      <PageHeader
+        eyebrow="Registre des comptes"
+        title="Utilisateurs"
+        description="Plans, abonnements et créations de chaque compte, gérés depuis un seul registre."
+      >
+        <HeaderMeta
+          value={total.toLocaleString("fr-FR")}
+          label={`compte${total !== 1 ? "s" : ""}`}
+        />
+      </PageHeader>
+
+      {/* Recherche */}
+      <div className="relative mb-5 max-w-sm">
+        <Search size={14} strokeWidth={1.8} className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-dusk" aria-hidden />
+        <Input
           type="text"
           value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder="Rechercher par email…"
-          className="w-full max-w-xs pl-9 pr-4 py-2 bg-white/[0.03] border border-white/[0.07] rounded-xl text-sm text-[#F5F0E8] placeholder-[#333] outline-none focus:border-white/[0.14] transition-colors"
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Rechercher par adresse e-mail…"
+          aria-label="Rechercher un utilisateur par adresse e-mail"
+          className="pl-10"
         />
       </div>
 
-      {/* Table */}
-      <div className="rounded-2xl border border-white/[0.07] overflow-hidden">
-        {/* Column headers */}
-        <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 px-5 py-2.5 bg-white/[0.02] border-b border-white/[0.05] text-[10px] font-semibold text-[#444] uppercase tracking-widest">
-          <span>Email</span>
-          <span className="text-right w-20">Plan</span>
-          <span className="text-right w-24">Créations</span>
-          <span className="text-right w-20">Inscrit</span>
-          <span className="text-right w-16">Action</span>
-        </div>
-
-        {loading ? (
-          <div className="flex items-center justify-center py-16 gap-2 text-sm text-[#444]">
-            <Loader2 size={14} className="animate-spin" /> Chargement…
-          </div>
-        ) : users.length === 0 ? (
-          <div className="text-center py-16 text-sm text-[#444]">
-            {debouncedQ ? `Aucun résultat pour "${debouncedQ}"` : "Aucun utilisateur"}
-          </div>
-        ) : (
-          users.map((u, i) => (
-            <div
-              key={u.id}
-              className={`grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 items-center px-5 py-3 hover:bg-white/[0.02] transition-colors ${
-                i < users.length - 1 ? "border-b border-white/[0.04]" : ""
-              }`}
-            >
-              <div className="min-w-0">
-                <div className="text-sm text-[#E8E3DB] truncate">{u.email}</div>
-                {u.subscription_status && u.subscription_status !== "active" && (
-                  <div className="text-[10px] text-[#FF6B7D] mt-0.5">{u.subscription_status}</div>
-                )}
-              </div>
-              <div className="w-20 flex justify-end">
-                <span
-                  className="text-[10px] font-bold px-2 py-1 rounded-md border"
-                  style={{ color: PLAN_COLORS[u.plan], borderColor: `${PLAN_COLORS[u.plan]}40`, background: `${PLAN_COLORS[u.plan]}12` }}
-                >
-                  {PLAN_LABELS[u.plan].toUpperCase()}
-                </span>
-              </div>
-              <div className="w-24 text-right">
-                <span className="text-sm font-semibold text-[#FFD166]">{u.credits.toLocaleString()}</span>
-                <span className="text-[10px] text-[#444] ml-1">créations</span>
-              </div>
-              <div className="w-20 text-right text-xs text-[#555]">
-                {timeAgo(u.created_at)}
-              </div>
-              <div className="w-16 flex justify-end">
-                <button
-                  onClick={() => setSelectedUser(u)}
-                  className="px-2.5 py-1.5 rounded-lg text-[11px] text-[#888] border border-white/[0.07] hover:text-[#F5F0E8] hover:border-white/[0.15] transition-all"
-                >
-                  Gérer
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+      {/* Registre */}
+      {loading ? (
+        <Card>
+          <LoadingBlock label="Chargement des comptes…" />
+        </Card>
+      ) : users.length === 0 ? (
+        <EmptyState
+          title={debouncedQ ? `Aucun résultat pour « ${debouncedQ} »` : "Aucun utilisateur pour le moment"}
+          hint={debouncedQ ? "Essayez une autre adresse e-mail." : "Les comptes apparaîtront ici dès la première inscription."}
+        />
+      ) : (
+        <Card className="overflow-hidden">
+          <Table>
+            <TableHeader className={TABLE_GRID}>
+              <span>E-mail</span>
+              <span className="text-right">Plan</span>
+              <span className="text-right">Créations</span>
+              <span className="text-right">Inscription</span>
+              <span className="text-right">Action</span>
+            </TableHeader>
+            {users.map((u) => (
+              <TableRow key={u.id} className={TABLE_GRID}>
+                <div className="min-w-0">
+                  <div className="truncate text-ink/85">{u.email}</div>
+                  {u.subscription_status && u.subscription_status !== "active" && (
+                    <div className="mt-0.5 font-mono text-[10px] tracking-[0.06em] text-err">
+                      {u.subscription_status}
+                    </div>
+                  )}
+                </div>
+                <div className="flex justify-end">
+                  <Badge variant={u.plan === "free" ? "subtle" : "neva"}>{PLAN_LABELS[u.plan]}</Badge>
+                </div>
+                <div className="text-right font-mono text-xs text-ink">
+                  {u.credits.toLocaleString("fr-FR")}
+                  <span className="ml-1 text-ink/30">cr</span>
+                </div>
+                <div className="text-right font-mono text-[11px] text-dusk">
+                  {timeAgo(u.created_at)}
+                </div>
+                <div className="flex justify-end">
+                  <Button variant="outline" size="sm" className="h-10 px-4" onClick={() => setSelectedUser(u)}>
+                    Gérer
+                  </Button>
+                </div>
+              </TableRow>
+            ))}
+          </Table>
+        </Card>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4">
-          <span className="text-xs text-[#444]">
+        <div className="mt-5 flex items-center justify-between">
+          <span className="font-mono text-[11px] tracking-[0.06em] text-dusk">
             Page {page} / {totalPages}
           </span>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="p-1.5 rounded-lg border border-white/[0.07] text-[#555] hover:text-[#CCCCC0] disabled:opacity-30 transition-all"
+              aria-label="Page précédente"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] text-steel transition-colors duration-300 hover:border-[rgba(109,91,232,0.45)] hover:text-ink disabled:pointer-events-none disabled:opacity-30"
             >
-              <ChevronLeft size={13} />
+              <ChevronLeft size={15} strokeWidth={1.8} />
             </button>
             <button
+              type="button"
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="p-1.5 rounded-lg border border-white/[0.07] text-[#555] hover:text-[#CCCCC0] disabled:opacity-30 transition-all"
+              aria-label="Page suivante"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] text-steel transition-colors duration-300 hover:border-[rgba(109,91,232,0.45)] hover:text-ink disabled:pointer-events-none disabled:opacity-30"
             >
-              <ChevronRight size={13} />
+              <ChevronRight size={15} strokeWidth={1.8} />
             </button>
           </div>
         </div>
       )}
 
-      {/* User modal */}
+      {/* Fiche utilisateur */}
       {selectedUser && (
         <UserModal
           user={selectedUser}
@@ -531,7 +519,7 @@ export function AdminUsersClient() {
         />
       )}
 
-      <Toasts items={toasts} />
+      <ToastViewport toasts={toasts} />
     </div>
   );
 }

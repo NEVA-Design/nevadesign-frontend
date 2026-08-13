@@ -1,11 +1,13 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import {
-  Palette, ArrowRight, Sparkles, Download, Copy, Check, Loader2,
+  Palette, ArrowRight, ArrowUpRight, Download, Copy, Check, Loader2,
   Upload, X, ChevronDown, ChevronRight, ChevronLeft, Maximize2, Lock, Eye, EyeOff,
   RefreshCw, Settings2, ImageIcon, BookUser, Trash2, Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input, Label, FormMessage } from "@/components/ui/field";
+import { Modal } from "@/components/ui/modal";
 import Image from "next/image";
 import Link from "next/link";
 import { IMAGE_MODELS, RESOLUTION_OPTIONS, type ImageModel } from "@/lib/ai/models";
@@ -13,7 +15,7 @@ import { ASPECT_RATIOS as BASE_ASPECT_RATIOS } from "@/lib/ai/aspect-ratios";
 import { readApiResponse } from "@/lib/api/client";
 import { ModuleHeader } from "@/components/dashboard/ModuleHeader";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// ─── Constantes ───────────────────────────────────────────────────────────────
 
 const PLAN_HIERARCHY: Record<string, number> = { free: 0, creator: 1, studio: 2, pro: 3 };
 
@@ -38,11 +40,11 @@ const ASPECT_RATIOS = BASE_ASPECT_RATIOS.map((ratio) => ({
 }));
 
 const RATIO_COPY: Record<string, string> = {
-  "1:1": "Square image",
-  "4:3": "Landscape image",
-  "16:9": "Widescreen image",
-  "3:4": "Portrait image",
-  "9:16": "TikTok image",
+  "1:1": "Carré",
+  "4:3": "Paysage classique",
+  "16:9": "Panoramique large",
+  "3:4": "Portrait",
+  "9:16": "Vertical story",
 };
 
 const REFERENCE_USAGE_OPTIONS = [
@@ -67,12 +69,12 @@ const RENDER_COUNTS = [
 ];
 
 const STYLE_PRESETS = [
-  { label: "Luxury", color: "#FFD166" },
-  { label: "Street", color: "#FF7B4B" },
-  { label: "Cartel", color: "#FF6B7D" },
-  { label: "Miami", color: "#38BDF8" },
-  { label: "Corporate", color: "#BBA7FF" },
-  { label: "FiveM", color: "#55D18A" },
+  { label: "Luxury" },
+  { label: "Street" },
+  { label: "Cartel" },
+  { label: "Miami" },
+  { label: "Corporate" },
+  { label: "FiveM" },
 ];
 
 const MAX_REFERENCE_IMAGES = 6;
@@ -98,7 +100,6 @@ const PROMPT_EXAMPLES = [
   {
     label: "Perso référence — Beach club luxe",
     tag: "Référence · Beach",
-    accentColor: "#34D399",
     ratio: "3:4",
     prompt: `Use my uploaded character as the exact subject. Preserve the exact face, hairstyle, makeup, skin tone, body proportions, clothing style and overall identity. Do not redesign or alter the character.
 
@@ -115,7 +116,6 @@ Professional commercial advertising quality, realistic photography, high-end Fiv
   {
     label: "Chef de gang — poster recrutement",
     tag: "Réaliste · Portrait",
-    accentColor: "#FF7B4B",
     ratio: "9:16",
     prompt: `FiveM gang leader character, sharp dark designer suit, gold chain, confident dominant stance with arms crossed. Strong commanding presence, masculine authority energy. No redesign — exactly as described.
 
@@ -130,7 +130,6 @@ Premium FiveM promotional artwork, Rockstar Editor inspired cinematic realism, u
   {
     label: "Loading screen — lever du soleil panoramique",
     tag: "Loading Screen · 16:9",
-    accentColor: "#FFD166",
     ratio: "16:9",
     prompt: `Lone FiveM character standing with their back to the camera, facing the breathtaking Los Santos skyline at dawn. Strong hero silhouette against the morning sky, cinematic composition, powerful and solitary.
 
@@ -145,7 +144,6 @@ Rockstar Editor quality, photoreal GTA V environment, ultra detailed, no text, n
   {
     label: "Staff LSPD — recrutement officier",
     tag: "Police · Recrutement",
-    accentColor: "#60A5FA",
     ratio: "9:16",
     prompt: `Professional LSPD officer in full tactical uniform — duty belt, badge, patrol cap, dark aviator sunglasses. Upright posture, calm authority, institutional confidence. Representing the Los Santos police force with dignity and professionalism.
 
@@ -160,7 +158,6 @@ Professional law enforcement photography quality, FiveM recruitment poster stand
   {
     label: "Lifestyle luxe — marina supercar",
     tag: "Luxe · Editorial",
-    accentColor: "#FFB5C8",
     ratio: "3:4",
     prompt: `Elegant FiveM character in tailored dark suit, luxury watch visible, relaxed confident posture leaning against a matte black Lamborghini Huracán. Aspirational lifestyle energy — successful, composed, untouchable.
 
@@ -175,7 +172,6 @@ High-end automotive editorial quality, GQ magazine standard, luxury lifestyle ad
   {
     label: "Beach lifestyle — Vespucci été",
     tag: "Beach · Lifestyle",
-    accentColor: "#38BDF8",
     ratio: "1:1",
     prompt: `FiveM character in stylish casual summer outfit — open linen shirt, sunglasses, relaxed natural posture, genuine expression. Authentic lifestyle energy, not stiff or overly posed.
 
@@ -190,7 +186,6 @@ Lifestyle photography quality, summer campaign standard, warm color grading, aut
   {
     label: "Mécano — workshop Benny's",
     tag: "Mécano · Authentique",
-    accentColor: "#F59E0B",
     ratio: "9:16",
     prompt: `Skilled FiveM mechanic character in authentic worn work overalls, subtle oil stains, confident no-nonsense energy. Casually resting against his work or holding a wrench. Real craftsman vibe — pride in his work.
 
@@ -205,7 +200,6 @@ Authentic automotive editorial quality, FiveM workshop marketing, ultra detailed
   {
     label: "Cartoon — personnage stylisé illustré",
     tag: "Cartoon · Artwork",
-    accentColor: "#A78BFA",
     ratio: "1:1",
     prompt: `FiveM character rendered in a professional cartoon / anime illustration style. Clean bold outlines, cel-shading technique, vibrant flat color fills. Dynamic energetic pose full of personality. The character feels like they belong in a premium animated series or game splash screen.
 
@@ -227,7 +221,32 @@ const LOADING_STEPS_ALL = [
   { label: "Génération en cours…",      show: () => true },
 ];
 
-// ─── Notification helpers ─────────────────────────────────────────────────────
+const PROMPT_STRUCTURE = [
+  { label: "Sujet & identité", desc: "Qui est le personnage — tenue, posture, énergie. Si référence : instruction de préservation exacte." },
+  { label: "Scène & activité", desc: "Ce que fait le personnage — pose, action, interaction avec le décor." },
+  { label: "Environnement", desc: "Lieu précis, éléments du décor, props, ambiance générale du lieu." },
+  { label: "Angle de caméra", desc: "Position, hauteur, cadrage, séparation des plans avant / milieu / fond." },
+  { label: "Lumière & ambiance", desc: "Source lumineuse, heure, température, humeur — motivée, jamais artificielle." },
+  { label: "Qualité technique", desc: "Standard de sortie : réaliste, ultra détaillé, FiveM marketing, 4K, pas de texte." },
+];
+
+const QUICK_TIPS = [
+  { label: "16:9", tip: "Bannière · Loading screen · Twitter" },
+  { label: "9:16", tip: "Poster portrait · Story · Recrutement" },
+  { label: "Léger", tip: "Conserve votre intention, corrections minimales" },
+  { label: "Directeur", tip: "Ajoute caméra, lumière, profondeur" },
+];
+
+const BETTER_RESULT_TIPS = [
+  "Ajoutez une référence claire : personnage, logo, décor ou style souhaité.",
+  "Décrivez le sujet principal et ce qu'il doit absolument conserver.",
+  "Décrivez la scène : lieu, action, ambiance, heure de la journée.",
+  "Précisez le style : FiveM réaliste, GTA V, lumière cinématique.",
+  "Indiquez ce qu'il ne faut pas changer : visage, tatouages, coiffure, tenue.",
+  "Ajoutez un prompt négatif : pas de texte, visage déformé ou autre personnage.",
+];
+
+// ─── Notifications ────────────────────────────────────────────────────────────
 
 function playNotificationSound() {
   try {
@@ -250,7 +269,7 @@ function playNotificationSound() {
     play(1318.5, 0.22, 0.28)
     setTimeout(() => ctx.close(), 700)
   } catch {
-    // Web Audio not available
+    // Web Audio indisponible
   }
 }
 
@@ -258,20 +277,20 @@ function showBrowserNotification() {
   if (!('Notification' in window)) return
   if (Notification.permission !== 'granted') return
   try {
-    new Notification('Neva Design ✦', {
-      body: "Ton image est prête à télécharger !",
+    new Notification('Neva Design', {
+      body: "Votre image est prête à télécharger.",
       icon: '/favicon.ico',
       tag: 'neva-generation',
     })
   } catch {
-    // Notification not supported in this context
+    // Notifications non prises en charge dans ce contexte
   }
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// ─── Composant ────────────────────────────────────────────────────────────────
 
 export function DesignPageClient({ userPlan }: { userPlan: string }) {
-  // Core state
+  // État principal
   const [prompt, setPrompt] = useState("");
   const [selectedAspectRatio, setSelectedAspectRatio] = useState("16:9");
   const [selectedResolution, setSelectedResolution] = useState("hd");
@@ -280,18 +299,18 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
   );
   const [modelPickerOpen, setModelPickerOpen] = useState(false);
 
-  // Enhancement mode
+  // Mode d'amélioration
   const [enhancementMode, setEnhancementMode] = useState<"light" | "director" | "full">("director");
 
-  // Render count
+  // Nombre de rendus
   const [renderCount, setRenderCount] = useState<1 | 3 | 4>(1);
 
-  // Character references (uploaded images)
+  // Références téléversées
   const [referenceImages, setReferenceImages] = useState<UploadedReferenceImage[]>([]);
   const [referenceUsageHint, setReferenceUsageHint] = useState<string>("auto");
   const [isDraggingReference, setIsDraggingReference] = useState(false);
 
-  // Saved character memory
+  // Personnages mémorisés
   type SavedChar = { id: string; name: string; image_preview?: string | null; role?: string | null; server?: string | null; style?: string | null };
   const [savedCharacters, setSavedCharacters] = useState<SavedChar[]>([]);
   const [selectedCharacter, setSelectedCharacter] = useState<{ id: string; name: string; description: string } | null>(null);
@@ -302,12 +321,12 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
   const [charSaveStatus, setCharSaveStatus] = useState<"idle" | "ok" | "err">("idle");
   const [showBetterResultGuide, setShowBetterResultGuide] = useState(false);
 
-  // Advanced settings
+  // Réglages avancés
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [negativePrompt, setNegativePrompt] = useState("");
   const [seed, setSeed] = useState<string>("");
 
-  // Generation state
+  // État de génération
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [result, setResult] = useState<{
@@ -325,7 +344,7 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // UI state
+  // État d'interface
   const [copied, setCopied] = useState(false);
   const [showEnhancedPrompt, setShowEnhancedPrompt] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
@@ -339,7 +358,7 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
   const previewAspectStyle = { aspectRatio: `${activeAspectRatio.w} / ${activeAspectRatio.h}` };
   const isFreePlan = userPlan === "free";
 
-  // Loading step animation
+  // Animation des étapes de chargement
   useEffect(() => {
     if (!loading) return;
     const steps = LOADING_STEPS_ALL.filter(s => s.show(hasReferenceImages, enhancementMode));
@@ -358,7 +377,7 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  // Load saved characters on mount
+  // Chargement des personnages mémorisés au montage
   useEffect(() => {
     fetch("/api/characters")
       .then(r => readApiResponse<{ characters: SavedChar[] }>(r))
@@ -576,15 +595,29 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
   const totalCreditCost = selectedImageModel.creditCost * renderCount;
   const activeStep = result ? 2 : prompt.trim() || hasReferenceImages || selectedCharacter ? 1 : 0;
 
+  const pillClass = (active: boolean, disabled = false) =>
+    `inline-flex h-10 items-center rounded-full border px-4 font-mono text-[11px] uppercase tracking-[0.08em] transition-colors duration-[var(--dur-base)] ${
+      disabled
+        ? "cursor-not-allowed border-[color:var(--hairline)] text-ink/15"
+        : active
+          ? "border-[rgba(109,91,232,0.5)] bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]"
+          : "border-[color:var(--hairline-strong)] bg-white/70 text-steel hover:border-[#C9C9C0] hover:text-ink"
+    }`;
+
+  const settingRowClass = "flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-[color:var(--hairline)] py-4";
+  const settingLabelClass = "pv-label w-full sm:w-28 shrink-0";
+
   return (
-    <div className="min-h-full" onClick={() => setModelPickerOpen(false)}>
-      <div className="mx-auto max-w-[1320px] px-4 py-6 sm:px-6 lg:px-8">
+    <div className="relative min-h-full" onClick={() => setModelPickerOpen(false)}>
+      <div aria-hidden className="pv-halo--violet pv-halo -top-24 left-[14%] h-72 w-72" />
+
+      <div className="relative mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-6 lg:px-10">
         <ModuleHeader
           icon={Palette}
           eyebrow="Neva Design"
           title="Design Studio"
           description="Décrivez le rendu voulu, ajoutez vos références, puis lancez une génération prête à publier."
-          accent="#FF7B4B"
+          accent="#7C6AFF"
           meta={renderCount > 1 ? `${selectedImageModel.creditCost} × ${renderCount} = ${totalCreditCost} créations` : `${totalCreditCost} création / image`}
           activeStep={activeStep}
           steps={[
@@ -594,827 +627,885 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
           ]}
         />
 
-        {/* ── Header ── */}
-        <div className="hidden">
-          <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#FF7B4B] to-[#FFD166] flex items-center justify-center">
-                <Palette size={13} className="text-white" />
-              </div>
-              <h1 className="text-xl font-semibold text-[#F5F0E8] tracking-tight">Neva Design</h1>
-            </div>
-            <p className="text-sm text-[#555] ml-8">Studio créatif adaptatif — 15 styles, 3 modes</p>
-          </div>
-          <div className="flex items-center gap-1.5 text-[11px] text-[#555] bg-white/[0.03] border border-white/[0.06] rounded-lg px-2.5 py-1.5">
-            <Sparkles size={9} className="text-[#FFD166]" />
-            {renderCount > 1
-              ? <><span className="text-[#888]">{selectedImageModel.creditCost} × {renderCount}</span> = <span className="text-[#F5F0E8] font-semibold">{totalCreditCost}</span> <span>créations</span></>
-              : <><span className="text-[#F5F0E8] font-semibold">{totalCreditCost}</span> <span>création / image</span></>
-            }
-          </div>
-        </div>
+        {/* ══ Plan de travail — brief + réglages | résultat ══ */}
+        <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
 
-        {/* ── Studio Card ── */}
-        <div className="mb-5 grid gap-4 lg:grid-cols-[1fr_320px]">
-          <div className="rounded-[16px] border border-[#FF7B4B]/18 bg-[linear-gradient(135deg,rgba(255,123,75,0.12),rgba(255,255,255,0.025))] p-5">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#FF7B4B]">Brief de création</div>
-            <div className="mt-2 text-2xl font-semibold tracking-tight text-[#F5F0E8]">Créez un visuel qui donne envie de rejoindre votre serveur.</div>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#A9A39B]">Un prompt clair, une référence propre, un format adapté. Le reste doit servir le rendu final.</p>
-          </div>
-          <div className="rounded-[16px] border border-white/[0.075] bg-white/[0.035] p-4">
-            <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#555]">Presets</div>
-            <div className="grid grid-cols-2 gap-2">
-              {STYLE_PRESETS.map((style) => (
-                <button
-                  key={style.label}
-                  type="button"
-                  onClick={() => setPrompt((current) => current ? `${current}, ${style.label} style` : `${style.label} FiveM premium visual`)}
-                  className="rounded-2xl border border-white/[0.07] bg-black/20 px-3 py-2 text-left text-sm font-medium text-[#D8D1C8] transition-all hover:border-white/[0.14] hover:bg-white/[0.055]"
-                >
-                  <span className="mr-2 inline-block h-2 w-2 rounded-full" style={{ background: style.color }} />
-                  {style.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+          {/* ── Zone brief + réglages ─────────────────────────── */}
+          <section className="min-w-0 lg:col-span-7">
 
-        <div
-          className={`mb-5 overflow-hidden rounded-[16px] border bg-[linear-gradient(135deg,rgba(255,255,255,0.055),rgba(255,255,255,0.018))] shadow-[0_24px_70px_rgba(0,0,0,0.25)] transition-all ${
-            isDraggingReference ? "border-[#FF7B4B]/55 ring-2 ring-[#FF7B4B]/20" : "border-white/[0.08]"
-          }`}
-          onDragEnter={(event) => {
-            event.preventDefault();
-            setIsDraggingReference(true);
-          }}
-          onDragOver={(event) => event.preventDefault()}
-          onDragLeave={(event) => {
-            if (event.currentTarget.contains(event.relatedTarget as Node)) return;
-            setIsDraggingReference(false);
-          }}
-          onDrop={handleDropReference}
-        >
-
-          {/* Top bar: model + resolution + mode + render count + aspect */}
-          <div className="flex items-center gap-2 px-4 pt-3 pb-0 flex-wrap">
-            {/* Model picker */}
-            <div className="relative" onClick={e => e.stopPropagation()}>
-              <button
-                onClick={() => setModelPickerOpen(v => !v)}
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.07] text-[#CCCCC0] hover:border-white/[0.14] transition-all"
-              >
-                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-[#FFD166]/15 text-[#FFD166] border border-[#FFD166]/25 font-mono">
-                  {selectedImageModel.badge}
+            {/* Brief — l'objet de verre premium posé sur la soie */}
+            <div
+              className={`pv-glass overflow-hidden !rounded-2xl transition-colors duration-300 ${
+                isDraggingReference
+                  ? "!border-[rgba(109,91,232,0.5)] !bg-[rgba(124,106,255,0.06)]"
+                  : ""
+              }`}
+              onDragEnter={(event) => {
+                event.preventDefault();
+                setIsDraggingReference(true);
+              }}
+              onDragOver={(event) => event.preventDefault()}
+              onDragLeave={(event) => {
+                if (event.currentTarget.contains(event.relatedTarget as Node)) return;
+                setIsDraggingReference(false);
+              }}
+              onDrop={handleDropReference}
+            >
+              <div className="flex items-baseline justify-between gap-3 border-b border-[color:var(--hairline)] px-5 py-4">
+                <span className="flex items-baseline gap-3">
+                  <span className="pv-num">01</span>
+                  <span className="pv-label">Brief de création</span>
                 </span>
-                {selectedImageModel.name}
-                <ChevronDown size={10} className="text-[#444]" />
-              </button>
+                <span className="pv-meta hidden sm:inline">Ctrl + Entrée pour lancer</span>
+              </div>
 
-              {modelPickerOpen && (
-                <div className="absolute left-0 top-full mt-1.5 w-64 bg-[#111] border border-white/[0.08] rounded-xl shadow-2xl z-50 overflow-hidden">
-                  {imageModelList.map(m => {
-                    const locked = !canUseModel(userPlan, m.requiredPlan);
+              <div className="px-5 pt-4">
+                <textarea
+                  rows={4}
+                  value={prompt}
+                  onChange={e => setPrompt(e.target.value)}
+                  onPaste={handlePasteReference}
+                  onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) generate(); }}
+                  placeholder="Décrivez le visuel à produire. Collez une image avec Ctrl+V ou glissez une référence dans cette zone."
+                  className="min-h-36 w-full resize-none bg-transparent text-[15px] leading-relaxed text-ink outline-none placeholder:text-ink/25"
+                />
+              </div>
+
+              {/* Ambiances rapides */}
+              <div className="flex flex-wrap items-center gap-2 px-5 pb-4">
+                <span className="pv-meta mr-1">Ambiances</span>
+                {STYLE_PRESETS.map((style) => (
+                  <button
+                    key={style.label}
+                    type="button"
+                    onClick={() => setPrompt((current) => current ? `${current}, ${style.label} style` : `${style.label} FiveM premium visual`)}
+                    className="inline-flex h-10 items-center rounded-full border border-[color:var(--hairline-strong)] bg-white/70 px-4 font-mono text-[11px] uppercase tracking-[0.08em] text-steel transition-colors duration-[var(--dur-base)] hover:border-[rgba(109,91,232,0.35)] hover:text-[color:var(--num-color)]"
+                  >
+                    {style.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Références */}
+              <div className="border-t border-[color:var(--hairline)] px-5 py-4">
+                {hasReferenceImages && (
+                  <div className="flex flex-wrap items-start gap-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {referenceImages.map((image, index) => (
+                        <div
+                          key={image.id}
+                          className="group relative h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-[color:var(--hairline-strong)]"
+                          title={image.name}
+                        >
+                          <Image src={image.preview} alt={`Référence ${index + 1}`} fill sizes="44px" className="object-cover" />
+                          {index === 0 && (
+                            <span className="absolute left-0.5 top-0.5 rounded-full bg-ink/60 px-1 font-mono text-[8px] text-[color:var(--num-color)]">
+                              1
+                            </span>
+                          )}
+                          <button
+                            onClick={() => removeReferenceImage(image.id)}
+                            aria-label={`Retirer la référence ${index + 1}`}
+                            className="absolute inset-0 flex items-center justify-center bg-ink/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                          >
+                            <X size={12} className="text-ink" />
+                          </button>
+                        </div>
+                      ))}
+                      {referenceImages.length < MAX_REFERENCE_IMAGES && (
+                        <button
+                          onClick={() => fileInputRef.current?.click()}
+                          aria-label="Ajouter une référence"
+                          className="flex h-11 w-11 items-center justify-center rounded-lg border border-dashed border-[color:var(--hairline-strong)] text-dusk transition-colors duration-300 hover:border-[rgba(109,91,232,0.45)] hover:text-[color:var(--num-color)]"
+                        >
+                          <Upload size={13} />
+                        </button>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="pv-meta mb-2">
+                        {referenceImages.length} / {MAX_REFERENCE_IMAGES} référence{referenceImages.length > 1 ? "s" : ""} — utilisée{referenceImages.length > 1 ? "s" : ""} comme :
+                      </p>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {REFERENCE_USAGE_OPTIONS.map(opt => (
+                          <button
+                            key={opt.id}
+                            onClick={() => setReferenceUsageHint(opt.id)}
+                            className={pillClass(referenceUsageHint === opt.id)}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {selectedCharacter && !hasReferenceImages && (
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex items-center gap-2 rounded-lg border border-[rgba(109,91,232,0.3)] bg-[rgba(124,106,255,0.08)] px-3 py-2 text-[13px] text-[color:var(--num-color)]">
+                      <BookUser size={13} />
+                      {selectedCharacter.name}
+                    </span>
+                    <button
+                      onClick={() => { setSelectedCharacter(null); setReferenceUsageHint("auto"); }}
+                      aria-label="Retirer le personnage sélectionné"
+                      className="flex h-10 w-10 items-center justify-center rounded-lg text-dusk transition-colors hover:bg-ink/5 hover:text-ink"
+                    >
+                      <X size={13} />
+                    </button>
+                  </div>
+                )}
+
+                {!hasReferenceImages && !selectedCharacter && (
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="inline-flex h-10 items-center gap-2 rounded-lg border border-dashed border-[color:var(--hairline-strong)] px-4 text-[13px] text-steel transition-colors duration-300 hover:border-[rgba(109,91,232,0.45)] hover:text-[color:var(--num-color)]"
+                    >
+                      <Upload size={13} />
+                      Téléverser une référence
+                    </button>
+
+                    {savedCharacters.length > 0 && (
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowCharPicker(v => !v)}
+                          className="inline-flex h-10 items-center gap-2 rounded-lg border border-[rgba(109,91,232,0.28)] bg-[rgba(124,106,255,0.06)] px-4 text-[13px] text-[color:var(--num-color)] transition-colors duration-300 hover:border-[rgba(109,91,232,0.5)]"
+                        >
+                          <BookUser size={13} />
+                          Mes personnages ({savedCharacters.length})
+                        </button>
+
+                        {showCharPicker && (
+                          <div className="pv-scale-in absolute left-0 top-full z-40 mt-2 w-60 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] bg-white shadow-[var(--shadow-float)]">
+                            <div className="border-b border-[color:var(--hairline)] px-3.5 py-2.5">
+                              <span className="pv-label">Personnages mémorisés</span>
+                            </div>
+                            {savedCharacters.map(c => (
+                              <div key={c.id} className="group flex items-center gap-2 px-3.5 py-2 transition-colors hover:bg-ink/[0.04]">
+                                <button
+                                  onClick={() => selectSavedCharacter(c)}
+                                  className="flex min-w-0 flex-1 items-center gap-2 py-1.5 text-left"
+                                >
+                                  <BookUser size={12} className="shrink-0 text-[color:var(--num-color)]" />
+                                  <span className="truncate text-[13px] text-ink/80">{c.name}</span>
+                                </button>
+                                <button
+                                  onClick={() => deleteCharacter(c.id)}
+                                  aria-label={`Supprimer ${c.name}`}
+                                  className="shrink-0 p-2 text-ink/25 opacity-0 transition-all hover:text-err group-hover:opacity-100"
+                                >
+                                  <Trash2 size={12} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <span className="pv-meta hidden sm:inline">personnage, pose, tenue, décor ou logo</span>
+                  </div>
+                )}
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={e => {
+                    handleFileUpload(e.target.files);
+                    e.currentTarget.value = "";
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Réglages */}
+            <div className="mt-8">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <span className="flex items-baseline gap-3">
+                  <span className="pv-num">02</span>
+                  <span className="pv-label">Réglages du rendu</span>
+                </span>
+                <span
+                  className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] ${
+                    isFreePlan
+                      ? "border-[#EAD9A8] bg-[#FBF6E9] text-[#8A6D1F]"
+                      : "border-[#C4E3D2] bg-[#EFF7F2] text-[#3E7A5C]"
+                  }`}
+                >
+                  <span className={`h-1.5 w-1.5 rounded-full ${isFreePlan ? "bg-warn" : "bg-ok"}`} />
+                  {isFreePlan ? "Filigrane actif" : "Sans filigrane"}
+                </span>
+              </div>
+
+              {/* Modèle */}
+              <div className={settingRowClass}>
+                <span className={settingLabelClass}>Modèle</span>
+                <div className="relative" onClick={e => e.stopPropagation()}>
+                  <button
+                    onClick={() => setModelPickerOpen(v => !v)}
+                    className="inline-flex h-10 items-center gap-2.5 rounded-lg border border-[color:var(--hairline-strong)] px-3.5 text-[13px] text-ink transition-colors duration-300 hover:border-[#C9C9C0]"
+                  >
+                    <span className="rounded-full border border-[rgba(109,91,232,0.3)] bg-[rgba(124,106,255,0.08)] px-1.5 py-0.5 font-mono text-[9px] font-medium uppercase tracking-[0.12em] text-[color:var(--num-color)]">
+                      {selectedImageModel.badge}
+                    </span>
+                    {selectedImageModel.name}
+                    <ChevronDown size={12} className="text-dusk" />
+                  </button>
+
+                  {modelPickerOpen && (
+                    <div className="pv-scale-in absolute left-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] bg-white shadow-[var(--shadow-float)]">
+                      {imageModelList.map(m => {
+                        const locked = !canUseModel(userPlan, m.requiredPlan);
+                        return (
+                          <button
+                            key={m.id}
+                            onClick={() => {
+                              setSelectedImageModel(m);
+                              setSelectedResolution(current => normalizeResolutionForModel(current, m));
+                              setModelPickerOpen(false);
+                            }}
+                            className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors ${
+                              selectedImageModel.id === m.id ? "bg-white" : "hover:bg-ink/[0.03]"
+                            }`}
+                          >
+                            <span className={`shrink-0 rounded-full border border-[rgba(109,91,232,0.3)] bg-[rgba(124,106,255,0.08)] px-1.5 py-0.5 font-mono text-[9px] font-medium uppercase tracking-[0.12em] text-[color:var(--num-color)] ${locked ? "opacity-35" : ""}`}>
+                              {m.badge}
+                            </span>
+                            <span className="min-w-0 flex-1">
+                              <span className={`flex items-center gap-1.5 text-[13px] font-medium ${locked ? "text-dusk" : "text-ink"}`}>
+                                {m.name}
+                                {locked && <Lock size={10} className="text-ink/25" />}
+                              </span>
+                              <span className="mt-0.5 block truncate text-[11px] text-dusk">{m.description}</span>
+                            </span>
+                            <span className="shrink-0 font-mono text-[10px] text-steel">
+                              {m.creditCost} cr
+                            </span>
+                            {locked && m.requiredPlan && (
+                              <span className="shrink-0 rounded-full border border-warn/30 bg-warn/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-warn">
+                                {m.requiredPlan}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Résolution */}
+              <div className={settingRowClass}>
+                <span className={settingLabelClass}>Résolution</span>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {RESOLUTION_OPTIONS.map(r => {
+                    const max = selectedImageModel.maxResolution;
+                    const available = !(r.id === "4k" && max !== "4K") && !(r.id === "2k" && max === "HD");
                     return (
                       <button
-                        key={m.id}
-                        onClick={() => {
-                          setSelectedImageModel(m);
-                          setSelectedResolution(current => normalizeResolutionForModel(current, m));
-                          setModelPickerOpen(false);
-                        }}
-                        className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 text-left transition-colors ${selectedImageModel.id === m.id ? "bg-white/[0.05]" : "hover:bg-white/[0.04]"}`}
+                        key={r.id}
+                        onClick={() => available && setSelectedResolution(r.id)}
+                        disabled={!available}
+                        className={pillClass(selectedResolution === r.id, !available)}
                       >
-                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md border font-mono flex-shrink-0 ${locked ? "opacity-30" : ""} bg-[#FFD166]/15 text-[#FFD166] border-[#FFD166]/25`}>
-                          {m.badge}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <div className={`text-xs font-medium flex items-center gap-1 ${locked ? "text-[#444]" : "text-[#F5F0E8]"}`}>
-                            {m.name}
-                            {locked && <Lock size={9} className="text-[#333]" />}
-                          </div>
-                          <div className="text-[10px] text-[#444] mt-0.5 truncate">{m.description}</div>
-                        </div>
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/[0.04] text-[#777] border border-white/[0.07] flex-shrink-0">
-                          {m.creditCost} création{m.creditCost > 1 ? "s" : ""}
-                        </span>
-                        {locked && m.requiredPlan && (
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#FF7B4B]/10 text-[#FF7B4B] border border-[#FF7B4B]/20 flex-shrink-0 capitalize">
-                            {m.requiredPlan}
-                          </span>
-                        )}
+                        {r.label}
                       </button>
                     );
                   })}
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Resolution */}
-            <div className="flex items-center gap-1">
-              {RESOLUTION_OPTIONS.map(r => {
-                const max = selectedImageModel.maxResolution;
-                const available = !(r.id === "4k" && max !== "4K") && !(r.id === "2k" && max === "HD");
-                return available ? (
-                  <button
-                    key={r.id}
-                    onClick={() => setSelectedResolution(r.id)}
-                    className={`text-[10px] font-semibold px-2 py-1 rounded-md border transition-all ${
-                      selectedResolution === r.id
-                        ? "bg-[#FF7B4B]/20 border-[#FF7B4B]/35 text-[#FF7B4B]"
-                        : "bg-white/[0.03] border-white/[0.06] text-[#444] hover:text-[#888]"
-                    }`}
-                  >
-                    {r.label}
-                  </button>
-                ) : (
-                  <button key={r.id} disabled className="text-[10px] font-semibold px-2 py-1 rounded-md border border-white/[0.03] text-[#2a2a2a] cursor-not-allowed">
-                    {r.label}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Enhancement mode */}
-            <div className="flex items-center gap-1">
-              {ENHANCEMENT_MODES.map(m => (
-                <button
-                  key={m.id}
-                  onClick={() => setEnhancementMode(m.id as "light" | "director" | "full")}
-                  title={m.description}
-                  className={`text-[10px] font-semibold px-2 py-1 rounded-md border transition-all ${
-                    enhancementMode === m.id
-                      ? "bg-[#A78BFA]/20 border-[#A78BFA]/35 text-[#A78BFA]"
-                      : "bg-white/[0.03] border-white/[0.06] text-[#444] hover:text-[#888]"
-                  }`}
-                >
-                  {m.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Render count */}
-            <div className="flex items-center gap-1" title="Nombre de rendus simultanés">
-              <Layers size={9} className="text-[#333]" />
-              {RENDER_COUNTS.map(r => (
-                <button
-                  key={r.value}
-                  onClick={() => setRenderCount(r.value)}
-                  className={`text-[10px] font-semibold px-2 py-1 rounded-md border transition-all ${
-                    renderCount === r.value
-                      ? "bg-[#FFD166]/20 border-[#FFD166]/35 text-[#FFD166]"
-                      : "bg-white/[0.03] border-white/[0.06] text-[#444] hover:text-[#888]"
-                  }`}
-                >
-                  {r.label}
-                </button>
-              ))}
-            </div>
-
-            <div className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[10px] font-semibold ${
-              isFreePlan
-                ? "border-[#FFD166]/25 bg-[#FFD166]/10 text-[#FFD166]"
-                : "border-[#55D18A]/25 bg-[#55D18A]/10 text-[#55D18A]"
-            }`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${isFreePlan ? "bg-[#FFD166]" : "bg-[#55D18A]"}`} />
-              {isFreePlan ? "Watermark Enabled" : "Watermark Disabled"}
-            </div>
-
-            {/* Aspect ratios */}
-            <div className="flex items-center gap-1 ml-auto">
-              {ASPECT_RATIOS.map(r => {
-                const active = selectedAspectRatio === r.id;
-                return (
-                  <button
-                    key={r.id}
-                    onClick={() => setSelectedAspectRatio(r.id)}
-                    title={r.label}
-                    className={`flex items-center justify-center w-8 h-7 rounded-md border transition-all ${
-                      active ? "bg-white/[0.06] border-white/[0.16]" : "border-transparent hover:border-white/[0.07]"
-                    }`}
-                  >
-                    <div
-                      style={{ width: r.w * 0.7, height: r.h * 0.7, minWidth: r.w * 0.7 }}
-                      className={`rounded-[1px] border transition-colors ${active ? "border-[#F5F0E8]" : "border-[#333]"}`}
-                    />
-                  </button>
-                );
-              })}
-              <span className="ml-1 rounded-lg border border-white/[0.07] bg-white/[0.03] px-2 py-1 text-[10px] text-[#CCCCC0]">
-                Output Ratio: <span className="font-mono">{activeAspectRatio.label}</span>
-                <span className="ml-1 text-[#777]">{RATIO_COPY[activeAspectRatio.label]}</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Prompt textarea */}
-          <div className="px-4 pt-3">
-            <textarea
-              rows={4}
-              value={prompt}
-              onChange={e => setPrompt(e.target.value)}
-              onPaste={handlePasteReference}
-              onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) generate(); }}
-              placeholder="Decrivez le visuel a produire. Collez une image avec Ctrl+V ou glissez une reference dans cette zone."
-              className="min-h-36 w-full resize-none bg-transparent text-base leading-relaxed text-[#E8E3DB] outline-none placeholder-[#4E4A45]"
-            />
-          </div>
-
-          {/* Character reference strip */}
-          <div className="px-4 pb-3">
-            <div className="flex items-center gap-3 flex-wrap">
-
-              {hasReferenceImages && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {referenceImages.map((image, index) => (
-                      <div key={image.id} className="relative w-10 h-10 rounded-lg overflow-hidden border border-white/[0.1] flex-shrink-0 group" title={image.name}>
-                        <Image src={image.preview} alt={`ref ${index + 1}`} fill sizes="40px" className="object-cover" />
-                        {index === 0 && (
-                          <div className="absolute left-0.5 top-0.5 px-1 rounded bg-black/60 text-[8px] text-white/70">
-                            1
-                          </div>
-                        )}
-                        <button
-                          onClick={() => removeReferenceImage(image.id)}
-                          className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X size={12} className="text-white" />
-                        </button>
-                      </div>
+              {/* Amélioration */}
+              <div className={settingRowClass}>
+                <span className={settingLabelClass}>Amélioration</span>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {ENHANCEMENT_MODES.map(m => (
+                      <button
+                        key={m.id}
+                        onClick={() => setEnhancementMode(m.id as "light" | "director" | "full")}
+                        title={m.description}
+                        className={pillClass(enhancementMode === m.id)}
+                      >
+                        {m.label}
+                      </button>
                     ))}
-                    {referenceImages.length < MAX_REFERENCE_IMAGES && (
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className="w-10 h-10 rounded-lg border border-dashed border-white/[0.1] flex items-center justify-center text-[#444] hover:text-[#FF7B4B] hover:border-[#FF7B4B]/40 transition-all"
-                        aria-label="Ajouter une rÃ©fÃ©rence"
-                      >
-                        <Upload size={13} />
-                      </button>
-                    )}
                   </div>
-                  <div>
-                    <div className="text-[10px] text-[#666] mb-1">
-                      {referenceImages.length} / {MAX_REFERENCE_IMAGES} rÃ©fÃ©rence{referenceImages.length > 1 ? "s" : ""} comme :
-                    </div>
-                    <div className="flex items-center gap-1 flex-wrap">
-                      {REFERENCE_USAGE_OPTIONS.map(opt => (
-                        <button
-                          key={opt.id}
-                          onClick={() => setReferenceUsageHint(opt.id)}
-                          className={`text-[10px] px-2 py-0.5 rounded-md border transition-all ${
-                            referenceUsageHint === opt.id
-                              ? "bg-[#FF7B4B]/20 border-[#FF7B4B]/35 text-[#FF7B4B]"
-                              : "bg-white/[0.03] border-white/[0.06] text-[#444] hover:text-[#888]"
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {selectedCharacter && !hasReferenceImages && (
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#A78BFA]/10 border border-[#A78BFA]/25 text-[#A78BFA]">
-                    <BookUser size={11} />
-                    <span className="text-[11px] font-medium">{selectedCharacter.name}</span>
-                  </div>
-                  <button
-                    onClick={() => { setSelectedCharacter(null); setReferenceUsageHint("auto"); }}
-                    className="text-[#333] hover:text-[#888] transition-colors"
-                  >
-                    <X size={12} />
-                  </button>
-                </div>
-              )}
-
-              {!hasReferenceImages && !selectedCharacter && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-white/[0.03] border border-dashed border-white/[0.1] text-[#555] hover:text-[#FF7B4B] hover:border-[#FF7B4B]/40 transition-all"
-                  >
-                    <Upload size={11} />
-                    Upload une référence
-                  </button>
-
-                  {savedCharacters.length > 0 && (
-                    <div className="relative">
-                      <button
-                        onClick={() => setShowCharPicker(v => !v)}
-                        className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-[#A78BFA]/8 border border-[#A78BFA]/20 text-[#A78BFA] hover:border-[#A78BFA]/40 transition-all"
-                      >
-                        <BookUser size={11} />
-                        Mes persos ({savedCharacters.length})
-                      </button>
-
-                      {showCharPicker && (
-                        <div className="absolute left-0 top-full mt-1.5 w-56 bg-[#111] border border-white/[0.08] rounded-xl shadow-2xl z-40 overflow-hidden">
-                          <div className="px-3 py-2 text-[9px] font-semibold text-[#444] uppercase tracking-wider border-b border-white/[0.05]">
-                            Personnages mémorisés
-                          </div>
-                          {savedCharacters.map(c => (
-                            <div key={c.id} className="flex items-center gap-2 px-3 py-2 hover:bg-white/[0.04] group">
-                              <button
-                                onClick={() => selectSavedCharacter(c)}
-                                className="flex-1 text-left flex items-center gap-2"
-                              >
-                                <BookUser size={11} className="text-[#A78BFA] flex-shrink-0" />
-                                <span className="text-xs text-[#CCCCC0] truncate">{c.name}</span>
-                              </button>
-                              <button
-                                onClick={() => deleteCharacter(c.id)}
-                                className="text-[#333] hover:text-[#FF6B7D] transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0"
-                              >
-                                <Trash2 size={10} />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={e => {
-                  handleFileUpload(e.target.files);
-                  e.currentTarget.value = "";
-                }}
-              />
-              {!hasReferenceImages && !selectedCharacter && (
-                <span className="text-[10px] text-[#2e2e2e] hidden sm:inline">
-                  personnage, pose, tenue, décor ou logo
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Advanced settings */}
-          <div className="border-t border-white/[0.04]">
-            <button
-              onClick={() => setAdvancedOpen(v => !v)}
-              className="flex items-center gap-1.5 w-full px-4 py-2 text-[10px] text-[#333] hover:text-[#666] transition-colors"
-            >
-              <Settings2 size={10} />
-              Réglages précis
-              <ChevronRight size={9} className={`ml-auto transition-transform ${advancedOpen ? "rotate-90" : ""}`} />
-            </button>
-
-            {advancedOpen && (
-              <div className="px-4 pb-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[10px] text-[#444] mb-1.5">Prompt négatif</label>
-                  <input
-                    type="text"
-                    value={negativePrompt}
-                    onChange={e => setNegativePrompt(e.target.value)}
-                    placeholder="ex: floue, cartoon, surexposé..."
-                    className="w-full bg-white/[0.03] border border-white/[0.07] rounded-lg px-3 py-2 text-xs text-[#CCCCC0] placeholder-[#333] outline-none focus:border-white/[0.12] transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] text-[#444] mb-1.5">Seed (optionnel)</label>
-                  <input
-                    type="number"
-                    value={seed}
-                    onChange={e => setSeed(e.target.value)}
-                    placeholder="ex: 42"
-                    className="w-full bg-white/[0.03] border border-white/[0.07] rounded-lg px-3 py-2 text-xs text-[#CCCCC0] placeholder-[#333] outline-none focus:border-white/[0.12] transition-colors"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Generate button row */}
-          <div className="flex items-center justify-between px-4 py-3 border-t border-white/[0.04]">
-            <div className="text-[10px] text-[#555]">{totalCreditCost} création{totalCreditCost > 1 ? "s" : ""} utilisée{totalCreditCost > 1 ? "s" : ""} après un rendu réussi</div>
-            <Button
-              variant="gradient"
-              size="sm"
-              onClick={() => generate()}
-              disabled={!prompt.trim() || loading}
-              className="min-w-[120px]"
-            >
-              {loading ? (
-                <><Loader2 size={12} className="animate-spin" /> Génération…</>
-              ) : (
-                <>Créer le rendu {renderCount > 1 ? `× ${renderCount}` : ""} <ArrowRight size={12} /></>
-              )}
-            </Button>
-          </div>
-        </div>
-
-        {/* ── Error ── */}
-        {error && (
-          <div className="mb-4 px-4 py-3 bg-red-500/8 border border-red-500/15 rounded-xl text-sm text-red-400 leading-relaxed">
-            {error}
-          </div>
-        )}
-
-        {/* ── Loading ── */}
-        {loading && (
-          <div className="mb-4 rounded-2xl border border-white/[0.06] bg-[#0c0c0c] px-6 py-8 flex flex-col items-center justify-center gap-5" style={previewAspectStyle}>
-            <div className="relative">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF6B7D]/20 to-[#FFD166]/20 border border-white/[0.07] flex items-center justify-center">
-                <ImageIcon size={22} className="text-[#FF7B4B] opacity-70" />
-              </div>
-              <div className="absolute inset-0 rounded-2xl border border-[#FF7B4B]/20 animate-ping" />
-            </div>
-
-            {renderCount > 1 && (
-              <div className="text-[11px] text-[#555]">{renderCount} rendus en parallèle…</div>
-            )}
-
-            <div className="space-y-2 text-center">
-              {activeLoadingSteps.map((step, i) => (
-                <div key={i} className={`flex items-center justify-center gap-2 text-xs transition-all ${
-                  i === loadingStep ? "text-[#F5F0E8]" : i < loadingStep ? "text-[#333] line-through" : "text-[#2a2a2a]"
-                }`}>
-                  {i < loadingStep ? (
-                    <Check size={10} className="text-[#4ADE80] flex-shrink-0" />
-                  ) : i === loadingStep ? (
-                    <Loader2 size={10} className="animate-spin text-[#FF7B4B] flex-shrink-0" />
-                  ) : (
-                    <div className="w-2.5 h-2.5 rounded-full border border-[#2a2a2a] flex-shrink-0" />
-                  )}
-                  {step.label}
-                </div>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-1">
-              {[0,1,2,3,4].map(d => (
-                <div key={d} className="w-1 h-1 rounded-full bg-[#FF7B4B]/40 animate-bounce" style={{ animationDelay: `${d * 0.12}s` }} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ── Result ── */}
-        {result && !loading && (
-          <div className="mb-8 overflow-hidden rounded-[16px] border border-white/[0.08] bg-[#0c0c0c] shadow-[0_24px_70px_rgba(0,0,0,0.28)]">
-
-            {/* Single image */}
-            {result.images.length === 1 && (
-              <div className="relative bg-[#080808] cursor-zoom-in group" onClick={() => { setFullscreenIdx(0); setFullscreen(true); }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={result.images[0]} alt="Generated" className="w-full h-auto block" />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all" />
-                <button
-                  onClick={e => { e.stopPropagation(); setFullscreenIdx(0); setFullscreen(true); }}
-                  className="absolute top-3 right-3 p-1.5 rounded-lg bg-black/40 backdrop-blur-sm text-white/70 hover:text-white hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100"
-                >
-                  <Maximize2 size={13} />
-                </button>
-              </div>
-            )}
-
-            {/* Multi-image grid */}
-            {result.images.length > 1 && (
-              <div className={`columns-1 gap-3 bg-[#080808] p-3 sm:columns-2 ${result.images.length >= 3 ? "lg:columns-3" : ""}`}>
-                {result.images.map((img, i) => (
-                  <div
-                    key={i}
-                    className="group relative mb-3 break-inside-avoid cursor-zoom-in overflow-hidden rounded-[16px] border border-white/[0.06]"
-                    onClick={() => { setFullscreenIdx(i); setFullscreen(true); }}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={img} alt={`Generated ${i + 1}`} className="w-full h-auto block" />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all" />
-                    <div className="absolute top-1.5 left-1.5 text-[9px] font-mono text-white/40 group-hover:text-white/70 transition-colors">
-                      {i + 1}
-                    </div>
-                    <button
-                      onClick={e => { e.stopPropagation(); downloadSingleImage(img, i); }}
-                      className="absolute bottom-1.5 right-1.5 p-1.5 rounded-md bg-black/50 backdrop-blur-sm text-white/60 hover:text-white opacity-0 group-hover:opacity-100 transition-all"
-                    >
-                      <Download size={11} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Enhanced prompt reveal */}
-            <div className="border-t border-white/[0.04]">
-              <button
-                onClick={() => setShowEnhancedPrompt(v => !v)}
-                className="flex items-center gap-2 w-full px-4 py-2.5 text-xs text-[#444] hover:text-[#888] transition-colors"
-              >
-                {showEnhancedPrompt ? <EyeOff size={11} /> : <Eye size={11} />}
-                {showEnhancedPrompt ? "Masquer le prompt amélioré" : "Voir le prompt amélioré par l'IA"}
-                <ChevronRight size={9} className={`ml-auto transition-transform ${showEnhancedPrompt ? "rotate-90" : ""}`} />
-              </button>
-              {showEnhancedPrompt && (
-                <div className="px-4 pb-3">
-                  <p className="text-[11px] text-[#555] leading-relaxed font-mono bg-white/[0.02] rounded-lg p-3 border border-white/[0.05]">
-                    {result.enhancedPrompt}
+                  <p className="pv-meta mt-2">
+                    {ENHANCEMENT_MODES.find(m => m.id === enhancementMode)?.description}
                   </p>
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Mémoriser ce personnage — only when a reference image was used */}
-            {hasReferenceImages && (referenceUsageHint === "auto" || referenceUsageHint === "character") && (
-              <div className="px-4 py-3 border-t border-white/[0.04]">
-                {!showSaveChar ? (
-                  <button
-                    onClick={() => setShowSaveChar(true)}
-                    className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-lg bg-[#A78BFA]/10 border border-[#A78BFA]/20 text-[#A78BFA] hover:bg-[#A78BFA]/18 transition-all"
-                  >
-                    <BookUser size={11} />
-                    Mémoriser ce personnage
-                  </button>
-                ) : (
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <input
-                      autoFocus
-                      value={saveCharName}
-                      onChange={e => setSaveCharName(e.target.value)}
-                      onKeyDown={e => { if (e.key === "Enter") saveCharacter(); if (e.key === "Escape") { setShowSaveChar(false); setCharSaveStatus("idle"); } }}
-                      placeholder="Nom du personnage…"
-                      maxLength={80}
-                      className="flex-1 min-w-0 bg-white/[0.04] border border-[#A78BFA]/25 rounded-lg px-3 py-1.5 text-xs text-[#F5F0E8] placeholder-[#444] outline-none focus:border-[#A78BFA]/50 transition-colors"
-                    />
+              {/* Rendus simultanés */}
+              <div className={settingRowClass}>
+                <span className={settingLabelClass}>Rendus</span>
+                <div className="flex flex-wrap items-center gap-1.5" title="Nombre de rendus simultanés">
+                  <Layers size={12} className="mr-1 text-ink/25" />
+                  {RENDER_COUNTS.map(r => (
                     <button
-                      onClick={saveCharacter}
-                      disabled={charSaving || !saveCharName.trim()}
-                      className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-lg bg-[#A78BFA]/20 border border-[#A78BFA]/30 text-[#A78BFA] hover:bg-[#A78BFA]/30 disabled:opacity-40 transition-all flex-shrink-0"
+                      key={r.value}
+                      onClick={() => setRenderCount(r.value)}
+                      className={pillClass(renderCount === r.value)}
                     >
-                      {charSaving ? (
-                        <Loader2 size={10} className="animate-spin" />
-                      ) : charSaveStatus === "ok" ? (
-                        <Check size={10} />
-                      ) : (
-                        <BookUser size={10} />
-                      )}
-                      {charSaving ? "Analyse…" : charSaveStatus === "ok" ? "Sauvegardé !" : "Sauvegarder"}
+                      {r.label}
                     </button>
-                    <button onClick={() => { setShowSaveChar(false); setCharSaveStatus("idle"); }} className="text-[#333] hover:text-[#888]">
-                      <X size={12} />
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Actions */}
-            <div className="flex items-center gap-2 px-4 py-3 border-t border-white/[0.04]">
-              <div className="flex items-center gap-1.5 text-[10px] text-[#333] mr-auto">
-                <span className="font-mono uppercase">{result.resolution}</span>
-                <span>·</span>
-                <span>{result.aspectRatio}</span>
-                <span>·</span>
-                <span className={result.watermarkEnabled ? "text-[#FFD166]" : "text-[#55D18A]"}>
-                  {result.watermarkEnabled ? "Watermark" : "Clean"}
-                </span>
-                <span className="text-[#333]">-</span>
-                <span className="truncate max-w-[120px]">{result.model}</span>
-                {result.images.length > 1 && (
-                  <><span>·</span><span className="text-[#FFD166]">{result.images.length} images</span></>
-                )}
-              </div>
-
-              <button
-                onClick={() => copyText(result.enhancedPrompt)}
-                className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.07] text-[#666] hover:text-[#CCCCC0] transition-all"
-              >
-                {copied ? <Check size={10} className="text-[#4ADE80]" /> : <Copy size={10} />}
-                {copied ? "Copié" : "Copier"}
-              </button>
-              <button
-                onClick={() => generate()}
-                className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.07] text-[#666] hover:text-[#CCCCC0] transition-all"
-              >
-                <RefreshCw size={10} />
-                Regénérer
-              </button>
-              <button
-                onClick={() => setShowBetterResultGuide(v => !v)}
-                className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.07] text-[#666] hover:text-[#CCCCC0] transition-all"
-              >
-                <Settings2 size={10} />
-                Je ne suis pas satisfait
-              </button>
-              <button
-                onClick={downloadAll}
-                className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg bg-[#FF7B4B]/10 border border-[#FF7B4B]/20 text-[#FF7B4B] hover:bg-[#FF7B4B]/20 transition-all"
-              >
-                <Download size={10} />
-                {result.images.length > 1 ? "Tout télécharger" : "Télécharger"}
-              </button>
-            </div>
-            {showBetterResultGuide && (
-              <div className="border-t border-white/[0.04] px-4 py-4">
-                <div className="mb-3 text-sm font-semibold text-[#F5F0E8]">Comment obtenir un meilleur résultat</div>
-                <div className="grid gap-2 text-xs leading-relaxed text-[#777] sm:grid-cols-2">
-                  {[
-                    "Ajoute une référence claire : personnage, logo, décor ou style souhaité.",
-                    "Décris le sujet principal et ce qu’il doit absolument conserver.",
-                    "Décris la scène : lieu, action, ambiance, heure de la journée.",
-                    "Précise le style : FiveM réaliste, GTA V, lumière cinématique.",
-                    "Indique ce qu’il ne faut pas changer : visage, tatouages, coiffure, tenue.",
-                    "Ajoute un prompt négatif : pas de texte, visage déformé ou autre personnage.",
-                  ].map((item, index) => (
-                    <div key={item} className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-2.5">
-                      <span className="mr-2 text-[#FF7B4B]">{index + 1}.</span>{item}
-                    </div>
                   ))}
                 </div>
-                <button
-                  type="button"
-                  onClick={improveCurrentPrompt}
-                  className="mt-3 rounded-lg border border-[#FF7B4B]/25 bg-[#FF7B4B]/10 px-3 py-2 text-xs font-medium text-[#FF7B4B] transition-all hover:bg-[#FF7B4B]/20"
-                >
-                  Améliorer mon prompt automatiquement
-                </button>
               </div>
-            )}
-          </div>
-        )}
 
-        {/* ── Prompt Guide ── */}
-        <div className="mb-8">
-          <h2 className="text-[10px] font-semibold text-[#2e2e2e] uppercase tracking-widest mb-3">Prompts recommandés</h2>
-
-          <div className="rounded-xl p-4 border border-white/[0.06] bg-white/[0.01] mb-3">
-            <div className="text-[10px] font-semibold text-[#FFD166] uppercase tracking-wider mb-3">Structure d&apos;un prompt premium</div>
-            <div className="flex flex-col gap-1.5">
-              {[
-                { num: "1", label: "Sujet & identité", desc: "Qui est le personnage — tenue, posture, énergie. Si référence : instruction de préservation exacte.", color: "#FF7B4B" },
-                { num: "2", label: "Scène & activité", desc: "Ce que fait le personnage — pose, action, interaction avec le décor.", color: "#FFD166" },
-                { num: "3", label: "Environnement", desc: "Lieu précis, éléments du décor, props, ambiance générale du lieu.", color: "#4ADE80" },
-                { num: "4", label: "Angle de caméra", desc: "Position, hauteur, cadrage, séparation des plans avant / milieu / fond.", color: "#60A5FA" },
-                { num: "5", label: "Lumière & ambiance", desc: "Source lumineuse, heure, température, humeur — motivée, jamais artificielle.", color: "#A78BFA" },
-                { num: "6", label: "Qualité technique", desc: "Standard de sortie : réaliste, ultra détaillé, FiveM marketing, 4K, pas de texte.", color: "#FF6B7D" },
-              ].map(b => (
-                <div key={b.num} className="flex items-start gap-2.5">
-                  <div className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0 mt-0.5 text-[9px] font-bold" style={{ background: `${b.color}18`, color: b.color, border: `1px solid ${b.color}30` }}>{b.num}</div>
-                  <div>
-                    <span className="text-[11px] font-semibold" style={{ color: b.color }}>{b.label}</span>
-                    <span className="text-[11px] text-[#444]"> — {b.desc}</span>
+              {/* Format */}
+              <div className={`${settingRowClass} border-b border-b-[color:var(--hairline)]`}>
+                <span className={settingLabelClass}>Format</span>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {ASPECT_RATIOS.map(r => {
+                      const active = selectedAspectRatio === r.id;
+                      return (
+                        <button
+                          key={r.id}
+                          onClick={() => setSelectedAspectRatio(r.id)}
+                          title={r.label}
+                          aria-label={`Format ${r.label}`}
+                          className={`flex h-10 w-11 items-center justify-center rounded-lg border transition-colors duration-300 ${
+                            active
+                              ? "border-[rgba(109,91,232,0.5)] bg-[rgba(124,106,255,0.08)]"
+                              : "border-[color:var(--hairline-strong)] hover:border-[#C9C9C0]"
+                          }`}
+                        >
+                          <span
+                            style={{ width: r.w * 0.7, height: r.h * 0.7, minWidth: r.w * 0.7 }}
+                            className={`block rounded-[1px] border transition-colors ${active ? "border-violet" : "border-ink/30"}`}
+                          />
+                        </button>
+                      );
+                    })}
                   </div>
+                  <p className="pv-meta mt-2">
+                    <span className="text-[color:var(--num-color)]">{activeAspectRatio.label}</span>
+                    {" — "}
+                    {RATIO_COPY[activeAspectRatio.label]}
+                  </p>
                 </div>
-              ))}
-              <div className="flex items-start gap-2.5 mt-1 pt-2 border-t border-white/[0.04]">
-                <div className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0 mt-0.5 text-[9px] font-bold bg-white/[0.04] text-[#555] border border-white/[0.06]">−</div>
-                <div>
-                  <span className="text-[11px] font-semibold text-[#555]">Prompt négatif</span>
-                  <span className="text-[11px] text-[#333]"> — Dans le champ dédié (Paramètres avancés) : éléments à exclure, erreurs à éviter.</span>
-                </div>
+              </div>
+
+              {/* Réglages précis */}
+              <div>
+                <button
+                  onClick={() => setAdvancedOpen(v => !v)}
+                  className="flex min-h-10 w-full items-center gap-2 py-2 text-left font-mono text-[11px] uppercase tracking-[0.14em] text-dusk transition-colors hover:text-ink/70"
+                >
+                  <Settings2 size={11} />
+                  Réglages précis
+                  <ChevronRight size={11} className={`ml-auto transition-transform duration-300 ${advancedOpen ? "rotate-90" : ""}`} />
+                </button>
+
+                {advancedOpen && (
+                  <div className="pv-scale-in grid grid-cols-1 gap-4 pb-4 pt-2 sm:grid-cols-2">
+                    <div>
+                      <Label htmlFor="negative-prompt">Prompt négatif</Label>
+                      <Input
+                        id="negative-prompt"
+                        type="text"
+                        value={negativePrompt}
+                        onChange={e => setNegativePrompt(e.target.value)}
+                        placeholder="ex : floue, cartoon, surexposé…"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="seed">Seed (optionnel)</Label>
+                      <Input
+                        id="seed"
+                        type="number"
+                        value={seed}
+                        onChange={e => setSeed(e.target.value)}
+                        placeholder="ex : 42"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-            {[
-              { label: "16:9", tip: "Bannière · Loading screen · Twitter", color: "#4ADE80" },
-              { label: "9:16", tip: "Poster portrait · Story · Recrutement", color: "#FF7B4B" },
-              { label: "Léger", tip: "Garde ton intent, corrections minimales", color: "#A78BFA" },
-              { label: "Directeur", tip: "Ajoute caméra, lumière, profondeur", color: "#FFD166" },
-            ].map(t => (
-              <div key={t.label} className="rounded-lg p-2.5 border border-white/[0.04] bg-white/[0.01]">
-                <div className="text-[10px] font-bold mb-0.5" style={{ color: t.color }}>{t.label}</div>
-                <div className="text-[10px] text-[#333] leading-relaxed">{t.tip}</div>
+            {/* Lancement */}
+            <div className="mt-6 flex flex-col gap-4 border-t border-[color:var(--hairline)] pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="pv-meta">
+                {totalCreditCost} création{totalCreditCost > 1 ? "s" : ""} utilisée{totalCreditCost > 1 ? "s" : ""} après un rendu réussi
+              </p>
+              <Button
+                variant="gradient"
+                size="md"
+                onClick={() => generate()}
+                disabled={!prompt.trim() || loading}
+                className="w-full sm:w-auto sm:min-w-[180px]"
+              >
+                {loading ? (
+                  <><Loader2 size={13} className="animate-spin" /> Génération…</>
+                ) : (
+                  <>Créer le rendu {renderCount > 1 ? `× ${renderCount}` : ""} <ArrowRight size={13} /></>
+                )}
+              </Button>
+            </div>
+
+            {error && (
+              <FormMessage tone="error" className="mt-5">
+                {error}
+              </FormMessage>
+            )}
+          </section>
+
+          {/* ── Zone résultat ─────────────────────────────────── */}
+          <section className="min-w-0 lg:col-span-5">
+            <div className="lg:sticky lg:top-24">
+              <div className="mb-4 flex items-baseline justify-between gap-3">
+                <span className="flex items-baseline gap-3">
+                  <span className="pv-num">03</span>
+                  <span className="pv-label">Résultat</span>
+                </span>
+                <span className="pv-meta">
+                  {selectedResolution.toUpperCase()} · {selectedAspectRatio}
+                </span>
+              </div>
+
+              {/* Attente */}
+              {!loading && !result && (
+                <div
+                  className="relative flex flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed border-[color:var(--hairline-strong)] px-6 py-10 text-center"
+                  style={previewAspectStyle}
+                >
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute left-1/2 top-0 h-40 w-72 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(124,106,255,0.09),transparent_70%)]"
+                  />
+                  <ImageIcon size={22} className="mb-4 text-[color:var(--num-color)]/40" />
+                  <p className="pv-display max-w-xs text-lg text-ink/85">Votre rendu apparaîtra ici.</p>
+                  <p className="pv-meta mt-3">Décrivez, réglez, lancez.</p>
+                </div>
+              )}
+
+              {/* Chargement */}
+              {loading && (
+                <div
+                  className="flex flex-col items-center justify-center gap-6 rounded-xl border border-[color:var(--hairline)] bg-abyss px-6 py-10"
+                  style={previewAspectStyle}
+                >
+                  <span aria-hidden className="pv-spinner h-8 w-8" />
+
+                  {renderCount > 1 && (
+                    <p className="pv-meta">{renderCount} rendus en parallèle…</p>
+                  )}
+
+                  <div className="space-y-2.5 text-center">
+                    {activeLoadingSteps.map((step, i) => (
+                      <div
+                        key={i}
+                        className={`flex items-center justify-center gap-2.5 text-[13px] transition-colors duration-300 ${
+                          i === loadingStep ? "text-ink" : i < loadingStep ? "text-dusk line-through" : "text-ink/20"
+                        }`}
+                      >
+                        {i < loadingStep ? (
+                          <Check size={11} className="shrink-0 text-ok" />
+                        ) : i === loadingStep ? (
+                          <Loader2 size={11} className="shrink-0 animate-spin text-[color:var(--num-color)]" />
+                        ) : (
+                          <span className="h-2.5 w-2.5 shrink-0 rounded-full border border-[color:var(--hairline-strong)]" />
+                        )}
+                        {step.label}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Résultat — l'œuvre exposée dans son passe-partout */}
+              {result && !loading && (
+                <div className="overflow-hidden rounded-2xl border border-[color:var(--hairline)] bg-white shadow-[var(--shadow-print)]">
+
+                  {/* Image unique */}
+                  {result.images.length === 1 && (
+                    <div className="bg-linen p-5">
+                      <div
+                        className="group relative cursor-zoom-in bg-white p-4 shadow-[var(--shadow-print)]"
+                        onClick={() => { setFullscreenIdx(0); setFullscreen(true); }}
+                      >
+                        <div className="relative overflow-hidden">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={result.images[0]} alt="Rendu généré" className="block h-auto w-full" />
+                          <div className="absolute inset-0 bg-void/0 transition-colors duration-300 group-hover:bg-void/15" />
+                          <button
+                            onClick={e => { e.stopPropagation(); setFullscreenIdx(0); setFullscreen(true); }}
+                            aria-label="Afficher en plein écran"
+                            className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-lg bg-[rgba(7,7,13,0.55)] text-white/85 opacity-0 backdrop-blur-sm transition-all duration-300 hover:text-white group-hover:opacity-100"
+                          >
+                            <Maximize2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Rendus multiples */}
+                  {result.images.length > 1 && (
+                    <div className="grid grid-cols-2 gap-4 bg-linen p-5">
+                      {result.images.map((img, i) => (
+                        <div
+                          key={i}
+                          className="group relative cursor-zoom-in bg-white p-2 shadow-[var(--shadow-print)]"
+                          onClick={() => { setFullscreenIdx(i); setFullscreen(true); }}
+                        >
+                          <div className="relative overflow-hidden">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={img} alt={`Rendu ${i + 1}`} className="block h-auto w-full" />
+                            <div className="absolute inset-0 bg-void/0 transition-colors duration-300 group-hover:bg-void/20" />
+                            <span className="absolute left-2 top-2 font-mono text-[9px] text-white/85 [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]">
+                              {i + 1}
+                            </span>
+                            <button
+                              onClick={e => { e.stopPropagation(); downloadSingleImage(img, i); }}
+                              aria-label={`Télécharger le rendu ${i + 1}`}
+                              className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(7,7,13,0.55)] text-white/85 opacity-0 backdrop-blur-sm transition-all duration-300 hover:text-white group-hover:opacity-100"
+                            >
+                              <Download size={12} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Métadonnées + actions */}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-[color:var(--hairline)] px-4 pt-3">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-steel">{result.resolution}</span>
+                    <span className="text-ink/20">·</span>
+                    <span className="font-mono text-[10px] tracking-[0.1em] text-steel">{result.aspectRatio}</span>
+                    <span className="text-ink/20">·</span>
+                    <span className={`font-mono text-[10px] uppercase tracking-[0.1em] ${result.watermarkEnabled ? "text-warn" : "text-ok"}`}>
+                      {result.watermarkEnabled ? "Filigrane" : "Sans filigrane"}
+                    </span>
+                    <span className="text-ink/20">·</span>
+                    <span className="max-w-[140px] truncate font-mono text-[10px] tracking-[0.1em] text-steel">{result.model}</span>
+                    {result.images.length > 1 && (
+                      <>
+                        <span className="text-ink/20">·</span>
+                        <span className="font-mono text-[10px] tracking-[0.1em] text-[color:var(--num-color)]">{result.images.length} images</span>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 px-4 py-3">
+                    <button
+                      onClick={() => copyText(result.enhancedPrompt)}
+                      className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-[color:var(--hairline-strong)] px-3 text-[12px] text-steel transition-colors duration-300 hover:border-[#C9C9C0] hover:text-ink"
+                    >
+                      {copied ? <Check size={11} className="text-ok" /> : <Copy size={11} />}
+                      {copied ? "Copié" : "Copier"}
+                    </button>
+                    <button
+                      onClick={() => generate()}
+                      className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-[color:var(--hairline-strong)] px-3 text-[12px] text-steel transition-colors duration-300 hover:border-[#C9C9C0] hover:text-ink"
+                    >
+                      <RefreshCw size={11} />
+                      Regénérer
+                    </button>
+                    <button
+                      onClick={() => setShowBetterResultGuide(v => !v)}
+                      className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-[color:var(--hairline-strong)] px-3 text-[12px] text-steel transition-colors duration-300 hover:border-[#C9C9C0] hover:text-ink"
+                    >
+                      <Settings2 size={11} />
+                      Je ne suis pas satisfait
+                    </button>
+                    <button
+                      onClick={downloadAll}
+                      className="ml-auto inline-flex h-10 items-center gap-1.5 rounded-full bg-ink px-4 text-[12px] font-medium text-white shadow-[0_1px_2px_rgba(29,35,64,0.12),0_8px_22px_rgba(29,35,64,0.16)] transition-colors duration-300 hover:bg-[#272E52]"
+                    >
+                      <Download size={11} />
+                      {result.images.length > 1 ? "Tout télécharger" : "Télécharger"}
+                    </button>
+                  </div>
+
+                  {/* Prompt amélioré */}
+                  <div className="border-t border-[color:var(--hairline)]">
+                    <button
+                      onClick={() => setShowEnhancedPrompt(v => !v)}
+                      className="flex min-h-10 w-full items-center gap-2 px-4 py-2.5 text-left font-mono text-[11px] uppercase tracking-[0.12em] text-dusk transition-colors hover:text-ink/70"
+                    >
+                      {showEnhancedPrompt ? <EyeOff size={11} /> : <Eye size={11} />}
+                      {showEnhancedPrompt ? "Masquer le prompt amélioré" : "Voir le prompt amélioré"}
+                      <ChevronRight size={10} className={`ml-auto transition-transform duration-300 ${showEnhancedPrompt ? "rotate-90" : ""}`} />
+                    </button>
+                    {showEnhancedPrompt && (
+                      <div className="px-4 pb-4">
+                        <p className="rounded-lg border border-[color:var(--hairline)] bg-abyss p-3.5 font-mono text-[11px] leading-relaxed text-steel">
+                          {result.enhancedPrompt}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Mémoriser ce personnage — uniquement avec référence utilisée */}
+                  {hasReferenceImages && (referenceUsageHint === "auto" || referenceUsageHint === "character") && (
+                    <div className="border-t border-[color:var(--hairline)] px-4 py-3.5">
+                      {!showSaveChar ? (
+                        <button
+                          onClick={() => setShowSaveChar(true)}
+                          className="inline-flex h-10 items-center gap-2 rounded-lg border border-[rgba(109,91,232,0.28)] bg-[rgba(124,106,255,0.06)] px-3.5 text-[12px] text-[color:var(--num-color)] transition-colors duration-300 hover:border-[rgba(109,91,232,0.5)]"
+                        >
+                          <BookUser size={12} />
+                          Mémoriser ce personnage
+                        </button>
+                      ) : (
+                        <div className="flex flex-wrap items-center gap-2">
+                          <input
+                            autoFocus
+                            value={saveCharName}
+                            onChange={e => setSaveCharName(e.target.value)}
+                            onKeyDown={e => { if (e.key === "Enter") saveCharacter(); if (e.key === "Escape") { setShowSaveChar(false); setCharSaveStatus("idle"); } }}
+                            placeholder="Nom du personnage…"
+                            maxLength={80}
+                            className="pv-field h-10 min-w-0 flex-1 py-0 text-[13px]"
+                          />
+                          <button
+                            onClick={saveCharacter}
+                            disabled={charSaving || !saveCharName.trim()}
+                            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-lg border border-[rgba(109,91,232,0.3)] bg-[rgba(124,106,255,0.08)] px-3.5 text-[12px] text-[color:var(--num-color)] transition-colors duration-300 hover:bg-violet/20 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            {charSaving ? (
+                              <Loader2 size={11} className="animate-spin" />
+                            ) : charSaveStatus === "ok" ? (
+                              <Check size={11} />
+                            ) : (
+                              <BookUser size={11} />
+                            )}
+                            {charSaving ? "Analyse…" : charSaveStatus === "ok" ? "Enregistré" : "Enregistrer"}
+                          </button>
+                          <button
+                            onClick={() => { setShowSaveChar(false); setCharSaveStatus("idle"); }}
+                            aria-label="Annuler la mémorisation"
+                            className="flex h-10 w-10 items-center justify-center rounded-lg text-dusk transition-colors hover:bg-ink/5 hover:text-ink"
+                          >
+                            <X size={13} />
+                          </button>
+                        </div>
+                      )}
+                      {charSaveStatus === "err" && (
+                        <p className="mt-2 text-[12px] text-err">
+                          L’enregistrement a échoué. Réessayez dans un instant.
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Guide de reprise */}
+                  {showBetterResultGuide && (
+                    <div className="border-t border-[color:var(--hairline)] px-4 py-4">
+                      <p className="pv-display mb-3 text-base text-ink">Comment obtenir un meilleur résultat</p>
+                      <ol className="space-y-2">
+                        {BETTER_RESULT_TIPS.map((item, index) => (
+                          <li key={item} className="flex gap-3 text-[12px] leading-relaxed text-steel">
+                            <span className="pv-num shrink-0">0{index + 1}</span>
+                            {item}
+                          </li>
+                        ))}
+                      </ol>
+                      <button
+                        type="button"
+                        onClick={improveCurrentPrompt}
+                        className="mt-4 inline-flex h-10 items-center rounded-lg border border-[rgba(109,91,232,0.3)] bg-[rgba(124,106,255,0.08)] px-4 text-[12px] font-medium text-[color:var(--num-color)] transition-colors duration-300 hover:bg-violet/20"
+                      >
+                        Améliorer mon prompt automatiquement
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+
+        {/* ══ Structure d'un prompt premium ══ */}
+        <section className="mt-16">
+          <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="pv-display text-xl text-ink">Structure d’un prompt premium</h2>
+            <span className="pv-label">Six couches, un rendu maîtrisé</span>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {PROMPT_STRUCTURE.map((block, index) => (
+              <div key={block.label} className="pv-glass pv-edge rounded-xl p-5">
+                <p className="flex items-baseline gap-2.5">
+                  <span className="pv-num">0{index + 1}</span>
+                  <span className="text-[14px] font-medium text-ink">{block.label}</span>
+                </p>
+                <p className="mt-2 text-[13px] leading-relaxed text-steel">{block.desc}</p>
               </div>
             ))}
           </div>
+          <p className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-xl border border-dashed border-[color:var(--hairline-strong)] px-5 py-4">
+            <span className="text-[13px] font-medium text-ink/70">Prompt négatif</span>
+            <span className="text-[13px] leading-relaxed text-steel">
+              Dans le champ dédié (Réglages précis) : éléments à exclure, erreurs à éviter.
+            </span>
+          </p>
 
-          <div className="text-[10px] font-semibold text-[#2e2e2e] uppercase tracking-widest mb-2.5">Exemples de génération</div>
-          <div className="flex flex-col gap-2">
-            {PROMPT_EXAMPLES.map(ex => (
+          {/* Repères rapides */}
+          <div className="mt-8 grid border-y border-[color:var(--hairline)] sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-[color:var(--hairline)]">
+            {QUICK_TIPS.map((t) => (
+              <div key={t.label} className="border-b border-[color:var(--hairline)] px-1 py-5 last:border-b-0 sm:px-4 lg:border-b-0">
+                <p className="font-mono text-[12px] tracking-[0.12em] text-[color:var(--num-color)]">{t.label}</p>
+                <p className="mt-1.5 text-[12px] leading-relaxed text-steel">{t.tip}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ══ Exemples de génération ══ */}
+        <section className="mt-14">
+          <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="pv-display text-xl text-ink">Exemples de génération</h2>
+            <span className="pv-label">Un clic remplit le brief</span>
+          </div>
+          <div className="grid gap-3 lg:grid-cols-2">
+            {PROMPT_EXAMPLES.map((ex) => (
               <button
                 key={ex.label}
                 onClick={() => { setPrompt(ex.prompt); if (ex.ratio) setSelectedAspectRatio(ex.ratio); }}
                 disabled={loading}
-                className="group text-left rounded-xl p-3.5 border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/[0.09] disabled:opacity-40 transition-all"
+                className="pv-glass pv-edge pv-ignite group flex cursor-pointer flex-col gap-2.5 rounded-xl p-5 text-left disabled:opacity-40"
               >
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-md border" style={{ color: ex.accentColor, borderColor: `${ex.accentColor}30`, background: `${ex.accentColor}10` }}>{ex.tag}</span>
-                    <span className="text-xs font-medium text-[#CCCCC0]">{ex.label}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                    {ex.ratio && <span className="text-[9px] font-mono text-[#333] border border-white/[0.05] rounded px-1 py-0.5">{ex.ratio}</span>}
-                    <ArrowRight size={10} className="text-[#2a2a2a] group-hover:text-[#FF7B4B] transition-colors" />
-                  </div>
-                </div>
-                <div className="text-[11px] text-[#444] leading-relaxed font-mono line-clamp-2">{ex.prompt}</div>
+                <span className="flex items-start justify-between gap-3">
+                  <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span className="text-[14px] font-medium text-ink">{ex.label}</span>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-dusk">{ex.tag}</span>
+                  </span>
+                  <span className="flex shrink-0 items-center gap-2">
+                    {ex.ratio && (
+                      <span className="rounded-full border border-[color:var(--hairline-strong)] px-1.5 py-0.5 font-mono text-[9px] text-steel">
+                        {ex.ratio}
+                      </span>
+                    )}
+                    <ArrowUpRight
+                      size={14}
+                      className="translate-y-0.5 text-ink/25 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-cyan"
+                    />
+                  </span>
+                </span>
+                <span className="line-clamp-2 font-mono text-[11px] leading-relaxed text-dusk">
+                  {ex.prompt}
+                </span>
               </button>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* ── Templates ── */}
-        <div>
-          <h2 className="text-[10px] font-semibold text-[#2e2e2e] uppercase tracking-widest mb-3">Formats prêts à lancer</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {TEMPLATES.map(t => (
+        {/* ══ Formats prêts à lancer ══ */}
+        <section className="mt-14">
+          <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="pv-display text-xl text-ink">Formats prêts à lancer</h2>
+            <span className="pv-label">La génération démarre aussitôt</span>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {TEMPLATES.map((t) => (
               <button
                 key={t.name}
                 onClick={() => { setPrompt(t.prompt); generate(t.prompt); }}
                 disabled={loading}
-                className="group text-left rounded-xl px-4 py-3.5 border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/[0.09] disabled:opacity-40 transition-all"
+                className="pv-glass pv-edge pv-ignite group flex cursor-pointer items-center justify-between gap-3 rounded-xl px-5 py-4 text-left disabled:opacity-40"
               >
-                <div className="flex items-start justify-between mb-1.5">
-                  <span className="text-[9px] font-semibold uppercase tracking-wider text-[#555]">{t.tag}</span>
-                  <ArrowRight size={10} className="text-[#2a2a2a] group-hover:text-[#FF7B4B] transition-colors mt-0.5 flex-shrink-0" />
-                </div>
-                <div className="text-xs font-medium text-[#CCCCC0]">{t.name}</div>
+                <span className="min-w-0">
+                  <span className="block truncate text-[14px] font-medium text-ink">{t.name}</span>
+                  <span className="mt-0.5 block font-mono text-[10px] uppercase tracking-[0.14em] text-dusk">
+                    {t.tag}
+                  </span>
+                </span>
+                <ArrowUpRight
+                  size={14}
+                  className="shrink-0 text-ink/25 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-cyan"
+                />
               </button>
             ))}
           </div>
-        </div>
-
+        </section>
       </div>
 
-      {/* ── Upgrade modal ── */}
+      {/* ══ Modale — modèle réservé ══ */}
       {upgradeModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setUpgradeModal(null)}>
-          <div className="bg-[#111] border border-white/[0.08] rounded-2xl p-6 max-w-sm w-full shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-[#FF7B4B]/10 border border-[#FF7B4B]/25 flex items-center justify-center">
-                <Lock size={16} className="text-[#FF7B4B]" />
-              </div>
-              <div>
-                <div className="text-sm font-bold text-[#F5F0E8]">{upgradeModal.modelName}</div>
-                <div className="text-xs text-[#444]">Modèle réservé</div>
-              </div>
-            </div>
-            <p className="text-sm text-[#666] mb-5 leading-relaxed">
-              Ce modèle est disponible uniquement avec le plan{" "}
-              <span className="text-[#FF7B4B] font-semibold capitalize">{upgradeModal.requiredPlan}</span>.
-            </p>
-            <div className="flex gap-2">
-              <button onClick={() => setUpgradeModal(null)} className="flex-1 py-2 rounded-xl border border-white/[0.07] text-sm text-[#555] hover:text-[#CCCCC0] transition-colors">
-                Annuler
-              </button>
-              <Link href="/dashboard/billing" className="flex-1">
-                <Button variant="gradient" size="sm" className="w-full">
-                  Upgrade →
-                </Button>
-              </Link>
-            </div>
+        <Modal
+          open
+          onClose={() => setUpgradeModal(null)}
+          eyebrow="Modèle réservé"
+          title={upgradeModal.modelName}
+          widthClassName="max-w-sm"
+        >
+          <p className="text-sm leading-relaxed text-steel">
+            Ce modèle est disponible uniquement avec le plan{" "}
+            <span className="font-medium capitalize text-[color:var(--num-color)]">{upgradeModal.requiredPlan}</span>.
+          </p>
+          <div className="mt-6 flex gap-3">
+            <Button variant="secondary" size="md" className="flex-1" onClick={() => setUpgradeModal(null)}>
+              Annuler
+            </Button>
+            <Link href="/dashboard/billing" className="flex-1">
+              <Button variant="gradient" size="md" className="w-full">
+                Passer au plan supérieur
+              </Button>
+            </Link>
           </div>
-        </div>
+        </Modal>
       )}
 
-      {/* ── Fullscreen viewer ── */}
+      {/* ══ Visionneuse plein écran ══ */}
       {fullscreen && result && (
         <div
-          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-[rgba(5,5,10,0.95)] p-4"
           onClick={() => setFullscreen(false)}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={result.images[fullscreenIdx]}
-            alt="Full size"
-            className="max-w-full max-h-full object-contain"
+            alt="Rendu en plein écran"
+            className="max-h-full max-w-full object-contain"
             onClick={e => e.stopPropagation()}
           />
 
-          {/* Navigation arrows for multi-image */}
+          {/* Navigation entre rendus */}
           {result.images.length > 1 && (
             <>
               <button
                 onClick={e => { e.stopPropagation(); setFullscreenIdx(i => (i - 1 + result.images.length) % result.images.length); }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all"
+                aria-label="Image précédente"
+                className="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg border border-[color:var(--hairline-strong)] bg-white/80 text-ink transition-colors duration-300 hover:border-[rgba(109,91,232,0.45)] hover:text-[color:var(--num-color)]"
               >
-                <ChevronLeft size={20} />
+                <ChevronLeft size={18} />
               </button>
               <button
                 onClick={e => { e.stopPropagation(); setFullscreenIdx(i => (i + 1) % result.images.length); }}
-                className="absolute right-16 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all"
+                aria-label="Image suivante"
+                className="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg border border-[color:var(--hairline-strong)] bg-white/80 text-ink transition-colors duration-300 hover:border-[rgba(109,91,232,0.45)] hover:text-[color:var(--num-color)]"
               >
-                <ChevronRight size={20} />
+                <ChevronRight size={18} />
               </button>
-              <div className="absolute bottom-16 left-1/2 -translate-x-1/2 text-white/40 text-xs">
+              <span className="absolute bottom-20 left-1/2 -translate-x-1/2 font-mono text-[11px] tracking-[0.12em] text-steel">
                 {fullscreenIdx + 1} / {result.images.length}
-              </div>
+              </span>
             </>
           )}
 
           <button
             onClick={() => setFullscreen(false)}
-            className="absolute top-4 right-4 p-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all"
+            aria-label="Fermer la visionneuse"
+            className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg border border-[color:var(--hairline-strong)] bg-white/80 text-ink transition-colors duration-300 hover:border-[rgba(109,91,232,0.45)] hover:text-[color:var(--num-color)]"
           >
             <X size={16} />
           </button>
           <button
             onClick={e => { e.stopPropagation(); downloadSingleImage(result.images[fullscreenIdx], fullscreenIdx); }}
-            className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FF7B4B] text-white text-sm font-medium hover:bg-[#FF6B3D] transition-all"
+            className="absolute bottom-4 right-4 inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-white shadow-[0_1px_2px_rgba(29,35,64,0.12),0_8px_22px_rgba(29,35,64,0.16)] transition-colors duration-300 hover:bg-[#272E52]"
           >
-            <Download size={13} />
+            <Download size={14} />
             Télécharger
           </button>
         </div>

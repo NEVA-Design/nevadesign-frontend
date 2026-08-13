@@ -1,319 +1,1372 @@
 @import "tailwindcss";
 
-/* ─── Tailwind v4 @theme — couleurs et polices uniquement ─── */
-@theme {
-  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+/* ════════════════════════════════════════════════════════════════════
+   NEVA DESIGN — GIVRE (docs/GIVRE.md)
+   Des panneaux de verre dépoli posés sur des scènes vivantes et
+   glacées. Le fond n'est jamais un aplat : dégradé lavande /
+   périwinkle / perle, rubans chromés, caustiques. Le verre floute
+   réellement ce qui passe derrière lui ; la typographie encre
+   indigo se pose dessus. La lumière vient du haut, légèrement à
+   gauche ; les ombres sont encrées bleutées, jamais noires.
+   Deux voix typographiques : Geist (tout), Geist Mono (précision).
+   ════════════════════════════════════════════════════════════════════ */
 
-  --color-background: #080808;
-  --color-surface-1: #0f0f0f;
-  --color-surface-2: #141414;
-  --color-neva-pink: #FFB5C8;
-  --color-neva-orange: #FF7B4B;
-  --color-neva-yellow: #FFD166;
-  --color-neva-coral: #FF6B7D;
-  --color-neva-cream: #F5F0E8;
+@theme {
+  /* ── Fonds de scène — brumes glacées ──────────────────────── */
+  --color-frost: #EEF0F7;       /* base de page, brume bleutée */
+  --color-pearl: #E4E6EF;       /* perle : creux des scènes */
+  --color-lavender: #C9C6E8;    /* pôle lavande des dégradés */
+  --color-periwinkle: #AFC2EC;  /* pôle froid des dégradés */
+  --color-glacier: #CBDCF2;     /* hautes lumières de scène */
+  --color-aurora: #E9D5E4;      /* aurore rosée, coins ≤ 12 % */
+  --color-blush: #F0D6DC;       /* rose des bords — scène dawn */
+
+  /* Alias legacy (composants existants) — remappés Givre */
+  --color-paper: #EEF0F7;       /* = frost */
+  --color-porcelain: #F7F8FC;   /* surfaces posées, blanc froid */
+  --color-linen: #E4E6EF;       /* = pearl */
+  --color-atelier: #ECEEF6;     /* fond produit (dashboard) */
+
+  /* ── Encres — froides, jamais de noir pur ─────────────────── */
+  --color-ink: #1D2340;         /* titres, texte fort */
+  --color-slate: #3F4767;       /* texte courant */
+  --color-mist: #5C6488;        /* tertiaire, métadonnées — foncé
+                                   v28 : les micro-labels doivent
+                                   tenir ≥ 5:1 sur l'ivoire du cyc */
+
+  /* ── Chrome — matière, pas couleur ────────────────────────── */
+  --color-silver: #C7CAD9;      /* creux des rubans */
+  --color-chrome-low: #989DB4;  /* ombre chromée */
+
+  /* ── Fonds produit sombres — îlots résiduels uniquement ───── */
+  --color-void: #0C0E1C;        /* îlot sombre (lightbox, CTA) */
+  --color-abyss: #080A14;       /* creux d'îlot */
+
+  /* ── Spectre — la seule couleur vive autorisée ────────────── */
+  --color-violet: #7C6AFF;
+  --color-cyan: #4CC9F0;
+  --color-magenta: #E879F9;
+
+  /* ── Texte sur îlots sombres ──────────────────────────────── */
+  --color-steel: #A6ABC4;
+  --color-dusk: #767C99;
+
+  /* ── États système (fond clair) ───────────────────────────── */
+  --color-ok: #3E7A5C;
+  --color-err: #9E4A45;
+  --color-warn: #8A6D1F;
+  --color-info: #3E6C94;
+
+  /* ── Rayons — 10 / 16 / 22, pilules full (resserrés 13/08 :
+     les grands rayons donnaient des cards lourdes) ─────────── */
+  --radius-xs: 10px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+
+  /* ── Courbes ──────────────────────────────────────────────── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-reveal: cubic-bezier(0.625, 0.05, 0, 1);
+
+  /* ── Durées ───────────────────────────────────────────────── */
+  --dur-fast: 150ms;
+  --dur-base: 300ms;
+  --dur-slow: 450ms;
 }
 
-/* ─── Reset ───────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; }
+@theme inline {
+  /* Plus aucun serif nulle part. Outfit porte le display en
+     light/medium — la géométrique ronde de la ref, jamais grasse. */
+  --font-display: var(--font-outfit), var(--font-geist-sans), system-ui, sans-serif;
+  --font-sans: var(--font-geist-sans), "Inter", system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "JetBrains Mono", monospace;
+
+  /* Ombres paramétrées par la peau active */
+  --shadow-glass: var(--sh-glass);
+  --shadow-float: var(--sh-float);
+  --shadow-modal: var(--sh-modal);
+  --shadow-beam: var(--sh-beam);
+  --shadow-print: var(--sh-print);
+  --shadow-print-lift: var(--sh-print-lift);
+}
+
+/* Angle animable de l'anneau spectral */
+@property --pv-ang {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* ── Peau GIVRE (défaut clair) ────────────────────────────────
+   Tout le produit vit dans cette lumière. Les îlots sombres
+   (.pv-dark-island : lightbox, CTA finale) reprennent une encre
+   profonde pour leur sous-arbre. */
+:root, .pv-light {
+  /* Marge du cadre éditorial — partagée entre le cadre du hero,
+     la navbar et les sections pour un alignement au pixel.
+     (Valeur fixe + media query : Lightning CSS mange les clamp()
+     dans les custom properties.) */
+  --frame-inset: 16px;
+
+  --surface-page: var(--color-frost);
+  --surface-text: var(--color-ink);
+  --text-2: var(--color-slate);
+  --text-3: var(--color-mist);
+
+  --hairline: rgba(29, 35, 64, 0.09);
+  --hairline-strong: rgba(29, 35, 64, 0.15);
+
+  /* Verre Givre — n'existe qu'au-dessus d'une matière à flouter ;
+     chaque scène en fournit. Recette stricte : voir docs/GIVRE.md §2 */
+  --glass: rgba(255, 255, 255, 0.55);
+  --glass-strong: rgba(255, 255, 255, 0.72);
+  --glass-tint: rgba(240, 240, 250, 0.5);
+  --hairline-glass: rgba(255, 255, 255, 0.62);
+
+  --ink-70: rgba(29, 35, 64, 0.72);
+  --ink-45: rgba(29, 35, 64, 0.48);
+  --ink-28: rgba(29, 35, 64, 0.30);
+
+  --beam: linear-gradient(115deg, #7c6aff 0%, #4cc9f0 100%);
+  --beam-ink: linear-gradient(115deg, #5B48E4 0%, #2795C9 100%);
+  --beam-soft: linear-gradient(115deg, rgba(124, 106, 255, 0.55), rgba(76, 201, 240, 0.55));
+  --halo-violet: rgba(124, 106, 255, 0.14);
+  --halo-cyan: rgba(76, 201, 240, 0.12);
+  --halo-magenta: rgba(232, 121, 249, 0.07);
+
+  /* Chrome froid — gradients perpendiculaires à la course */
+  --chrome: linear-gradient(90deg, #FFFFFF 0%, #DDE0EA 16%, #A4A9BE 36%, #FCFCFE 52%, #C7CAD9 72%, #EDEEF4 100%);
+  --chrome-ring: linear-gradient(135deg, #FCFCFE 0%, #BFC3D4 22%, #FFFFFF 42%, #A4A9BE 62%, #E9EAF1 82%, #C7CAD9 100%);
+
+  /* Arête haute allumée + double ombre encrée (contact + diffuse) */
+  --sh-glass: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 1px 4px rgba(29, 35, 64, 0.045), 0 18px 44px rgba(29, 35, 64, 0.085);
+  --sh-float: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 2px 6px rgba(29, 35, 64, 0.055), 0 26px 64px rgba(29, 35, 64, 0.12);
+  --sh-modal: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 6px 14px rgba(29, 35, 64, 0.08), 0 52px 120px rgba(29, 35, 64, 0.20);
+  --sh-beam: 0 0 0 1px rgba(124, 106, 255, 0.28), 0 4px 20px rgba(124, 106, 255, 0.22), 0 1px 2px rgba(29, 35, 64, 0.18);
+  --sh-print: 0 1px 3px rgba(29, 35, 64, 0.07), 0 18px 44px rgba(29, 35, 64, 0.09);
+  --sh-print-lift: 0 3px 6px rgba(29, 35, 64, 0.08), 0 32px 72px rgba(29, 35, 64, 0.14);
+
+  --btn-primary-bg: var(--color-ink);
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #272E52;
+
+  --surface-hover: rgba(255, 255, 255, 0.5);
+  --ignite-hover-bg: rgba(255, 255, 255, 0.68);
+  --edge-light: rgba(255, 255, 255, 0.95);
+  --blueprint-line: rgba(29, 35, 64, 0.04);
+  --media-bg: var(--color-pearl);
+  --media-border: rgba(29, 35, 64, 0.08);
+  --field-bg: rgba(255, 255, 255, 0.72);
+  --field-bg-focus: rgba(255, 255, 255, 0.92);
+  --gauge-track: rgba(29, 35, 64, 0.09);
+  --skeleton-a: rgba(29, 35, 64, 0.05);
+  --skeleton-b: rgba(29, 35, 64, 0.1);
+  --num-color: #5B48E4;
+  --link-color: var(--color-ink);
+  --link-hover: #5B48E4;
+  --noise-blend: multiply;
+  --noise-opacity: 0.025;
+  --scrollbar-track: var(--color-frost);
+  --scrollbar-thumb: #C9CCDB;
+  --scrollbar-thumb-hover: #B3B7CB;
+  --selection-bg: rgba(124, 106, 255, 0.22);
+  --selection-text: var(--color-ink);
+  --focus-ring: rgba(91, 72, 228, 0.75);
+}
+
+/* ── Îlot sombre — lightbox, CTA finale, aperçus nuit ─────────
+   Encre bleutée profonde ; le verre y redevient translucide noir. */
+.pv-dark-island {
+  --surface-text: #ffffff;
+  --text-2: var(--color-steel);
+  --text-3: var(--color-dusk);
+
+  --hairline: rgba(255, 255, 255, 0.1);
+  --hairline-strong: rgba(255, 255, 255, 0.16);
+  --glass: rgba(255, 255, 255, 0.06);
+  --glass-strong: rgba(255, 255, 255, 0.09);
+  --hairline-glass: rgba(255, 255, 255, 0.14);
+  --ink-70: rgba(255, 255, 255, 0.72);
+  --ink-45: rgba(255, 255, 255, 0.48);
+  --ink-28: rgba(255, 255, 255, 0.3);
+  --halo-violet: rgba(124, 106, 255, 0.18);
+  --halo-cyan: rgba(76, 201, 240, 0.14);
+
+  --sh-glass: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 18px 46px rgba(0, 0, 0, 0.42);
+  --sh-float: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 30px 80px rgba(0, 0, 0, 0.55);
+  --sh-print: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 40px rgba(0, 0, 0, 0.45);
+  --sh-print-lift: 0 2px 4px rgba(0, 0, 0, 0.45), 0 28px 64px rgba(0, 0, 0, 0.55);
+
+  --btn-primary-bg: #ffffff;
+  --btn-primary-text: var(--color-void);
+  --btn-primary-hover: #E9E9F4;
+
+  --surface-hover: rgba(255, 255, 255, 0.04);
+  --ignite-hover-bg: rgba(255, 255, 255, 0.07);
+  --edge-light: rgba(255, 255, 255, 0.24);
+  --media-bg: var(--color-abyss);
+  --media-border: rgba(255, 255, 255, 0.08);
+  --field-bg: rgba(255, 255, 255, 0.05);
+  --field-bg-focus: rgba(255, 255, 255, 0.07);
+  --gauge-track: rgba(255, 255, 255, 0.09);
+  --num-color: #B4A8FF;
+  --link-color: #ffffff;
+  --link-hover: var(--color-cyan);
+
+  color: #ffffff;
+}
+
+/* La marge du cadre grandit avec l'écran (pas de clamp() possible
+   dans une custom property — voir le piège Lightning CSS). */
+@media (min-width: 768px) {
+  :root, .pv-light {
+    --frame-inset: 24px;
+  }
+}
+@media (min-width: 1280px) {
+  :root, .pv-light {
+    --frame-inset: 32px;
+  }
+}
+
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+/* ═══ Base ═══════════════════════════════════════════════════ */
+
+@layer base {
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 80px;
-  color-scheme: dark;
+  color-scheme: light;
+  scroll-padding-top: 96px;
 }
 
 body {
-  background-color: #080808;
-  color: #F5F0E8;
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background-color: var(--color-frost);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  text-rendering: optimizeLegibility;
 }
 
-/* ─── Scrollbar ───────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0f0f0f; }
-::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #FF7B4B; }
-
-/* ─── Selection / Focus ───────────────────────────────────── */
-::selection { background: rgba(255,123,75,0.3); color: #F5F0E8; }
-:focus-visible { outline: 2px solid rgba(255,123,75,0.5); outline-offset: 2px; }
-
-/* ─── Gradient text ───────────────────────────────────────── */
-.text-neva-gradient {
-  background: linear-gradient(135deg, #FF6B7D 0%, #FF7B4B 50%, #FFD166 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.text-neva-gradient-soft {
-  background: linear-gradient(135deg, #FFB5C8 0%, #FF7B4B 60%, #FFD166 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
-/* ─── Glass cards ─────────────────────────────────────────── */
-.glass-card {
-  background: rgba(255,255,255,0.03);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.06);
+/* Scrollbar discrète : aucun rail plein — un fil de pouce encré
+   translucide posé sur la scène, qui s'affirme au survol. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(29, 35, 64, 0.3) transparent;
 }
-.glass-card-hover {
-  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+  background: transparent;
 }
-.glass-card-hover:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,123,75,0.2);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,123,75,0.1);
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(29, 35, 64, 0.26);
+  border-radius: 999px;
+  border: 4px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(29, 35, 64, 0.44);
+  background-clip: content-box;
 }
 
-/* ─── Orbs ────────────────────────────────────────────────── */
-.orb {
+} /* fin @layer base */
+
+/* ═══ Composants Givre ═══════════════════════════════════════
+   Dans @layer components : les utilitaires Tailwind gardent la
+   priorité pour les surcharges ponctuelles. */
+
+@layer components {
+
+/* ═══ Scènes — le fond n'est jamais un aplat ═════════════════ */
+
+/* Conteneur de scène : isole le rendu, porte matière et lumière */
+.pv-scene {
+  position: relative;
+  overflow: hidden;
+  contain: layout paint;
+}
+
+/* Dégradé de scène héroïque — lavande à gauche, périwinkle à
+   droite, brume au centre : la lumière du haut perce au milieu. */
+.pv-scene-bg {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
+  inset: 0;
   pointer-events: none;
-}
-.orb-pink  { background: radial-gradient(circle, rgba(255,107,125,0.3) 0%, transparent 70%); }
-.orb-orange { background: radial-gradient(circle, rgba(255,123,75,0.25) 0%, transparent 70%); }
-.orb-yellow { background: radial-gradient(circle, rgba(255,209,102,0.2) 0%, transparent 70%); }
-
-/* ─── Animation helpers ───────────────────────────────────── */
-.animate-float        { animation: neva-float 6s ease-in-out infinite; }
-.animate-float-delayed { animation: neva-float 6s ease-in-out 2s infinite; }
-.animate-glow-pulse   { animation: neva-glow 4s ease-in-out infinite; }
-.animate-shimmer      { animation: neva-shimmer 2.5s linear infinite; }
-.animate-fade-in-up   { animation: neva-fadeInUp 0.6s ease-out forwards; }
-.typing-cursor        { animation: neva-cursor 1s step-end infinite; }
-
-/* ─── Keyframes ───────────────────────────────────────────── */
-@keyframes neva-float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-12px); }
-}
-@keyframes neva-glow {
-  0%, 100% { opacity: 0.4; }
-  50%       { opacity: 0.8; }
-}
-@keyframes neva-shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
-}
-@keyframes neva-fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0);    }
-}
-@keyframes neva-cursor {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
-}
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0);    }
-}
-
-.animate-creator-scroll {
-  animation: creator-scroll 10s ease-in-out infinite;
-}
-
-@keyframes creator-scroll {
-  0%   { transform: translateY(18px); opacity: 0; }
-  18%  { transform: translateY(0); opacity: 1; }
-  55%  { transform: translateY(-8px); opacity: 0.85; }
-  85%  { transform: translateY(-30px); opacity: 0; }
-  100% { transform: translateY(-30px); opacity: 0; }
-}
-
-.hero-energy-ring {
   background:
-    radial-gradient(circle, rgba(255, 123, 75, 0.2) 0 1px, transparent 2px 100%),
-    conic-gradient(
-      from 210deg,
-      rgba(255, 107, 125, 0),
-      rgba(255, 107, 125, 0.3),
-      rgba(255, 209, 102, 0.18),
-      rgba(255, 123, 75, 0.28),
-      rgba(255, 107, 125, 0)
-    );
-  background-size: 26px 26px, auto;
-  opacity: 0.72;
-  filter: drop-shadow(0 0 34px rgba(255, 123, 75, 0.2));
-  animation: hero-centered-spiral-spin 28s linear infinite;
-  -webkit-mask: radial-gradient(circle, transparent 0 48%, #000 49% 51%, transparent 52% 58%, #000 59% 60%, transparent 61%);
-  mask: radial-gradient(circle, transparent 0 48%, #000 49% 51%, transparent 52% 58%, #000 59% 60%, transparent 61%);
+    radial-gradient(120% 90% at 50% -20%, #FDFDFF 0%, rgba(253, 253, 255, 0) 55%),
+    radial-gradient(94% 110% at -12% 46%, rgba(193, 189, 233, 0.92) 0%, rgba(193, 189, 233, 0) 62%),
+    radial-gradient(94% 112% at 112% 48%, rgba(166, 189, 238, 0.88) 0%, rgba(166, 189, 238, 0) 64%),
+    radial-gradient(70% 60% at 84% 96%, rgba(233, 209, 226, 0.5) 0%, rgba(233, 209, 226, 0) 70%),
+    linear-gradient(180deg, #ECEEF7 0%, #E7E9F4 52%, #E2E4F0 100%);
 }
 
-.hero-energy-ring::before,
-.hero-energy-ring::after {
+/* Variante calme — ivoire perle, pour sections de respiration
+   (v28 : tout le monde vit dans la lumière du cyclorama).
+   Double sélecteur : la variante doit BATTRE la base quand un
+   élément porte les deux classes, quel que soit l'ordre/le layer. */
+.pv-scene-bg--calm,
+.pv-scene-bg.pv-scene-bg--calm {
+  background:
+    radial-gradient(110% 80% at 50% -14%, #FCFBF8 0%, rgba(252, 251, 248, 0) 58%),
+    radial-gradient(80% 90% at -10% 70%, rgba(206, 200, 234, 0.2) 0%, rgba(206, 200, 234, 0) 60%),
+    radial-gradient(80% 90% at 110% 66%, rgba(244, 213, 194, 0.16) 0%, rgba(244, 213, 194, 0) 62%),
+    linear-gradient(180deg, #F3F1EC 0%, #EDEBE5 100%);
+}
+
+/* Variante glacier — ivoire froid et haut, pour les moments
+   produit : une pointe pervenche très diluée en tête, rien d'autre */
+.pv-scene-bg--glacier,
+.pv-scene-bg.pv-scene-bg--glacier {
+  background:
+    radial-gradient(120% 90% at 50% -18%, #FBFAF7 0%, rgba(251, 250, 247, 0) 52%),
+    radial-gradient(88% 100% at -10% 40%, rgba(196, 208, 238, 0.34) 0%, rgba(196, 208, 238, 0) 62%),
+    radial-gradient(92% 110% at 112% 44%, rgba(206, 200, 234, 0.22) 0%, rgba(206, 200, 234, 0) 60%),
+    linear-gradient(180deg, #F0EEE9 0%, #E9E7E1 100%);
+}
+
+/* Caustiques — deux nappes de lumière qui dérivent très lentement.
+   Transform only : aucun repaint, la vie du fond pour rien. */
+@keyframes pv-caustic-a {
+  0%, 100% { transform: translate3d(-3%, -2%, 0) scale(1); }
+  50%      { transform: translate3d(3.5%, 2.5%, 0) scale(1.08); }
+}
+@keyframes pv-caustic-b {
+  0%, 100% { transform: translate3d(2.5%, 2%, 0) scale(1.06); }
+  50%      { transform: translate3d(-3%, -2.5%, 0) scale(1); }
+}
+.pv-caustics {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.pv-caustics::before,
+.pv-caustics::after {
   content: "";
   position: absolute;
-  inset: 12%;
+  inset: -18%;
+  pointer-events: none;
+}
+.pv-caustics::before {
+  background:
+    radial-gradient(34% 26% at 30% 24%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 70%),
+    radial-gradient(26% 22% at 72% 16%, rgba(246, 236, 224, 0.4) 0%, rgba(246, 236, 224, 0) 72%);
+  animation: pv-caustic-a 46s ease-in-out infinite;
+}
+.pv-caustics::after {
+  background:
+    radial-gradient(30% 24% at 64% 70%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0) 70%),
+    radial-gradient(24% 20% at 18% 78%, rgba(226, 219, 240, 0.26) 0%, rgba(226, 219, 240, 0) 72%);
+  animation: pv-caustic-b 58s ease-in-out infinite;
+}
+
+/* ═══ Matière ════════════════════════════════════════════════ */
+
+/* Grain papier très léger — dans le FOND de chaque scène (z0,
+   GIVRE §6), jamais par-dessus le contenu : un grain en overlay
+   viewport voilait le canvas 3D et le texte. */
+.pv-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  opacity: var(--noise-opacity);
+  mix-blend-mode: var(--noise-blend);
+}
+
+/* Scène à canvas 3D (hero) : aucun grain DOM — le rendu WebGL
+   porte son propre dither, rien ne se pose au-dessus du canvas. */
+.pv-scene--canvas::after {
+  content: none;
+}
+
+/* Panneau de verre dépoli — LA surface Givre.
+   Règle d'or : n'existe qu'au-dessus d'une matière à flouter. */
+.pv-glass {
+  position: relative;
+  background: var(--glass);
+  border: 1px solid var(--hairline-glass);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(28px) saturate(1.45);
+  box-shadow: var(--sh-glass);
+}
+
+.pv-glass--strong {
+  background: var(--glass-strong);
+}
+
+.pv-glass--tint {
+  background: var(--glass-tint);
+}
+
+/* Verre figé — le même vocabulaire (translucidité, arête, ombre)
+   sans backdrop-filter : pour les grilles denses posées sur fond
+   calme, où le blur ne flouterait presque rien. Budget 60fps :
+   le vrai verre reste réservé aux panneaux héroïques. */
+.pv-glass--still {
+  backdrop-filter: none;
+  background: rgba(255, 255, 255, 0.66);
+}
+
+/* L'îlot sombre garde un dépoli plus léger */
+.pv-dark-island .pv-glass {
+  backdrop-filter: blur(20px) saturate(1.45);
+}
+
+/* Mobile : le rendu perçu reste identique, le GPU respire
+   (docs/GIVRE.md §8). PIÈGE OUTILLAGE : ne jamais écrire
+   -webkit-backdrop-filter à la main ni var() dans blur() —
+   Lightning CSS supprime alors toute la déclaration. */
+@media (max-width: 640px) {
+  .pv-glass {
+    backdrop-filter: blur(20px) saturate(1.45);
+  }
+  .pv-lens {
+    backdrop-filter: blur(14px) saturate(1.35);
+  }
+}
+
+/* Carte interne d'un panneau — verre plus discret, radius md */
+.pv-glass--card {
+  border-radius: var(--radius-md);
+}
+
+/* Carte interactive — l'élévation discrète au survol, la même
+   pour toutes les cards du site (transform + ombre uniquement,
+   jamais de scale ni de rebond) */
+.pv-card-hover {
+  transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
+}
+.pv-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sh-float);
+}
+.pv-card-hover:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+/* Pilule de verre — badges, prix, tags, légendes */
+.pv-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--hairline-glass);
+  backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(29, 35, 64, 0.05), 0 10px 24px rgba(29, 35, 64, 0.06);
+  color: var(--surface-text);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.004em;
+}
+
+.pv-pill--lg {
+  min-height: 40px;
+  padding: 0 18px;
+}
+
+/* Lentille — l'objet de verre posé dans la scène. Le fond qui la
+   traverse se floute réellement : la réfraction perçue de Givre.
+   Petite (≤ 320px) et rare (2 par scène, 1 sur mobile). */
+.pv-lens {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(18px) saturate(1.35);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -22px 40px rgba(29, 35, 64, 0.06),
+    inset 16px 26px 48px rgba(255, 255, 255, 0.38),
+    0 2px 6px rgba(29, 35, 64, 0.05),
+    0 28px 56px rgba(29, 35, 64, 0.12);
+}
+/* Reflet spéculaire — l'arc de lumière haut-gauche */
+.pv-lens::before {
+  content: "";
+  position: absolute;
+  top: 6%;
+  left: 12%;
+  width: 44%;
+  height: 30%;
+  border-radius: 50%;
+  background: radial-gradient(50% 60% at 50% 40%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 100%);
+  transform: rotate(-18deg);
+}
+/* Caustique interne basse — la lumière ressort du verre */
+.pv-lens::after {
+  content: "";
+  position: absolute;
+  bottom: 7%;
+  left: 22%;
+  width: 56%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(50% 70% at 50% 60%, rgba(203, 220, 242, 0.5) 0%, rgba(203, 220, 242, 0) 100%);
+}
+
+/* Ombre au sol d'un objet de verre — le pose dans la scène */
+.pv-ground-shadow {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(29, 35, 64, 0.16) 0%, rgba(29, 35, 64, 0) 72%);
+  filter: blur(14px);
+}
+
+/* Filet chrome horizontal — souligné (3 chromes max/page) */
+.pv-chrome-line {
+  display: block;
+  height: 2px;
+  border: none;
+  border-radius: 1px;
+  background: var(--chrome);
+  box-shadow: 0 1px 1px rgba(29, 35, 64, 0.14);
+}
+
+/* Arête chrome en tête de panneau */
+.pv-chrome-edge {
+  position: relative;
+}
+.pv-chrome-edge::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 14px;
+  right: 14px;
+  height: 3px;
+  border-radius: 0 0 2px 2px;
+  background: var(--chrome);
+  box-shadow: 0 1px 2px rgba(29, 35, 64, 0.2);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Bordure chrome complète — le cadre métallique */
+.pv-chrome-ring {
+  position: relative;
+}
+.pv-chrome-ring::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
   border-radius: inherit;
-  border: 1px solid rgba(255, 209, 102, 0.18);
+  padding: 2px;
+  background: var(--chrome-ring);
+  box-shadow: 0 1px 2px rgba(29, 35, 64, 0.16);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
-.hero-energy-ring::after {
-  inset: 24%;
-  border-color: rgba(255, 107, 125, 0.18);
+/* Passe-partout — un rendu exposé : marge de verre, filet, ombre */
+.pv-passepartout {
+  position: relative;
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid var(--hairline-glass);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), var(--sh-print);
+}
+.pv-passepartout > * {
+  border-radius: var(--radius-xs);
+  overflow: hidden;
 }
 
-.hero-spiral-disc {
-  background:
-    conic-gradient(
-      from -36deg,
-      rgba(255, 107, 125, 0) 0deg,
-      rgba(255, 107, 125, 0.42) 38deg,
-      rgba(255, 123, 75, 0.12) 86deg,
-      rgba(255, 209, 102, 0.34) 128deg,
-      rgba(255, 123, 75, 0.03) 190deg,
-      rgba(255, 107, 125, 0.28) 284deg,
-      rgba(255, 107, 125, 0) 360deg
-    );
-  filter: blur(2px) drop-shadow(0 0 42px rgba(255, 123, 75, 0.28));
-  opacity: 0.86;
-  animation: hero-centered-spiral-spin 18s linear infinite;
-  -webkit-mask: radial-gradient(circle, transparent 0 35%, #000 36% 39%, transparent 40% 47%, #000 48% 62%, transparent 64%);
-  mask: radial-gradient(circle, transparent 0 35%, #000 36% 39%, transparent 40% 47%, #000 48% 62%, transparent 64%);
+/* Atelier — la lumière de travail du produit */
+.pv-atelier {
+  --color-paper: var(--color-atelier);
+  --color-frost: var(--color-atelier);
 }
 
-.hero-orbit-lines {
-  background:
-    repeating-conic-gradient(
-      from 12deg,
-      rgba(255, 255, 255, 0) 0deg 7deg,
-      rgba(255, 209, 102, 0.25) 8deg 9deg,
-      rgba(255, 123, 75, 0.2) 10deg 11deg,
-      rgba(255, 255, 255, 0) 12deg 22deg
+/* Pilule de crédits — verre serti d'un liseré spectral fin */
+.pv-credit-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(29, 35, 64, 0.05), 0 10px 24px rgba(29, 35, 64, 0.06);
+}
+.pv-credit-pill::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(115deg, rgba(124, 106, 255, 0.55), rgba(76, 201, 240, 0.45));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Ligne de lumière sur l'arête haute */
+.pv-edge::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--edge-light), transparent);
+}
+
+/* Carte qui répond au survol — lift, ombre, liseré (pas d'effet souris) */
+.pv-ignite {
+  position: relative;
+  transition: border-color 0.4s var(--ease-smooth), transform 0.4s var(--ease-smooth),
+    box-shadow 0.4s var(--ease-smooth), background-color 0.4s var(--ease-smooth);
+}
+.pv-ignite::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(130deg, rgba(124, 106, 255, 0.45), rgba(76, 201, 240, 0.32) 50%, transparent 80%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.45s var(--ease-smooth);
+  pointer-events: none;
+}
+.pv-ignite:hover {
+  background-color: var(--ignite-hover-bg);
+  transform: translateY(-2px);
+  box-shadow: var(--sh-print-lift);
+}
+.pv-ignite:hover::after {
+  opacity: 1;
+}
+
+/* Halo spectral — dilué dans la brume */
+.pv-halo {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    var(--halo-violet) 0%,
+    var(--halo-magenta) 45%,
+    var(--halo-cyan) 70%,
+    transparent 100%
   );
-  opacity: 0.74;
-  animation: hero-centered-orbit-spin 34s linear infinite;
-  -webkit-mask: radial-gradient(circle, transparent 0 46%, #000 47% 48%, transparent 49% 55%, #000 56% 57%, transparent 58% 66%, #000 67% 68%, transparent 69%);
-  mask: radial-gradient(circle, transparent 0 46%, #000 47% 48%, transparent 49% 55%, #000 56% 57%, transparent 58% 66%, #000 67% 68%, transparent 69%);
+  filter: blur(48px);
 }
 
-.animate-hero-spiral {
-  animation: hero-spiral-spin 18s linear infinite;
-  box-shadow: 0 0 42px rgba(255, 123, 75, 0.16), inset 0 0 28px rgba(255, 209, 102, 0.06);
+.pv-halo--violet {
+  background: radial-gradient(closest-side, var(--halo-violet), transparent 72%);
 }
 
-.animate-hero-spiral-reverse {
-  animation: hero-orbit-spin 14s linear infinite reverse;
-  box-shadow: 0 0 34px rgba(255, 209, 102, 0.12);
+.pv-halo--cyan {
+  background: radial-gradient(closest-side, var(--halo-cyan), transparent 72%);
 }
 
-.animate-hero-character {
-  animation: hero-character-rise 1.1s cubic-bezier(.2, .9, .2, 1) both, hero-character-float 5.8s ease-in-out 1.1s infinite;
+/* Ombre portée sous un objet exposé */
+.pv-underglow {
+  position: absolute;
+  pointer-events: none;
+  height: 120px;
+  left: 6%;
+  right: 6%;
+  bottom: -60px;
+  background: radial-gradient(
+    50% 100% at 50% 0%,
+    rgba(29, 35, 64, 0.2) 0%,
+    rgba(124, 106, 255, 0.06) 55%,
+    transparent 100%
+  );
+  filter: blur(28px);
 }
 
-.animate-landing-loader-ring {
-  animation: hero-spiral-spin 1.8s linear infinite;
+/* Grille technique discrète */
+.pv-blueprint {
+  background-image:
+    linear-gradient(to right, var(--blueprint-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--blueprint-line) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(75% 60% at 50% 38%, rgba(0, 0, 0, 0.9), transparent 100%);
+  -webkit-mask-image: radial-gradient(75% 60% at 50% 38%, rgba(0, 0, 0, 0.9), transparent 100%);
 }
 
-.animate-landing-loader-ring-reverse {
-  animation: hero-orbit-spin 2.4s linear infinite reverse;
+/* ═══ Boutons ════════════════════════════════════════════════ */
+
+/* Pilule encre — le bouton primaire Givre (ref Founder) */
+.pv-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 24px;
+  border-radius: 999px;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.006em;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 1px 2px rgba(29, 35, 64, 0.18), 0 10px 26px rgba(29, 35, 64, 0.22);
+  transition: transform 0.35s var(--ease-out-expo), box-shadow 0.35s var(--ease-out-expo),
+    background-color 0.35s var(--ease-smooth);
+}
+.pv-btn:hover {
+  transform: translateY(-2px);
+  background: var(--btn-primary-hover);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 2px 4px rgba(29, 35, 64, 0.18), 0 18px 40px rgba(29, 35, 64, 0.28);
+}
+.pv-btn:active {
+  transform: translateY(0);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 2px rgba(29, 35, 64, 0.16), 0 6px 16px rgba(29, 35, 64, 0.18);
+}
+.pv-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 2px rgba(29, 35, 64, 0.12);
+}
+/* Focus clavier : anneau net qui épouse la pilule (l'outline
+   global radius 4px casserait la forme) */
+.pv-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+  border-radius: 999px;
 }
 
-.animate-landing-loader-bar {
-  animation: landing-loader-bar 1.05s ease-in-out infinite;
+/* Pilule de verre — le secondaire se fond dans la scène */
+.pv-btn--ghost {
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--color-ink);
+  border: 1px solid var(--hairline-glass);
+  backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(29, 35, 64, 0.05), 0 8px 20px rgba(29, 35, 64, 0.07);
+}
+.pv-btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 2px 4px rgba(29, 35, 64, 0.06), 0 14px 32px rgba(29, 35, 64, 0.1);
+}
+.pv-btn--ghost:active {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(29, 35, 64, 0.05);
 }
 
-@keyframes hero-spiral-spin {
+/* Sur îlot sombre : pilule blanche pleine */
+.pv-btn--reverse {
+  background: #ffffff;
+  color: var(--color-ink);
+  border: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 10px 28px rgba(0, 0, 0, 0.3);
+}
+.pv-btn--reverse:hover {
+  background: #F0F1F8;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.28), 0 18px 40px rgba(0, 0, 0, 0.36);
+}
+
+/* ═══ Typographie ════════════════════════════════════════════ */
+
+/* Étiquette technique — mono, petites capitales espacées */
+.pv-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.pv-label--dim {
+  color: var(--ink-45);
+}
+
+/* Titre display — Outfit léger, encre ardoise-violet.
+   La graisse ne monte jamais au-dessus de medium : le luxe de la
+   ref vient de la légèreté, l'accent vient du CONTRASTE de graisse
+   (un segment .pv-display-strong en 500), jamais du gras. */
+.pv-display {
+  font-family: var(--font-display);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--text-2);
+}
+
+.pv-display-strong {
+  font-weight: 500;
+  color: var(--surface-text);
+}
+
+/* Compat : les écrans produit qui montaient la graisse retombent
+   sur la voix display unique. */
+.pv-display b,
+.pv-display strong {
+  font-weight: 500;
+  color: var(--surface-text);
+}
+
+/* Dégradé spectral encré sur un mot-clé (un par écran max) */
+.pv-beam-text {
+  background-image: var(--beam-ink);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Souligné spectral fin */
+.pv-beam-underline {
+  position: relative;
+}
+.pv-beam-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--beam);
+}
+
+/* Numéro technique — mono spectral encré */
+.pv-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--num-color);
+}
+
+/* Métadonnée mono discrète */
+.pv-meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+
+/* Rangée de registre */
+.pv-row {
+  border-top: 1px solid var(--hairline);
+  transition: background-color 0.4s var(--ease-smooth);
+}
+.pv-row:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+.pv-row:hover {
+  background-color: var(--surface-hover);
+}
+
+/* Cadre média — les rendus s'affichent purs */
+.pv-media {
+  position: relative;
+  overflow: hidden;
+  background: var(--media-bg);
+  border: 1px solid var(--media-border);
+  border-radius: var(--radius-xs);
+}
+.pv-media > img,
+.pv-media > video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s var(--ease-out-expo);
+}
+.pv-media--hover:hover > img {
+  transform: scale(1.04);
+}
+
+/* Lien — soulignement spectral qui se dessine */
+.pv-link {
+  position: relative;
+  display: inline-block;
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.3s var(--ease-smooth);
+}
+.pv-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 1px;
+  background: var(--beam);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s var(--ease-smooth);
+}
+.pv-link:hover {
+  color: var(--link-hover);
+}
+.pv-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ═══ Structure ══════════════════════════════════════════════ */
+
+.pv-hairline {
+  border-color: var(--hairline);
+}
+
+.pv-rule {
+  height: 1px;
+  background: var(--hairline);
+  border: none;
+}
+
+.pv-rule--beam {
+  height: 1px;
+  border: none;
+  background: linear-gradient(90deg, transparent, rgba(124, 106, 255, 0.4) 30%, rgba(76, 201, 240, 0.4) 70%, transparent);
+}
+
+/* ═══ Champs ═════════════════════════════════════════════════ */
+
+.pv-field {
+  width: 100%;
+  background: var(--field-bg);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-xs);
+  color: var(--surface-text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 11px 14px;
+  transition: border-color 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth),
+    background-color 0.3s var(--ease-smooth);
+}
+.pv-field::placeholder {
+  color: var(--ink-45);
+}
+.pv-field:hover {
+  border-color: var(--hairline-strong);
+}
+.pv-field:focus {
+  outline: none;
+  border-color: rgba(91, 72, 228, 0.55);
+  box-shadow: 0 0 0 3px rgba(91, 72, 228, 0.16);
+  background: var(--field-bg-focus);
+}
+.pv-field:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Jauge — le spectre mesure */
+.pv-gauge {
+  position: relative;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--gauge-track);
+  overflow: hidden;
+}
+.pv-gauge > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 2px;
+  background: var(--beam);
+  transition: width 0.9s var(--ease-smooth);
+}
+
+/* ═══ Animations ═════════════════════════════════════════════ */
+
+@keyframes pv-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+.pv-marquee {
+  display: flex;
+  width: max-content;
+  animation: pv-marquee var(--marquee-duration, 42s) linear infinite;
+  will-change: transform;
+}
+.pv-marquee:hover {
+  animation-play-state: paused;
+}
+@keyframes pv-marquee-reverse {
+  from { transform: translate3d(-50%, 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
+}
+.pv-marquee--reverse {
+  animation-name: pv-marquee-reverse;
+}
+
+@keyframes pv-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.pv-fade-up {
+  animation: pv-fade-up 0.9s var(--ease-out-expo) both;
+}
+
+@keyframes pv-spin {
   to { transform: rotate(360deg); }
 }
-
-@keyframes hero-orbit-spin {
-  to { transform: rotate(-360deg); }
+.pv-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(91, 72, 228, 0.25);
+  border-top-color: #5B48E4;
+  animation: pv-spin 0.8s linear infinite;
 }
 
-@keyframes hero-centered-spiral-spin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(360deg); }
+@keyframes pv-shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position: 200% 0; }
+}
+.pv-skeleton {
+  border-radius: var(--radius-xs);
+  background: linear-gradient(
+    100deg,
+    var(--skeleton-a) 40%,
+    var(--skeleton-b) 50%,
+    var(--skeleton-a) 60%
+  );
+  background-size: 200% 100%;
+  animation: pv-shimmer 1.6s linear infinite;
 }
 
-@keyframes hero-centered-orbit-spin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(-360deg); }
+@keyframes pv-scale-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.pv-scale-in {
+  animation: pv-scale-in 0.35s var(--ease-out-expo) both;
 }
 
-@keyframes hero-character-rise {
-  from { opacity: 0; transform: translateY(26px) scale(0.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes pv-toast-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.pv-toast-in {
+  animation: pv-toast-in 0.4s var(--ease-out-expo) both;
 }
 
-@keyframes hero-character-float {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-10px) scale(1.01); }
+@keyframes pv-accordion-down {
+  from { height: 0; opacity: 0; }
+  to { height: var(--radix-accordion-content-height); opacity: 1; }
+}
+@keyframes pv-accordion-up {
+  from { height: var(--radix-accordion-content-height); opacity: 1; }
+  to { height: 0; opacity: 0; }
 }
 
-@keyframes landing-loader-bar {
-  0% { transform: translateX(-110%); }
-  55% { transform: translateX(70%); }
-  100% { transform: translateX(220%); }
+/* Respiration d'un halo */
+@keyframes pv-breathe {
+  0%, 100% { opacity: 0.65; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+.pv-breathe {
+  animation: pv-breathe 5s ease-in-out infinite;
 }
 
-.hero-premium-orbit {
+/* Lévitation d'un objet de verre — dérive verticale lente */
+@keyframes pv-float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--float-rot, 0deg)); }
+  50%      { transform: translate3d(0, var(--float-y, -16px), 0) rotate(var(--float-rot, 0deg)); }
+}
+.pv-float {
+  animation: pv-float var(--float-dur, 9s) ease-in-out infinite;
+}
+
+/* Fil de lumière qui balaie une bordure (stats) */
+@keyframes pv-sweep {
+  0%   { transform: translateX(-280px); }
+  60%, 100% { transform: translateX(calc(100vw + 280px)); }
+}
+
+/* Anneau spectral en orbite lente */
+@keyframes pv-orbit-turn {
+  to { --pv-ang: 360deg; }
+}
+.pv-orbit {
+  position: relative;
+}
+.pv-orbit::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--pv-ang),
+    transparent 0 8%,
+    rgba(124, 106, 255, 0.9) 16%,
+    rgba(76, 201, 240, 0.9) 24%,
+    transparent 32% 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: pv-orbit-turn 7s linear infinite;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ═══ Créations — la vraie couleur de la page ════════════════ */
+
+.pv-artwork {
+  position: relative;
+  overflow: hidden;
+  background: var(--media-bg);
+}
+.pv-artwork > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Carte-tirage : l'œuvre posée sur la scène */
+.pv-print {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-porcelain);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--sh-print);
+  transition: transform 0.5s var(--ease-out-expo), box-shadow 0.5s var(--ease-out-expo);
+}
+.pv-print:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sh-print-lift);
+}
+
+/* ═══ Voile — fallback sans WebGL ════════════════════════════ */
+
+@keyframes pv-veil-drift {
+  0%, 100% { transform: translate3d(-4%, -2%, 0) scale(1); }
+  50%      { transform: translate3d(4%, 3%, 0) scale(1.12); }
+}
+@keyframes pv-veil-drift-b {
+  0%, 100% { transform: translate3d(3%, 2%, 0) scale(1.1); }
+  50%      { transform: translate3d(-4%, -3%, 0) scale(1); }
+}
+.pv-veil-fallback {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.pv-veil-fallback::before,
+.pv-veil-fallback::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+}
+.pv-veil-fallback::before {
   background:
-    repeating-conic-gradient(
-      from 18deg,
-      rgba(255, 255, 255, 0) 0deg 9deg,
-      rgba(255, 209, 102, 0.24) 10deg 11deg,
-      rgba(255, 123, 75, 0.22) 12deg 13deg,
-      rgba(255, 255, 255, 0) 14deg 28deg
-    );
-  filter: drop-shadow(0 0 42px rgba(255, 123, 75, 0.18));
-  opacity: 0.85;
-  animation: hero-premium-spin 36s linear infinite;
-  -webkit-mask: radial-gradient(circle, transparent 0 42%, #000 43% 44%, transparent 45% 51%, #000 52% 53%, transparent 54% 61%, #000 62% 63%, transparent 64%);
-  mask: radial-gradient(circle, transparent 0 42%, #000 43% 44%, transparent 45% 51%, #000 52% 53%, transparent 54% 61%, #000 62% 63%, transparent 64%);
+    radial-gradient(42% 54% at 26% 30%, var(--veil-a, rgba(201, 198, 232, 0.4)), transparent 70%),
+    radial-gradient(36% 48% at 74% 22%, var(--veil-b, rgba(175, 194, 236, 0.32)), transparent 72%);
+  animation: pv-veil-drift 26s ease-in-out infinite;
 }
-
-.hero-premium-ring {
+.pv-veil-fallback::after {
   background:
-    conic-gradient(
-      from -24deg,
-      transparent 0deg,
-      rgba(255, 95, 123, 0.58) 48deg,
-      rgba(255, 123, 75, 0.16) 108deg,
-      rgba(255, 209, 102, 0.48) 158deg,
-      transparent 218deg,
-      rgba(255, 95, 123, 0.34) 312deg,
-      transparent 360deg
-    );
-  filter: blur(1.5px) drop-shadow(0 0 52px rgba(255, 95, 123, 0.24));
-  opacity: 0.95;
-  animation: hero-premium-spin-reverse 24s linear infinite;
-  -webkit-mask: radial-gradient(circle, transparent 0 36%, #000 37% 40%, transparent 41% 47%, #000 48% 62%, transparent 64%);
-  mask: radial-gradient(circle, transparent 0 36%, #000 37% 40%, transparent 41% 47%, #000 48% 62%, transparent 64%);
+    radial-gradient(38% 50% at 62% 68%, var(--veil-a, rgba(201, 198, 232, 0.24)), transparent 70%),
+    radial-gradient(30% 42% at 18% 74%, var(--veil-b, rgba(175, 194, 236, 0.2)), transparent 72%);
+  animation: pv-veil-drift-b 32s ease-in-out infinite;
 }
 
-.hero-premium-particles {
+/* ═══ Dawn — la scène de la ref ═══════════════════════════════
+   Lilas en tête, brume au centre, rose sur le bord droit et le
+   pied. Ni noir pur ni blanc pur : tout vit entre porcelaine,
+   lavande, pervenche et une pointe de rose. */
+
+.pv-scene-bg--dawn,
+.pv-scene-bg.pv-scene-bg--dawn {
   background:
-    radial-gradient(circle at 20% 34%, rgba(255, 209, 102, 0.9) 0 2px, transparent 3px),
-    radial-gradient(circle at 72% 18%, rgba(255, 95, 123, 0.85) 0 2px, transparent 3px),
-    radial-gradient(circle at 86% 56%, rgba(255, 123, 75, 0.8) 0 2px, transparent 3px),
-    radial-gradient(circle at 38% 76%, rgba(255, 209, 102, 0.7) 0 1px, transparent 2px),
-    radial-gradient(circle at 58% 10%, rgba(255, 123, 75, 0.72) 0 1px, transparent 2px);
-  opacity: 0.46;
-  animation: hero-premium-particles 8s ease-in-out infinite;
+    radial-gradient(70% 60% at 22% -8%, rgba(252, 250, 246, 0.95) 0%, rgba(252, 250, 246, 0) 55%),
+    radial-gradient(58% 64% at 58% 42%, rgba(214, 202, 240, 0.42) 0%, rgba(214, 202, 240, 0) 62%),
+    radial-gradient(48% 55% at 62% 66%, rgba(246, 212, 190, 0.4) 0%, rgba(246, 212, 190, 0) 64%),
+    linear-gradient(172deg, #F1EFE9 0%, #F0EDE7 48%, #ECE9E2 100%);
 }
 
-@keyframes hero-premium-spin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(360deg); }
+/* Version diluée pour les sections courantes — le même atelier,
+   l'aurore à peine suggérée sur un bord. */
+.pv-scene-bg--dawn-calm,
+.pv-scene-bg.pv-scene-bg--dawn-calm {
+  background:
+    radial-gradient(95% 70% at 40% -10%, rgba(252, 251, 248, 0.85) 0%, rgba(252, 251, 248, 0) 55%),
+    radial-gradient(70% 85% at -12% 44%, rgba(212, 203, 238, 0.28) 0%, rgba(212, 203, 238, 0) 60%),
+    radial-gradient(65% 80% at 110% 58%, rgba(246, 214, 194, 0.24) 0%, rgba(246, 214, 194, 0) 60%),
+    linear-gradient(174deg, #F2F0EB 0%, #F0EEE8 52%, #EBE8E1 100%);
 }
 
-@keyframes hero-premium-spin-reverse {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(-360deg); }
+/* Rais de fenêtre — la lumière entre en diagonale, haut-droite.
+   Deux nappes en dérive très lente, la respiration de la scène.
+   Transform/opacity uniquement. */
+@keyframes pv-ray-drift {
+  0%, 100% { transform: translate3d(-1.5%, 0, 0) skewX(-14deg); opacity: 0.8; }
+  50%      { transform: translate3d(1.5%, 0, 0) skewX(-14deg); opacity: 1; }
+}
+@keyframes pv-ray-drift-b {
+  0%, 100% { transform: translate3d(1%, 0, 0) skewX(-14deg); opacity: 0.65; }
+  50%      { transform: translate3d(-1.2%, 0, 0) skewX(-14deg); opacity: 0.9; }
+}
+.pv-windowlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.pv-windowlight::before,
+.pv-windowlight::after {
+  content: "";
+  position: absolute;
+  top: -12%;
+  bottom: -12%;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(178deg, rgba(0, 0, 0, 0.95) 8%, rgba(0, 0, 0, 0.35) 56%, transparent 86%);
+  mask-image: linear-gradient(178deg, rgba(0, 0, 0, 0.95) 8%, rgba(0, 0, 0, 0.35) 56%, transparent 86%);
+}
+.pv-windowlight::before {
+  left: 30%;
+  width: 58%;
+  background:
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.34) 9%, transparent 21%,
+      transparent 30%,
+      rgba(255, 255, 255, 0.26) 41%, transparent 55%,
+      transparent 66%,
+      rgba(253, 250, 255, 0.3) 78%, transparent 92%);
+  animation: pv-ray-drift 24s ease-in-out infinite;
+}
+.pv-windowlight::after {
+  left: 48%;
+  width: 44%;
+  background:
+    linear-gradient(90deg,
+      transparent 4%,
+      rgba(255, 253, 255, 0.2) 18%, transparent 34%,
+      transparent 52%,
+      rgba(255, 255, 255, 0.16) 68%, transparent 88%);
+  animation: pv-ray-drift-b 31s ease-in-out infinite;
 }
 
-@keyframes hero-premium-particles {
-  0%, 100% { transform: translateY(0); opacity: 0.38; }
-  50% { transform: translateY(-14px); opacity: 0.62; }
+/* ═══ Cadre éditorial ════════════════════════════════════════
+   La page comme objet imprimé : filets translucides d'un pixel,
+   pagination, points de navigation. L'UI chuchote autour de la
+   scène. */
+
+/* Filets du cadre — blancs lumineux sur scène, jamais encre */
+.pv-frame-line {
+  border-color: rgba(255, 255, 255, 0.55);
 }
+.pv-frame-line--soft {
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+/* Pagination de section — 01 immense et léger, /08 en retrait */
+.pv-page-num {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-display);
+  color: var(--text-2);
+}
+.pv-page-num > b {
+  font-size: 64px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+.pv-page-num > span {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: var(--text-3);
+}
+
+/* Rail de points — navigation latérale silencieuse */
+.pv-dot-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.pv-dot-rail > a,
+.pv-dot-rail > span {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--ink-28);
+  transition: background-color 0.35s var(--ease-smooth), transform 0.35s var(--ease-smooth);
+}
+.pv-dot-rail > a:hover {
+  background: var(--text-2);
+}
+.pv-dot-rail > .is-active {
+  background: var(--surface-text);
+  transform: scale(1.35);
+}
+
+/* Grille de pastilles — le motif bas du rail (2×2) */
+.pv-dot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 5px);
+  gap: 7px;
+}
+.pv-dot-grid > span {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--ink-28);
+}
+
+/* Ombre mauve — l'ombre des objets sur scène dawn (jamais grise) */
+.pv-shadow-mauve {
+  box-shadow: 0 2px 6px rgba(96, 84, 140, 0.1), 0 26px 60px rgba(96, 84, 140, 0.22);
+}
+
+} /* fin @layer components */
+
+/* ═══ Motion — décision produit ══════════════════════════════
+   Les animations font partie de l'identité du studio : elles
+   restent actives même quand le système déclare
+   prefers-reduced-motion (optimisations Windows comprises). */

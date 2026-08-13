@@ -8,7 +8,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 
 const title = "Neva Design - Studio graphique premium pour serveurs FiveM";
 const description =
-  "Neva Design cree logos, branding, affiches, bannieres, landing pages, visuels Discord et packs GFX premium pour serveurs FiveM ambitieux.";
+  "Neva Design crée logos, branding, affiches, bannières, landing pages, visuels Discord et packs GFX premium pour les serveurs FiveM ambitieux.";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     siteName: "Neva Design",
     images: [
       {
-        url: "/bglanding.png",
+        url: "/brand/og.png",
         width: 1200,
         height: 630,
         alt: "Neva Design - studio graphique premium FiveM",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title,
     description,
-    images: ["/bglanding.png"],
+    images: ["/brand/og.png"],
   },
 };
 
@@ -78,25 +78,25 @@ const PUBLIC_FOLDER_CONFIG: Record<
   packs: {
     category: "Packs",
     tag: "Pack GFX",
-    description: "Pack GFX premium pour presenter un serveur FiveM.",
+    description: "Pack GFX premium pour présenter un serveur FiveM.",
     priority: 400,
   },
   logos: {
     category: "Logos",
     tag: "Logo",
-    description: "Logo serveur FiveM preserve en bonnes proportions.",
+    description: "Logo serveur FiveM préservé dans ses proportions.",
     priority: 300,
   },
   branding: {
     category: "Branding",
     tag: "Branding",
-    description: "Direction visuelle premium pour identite serveur.",
+    description: "Direction visuelle premium pour identité de serveur.",
     priority: 200,
   },
   affiches: {
     category: "Affiches",
     tag: "Affiche",
-    description: "Affiche premium pour lancement, teasing ou communication serveur.",
+    description: "Affiche premium pour lancement, teasing ou communication de serveur.",
     priority: 100,
   },
 };
@@ -181,7 +181,7 @@ export default function Page() {
     "@type": "ProfessionalService",
     name: "Neva Design",
     url: `${siteUrl}/neva-design`,
-    image: `${siteUrl}/bglanding.png`,
+    image: `${siteUrl}/brand/og.png`,
     description,
     areaServed: "France",
     serviceType: [
@@ -194,13 +194,18 @@ export default function Page() {
   };
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#030303] text-[#F8F1EA]">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <PortfolioLoader getPortfolioItems={getPortfolioItems} />
-    </main>
+    <>
+      {/* Givre impose sa lumière à la route : fond clair jusque
+          sous l'overscroll, scrollbars et contrôles natifs clairs. */}
+      <style>{`html{color-scheme:light}body{background-color:#EEF0F7;color:#1D2340}`}</style>
+      <main className="pv-light min-h-screen bg-paper text-ink">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <PortfolioLoader getPortfolioItems={getPortfolioItems} />
+      </main>
+    </>
   );
 }
 

@@ -1,7 +1,13 @@
 "use client";
-import { Check, Download, ExternalLink, Package, ShoppingBag } from "lucide-react";
+import { ArrowRight, Check, Download } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+
+/*
+ * Ressources — bandeau d'achat confirmé en sage, packs possédés en
+ * rangées éditoriales : nom serif, badge Acheté, date, téléchargement.
+ */
 
 interface OwnedPack {
   id: string;
@@ -22,109 +28,102 @@ export default function DownloadsClient({ ownedPacks, successPack }: Props) {
     : null;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-3xl">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Package size={16} className="text-[#FF7B4B]" />
-            <h1 className="text-2xl font-bold text-[#F5F0E8]">Mes Ressources</h1>
-          </div>
-          <p className="text-sm text-[#666]">Tes packs achetés, disponibles en téléchargement.</p>
-        </div>
+    <div className="relative mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+      <div aria-hidden className="pv-halo--violet pv-halo right-[-15%] top-[-100px] h-[380px] w-[460px] opacity-70" />
+
+      {/* En-tête */}
+      <div className="relative mb-10">
+        <p className="pv-label text-[color:var(--num-color)]">Ressources</p>
+        <h1 className="pv-display mt-4 text-[clamp(1.9rem,3.4vw,2.6rem)] text-ink">
+          Vos <span className="pv-beam-text">ressources.</span>
+        </h1>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-steel">
+          Vos packs achetés, disponibles en téléchargement.
+        </p>
       </div>
 
-      {/* Success banner */}
+      {/* Bandeau d'achat confirmé */}
       {successPack_ && (
-        <div className="mb-6 flex items-center gap-3 px-4 py-3.5 bg-green-500/8 border border-green-500/20 rounded-xl">
-          <div className="w-8 h-8 rounded-full bg-green-500/15 flex items-center justify-center flex-shrink-0">
-            <Check size={14} className="text-green-400" />
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-green-400">Achat confirmé !</div>
-            <div className="text-xs text-[#555]">
+        <div className="relative mb-8 flex items-center gap-4 rounded-lg border border-ok/30 bg-ok/10 px-4 py-3.5">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-ok/30 bg-ok/15 text-ok">
+            <Check size={14} />
+          </span>
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-ok">Achat confirmé.</p>
+            <p className="truncate text-xs text-steel">
               {successPack_.name} est maintenant disponible ci-dessous.
-            </div>
+            </p>
           </div>
         </div>
       )}
 
       {ownedPacks.length === 0 ? (
-        /* Empty state */
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.01] p-12 flex flex-col items-center gap-5 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
-            <ShoppingBag size={24} className="text-[#333]" />
-          </div>
-          <div>
-            <div className="text-base font-semibold text-[#F5F0E8] mb-1.5">Aucun pack acheté</div>
-            <p className="text-sm text-[#444] leading-relaxed max-w-xs">
-              Découvre nos brushes et templates premium pour créer des visuels FiveM professionnels.
-            </p>
-          </div>
-          <Link href="/#resources">
-            <Button variant="gradient" size="sm">
-              Voir les packs <ExternalLink size={12} />
-            </Button>
-          </Link>
-        </div>
+        /* État vide */
+        <EmptyState
+          title="Aucun pack pour l'instant."
+          hint="Découvrez nos pinceaux et modèles premium pour des visuels FiveM professionnels."
+          action={
+            <Link href="/#resources">
+              <Button variant="gradient" size="sm">
+                Voir les packs
+                <ArrowRight size={13} />
+              </Button>
+            </Link>
+          }
+        />
       ) : (
-        /* Owned packs */
-        <div className="space-y-3">
-          {ownedPacks.map((pack) => {
+        /* Packs possédés — rangées éditoriales */
+        <ul className="relative">
+          {ownedPacks.map((pack, index) => {
             const hasDownload = !!pack.downloadUrl;
             return (
-              <div
-                key={pack.id}
-                className="glass-card rounded-2xl border border-white/[0.08] p-5 flex items-center gap-4"
-              >
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#FF7B4B]/20 to-[#FFD166]/20 border border-[#FF7B4B]/25 flex items-center justify-center flex-shrink-0">
-                  <Package size={18} className="text-[#FF7B4B]" />
-                </div>
+              <li key={pack.id} className="pv-row">
+                <div className="flex flex-col gap-4 px-2 py-6 sm:flex-row sm:items-center sm:gap-6">
+                  <span className="pv-num hidden w-9 shrink-0 sm:block">0{index + 1}</span>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-sm font-semibold text-[#F5F0E8]">{pack.name}</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-green-500/15 text-green-400 border border-green-500/20 font-medium">
-                      ACHETÉ
-                    </span>
-                  </div>
-                  <div className="text-xs text-[#555]">{pack.tagline}</div>
-                  {pack.purchasedAt && (
-                    <div className="text-[10px] text-[#333] mt-0.5">
-                      {new Date(pack.purchasedAt).toLocaleDateString("fr-FR", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
+                      <span className="pv-display text-lg text-ink">{pack.name}</span>
+                      <span className="inline-flex rounded-full border border-ok/35 bg-ok/10 px-2 py-[3px] font-mono text-[9px] font-medium uppercase tracking-[0.16em] text-ok">
+                        Acheté
+                      </span>
                     </div>
-                  )}
-                </div>
+                    <p className="mt-1 text-xs text-steel">{pack.tagline}</p>
+                    {pack.purchasedAt && (
+                      <p className="pv-meta mt-1.5">
+                        {new Date(pack.purchasedAt).toLocaleDateString("fr-FR", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </p>
+                    )}
+                  </div>
 
-                {hasDownload ? (
-                  <a
-                    href={pack.downloadUrl}
-                    download
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FF7B4B]/10 border border-[#FF7B4B]/25 text-[#FF7B4B] text-xs font-semibold hover:bg-[#FF7B4B]/20 transition-all flex-shrink-0"
-                  >
-                    <Download size={13} />
-                    Télécharger
-                  </a>
-                ) : (
-                  <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
-                    <span className="text-xs text-[#444] px-3 py-2 rounded-xl border border-white/[0.05]">
+                  {hasDownload ? (
+                    <a
+                      href={pack.downloadUrl}
+                      download
+                      className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg border border-[color:var(--hairline-strong)] px-5 text-sm font-medium text-ink transition-colors duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] hover:border-[rgba(109,91,232,0.5)] hover:text-[color:var(--num-color)]"
+                    >
+                      <Download size={14} />
+                      Télécharger
+                    </a>
+                  ) : (
+                    <span className="inline-flex h-10 shrink-0 items-center justify-center rounded-lg border border-[color:var(--hairline)] px-5 font-mono text-[11px] uppercase tracking-[0.12em] text-dusk">
                       Disponible bientôt
                     </span>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              </li>
             );
           })}
-        </div>
+        </ul>
       )}
 
       {ownedPacks.length > 0 && (
-        <p className="text-xs text-[#2e2e2e] text-center mt-6">
-          Problème de téléchargement ? Contacte le support Discord.
+        <p className="pv-meta mt-8 text-center">
+          Un problème de téléchargement ? Contactez le support sur Discord.
         </p>
       )}
     </div>

@@ -14,7 +14,7 @@ export default async function DashboardLayout({
   if (!user) redirect('/login')
 
   const meta = user.user_metadata ?? {}
-  const name = meta.display_name ?? meta.full_name ?? meta.name ?? user.email?.split('@')[0] ?? 'User'
+  const name = meta.display_name ?? meta.full_name ?? meta.name ?? user.email?.split('@')[0] ?? 'Créateur'
   const email = user.email ?? ''
   const avatarUrl = meta.avatar_url ?? meta.picture ?? null
   const initials = name

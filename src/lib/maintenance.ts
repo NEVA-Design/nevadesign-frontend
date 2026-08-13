@@ -23,7 +23,7 @@ export const DEFAULT_MAINTENANCE: MaintenanceMode = {
   id: 'global',
   enabled: false,
   title: 'Maintenance en cours',
-  message: 'Neva AI revient dans quelques minutes. Merci pour ta patience.',
+  message: 'Neva Design revient dans quelques minutes. Merci pour votre patience.',
   allow_admin_access: true,
   starts_at: null,
   ends_at: null,

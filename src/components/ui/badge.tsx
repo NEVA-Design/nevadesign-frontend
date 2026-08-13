@@ -5,17 +5,25 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: "default" | "neva" | "subtle" | "popular";
 }
 
+/*
+ * Badge Prisme — étiquette mono en petites capitales espacées.
+ * « popular » est le seul endroit du système où le dégradé spectral
+ * remplit une surface : un filet de lumière de 18px, pas un aplat.
+ */
 const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
   ({ className, variant = "default", ...props }, ref) => (
     <span
       ref={ref}
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors",
+        "inline-flex items-center gap-1 rounded-full px-3 py-[3px] font-mono text-[10px] font-medium uppercase tracking-[0.14em] transition-colors",
         {
-          "bg-[#1a1a1a] text-[#9A9A9A] border border-[#222]": variant === "default",
-          "bg-gradient-to-r from-[#FF6B7D]/20 to-[#FFD166]/20 text-[#FFD166] border border-[#FF7B4B]/30": variant === "neva",
-          "bg-white/5 text-[#9A9A9A] border border-white/10": variant === "subtle",
-          "bg-gradient-to-r from-[#FF6B7D] via-[#FF7B4B] to-[#FFD166] text-white font-semibold shadow-[0_2px_12px_rgba(255,123,75,0.4)]": variant === "popular",
+          "border border-[color:var(--hairline)] bg-linen text-slate":
+            variant === "default",
+          "border border-[rgba(109,91,232,0.28)] bg-[rgba(124,106,255,0.07)] text-[color:var(--num-color)]":
+            variant === "neva",
+          "border border-[color:var(--hairline)] bg-white text-mist": variant === "subtle",
+          "border-0 bg-[linear-gradient(115deg,#7C6AFF,#4CC9F0)] font-semibold text-white":
+            variant === "popular",
         },
         className
       )}

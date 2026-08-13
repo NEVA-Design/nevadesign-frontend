@@ -1,8 +1,16 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { Send, Plus, Sparkles, MessageSquare, ChevronDown, ImageIcon, Loader2, Download, X, Paperclip } from "lucide-react";
+import { ChevronDown, Download, ImageIcon, Paperclip, Plus, Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { IMAGE_BRIEF_MARKER, NEVA_MODELS, type NevaModel } from "@/lib/ai/models";
+
+/*
+ * Creative Director — salon de conversation plein écran : en-tête fin
+ * sur filet, fil éditorial (réponses posées sur la nuit, messages
+ * utilisateur en carte sobre à droite), saisie creusée posée sur un
+ * filet. Une seule lumière : violet.
+ */
 
 interface Attachment {
   data: string;
@@ -24,21 +32,24 @@ interface StoredMessage extends Omit<Message, "timestamp"> {
   timestamp?: string;
 }
 
+const INTRO_MESSAGE =
+  "Dites-moi ce que vous voulez publier : bannière, logo, landing page ou identité serveur. Je vous réponds avec un angle clair, un format et un prompt prêt à lancer.";
+
 const suggestions = [
-  "Ameliore mon prompt de poster",
+  "Améliore mon prompt d'affiche",
   "Trouve un concept de lancement",
-  "Cree une direction artistique",
+  "Crée une direction artistique",
   "Optimise une annonce Discord",
 ];
 
 const modelList = Object.values(NEVA_MODELS);
 
-const BADGE_COLORS: Record<string, string> = {
-  PRO: "bg-[#FF7B4B]/20 text-[#FF7B4B] border-[#FF7B4B]/30",
-  FAST: "bg-[#FFD166]/20 text-[#FFD166] border-[#FFD166]/30",
-  STUDIO: "bg-[#FF7B4B]/20 text-[#FF7B4B] border-[#FF7B4B]/30",
-  CORE: "bg-[#FFD166]/20 text-[#FFD166] border-[#FFD166]/30",
+/* Badges des modèles — tokens Prisme uniquement. */
+const BADGE_STYLES: Record<string, string> = {
+  STUDIO: "border-[rgba(109,91,232,0.3)] bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]",
+  CORE: "border-info/30 bg-info/10 text-info",
 };
+const BADGE_FALLBACK = "border-[color:var(--hairline-strong)] bg-linen text-steel";
 
 const IMAGE_INTENT_PATTERN =
   /\b(génère|genere|crée|cree|produis|fais-moi).*\b(image|visuel|poster|affiche|bannière|banniere|banner|miniature|thumbnail|logo|cover|flyer|pub|ad|maquette|mockup)\b|\b(image|visuel|poster|affiche|bannière|banniere|banner|miniature|thumbnail|logo|cover|flyer|mockup)\b/i;
@@ -61,28 +72,43 @@ function formatTime(date: Date | string) {
   return `${h}:${m}`;
 }
 
-// ─── Inline markdown renderer ─────────────────────────────────────────────────
+// ─── Mini-parseur markdown en ligne ──────────────────────────────────────────
 
 function formatInline(text: string): React.ReactNode[] {
-  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g);
+  const parts = text.split(/(\[[^\]]+\]\([^)\s]+\)|\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g);
   return parts.map((part, i) => {
+    const link = part.match(/^\[([^\]]+)\]\(([^)\s]+)\)$/);
+    if (link) {
+      return (
+        <a
+          key={i}
+          href={link[2]}
+          className="text-[color:var(--num-color)] underline decoration-violet/40 underline-offset-2 transition-colors duration-300 hover:text-cyan"
+        >
+          {link[1]}
+        </a>
+      );
+    }
     if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
       return (
-        <strong key={i} className="text-[#F5F0E8] font-semibold">
+        <strong key={i} className="font-semibold text-ink">
           {part.slice(2, -2)}
         </strong>
       );
     }
     if (part.startsWith("*") && part.endsWith("*") && part.length > 2 && !part.startsWith("**")) {
       return (
-        <em key={i} className="text-[#CCCCC0] italic">
+        <em key={i} className="italic text-steel">
           {part.slice(1, -1)}
         </em>
       );
     }
     if (part.startsWith("`") && part.endsWith("`") && part.length > 2) {
       return (
-        <code key={i} className="bg-white/[0.07] text-[#FFD166] font-mono text-[11px] px-1.5 py-0.5 rounded mx-0.5">
+        <code
+          key={i}
+          className="mx-0.5 rounded-full border border-[color:var(--hairline)] bg-abyss px-1.5 py-0.5 font-mono text-[11px] text-[color:var(--num-color)]"
+        >
           {part.slice(1, -1)}
         </code>
       );
@@ -103,7 +129,7 @@ function MessageContent({ content, variant }: { content: string; variant: "user"
   if (lines.length === 0) return <>{cleanContent}</>;
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       {lines.map((line, index) => {
         const h2 = line.match(/^## (.+)/);
         const h3 = line.match(/^### (.+)/);
@@ -113,37 +139,38 @@ function MessageContent({ content, variant }: { content: string; variant: "user"
         const sectionHead = line.endsWith(":") && line.length < 62 && !line.startsWith("-") && !line.startsWith("*");
 
         if (h2) return (
-          <div key={index} className="text-[#F5F0E8] font-semibold text-[13px] pt-2 mt-0.5 first:pt-0 border-t border-white/[0.05]">
+          <div
+            key={index}
+            className="pv-display border-t border-[color:var(--hairline)] pt-3 text-[15px] text-ink first:border-t-0 first:pt-0"
+          >
             {formatInline(h2[1])}
           </div>
         );
 
         if (h3) return (
-          <div key={index} className="text-[#CCCCC0] font-semibold text-[12px] pt-1 first:pt-0">
+          <div key={index} className="pv-display pt-1.5 text-[14px] text-ink/85 first:pt-0">
             {formatInline(h3[1])}
           </div>
         );
 
-        if (hr) return <div key={index} className="border-t border-white/[0.06] my-1" />;
+        if (hr) return <div key={index} aria-hidden className="my-2 border-t border-[color:var(--hairline)]" />;
 
         if (sectionHead) return (
-          <div key={index} className="text-[#F5F0E8] font-semibold text-[13px] pt-1.5 first:pt-0">
+          <div key={index} className="pv-display pt-2 text-[14px] text-ink first:pt-0">
             {formatInline(line.slice(0, -1))}
           </div>
         );
 
         if (numbered) return (
-          <div key={index} className="flex gap-2.5 rounded-lg bg-white/[0.03] border border-white/[0.05] px-3 py-2">
-            <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-[#FF7B4B]/15 text-[10px] font-bold text-[#FFD166]">
-              {numbered[1]}
-            </span>
+          <div key={index} className="flex gap-3">
+            <span className="pv-num w-6 shrink-0 pt-[3px] text-right">{numbered[1]}.</span>
             <span className="leading-relaxed">{formatInline(numbered[2])}</span>
           </div>
         );
 
         if (bullet) return (
-          <div key={index} className="flex gap-2.5">
-            <span className="mt-[9px] h-1 w-1 flex-shrink-0 rounded-full bg-[#FFD166]" />
+          <div key={index} className="flex gap-3">
+            <span aria-hidden className="mt-[10px] h-px w-3.5 shrink-0 bg-violet/50" />
             <span className="leading-relaxed">{formatInline(bullet[1])}</span>
           </div>
         );
@@ -158,14 +185,25 @@ function MessageContent({ content, variant }: { content: string; variant: "user"
   );
 }
 
-// ─── Page component ───────────────────────────────────────────────────────────
+/* Monogramme du directeur artistique — serif en veilleuse violet. */
+function AssistantAvatar() {
+  return (
+    <div
+      aria-hidden
+      className="mt-0.5 flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-lg border border-violet/25 bg-[rgba(124,106,255,0.08)]"
+    >
+      <span className="pv-display text-[13px] text-[color:var(--num-color)]">N</span>
+    </div>
+  );
+}
+
+// ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content:
-        "Dites-moi ce que vous voulez publier : bannière, logo, landing page ou identité serveur. Je vous réponds avec un angle clair, un format et un prompt prêt à lancer.",
+      content: INTRO_MESSAGE,
       timestamp: new Date(),
     },
   ]);
@@ -345,7 +383,7 @@ export default function ChatPage() {
       setMessages((prev) =>
         prev.map((m, i) =>
           i === placeholderIdx
-            ? { ...m, content: "Erreur réseau. Réessaie.", generatingImage: false }
+            ? { ...m, content: "Erreur réseau. Réessayez.", generatingImage: false }
             : m
         )
       );
@@ -393,7 +431,7 @@ export default function ChatPage() {
           ...prev,
           {
             role: "assistant",
-            content: "Tes créations disponibles sont épuisées. Recharge ton espace dans [Billing](/dashboard/billing) pour continuer.",
+            content: "Vos créations disponibles sont épuisées. Rechargez votre espace dans [Abonnement](/dashboard/billing) pour continuer.",
             timestamp: new Date(),
           },
         ]);
@@ -401,7 +439,7 @@ export default function ChatPage() {
       }
 
       if (!res.ok || !res.body) {
-        let errorMsg = "Désolé, une erreur s'est produite. Réessaie dans un instant.";
+        let errorMsg = "Une erreur est survenue. Réessayez dans un instant.";
         try {
           const errData = await res.json();
           if (errData?.error) errorMsg = `Erreur : ${errData.error}`;
@@ -447,7 +485,7 @@ export default function ChatPage() {
         ...prev,
         {
           role: "assistant",
-          content: "Désolé, une erreur s'est produite. Réessaie dans un instant.",
+          content: "Une erreur est survenue. Réessayez dans un instant.",
           timestamp: new Date(),
         },
       ]);
@@ -468,8 +506,7 @@ export default function ChatPage() {
     setMessages([
       {
         role: "assistant",
-        content:
-          "Dites-moi ce que vous voulez publier : bannière, logo, landing page ou identité serveur. Je vous réponds avec un angle clair, un format et un prompt prêt à lancer.",
+        content: INTRO_MESSAGE,
         timestamp: new Date(),
       },
     ]);
@@ -479,301 +516,329 @@ export default function ChatPage() {
 
   return (
     <div
-      className="mx-auto flex min-h-0 w-full max-w-[1180px] flex-1 flex-col"
-      style={{ height: "100dvh" }}
+      className="relative flex h-[calc(100dvh-3.5rem)] min-h-0 w-full flex-col overflow-hidden lg:h-dvh"
       onClick={() => setModelPickerOpen(false)}
     >
-      {/* Header */}
-      <div className="flex h-16 flex-shrink-0 items-center justify-between border-b border-white/[0.06] bg-[#050505]/55 px-4 backdrop-blur-xl sm:px-6">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-white/[0.10] bg-gradient-to-br from-[#FF6B7D] to-[#FFD166] text-[12px] font-bold text-white shadow-[0_14px_40px_rgba(255,123,75,0.16)]">
-            N
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-[#F5F0E8]">Creative Director</div>
-            <div className="text-[11px] text-[#777]">Strategy, prompts, branding, launch ideas</div>
-          </div>
-          <div className="ml-3 hidden items-center gap-1 rounded-full border border-[#55D18A]/20 bg-[#55D18A]/10 px-2 py-1 text-[10px] text-[#55D18A] sm:flex">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#4ADE80] animate-pulse" />
-            Online
-          </div>
+      {/* Halo — la profondeur de la scène, jamais de noir nu */}
+      <div
+        aria-hidden
+        className="pv-halo--violet pv-halo left-1/2 top-[-180px] h-[400px] w-[640px] -translate-x-1/2"
+      />
+
+      {/* ── En-tête fin sur filet ─────────────────────────────── */}
+      <header className="relative z-20 flex h-[60px] shrink-0 items-center justify-between gap-3 border-b border-[color:var(--hairline)] px-4 sm:px-6">
+        <div className="flex min-w-0 items-center gap-3.5">
+          <h1 className="pv-display truncate text-[17px] text-ink sm:text-lg">
+            Creative <span className="pv-beam-text">Director</span>
+          </h1>
+          <span aria-hidden className="hidden h-4 w-px shrink-0 bg-[color:var(--hairline-strong)] md:block" />
+          <p className="hidden truncate font-mono text-[10px] uppercase tracking-[0.14em] text-dusk md:block">
+            Stratégie · prompts · identité · lancements
+          </p>
+          <span className="hidden shrink-0 items-center gap-2 sm:flex">
+            <span aria-hidden className="pv-breathe h-1.5 w-1.5 rounded-full bg-ok" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ok/80">En ligne</span>
+          </span>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Model picker */}
+        <div className="flex shrink-0 items-center gap-2">
+          {/* Sélecteur de modèle */}
           <div className="relative" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setModelPickerOpen((v) => !v)}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#111] border border-white/[0.10] text-sm text-[#CCCCC0] hover:border-[#FF7B4B]/40 hover:bg-[#FF7B4B]/5 transition-all"
+              aria-expanded={modelPickerOpen}
+              aria-haspopup="listbox"
+              className="flex min-h-[40px] items-center gap-2 rounded-lg border border-[color:var(--hairline-strong)] bg-white px-3 text-[13px] text-ink/80 transition-colors duration-300 hover:border-[rgba(109,91,232,0.35)] hover:text-ink"
             >
               <span
-                className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${
-                  BADGE_COLORS[selectedModel.badge] ?? BADGE_COLORS.PRO
+                className={`rounded-full border px-1.5 py-px font-mono text-[9px] font-medium uppercase tracking-[0.14em] ${
+                  BADGE_STYLES[selectedModel.badge] ?? BADGE_FALLBACK
                 }`}
               >
                 {selectedModel.badge}
               </span>
-              <span className="font-medium">{selectedModel.name}</span>
-              <ChevronDown size={12} className="text-[#555]" />
+              <span className="max-w-[110px] truncate font-medium">{selectedModel.name}</span>
+              <ChevronDown
+                size={12}
+                className={`text-dusk transition-transform duration-300 ${modelPickerOpen ? "rotate-180" : ""}`}
+              />
             </button>
 
             {modelPickerOpen && (
-              <div className="absolute right-0 top-full mt-1.5 w-60 bg-[#111] border border-white/[0.08] rounded-xl shadow-2xl z-50 overflow-hidden">
-                {modelList.map((m) => (
-                  <button
-                    key={m.id}
-                    onClick={() => {
-                      setSelectedModel(m);
-                      setModelPickerOpen(false);
-                    }}
-                    className={`w-full flex items-start gap-2.5 px-3.5 py-3 text-left hover:bg-white/[0.04] transition-colors ${
-                      selectedModel.id === m.id ? "bg-white/[0.04]" : ""
-                    }`}
-                  >
-                    <span
-                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded border mt-0.5 flex-shrink-0 ${
-                        BADGE_COLORS[m.badge] ?? BADGE_COLORS.PRO
+              <div className="pv-scale-in absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] bg-white shadow-[var(--shadow-float)]">
+                <p className="pv-label border-b border-[color:var(--hairline)] px-4 py-2.5">
+                  Modèle de direction
+                </p>
+                {modelList.map((m) => {
+                  const isActive = selectedModel.id === m.id;
+                  return (
+                    <button
+                      key={m.id}
+                      onClick={() => {
+                        setSelectedModel(m);
+                        setModelPickerOpen(false);
+                      }}
+                      className={`flex w-full items-start gap-2.5 border-b border-[color:var(--hairline)] px-4 py-3 text-left transition-colors duration-300 last:border-b-0 hover:bg-ink/[0.04] ${
+                        isActive ? "bg-[rgba(124,106,255,0.06)]" : ""
                       }`}
                     >
-                      {m.badge}
-                    </span>
-                    <div>
-                      <div className="text-xs font-medium text-[#F5F0E8]">{m.name}</div>
-                      <div className="text-[10px] text-[#555] mt-0.5">{m.description}</div>
-                    </div>
-                  </button>
-                ))}
+                      <span
+                        className={`mt-0.5 shrink-0 rounded-full border px-1.5 py-px font-mono text-[9px] font-medium uppercase tracking-[0.14em] ${
+                          BADGE_STYLES[m.badge] ?? BADGE_FALLBACK
+                        }`}
+                      >
+                        {m.badge}
+                      </span>
+                      <span className="min-w-0">
+                        <span className={`block text-[13px] font-medium ${isActive ? "text-[color:var(--num-color)]" : "text-ink/85"}`}>
+                          {m.name}
+                        </span>
+                        <span className="mt-0.5 block text-[11px] leading-relaxed text-steel">
+                          {m.description}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
 
-          <Button variant="ghost" size="sm" className="gap-1.5" onClick={resetChat}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="min-h-[40px] gap-1.5 px-3"
+            onClick={resetChat}
+            aria-label="Nouvelle conversation"
+          >
             <Plus size={14} />
-            New Chat
+            <span className="hidden md:inline">Nouvelle conversation</span>
           </Button>
         </div>
-      </div>
+      </header>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
-        <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-        {messages.map((msg, i) => (
-          <div key={i} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
-            {msg.role === "assistant" && (
-              <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#FF6B7D] to-[#FFD166] text-[12px] font-bold text-white">
-                N
-              </div>
-            )}
-            <div
-              className={`max-w-[82%] ${
-                msg.role === "user" ? "items-end" : "items-start"
-              } flex flex-col gap-1.5`}
-            >
-              {/* Attachments preview */}
-              {msg.attachments && msg.attachments.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 justify-end">
-                  {msg.attachments.map((att, ai) => (
-                    <div
-                      key={ai}
-                      className="w-20 h-20 rounded-xl overflow-hidden border border-white/[0.08] flex-shrink-0"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={att.preview} alt="ref" className="w-full h-full object-cover" />
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {msg.content && msg.content !== "📎" && (
-                <div
-                  className={`rounded-[16px] px-4 py-3 text-sm leading-relaxed shadow-[0_14px_38px_rgba(0,0,0,0.22)] ${
-                    msg.role === "user"
-                      ? "rounded-tr-md border border-[#FF7B4B]/22 bg-[#FF7B4B]/16 text-[#F5F0E8]"
-                      : "rounded-tl-md border border-white/[0.07] bg-white/[0.045] text-[#D8D1C8]"
-                  }`}
-                >
-                  <MessageContent content={msg.content} variant={msg.role} />
-                </div>
-              )}
-
-              {/* Generated image */}
-              {msg.image && (
-                <div className="rounded-xl overflow-hidden border border-white/[0.08] bg-[#0a0a0a] max-w-sm">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={msg.image} alt="Generated" className="w-full h-auto block" />
-                  <div className="px-3 py-2 flex items-center justify-between">
-                    <span className="text-[10px] text-[#444]">Généré par Neva</span>
-                    <button
-                      onClick={() => {
-                        const a = document.createElement("a");
-                        a.href = msg.image!;
-                        a.download = `neva-${Date.now()}.webp`;
-                        a.click();
-                      }}
-                      className="flex items-center gap-1 text-[10px] text-[#FF7B4B] hover:text-[#FFD166] transition-colors"
-                    >
-                      <Download size={10} /> Télécharger
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {msg.generatingImage && (
-                <div className="flex items-center gap-2 px-3 py-2.5 bg-[#111] border border-[#FF7B4B]/20 rounded-xl text-xs text-[#666]">
-                  <Loader2 size={11} className="animate-spin text-[#FF7B4B] flex-shrink-0" />
-                  <span>
-                    Génération de l&apos;image en cours…
-                    <span className="text-[#444] ml-1">· inclus selon ton plan</span>
-                  </span>
-                </div>
-              )}
-
-              {msg.role === "assistant" &&
-                msg.canGenerateImage &&
-                !msg.image &&
-                !msg.generatingImage &&
-                i > 0 && (
-                  <button
-                    onClick={() => generateImageFromMessage(i, cleanAssistantText(msg.content))}
-                    className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-lg bg-white/5 border border-white/[0.08] text-[#555] hover:text-[#FFD166] hover:border-[#FFD166]/30 transition-all"
-                  >
-                    <ImageIcon size={10} />
-                    Regénérer l&apos;image
-                  </button>
-                )}
-
-              <span className="text-[10px] text-[#444]">{formatTime(msg.timestamp)}</span>
-            </div>
-          </div>
-        ))}
-
-        {isLoading && (
-          <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FF6B7D] to-[#FFD166] flex-shrink-0 flex items-center justify-center text-[12px] font-bold text-white">
-              N
-            </div>
-            <div className="max-w-[75%] flex flex-col gap-1">
-              <div className="px-4 py-3 bg-[#111] text-[#CCCCC0] border border-white/[0.06] rounded-2xl rounded-tl-sm text-sm leading-relaxed min-w-[120px]">
-                {streamingContent ? (
-                  <MessageContent content={streamingContent} variant="assistant" />
-                ) : (
-                  <div className="flex items-center gap-1.5">
-                    {[0, 1, 2].map((d) => (
+      {/* ── Fil de messages éditorial ─────────────────────────── */}
+      <div className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-6 sm:px-6">
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-7">
+          {messages.map((msg, i) =>
+            msg.role === "user" ? (
+              <div key={i} className="flex flex-col items-end gap-1.5">
+                {msg.attachments && msg.attachments.length > 0 && (
+                  <div className="flex flex-wrap justify-end gap-1.5">
+                    {msg.attachments.map((att, ai) => (
                       <div
-                        key={d}
-                        className="w-1.5 h-1.5 rounded-full bg-[#555] animate-bounce"
-                        style={{ animationDelay: `${d * 0.15}s` }}
-                      />
+                        key={ai}
+                        className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-[color:var(--hairline)] bg-abyss"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={att.preview} alt="Image de référence" className="h-full w-full object-cover" />
+                      </div>
                     ))}
                   </div>
                 )}
+
+                {msg.content && msg.content !== "📎" && (
+                  <div className="max-w-[85%] whitespace-pre-wrap rounded-xl rounded-br-[2px] border border-[color:var(--hairline)] bg-white px-4 py-3 text-sm leading-relaxed text-ink/90 shadow-[var(--shadow-print)]">
+                    <MessageContent content={msg.content} variant="user" />
+                  </div>
+                )}
+
+                <span className="font-mono text-[10px] text-ink/25">{formatTime(msg.timestamp)}</span>
+              </div>
+            ) : (
+              <div key={i} className="flex gap-3">
+                <AssistantAvatar />
+                <div className="min-w-0 flex-1 space-y-2.5 pt-1">
+                  {msg.content && msg.content !== "📎" && (
+                    <div className="text-sm leading-relaxed text-ink/80">
+                      <MessageContent content={msg.content} variant="assistant" />
+                    </div>
+                  )}
+
+                  {/* Visuel généré */}
+                  {msg.image && (
+                    <div className="max-w-sm overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-abyss">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={msg.image} alt="Visuel généré" className="block h-auto w-full" />
+                      <div className="flex items-center justify-between gap-3 border-t border-[color:var(--hairline)] py-1 pl-3.5 pr-1.5">
+                        <span className="font-mono text-[10px] tracking-[0.08em] text-dusk">
+                          Généré par Neva
+                        </span>
+                        <button
+                          onClick={() => {
+                            const a = document.createElement("a");
+                            a.href = msg.image!;
+                            a.download = `neva-${Date.now()}.webp`;
+                            a.click();
+                          }}
+                          className="flex min-h-[40px] items-center gap-1.5 rounded-lg px-2.5 font-mono text-[10px] uppercase tracking-[0.1em] text-[color:var(--num-color)] transition-colors duration-300 hover:text-cyan"
+                        >
+                          <Download size={11} />
+                          Télécharger
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {msg.generatingImage && (
+                    <div className="flex w-fit items-center gap-2.5 rounded-xl border border-violet/20 bg-violet/5 px-3.5 py-2.5 text-xs text-steel">
+                      <Spinner className="h-3.5 w-3.5 shrink-0" />
+                      <span>
+                        Génération de l&apos;image en cours…
+                        <span className="ml-1 text-dusk">· incluse selon votre abonnement</span>
+                      </span>
+                    </div>
+                  )}
+
+                  {msg.canGenerateImage && !msg.image && !msg.generatingImage && i > 0 && (
+                    <button
+                      onClick={() => generateImageFromMessage(i, cleanAssistantText(msg.content))}
+                      className="flex min-h-[40px] w-fit items-center gap-2 rounded-lg border border-[color:var(--hairline-strong)] px-3.5 font-mono text-[10px] uppercase tracking-[0.12em] text-steel transition-colors duration-300 hover:border-violet/45 hover:text-[color:var(--num-color)]"
+                    >
+                      <ImageIcon size={12} />
+                      Régénérer l&apos;image
+                    </button>
+                  )}
+
+                  <span className="block font-mono text-[10px] text-ink/25">{formatTime(msg.timestamp)}</span>
+                </div>
+              </div>
+            )
+          )}
+
+          {isLoading && (
+            <div className="flex gap-3">
+              <AssistantAvatar />
+              <div className="min-w-0 flex-1 pt-1">
+                {streamingContent ? (
+                  <div className="text-sm leading-relaxed text-ink/80">
+                    <MessageContent content={streamingContent} variant="assistant" />
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2.5 py-1.5">
+                    <Spinner className="h-3.5 w-3.5" />
+                    <span className="pv-meta">Rédaction en cours…</span>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
+          )}
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
-      {/* Suggestions */}
+      {/* ── Suggestions d'ouverture ───────────────────────────── */}
       {messages.length === 1 && !isLoading && (
-        <div className="mx-auto flex w-full max-w-4xl flex-wrap gap-2 px-4 pb-3 sm:px-6">
-          {suggestions.map((s) => (
-            <button
-              key={s}
-              onClick={() => handleSend(s)}
-              className="flex items-center gap-1.5 rounded-2xl border border-white/[0.08] bg-white/[0.045] px-3 py-2 text-xs text-[#A9A39B] transition-all hover:border-[#FF7B4B]/30 hover:bg-white/[0.07] hover:text-[#F5F0E8]"
-            >
-              <Sparkles size={10} className="text-[#FFD166]" />
-              {s}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Pending attachments */}
-      {pendingAttachments.length > 0 && (
-        <div className="px-6 pb-2 flex items-center gap-2">
-          {pendingAttachments.map((att, i) => (
-            <div
-              key={i}
-              className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#FF7B4B]/30 flex-shrink-0"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={att.preview} alt="attachment" className="w-full h-full object-cover" />
+        <div className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-3 sm:px-6">
+          <p className="pv-label mb-2.5">Pour commencer</p>
+          <div className="flex flex-wrap gap-2">
+            {suggestions.map((s, index) => (
               <button
-                onClick={() => setPendingAttachments((prev) => prev.filter((_, idx) => idx !== i))}
-                className="absolute top-0 right-0 w-4 h-4 bg-black/80 flex items-center justify-center rounded-bl"
+                key={s}
+                onClick={() => handleSend(s)}
+                className="flex min-h-[40px] items-center gap-2.5 rounded-lg border border-[color:var(--hairline)] px-3.5 text-xs text-steel transition-colors duration-300 hover:border-[rgba(109,91,232,0.35)] hover:text-[color:var(--num-color)]"
               >
-                <X size={8} className="text-white" />
+                <span className="pv-num text-[10px]">0{index + 1}</span>
+                {s}
               </button>
-            </div>
-          ))}
-          <span className="text-[10px] text-[#555]">
-            {pendingAttachments.length} image{pendingAttachments.length > 1 ? "s" : ""} de référence
-          </span>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Input */}
-      <div className="mx-auto w-full max-w-4xl flex-shrink-0 px-4 pb-6 sm:px-6">
-        <div className="flex gap-2 rounded-[16px] border border-white/[0.09] bg-white/[0.055] px-4 py-3 shadow-[0_22px_70px_rgba(0,0,0,0.32)] backdrop-blur-xl transition-colors focus-within:border-[#FF7B4B]/40">
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={pendingAttachments.length >= 4}
-            className="flex-shrink-0 text-[#444] hover:text-[#FF7B4B] transition-colors disabled:opacity-30 pt-0.5"
-            title="Ajouter une image de référence"
-          >
-            <Paperclip size={15} />
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={(e) => handleFileSelect(e.target.files)}
-          />
-          <div className="flex items-center pt-0.5 flex-shrink-0">
-            <MessageSquare size={14} className="text-[#333]" />
-          </div>
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={
-              pendingAttachments.length > 0
-                ? "Decris l objectif creatif avec ces references..."
-                : "Demandez une direction artistique, un prompt ou une idee de campagne..."
-            }
-            rows={1}
-            className="flex-1 bg-transparent text-sm text-[#F5F0E8] placeholder-[#444] outline-none resize-none leading-relaxed"
-            style={{ minHeight: "24px", maxHeight: "120px" }}
-          />
-          {(pendingAttachments.length > 0 || hasImageIntent(input)) && (
-            <button
-              onClick={() => handleGenerateImage()}
-              disabled={
-                (!input.trim() && pendingAttachments.length === 0) || isLoading || isGeneratingImage
-              }
-              className="flex-shrink-0 w-10 h-8 rounded-xl bg-white/5 border border-white/[0.08] text-[#CCCCC0] hover:text-[#FFD166] disabled:opacity-30 transition-all self-end"
-              title="Générer un visuel"
-            >
-              <ImageIcon size={14} />
-            </button>
+      {/* ── Saisie posée sur filet ────────────────────────────── */}
+      <div className="relative z-10 shrink-0 border-t border-[color:var(--hairline)]">
+        <div className="mx-auto w-full max-w-3xl px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3.5 sm:px-6">
+          {pendingAttachments.length > 0 && (
+            <div className="mb-2.5 flex flex-wrap items-center gap-2">
+              {pendingAttachments.map((att, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setPendingAttachments((prev) => prev.filter((_, idx) => idx !== i))}
+                  title="Retirer cette image"
+                  className="group relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-[rgba(109,91,232,0.28)] transition-colors duration-300 hover:border-err/60"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={att.preview} alt="Image de référence" className="h-full w-full object-cover" />
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 flex items-center justify-center bg-ink/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  >
+                    <X size={12} className="text-ink" />
+                  </span>
+                  <span
+                    aria-hidden
+                    className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-bl-[6px] bg-[rgba(7,7,13,0.8)]"
+                  >
+                    <X size={8} className="text-ink/70" />
+                  </span>
+                </button>
+              ))}
+              <span className="font-mono text-[10px] tracking-[0.08em] text-dusk">
+                {pendingAttachments.length} image{pendingAttachments.length > 1 ? "s" : ""} de référence · 4 au maximum
+              </span>
+            </div>
           )}
-          <button
-            onClick={() => handleSend()}
-            disabled={(!input.trim() && pendingAttachments.length === 0) || isLoading}
-            className="flex-shrink-0 w-8 h-8 rounded-xl bg-gradient-to-br from-[#FF6B7D] to-[#FFD166] flex items-center justify-center disabled:opacity-30 hover:opacity-90 transition-opacity self-end"
-          >
-            <Send size={13} className="text-white" />
-          </button>
+
+          <div className="flex items-end gap-1.5 rounded-xl border border-[color:var(--hairline-strong)] bg-abyss px-2 py-1.5 transition-[border-color,box-shadow] duration-300 focus-within:border-[rgba(109,91,232,0.5)] focus-within:shadow-[0_0_0_3px_rgba(124,106,255,0.12)]">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={pendingAttachments.length >= 4}
+              title="Ajouter une image de référence"
+              aria-label="Ajouter une image de référence"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-steel transition-colors duration-300 hover:bg-ink/5 hover:text-[color:var(--num-color)] disabled:opacity-30"
+            >
+              <Paperclip size={15} />
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => handleFileSelect(e.target.files)}
+            />
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={
+                pendingAttachments.length > 0
+                  ? "Décrivez l'objectif créatif avec ces références…"
+                  : "Demandez une direction artistique, un prompt ou une idée de campagne…"
+              }
+              rows={1}
+              className="max-h-[120px] min-h-[24px] flex-1 resize-none bg-transparent py-2 text-sm leading-relaxed text-ink outline-none placeholder:text-ink/25"
+            />
+            {(pendingAttachments.length > 0 || hasImageIntent(input)) && (
+              <button
+                onClick={() => handleGenerateImage()}
+                disabled={
+                  (!input.trim() && pendingAttachments.length === 0) || isLoading || isGeneratingImage
+                }
+                title="Générer un visuel"
+                aria-label="Générer un visuel"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[color:var(--hairline-strong)] text-steel transition-colors duration-300 hover:border-[rgba(109,91,232,0.45)] hover:text-[color:var(--num-color)] disabled:opacity-30"
+              >
+                <ImageIcon size={14} />
+              </button>
+            )}
+            <button
+              onClick={() => handleSend()}
+              disabled={(!input.trim() && pendingAttachments.length === 0) || isLoading}
+              aria-label="Envoyer le message"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ink text-ink shadow-[0_1px_2px_rgba(29,35,64,0.14)] transition-colors duration-300 hover:bg-[#272E52] disabled:opacity-30"
+            >
+              <Send size={13} />
+            </button>
+          </div>
+
+          <p className="mt-2.5 text-center font-mono text-[10px] tracking-[0.08em] text-ink/25">
+            {selectedModel.name} · Entrée pour envoyer · Maj + Entrée pour une nouvelle ligne
+          </p>
         </div>
-        <p className="text-[10px] text-[#333] text-center mt-2">
-          {selectedModel.name} · Neva AI · références acceptées · Enter pour envoyer
-        </p>
       </div>
     </div>
   );

@@ -1,9 +1,19 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { AlertTriangle, ArrowRight, CreditCard, ShieldCheck, TrendingUp, Users, Zap } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { verifyAdmin } from '@/lib/admin'
 import { createServiceClient } from '@/lib/supabase/server'
 import { PLANS } from '@/lib/plans'
+import { PageHeader } from '@/components/admin/PageHeader'
+import { StatTile } from '@/components/admin/StatTile'
+import { Card } from '@/components/ui/card'
+import { Gauge } from '@/components/ui/gauge'
+
+/*
+ * Vue d'ensemble — l'activité du studio sur un seul écran : tuiles de
+ * verre aux grands chiffres display, rythme de génération en barres
+ * spectrales sur pistes de verre, économie de crédits et file d'abus.
+ */
 
 type ProfileRow = {
   id: string
@@ -87,140 +97,178 @@ export default async function AdminOverviewPage() {
   }))
 
   const primaryMetrics = [
-    { label: 'Revenue', value: money(monthlyRevenue), detail: 'estimated monthly recurring', icon: CreditCard, color: '#FFD166' },
-    { label: 'Active users', value: totalUsers.toLocaleString('fr-FR'), detail: `${paidUsers} paid / ${freeUsers} free`, icon: Users, color: '#55D18A' },
-    { label: 'Conversion', value: pct(conversionRate), detail: 'free to paid accounts', icon: TrendingUp, color: '#FF7B4B' },
-    { label: 'Abuse alerts', value: pendingSecurityAlerts.toLocaleString('fr-FR'), detail: `${blockedFreeCreditAttempts} blocked attempts`, icon: AlertTriangle, color: '#FF6B7D' },
+    { label: 'MRR estimé', value: money(monthlyRevenue), detail: 'récurrence mensuelle estimée' },
+    { label: 'Utilisateurs actifs', value: totalUsers.toLocaleString('fr-FR'), detail: `${paidUsers} payants · ${freeUsers} gratuits` },
+    { label: 'Conversion', value: pct(conversionRate), detail: 'des comptes gratuits passés en payant' },
+    { label: 'Alertes en attente', value: pendingSecurityAlerts.toLocaleString('fr-FR'), detail: `${blockedFreeCreditAttempts} tentatives bloquées` },
   ]
 
   const usageMetrics = [
-    { label: 'Credits consumed', value: creditsConsumed.toLocaleString('fr-FR'), detail: `${creditsRemaining.toLocaleString('fr-FR')} remaining in wallets` },
-    { label: 'Credits purchased', value: purchasedCredits.toLocaleString('fr-FR'), detail: 'subscriptions and topups' },
-    { label: 'Daily generations', value: dailyGenerations.toLocaleString('fr-FR'), detail: `${monthlyGenerations} in the last 30 days` },
+    { label: 'Crédits consommés', value: creditsConsumed.toLocaleString('fr-FR'), detail: `${creditsRemaining.toLocaleString('fr-FR')} restants dans les portefeuilles` },
+    { label: 'Crédits achetés', value: purchasedCredits.toLocaleString('fr-FR'), detail: 'abonnements et packs de créations' },
+    { label: 'Générations du jour', value: dailyGenerations.toLocaleString('fr-FR'), detail: `${monthlyGenerations.toLocaleString('fr-FR')} sur les 30 derniers jours` },
+  ]
+
+  const abuseFigures = [
+    { label: 'En attente de revue', value: pendingSecurityAlerts },
+    { label: 'Tentatives bloquées', value: blockedFreeCreditAttempts },
+    { label: 'Signaux à risque du jour', value: duplicateIpSignupsToday },
+    { label: 'Crédits préservés', value: estimatedCreditsSaved },
   ]
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#FF7B4B]">Neva AI 3.0</p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-[#F8F3EA]">Command center</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-7 text-[#8C8780]">
-            The business in one screen: revenue, growth, usage, conversion and free-credit abuse.
-          </p>
-        </div>
-        <div className="rounded-xl border border-white/[0.08] bg-white/[0.025] px-4 py-3 text-xs text-[#777]">
-          Signed in as <span className="text-[#DCD6CD]">{admin.email}</span>
-        </div>
-      </div>
+    <div className="pv-fade-up">
+      <PageHeader
+        eyebrow="Console"
+        title={
+          <>
+            Vue <span className="pv-beam-text">d&apos;ensemble.</span>
+          </>
+        }
+        description="Revenu, croissance, usage et abus de crédits gratuits — l'activité du studio sur un seul écran."
+      >
+        <p className="font-mono text-[11px] tracking-[0.06em] text-dusk">
+          Session — <span className="text-ink/70">{admin.email}</span>
+        </p>
+      </PageHeader>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {primaryMetrics.map((metric) => (
-          <section key={metric.label} className="rounded-2xl border border-white/[0.08] bg-[#0A0A0A] p-5">
-            <div className="mb-6 flex items-center justify-between">
-              <div className="text-sm font-medium text-[#A9A39B]">{metric.label}</div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border" style={{ color: metric.color, borderColor: `${metric.color}30`, background: `${metric.color}10` }}>
-                <metric.icon size={18} />
-              </div>
-            </div>
-            <div className="text-3xl font-semibold tracking-tight text-[#F8F3EA]">{metric.value}</div>
-            <div className="mt-2 text-xs text-[#777]">{metric.detail}</div>
-          </section>
+      {/* Tuiles de verre — les quatre chiffres qui comptent */}
+      <section className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+        {primaryMetrics.map((metric, index) => (
+          <StatTile
+            key={metric.label}
+            label={metric.label}
+            value={metric.value}
+            detail={metric.detail}
+            tone={index === 3 && pendingSecurityAlerts > 0 ? 'warn' : 'default'}
+          />
         ))}
-      </div>
+      </section>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
-        <section className="rounded-2xl border border-white/[0.08] bg-[#0A0A0A] p-5">
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-[#F8F3EA]">Generation velocity</h2>
-              <p className="mt-1 text-sm text-[#777]">Last 14 days of credit-consuming actions.</p>
-            </div>
-            <Zap size={18} className="text-[#FFD166]" />
+      <div className="mt-5 grid gap-5 xl:grid-cols-12">
+        {/* Rythme de génération — barres spectrales sur pistes de verre */}
+        <Card className="p-6 sm:p-7 xl:col-span-8">
+          <div className="mb-7 flex items-baseline justify-between gap-4">
+            <h2 className="text-lg font-semibold tracking-[-0.01em] text-ink">
+              Rythme de génération
+            </h2>
+            <span className="pv-label text-[10px]">14 derniers jours</span>
           </div>
-          <div className="flex h-72 items-end gap-2">
+          <div className="flex h-52 items-end gap-1.5 sm:h-60 sm:gap-2.5">
             {generationSeries.map((entry) => (
-              <div key={entry.day} className="flex flex-1 flex-col items-center gap-2">
+              <div
+                key={entry.day}
+                className="group relative h-full flex-1"
+                title={`${entry.day}: ${entry.value}`}
+              >
+                {/* piste de verre */}
+                <div aria-hidden className="absolute inset-0 rounded-full bg-white/[0.06]" />
+                {/* barre spectrale */}
                 <div
-                  className="w-full rounded-t-lg bg-[linear-gradient(180deg,#FFD166,#FF7B4B)] opacity-85"
-                  style={{ height: `${Math.max(8, (entry.value / maxSeries) * 245)}px` }}
-                  title={`${entry.day}: ${entry.value}`}
+                  className="absolute inset-x-0 bottom-0 rounded-full bg-[linear-gradient(180deg,#7C6AFF,#4CC9F0)] opacity-80 transition-opacity duration-300 group-hover:opacity-100"
+                  style={{ height: `${Math.max(4, (entry.value / maxSeries) * 100)}%` }}
                 />
-                <span className="text-[9px] text-[#555]">{entry.day.slice(5)}</span>
               </div>
             ))}
           </div>
-        </section>
-
-        <section className="rounded-2xl border border-white/[0.08] bg-[#0A0A0A] p-5">
-          <h2 className="text-lg font-semibold text-[#F8F3EA]">Plan mix</h2>
-          <p className="mb-5 mt-1 text-sm text-[#777]">Distribution and conversion pressure.</p>
-          <div className="space-y-4">
-            {planCounts.map((entry) => {
-              const width = totalUsers > 0 ? (entry.count / totalUsers) * 100 : 0
-              return (
-                <div key={entry.plan}>
-                  <div className="mb-1.5 flex items-center justify-between text-xs">
-                    <span className="text-[#CCCCC0]">{entry.label}</span>
-                    <span className="text-[#666]">{entry.count}</span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
-                    <div className="h-full rounded-full bg-[#FF7B4B]" style={{ width: `${width}%` }} />
-                  </div>
-                </div>
-              )
-            })}
+          <div className="mt-3 flex gap-1.5 sm:gap-2.5" aria-hidden>
+            {generationSeries.map((entry) => (
+              <span key={entry.day} className="flex-1 text-center font-mono text-[9px] text-dusk">
+                {entry.day.slice(8)}
+              </span>
+            ))}
           </div>
-        </section>
+          <p className="mt-5 font-mono text-[10px] tracking-[0.08em] text-dusk">
+            Actions consommant des crédits, comptées par jour.
+          </p>
+        </Card>
+
+        {/* Répartition par plan — le spectre mesure */}
+        <Card className="p-6 sm:p-7 xl:col-span-4">
+          <div className="mb-7 flex items-baseline justify-between gap-4">
+            <h2 className="text-lg font-semibold tracking-[-0.01em] text-ink">
+              Répartition par plan
+            </h2>
+            <span className="pv-label text-[10px]">
+              {totalUsers.toLocaleString('fr-FR')} comptes
+            </span>
+          </div>
+          <ul className="space-y-6">
+            {planCounts.map((entry) => (
+              <li key={entry.plan}>
+                <div className="mb-2.5 flex items-baseline justify-between">
+                  <span className="text-[13px] text-ink/80">{entry.label}</span>
+                  <span className="font-mono text-[11px] text-steel">
+                    {entry.count.toLocaleString('fr-FR')}
+                  </span>
+                </div>
+                <Gauge value={entry.count} max={Math.max(totalUsers, 1)} />
+              </li>
+            ))}
+          </ul>
+        </Card>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
-        <section className="rounded-2xl border border-white/[0.08] bg-[#0A0A0A] p-5">
-          <div className="mb-5 flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-[#F8F3EA]">Credit economy</h2>
-              <p className="mt-1 text-sm text-[#777]">Consumption, purchase behavior and retained balance.</p>
-            </div>
+      <div className="mt-5 grid gap-5 pb-4 xl:grid-cols-12">
+        {/* Économie de crédits — trois mesures sous la même arête */}
+        <Card className="overflow-hidden xl:col-span-7">
+          <div className="flex items-baseline justify-between gap-4 border-b border-[color:var(--hairline)] px-6 py-5 sm:px-7">
+            <h2 className="text-lg font-semibold tracking-[-0.01em] text-ink">
+              Économie de crédits
+            </h2>
+            <span className="pv-label text-[10px]">Consommation et achats</span>
           </div>
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid sm:grid-cols-3 sm:divide-x sm:divide-[color:var(--hairline)]">
             {usageMetrics.map((item) => (
-              <div key={item.label} className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-4">
-                <div className="text-[11px] uppercase tracking-[0.18em] text-[#666]">{item.label}</div>
-                <div className="mt-3 text-2xl font-semibold text-[#F8F3EA]">{item.value}</div>
-                <div className="mt-2 text-xs leading-5 text-[#777]">{item.detail}</div>
+              <div
+                key={item.label}
+                className="border-b border-[color:var(--hairline)] px-6 py-6 last:border-b-0 sm:border-b-0 sm:px-7"
+              >
+                <p className="pv-label text-[10px]">{item.label}</p>
+                <p className="pv-display mt-3.5 text-[28px] leading-none text-ink">{item.value}</p>
+                <p className="mt-3.5 font-mono text-[10px] leading-relaxed tracking-[0.06em] text-dusk">
+                  {item.detail}
+                </p>
               </div>
             ))}
           </div>
-        </section>
+        </Card>
 
-        <section className="rounded-2xl border border-[#FFD166]/20 bg-[#FFD166]/[0.045] p-5">
-          <div className="mb-5 flex items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <ShieldCheck size={17} className="text-[#FFD166]" />
-                <h2 className="text-lg font-semibold text-[#F8F3EA]">Free Credit Abuse Alerts</h2>
-              </div>
-              <p className="mt-1 text-sm text-[#A99563]">Duplicate IP signups, blocked grants and review queue.</p>
-            </div>
-            <Link href="/admin/security-alerts" className="inline-flex items-center gap-2 text-xs font-semibold text-[#FFD166] hover:text-[#F5F0E8]">
-              Open queue
-              <ArrowRight size={13} />
+        {/* Alertes d'abus de crédits gratuits */}
+        <Card className="overflow-hidden xl:col-span-5">
+          <div className="flex items-baseline justify-between gap-4 border-b border-[color:var(--hairline)] px-6 py-5 sm:px-7">
+            <h2 className="text-lg font-semibold tracking-[-0.01em] text-ink">
+              Alertes d&apos;abus
+            </h2>
+            <Link
+              href="/admin/security-alerts"
+              className="pv-link inline-flex items-center gap-1.5 text-[13px]"
+            >
+              Ouvrir la file
+              <ArrowUpRight size={13} strokeWidth={1.8} className="text-[color:var(--num-color)]" />
             </Link>
           </div>
-          <div className="grid gap-3 md:grid-cols-4">
-            {[
-              { label: 'Pending', value: pendingSecurityAlerts },
-              { label: 'Blocked', value: blockedFreeCreditAttempts },
-              { label: 'Duplicate today', value: duplicateIpSignupsToday },
-              { label: 'Credits saved', value: estimatedCreditsSaved },
-            ].map((item) => (
-              <div key={item.label} className="rounded-xl border border-white/[0.08] bg-black/20 p-4">
-                <div className="text-[10px] uppercase tracking-[0.18em] text-[#8A7440]">{item.label}</div>
-                <div className="mt-2 text-2xl font-semibold text-[#FFD166]">{item.value.toLocaleString('fr-FR')}</div>
+          <div className="px-6 py-2 sm:px-7">
+            {abuseFigures.map((item, index) => (
+              <div
+                key={item.label}
+                className="flex items-baseline justify-between gap-4 border-b border-[color:var(--hairline)] py-4 last:border-b-0"
+              >
+                <span className="text-[13px] text-ink/70">{item.label}</span>
+                <span
+                  className={`pv-display text-xl ${
+                    index === 0 && item.value > 0 ? 'text-warn' : 'text-ink'
+                  }`}
+                >
+                  {item.value.toLocaleString('fr-FR')}
+                </span>
               </div>
             ))}
+            <p className="border-t border-[color:var(--hairline)] py-4 font-mono text-[10px] leading-relaxed tracking-[0.06em] text-dusk">
+              Inscriptions à IP dupliquée, dotations bloquées et file de revue.
+            </p>
           </div>
-        </section>
+        </Card>
       </div>
     </div>
   )

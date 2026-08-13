@@ -4,6 +4,7 @@ import { DEFAULT_MAINTENANCE, type MaintenanceMode } from '@/lib/maintenance'
 import { createServiceClient } from '@/lib/supabase/server'
 import { AdminMaintenanceClient } from './AdminMaintenanceClient'
 
+/* Maintenance — chargement serveur de l'état global, rendu côté client. */
 export default async function AdminMaintenancePage() {
   const admin = await verifyAdmin()
   if (!admin) redirect('/dashboard')

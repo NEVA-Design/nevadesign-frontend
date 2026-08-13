@@ -1,3 +1,6 @@
+/* Portfolio Neva Design — garde d'auth admin, chargement trié et repli
+   sur le portfolio par défaut si la table Supabase est absente. Tout le
+   visuel vit dans le client. */
 import { redirect } from "next/navigation";
 import { verifyAdmin } from "@/lib/admin";
 import {

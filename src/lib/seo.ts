@@ -1,27 +1,27 @@
 export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://neva-ai.com").replace(/\/$/, "");
 
-export const siteName = "Neva AI";
+export const siteName = "Neva Design";
 
 export const defaultSeo = {
-  title: "Neva AI - Neva Design, IA créative pour FiveM",
+  title: "Neva Design — Studio créatif IA : miniatures, logos, identités",
   description:
-    "Neva AI, par Neva Design, aide les créateurs FiveM à générer des visuels, prompts, logos, landing pages, branding serveur et concepts marketing premium avec l'IA.",
+    "Neva Design compose vos visuels avec une vraie direction artistique : miniatures YouTube, logos, chartes graphiques, assets gaming et FiveM. Brief en français, rendus prêts à publier, exports jusqu'en 8K.",
   keywords: [
-    "Neva AI",
     "Neva Design",
-    "Neva design IA",
+    "Neva AI",
+    "studio créatif IA",
+    "miniature YouTube IA",
+    "générateur miniature YouTube",
+    "logo IA",
+    "création logo en ligne",
+    "charte graphique IA",
+    "identité visuelle IA",
+    "branding IA",
+    "design gaming",
+    "studio créatif FiveM",
     "FiveM IA",
-    "IA FiveM",
-    "Fivem AI",
-    "créateur FiveM",
-    "createur FiveM",
-    "outil IA FiveM",
-    "branding serveur FiveM",
-    "logo FiveM",
-    "landing page FiveM",
-    "marketing FiveM",
-    "prompts FiveM",
+    "affiche FiveM",
     "GTA RP design",
-    "GTA RP IA",
+    "direction artistique IA",
   ],
 };

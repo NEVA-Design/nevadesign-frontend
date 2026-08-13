@@ -1,82 +1,151 @@
-﻿import { Code2, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowUpRight, Code2, Copy } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Label, Textarea } from "@/components/ui/field";
+import { ModuleHeader } from "@/components/dashboard/ModuleHeader";
 
-const snippets = [
-  { name: "Job Script (ESX)", lang: "Lua", color: "#FF7B4B" },
-  { name: "Custom Inventory UI", lang: "React/HTML", color: "#FFD166" },
-  { name: "Vehicle Spawn System", lang: "Lua", color: "#FF6B7D" },
-  { name: "Whitelist System", lang: "Lua", color: "#FF7B4B" },
-  { name: "Admin Panel Commands", lang: "Lua", color: "#FFB5C8" },
-  { name: "HUD Component", lang: "HTML/CSS", color: "#FFD166" },
+/*
+ * Neva Code — maquette sans logique. Le futur générateur de scripts
+ * FiveM : brief à gauche, éditeur de sortie à droite. Toutes les
+ * actions restent désactivées tant que le module est en préparation.
+ */
+
+const frameworks = ["ESX", "QBCore", "Standalone"];
+
+const templates = [
+  { name: "Script de métier (ESX)", lang: "Lua" },
+  { name: "Interface d'inventaire personnalisée", lang: "React/HTML" },
+  { name: "Système d'apparition de véhicules", lang: "Lua" },
+  { name: "Système de liste blanche", lang: "Lua" },
+  { name: "Commandes du panneau d'administration", lang: "Lua" },
+  { name: "Composant d'ATH", lang: "HTML/CSS" },
 ];
 
 export default function CodePage() {
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-5xl">
-      <div className="flex items-start justify-between mb-10">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Code2 size={16} className="text-[#FF7B4B]" />
-            <h1 className="text-2xl font-bold text-[#F5F0E8]">Neva Code</h1>
-          </div>
-          <p className="text-sm text-[#666]">Lua snippets, resource scaffolding, and FiveM development assistance.</p>
-        </div>
-        <div className="flex items-center gap-1.5 text-xs text-[#9A9A9A] bg-white/5 border border-white/[0.08] rounded-lg px-3 py-1.5">
-          <Sparkles size={10} className="text-[#FFD166]" />
-          Inclus selon ton plan
-        </div>
+    <div className="relative mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-6 lg:px-10">
+      {/* Profondeur — jamais d'aplat noir nu */}
+      <div aria-hidden className="pv-halo--violet pv-halo -top-24 right-[8%] h-72 w-72" />
+
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+        <Badge variant="subtle">En préparation</Badge>
+        <span className="font-mono text-[10px] tracking-[0.1em] text-dusk">
+          Ce module ouvrira prochainement dans l&apos;atelier
+        </span>
       </div>
 
-      <div className="grid lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-2 flex flex-col gap-5">
-          <div className="glass-card rounded-2xl p-5 border border-white/[0.08]">
-            <div className="flex gap-2 mb-4">
-              {["ESX", "QBCore", "Standalone"].map((f, i) => (
-                <button key={f} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${i === 0 ? "bg-[#FF7B4B]/15 border border-[#FF7B4B]/30 text-[#FF7B4B]" : "bg-white/5 border border-white/[0.06] text-[#666]"}`}>
-                  {f}
+      <ModuleHeader
+        icon={Code2}
+        eyebrow="Neva Code"
+        title="Du code prêt à intégrer sur votre serveur"
+        description="Décrivez la ressource dont vous avez besoin : Neva Code écrira des scripts Lua propres, structurés et compatibles avec votre framework."
+        accent="#7C6AFF"
+        meta="Inclus selon votre plan"
+        activeStep={0}
+        steps={[
+          { label: "Décrire", detail: "Votre besoin, votre framework" },
+          { label: "Générer", detail: "Script structuré et commenté" },
+          { label: "Intégrer", detail: "Copie directe dans la ressource" },
+        ]}
+      />
+
+      <div className="grid gap-6 lg:grid-cols-5 lg:gap-8">
+        {/* Brief */}
+        <div className="flex flex-col gap-8 lg:col-span-2">
+          <div className="pv-glass pv-edge rounded-2xl p-5 sm:p-6">
+            <p className="pv-label mb-3">Framework cible</p>
+            <div className="mb-6 flex flex-wrap gap-2">
+              {frameworks.map((framework, index) => (
+                <button
+                  key={framework}
+                  type="button"
+                  disabled
+                  className={`h-10 flex-1 rounded-lg border px-3 font-mono text-[11px] uppercase tracking-[0.1em] transition-colors duration-300 disabled:cursor-not-allowed ${
+                    index === 0
+                      ? "border-[rgba(109,91,232,0.5)] bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]"
+                      : "border-[color:var(--hairline)] text-steel"
+                  }`}
+                >
+                  {framework}
                 </button>
               ))}
             </div>
 
-            <label className="block text-[11px] text-[#666] mb-2">Describe what you need</label>
-            <textarea
-              rows={5}
-              placeholder="e.g. A job script for a mechanic job with ESX, including job grades, blips, and vehicle repair mechanics..."
-              className="w-full bg-transparent text-sm text-[#F5F0E8] placeholder-[#444] outline-none resize-none leading-relaxed"
+            <Label htmlFor="code-brief">Décrivez ce dont vous avez besoin</Label>
+            <Textarea
+              id="code-brief"
+              rows={6}
+              placeholder="Ex. : un script de métier mécanicien sous ESX, avec grades, points d'intérêt sur la carte et mécanique de réparation de véhicules…"
             />
 
-            <Button variant="gradient" size="md" className="w-full mt-3">
-              Generate Code <ArrowRight size={14} />
+            <Button variant="primary" size="md" disabled className="mt-4 w-full">
+              Générer le code
+              <ArrowUpRight size={14} />
             </Button>
+            <p className="mt-3 text-center font-mono text-[10px] tracking-[0.08em] text-dusk">
+              L&apos;action sera activée à l&apos;ouverture du module.
+            </p>
           </div>
 
-          <div>
-            <div className="text-xs font-semibold text-[#9A9A9A] uppercase tracking-widest mb-3">Quick Templates</div>
-            <div className="flex flex-col gap-2">
-              {snippets.map((s) => (
-                <button key={s.name} className="flex items-center gap-3 px-3 py-2.5 rounded-xl glass-card border border-white/[0.06] hover:border-white/10 group transition-all">
-                  <span className="text-[10px] px-1.5 py-0.5 rounded font-mono font-bold" style={{ background: `${s.color}18`, color: s.color }}>{s.lang}</span>
-                  <span className="text-sm text-[#CCCCC0] group-hover:text-[#F5F0E8] transition-colors flex-1 text-left">{s.name}</span>
-                  <ArrowRight size={11} className="text-[#444] group-hover:text-[#FF7B4B] transition-colors" />
-                </button>
-              ))}
+          {/* Modèles rapides */}
+          <section>
+            <div className="mb-4 flex items-baseline justify-between">
+              <h2 className="pv-display text-lg text-ink">Modèles rapides</h2>
+              <span className="pv-label">Bientôt</span>
             </div>
-          </div>
+            <ul>
+              {templates.map((template, index) => (
+                <li key={template.name} className="pv-row group">
+                  <button
+                    type="button"
+                    disabled
+                    className="grid w-full grid-cols-[32px_1fr_auto] items-baseline gap-3 px-2 py-4 text-left disabled:cursor-not-allowed"
+                  >
+                    <span className="pv-num">0{index + 1}</span>
+                    <span className="min-w-0">
+                      <span className="block truncate text-[14px] text-ink/80">
+                        {template.name}
+                      </span>
+                      <span className="mt-0.5 block font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">
+                        {template.lang}
+                      </span>
+                    </span>
+                    <ArrowUpRight size={14} className="translate-y-0.5 text-ink/25" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
 
-        {/* Code output */}
-        <div className="lg:col-span-3 glass-card rounded-2xl border border-white/[0.08] overflow-hidden flex flex-col">
-          <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06] bg-[#0a0a0a]">
-            <div className="flex gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-white/10" />
-              <div className="w-3 h-3 rounded-full bg-white/10" />
-              <div className="w-3 h-3 rounded-full bg-white/10" />
+        {/* Sortie — éditeur en veilleuse */}
+        <div className="pv-glass pv-edge rounded-2xl flex min-h-[420px] flex-col overflow-hidden lg:col-span-3">
+          <div className="flex items-center justify-between border-b border-[color:var(--hairline)] bg-abyss px-5 py-3">
+            <div className="flex gap-1.5" aria-hidden>
+              <span className="h-2.5 w-2.5 rounded-full bg-ink/10" />
+              <span className="h-2.5 w-2.5 rounded-full bg-ink/10" />
+              <span className="h-2.5 w-2.5 rounded-full bg-ink/10" />
             </div>
-            <span className="text-xs text-[#444] font-mono">output.lua</span>
-            <button className="text-xs text-[#666] hover:text-[#F5F0E8] transition-colors">Copy</button>
+            <span className="font-mono text-[11px] tracking-[0.06em] text-dusk">output.lua</span>
+            <button
+              type="button"
+              disabled
+              className="inline-flex h-10 items-center gap-1.5 rounded-lg px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-dusk disabled:cursor-not-allowed"
+            >
+              <Copy size={11} />
+              Copier
+            </button>
           </div>
-          <div className="flex-1 p-5 font-mono text-sm text-[#CCCCC0] leading-relaxed">
-            <span className="text-[#444]">-- Your generated code will appear here</span>
+          <div className="relative flex-1 bg-abyss p-5 font-mono text-[13px] leading-relaxed sm:p-6">
+            <div aria-hidden className="pv-halo--violet pv-halo right-6 top-8 h-40 w-40 opacity-60" />
+            <p className="text-dusk">-- Votre code généré s&apos;affichera ici.</p>
+            <p className="mt-2 text-ink/20">-- Structure, événements et configuration inclus.</p>
+            <div className="mt-8 flex flex-col gap-2.5" aria-hidden>
+              <div className="pv-skeleton h-3 w-3/4" />
+              <div className="pv-skeleton h-3 w-1/2" />
+              <div className="pv-skeleton h-3 w-2/3" />
+              <div className="pv-skeleton h-3 w-2/5" />
+            </div>
           </div>
         </div>
       </div>

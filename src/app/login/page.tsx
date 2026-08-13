@@ -1,11 +1,19 @@
 'use client'
 
 import Link from "next/link";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { login, loginWithGoogle } from "@/app/auth/actions";
 import { useEffect, useState } from "react";
+import { login, loginWithGoogle } from "@/app/auth/actions";
+import { BrandMark } from "@/components/prisme/Brand";
+import { Button } from "@/components/ui/button";
+import { Input, Label, FormMessage } from "@/components/ui/field";
+
+/*
+ * Connexion — la déclinaison calme du hero Givre. La scène d'aube
+ * diluée respire derrière un cadre éditorial d'un pixel ; une seule
+ * carte de verre dépoli porte le monogramme et le formulaire.
+ * L'UI chuchote, la lumière fait le reste.
+ */
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
@@ -32,92 +40,148 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080808] flex items-center justify-center px-4 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-[#FF7B4B]/10 to-transparent rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-[#FF6B7D]/8 to-transparent rounded-full blur-3xl pointer-events-none" />
+    <div className="pv-scene relative min-h-[100svh] text-ink">
+      {/* La scène — aube calme, caustiques, rais de fenêtre discrets */}
+      <div aria-hidden className="pv-scene-bg--dawn-calm absolute inset-0" />
+      <div aria-hidden className="pv-caustics" />
+      <div aria-hidden className="pv-windowlight absolute inset-0 opacity-60" />
 
-      <Link href="/" className="absolute top-6 left-6 flex items-center gap-2 text-sm text-[#666] hover:text-[#F5F0E8] transition-colors">
-        <ArrowLeft size={14} />
-        Back to home
-      </Link>
+      {/* Cadre éditorial — la page comme objet imprimé */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.55)]"
+        style={{ inset: "var(--frame-inset)" }}
+      />
 
-      <div className="w-full max-w-sm">
-        <div className="flex flex-col items-center mb-8">
-          <div className="relative w-12 h-12 mb-3">
-            <Image src="/nevalogooo.png" alt="Neva AI" fill sizes="48px" className="object-contain" />
-          </div>
-          <span className="font-bold text-xl">
-            <span className="text-neva-gradient">Neva</span>
-            <span className="text-[#F5F0E8]/80"> AI</span>
-          </span>
-        </div>
+      {/* Coins du cadre — retour discret, registre de page */}
+      <header
+        className="absolute z-20 flex items-center justify-between"
+        style={{
+          top: "calc(var(--frame-inset) + 18px)",
+          left: "calc(var(--frame-inset) + 22px)",
+          right: "calc(var(--frame-inset) + 22px)",
+        }}
+      >
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist transition-colors hover:text-ink"
+        >
+          <ArrowLeft size={12} strokeWidth={1.6} />
+          Retour à l’accueil
+        </Link>
+        <span className="hidden font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist sm:block">
+          Connexion
+        </span>
+      </header>
 
-        <div className="glass-card rounded-2xl p-7 border border-white/[0.08]">
-          <h1 className="text-xl font-bold text-[#F5F0E8] mb-1">Welcome back</h1>
-          <p className="text-sm text-[#666] mb-6">Sign in to your Neva AI account.</p>
+      <main className="relative z-10 flex min-h-[100svh] items-center justify-center px-6 py-24 sm:px-8">
+        <div className="w-full max-w-[420px]">
+          {/* La carte porteuse — verre fort, arête allumée, ombre mauve */}
+          <section className="pv-glass pv-glass--strong pv-edge pv-shadow-mauve pv-fade-up px-6 py-8 sm:px-9 sm:py-10">
+            <Link href="/" aria-label="Neva Design — accueil" className="inline-flex">
+              <BrandMark size={24} tone="ink" />
+            </Link>
 
-          {error && (
-            <div className="mb-4 px-3.5 py-2.5 bg-red-500/10 border border-red-500/20 rounded-xl text-sm text-red-400">
-              {error}
-            </div>
-          )}
+            <p className="mt-7 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
+              Espace créateur
+            </p>
+            <h1 className="pv-display mt-3 text-[clamp(1.8rem,5.6vw,2.25rem)] leading-[1.12]">
+              Reprenez <span className="font-medium text-ink">la lumière</span>.
+            </h1>
+            <p className="mt-3 max-w-[320px] text-sm leading-relaxed text-slate">
+              Vos créations et vos crédits vous attendent, exactement où vous
+              les avez laissés.
+            </p>
 
-          <form action={handleSubmit} className="flex flex-col gap-4">
-            <div>
-              <label className="block text-xs font-medium text-[#9A9A9A] mb-1.5">Email</label>
-              <input
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                required
-                className="w-full px-3.5 py-2.5 bg-white/5 border border-white/[0.08] rounded-xl text-sm text-[#F5F0E8] placeholder-[#444] outline-none focus:border-[#FF7B4B]/40 transition-colors"
-              />
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-medium text-[#9A9A9A]">Password</label>
-                <Link href="/forgot-password" className="text-xs text-[#FF7B4B] hover:text-[#FFD166] transition-colors">Forgot?</Link>
+            {error ? (
+              <FormMessage tone="error" className="mt-6">
+                {error}
+              </FormMessage>
+            ) : null}
+
+            <form action={handleSubmit} className="mt-7 flex flex-col gap-5">
+              <div>
+                <Label htmlFor="email">Adresse e-mail</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="vous@exemple.com"
+                  autoComplete="email"
+                  required
+                />
               </div>
-              <input
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                required
-                className="w-full px-3.5 py-2.5 bg-white/5 border border-white/[0.08] rounded-xl text-sm text-[#F5F0E8] placeholder-[#444] outline-none focus:border-[#FF7B4B]/40 transition-colors"
-              />
+              <div>
+                <div className="mb-2 flex items-baseline justify-between">
+                  <Label htmlFor="password" className="mb-0">
+                    Mot de passe
+                  </Label>
+                  <Link
+                    href="/forgot-password"
+                    className="font-mono text-[10px] uppercase tracking-[0.14em] text-mist transition-colors hover:text-ink"
+                  >
+                    Oublié ?
+                  </Link>
+                </div>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  required
+                />
+              </div>
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                className="pv-btn mt-1 w-full"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span aria-hidden className="pv-spinner h-4 w-4" />
+                    Connexion…
+                  </>
+                ) : (
+                  "Se connecter"
+                )}
+              </Button>
+            </form>
+
+            <div className="my-6 flex items-center gap-4">
+              <span aria-hidden className="pv-rule flex-1" />
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-mist">
+                ou
+              </span>
+              <span aria-hidden className="pv-rule flex-1" />
             </div>
-            <Button variant="gradient" size="lg" className="w-full mt-2" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </form>
 
-          <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px bg-white/[0.06]" />
-            <span className="text-xs text-[#444]">or continue with</span>
-            <div className="flex-1 h-px bg-white/[0.06]" />
-          </div>
+            <form action={loginWithGoogle}>
+              <Button type="submit" variant="secondary" size="lg" className="w-full">
+                <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden>
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                </svg>
+                Continuer avec Google
+              </Button>
+            </form>
+          </section>
 
-          <form action={loginWithGoogle}>
-            <button
-              type="submit"
-              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 bg-white/5 border border-white/[0.08] rounded-xl text-sm text-[#CCCCC0] hover:bg-white/[0.08] hover:border-white/[0.14] transition-all"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-              </svg>
-              Continue with Google
-            </button>
-          </form>
+          <p
+            className="pv-fade-up mt-7 text-center text-[13px] text-slate"
+            style={{ animationDelay: "0.2s" }}
+          >
+            Pas encore de compte ?{" "}
+            <Link href="/signup" className="pv-link">
+              Créez-le gratuitement
+            </Link>
+          </p>
         </div>
-
-        <p className="text-center text-xs text-[#555] mt-5">
-          Don't have an account?{" "}
-          <Link href="/signup" className="text-[#FF7B4B] hover:text-[#FFD166] transition-colors">Sign up free</Link>
-        </p>
-      </div>
+      </main>
     </div>
   );
 }

@@ -5,12 +5,19 @@ type ModuleStep = {
   detail: string;
 };
 
+/*
+ * En-tête de module — Givre calme : pastille de verre, micro-label
+ * mono mist, titre Outfit light (l'accent medium ink vit dans
+ * pv-display), stepper en filets dont l'étape active est soulignée
+ * par le spectre — le seul fil vif de l'en-tête. Le paramètre
+ * `accent` est conservé pour compatibilité d'API.
+ */
 export function ModuleHeader({
   icon: Icon,
   eyebrow,
   title,
   description,
-  accent,
+  accent: _accent,
   meta,
   steps,
   activeStep = 0,
@@ -24,62 +31,64 @@ export function ModuleHeader({
   steps: ModuleStep[];
   activeStep?: number;
 }) {
+  void _accent;
   return (
-    <div className="mb-6 overflow-hidden rounded-[16px] border border-white/[0.075] bg-[linear-gradient(135deg,rgba(255,255,255,0.055),rgba(255,255,255,0.018))] shadow-[0_24px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl">
-      <div className="flex flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-start lg:justify-between">
+    <div className="mb-8">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
-          <div className="mb-3 flex items-center gap-2">
-            <div
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-              style={{ background: `${accent}14`, borderColor: `${accent}32`, color: accent }}
-            >
-              <Icon size={17} />
-            </div>
-            <div className="min-w-0">
-              <div className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: accent }}>
-                {eyebrow}
-              </div>
-              <h1 className="truncate text-2xl font-semibold tracking-tight text-[#F5F0E8]">{title}</h1>
-            </div>
+          <div className="mb-4 flex items-center gap-3">
+            <span className="relative flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(255,255,255,0.68)] bg-[rgba(255,255,255,0.55)] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_6px_16px_rgba(96,84,140,0.12)]">
+              <Icon size={14} strokeWidth={1.8} />
+            </span>
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
+              {eyebrow}
+            </span>
           </div>
-          <p className="max-w-3xl text-sm leading-relaxed text-[#A9A39B]">{description}</p>
+          <h1 className="pv-display text-[clamp(1.9rem,3.4vw,2.6rem)]">{title}</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate">{description}</p>
         </div>
 
-        {meta && (
-          <div className="flex w-fit items-center gap-2 rounded-2xl border border-white/[0.075] bg-black/20 px-3 py-2 text-[11px] text-[#A9A39B]">
-            <span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} />
+        {meta ? (
+          <span className="w-fit shrink-0 whitespace-nowrap font-mono text-[10.5px] uppercase tracking-[0.18em] text-mist">
             {meta}
-          </div>
-        )}
+          </span>
+        ) : null}
       </div>
 
-      <div className="grid border-t border-white/[0.05] sm:grid-cols-3">
+      {/* Stepper en filets */}
+      <div className="pv-hairline mt-7 grid border-t sm:grid-cols-3">
         {steps.map((step, index) => {
           const isActive = index === activeStep;
           const isDone = index < activeStep;
+          const lit = isActive || isDone;
           return (
             <div
               key={step.label}
-              className={`flex min-h-16 items-center gap-3 border-white/[0.05] px-5 py-3 sm:border-r sm:last:border-r-0 ${
-                isActive ? "bg-white/[0.035]" : ""
+              className={`relative flex items-baseline gap-3 py-4 pr-6 ${
+                isActive
+                  ? "-mt-px border-t-2 border-t-transparent [border-image:linear-gradient(90deg,#7C6AFF,#4CC9F0)_1]"
+                  : ""
               }`}
             >
-              <div
-                className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-xl border text-[11px] font-bold"
-                style={{
-                  borderColor: isActive || isDone ? `${accent}45` : "rgba(255,255,255,.08)",
-                  background: isActive || isDone ? `${accent}16` : "rgba(255,255,255,.025)",
-                  color: isActive || isDone ? accent : "#555",
-                }}
+              <span
+                className={`font-mono text-[11px] tracking-[0.12em] ${
+                  lit ? "text-[color:var(--num-color)]" : "text-ink/25"
+                }`}
               >
-                {index + 1}
-              </div>
-              <div className="min-w-0">
-                <div className={`truncate text-xs font-semibold ${isActive ? "text-[#F5F0E8]" : "text-[#A9A39B]"}`}>
+                0{index + 1}
+              </span>
+              <span className="min-w-0">
+                <span
+                  className={`block truncate text-[13px] font-medium ${
+                    lit ? "text-ink" : "text-ink/35"
+                  }`}
+                >
                   {step.label}
-                </div>
-                <div className="mt-0.5 truncate text-[11px] text-[#444]">{step.detail}</div>
-              </div>
+                </span>
+                <span className="mt-1 block truncate font-mono text-[10px] tracking-[0.06em] text-mist">
+                  {step.detail}
+                </span>
+              </span>
             </div>
           );
         })}

@@ -1,3 +1,5 @@
+/* Affichages — garde d'auth admin puis chargement trié (priorité desc,
+   création desc). Tout le visuel vit dans le client. */
 import { redirect } from 'next/navigation'
 import { verifyAdmin } from '@/lib/admin'
 import { createServiceClient } from '@/lib/supabase/server'

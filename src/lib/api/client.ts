@@ -12,22 +12,22 @@ function messageFor(code: string | undefined, status: number, rawText: string) {
   const normalized = `${code ?? ""} ${rawText}`.toLowerCase();
 
   if (status === 413 || normalized.includes("request entity too large") || normalized.includes("too_large")) {
-    return "Ton image est trop lourde. Compresse-la ou utilise une image plus légère.";
+    return "Votre image est trop lourde. Compressez-la ou utilisez un fichier plus léger.";
   }
   if (normalized.includes("unsupported_type") || normalized.includes("format")) {
-    return "Format non supporté. Utilise PNG, JPG ou WEBP.";
+    return "Format non pris en charge. Utilisez PNG, JPG ou WEBP.";
   }
   if (normalized.includes("insufficient_credits")) {
-    return "Créations disponibles insuffisantes. Recharge dans Billing.";
+    return "Créations disponibles insuffisantes. Rechargez depuis l'espace Abonnement.";
   }
   if (status === 429 || normalized.includes("rate_limited")) {
-    return "Trop de demandes en même temps. Attends quelques secondes puis réessaie.";
+    return "Trop de demandes en même temps. Patientez quelques secondes puis réessayez.";
   }
   if (status >= 500) {
-    return "La génération a échoué. Aucune création n’a été utilisée.";
+    return "La génération a échoué. Aucune création n'a été décomptée.";
   }
 
-  return "Une erreur est survenue. Réessaie avec un fichier plus léger ou un prompt plus simple.";
+  return "Une erreur est survenue. Réessayez avec un fichier plus léger ou un brief plus simple.";
 }
 
 export async function readApiResponse<T>(response: Response): Promise<T> {
@@ -58,7 +58,7 @@ export async function readApiResponse<T>(response: Response): Promise<T> {
   }
 
   if (!parsed) {
-    throw new Error("Réponse serveur invalide. Réessaie dans un instant.");
+    throw new Error("Réponse serveur invalide. Réessayez dans un instant.");
   }
 
   const payload = parsed as { success?: boolean; data?: T; error?: ApiErrorPayload["error"] };

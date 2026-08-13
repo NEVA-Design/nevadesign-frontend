@@ -24,15 +24,17 @@ export const ANNOUNCEMENT_ACCENTS: AnnouncementAccent[] = ["coral", "orange", "y
 export const KIND_LABELS: Record<AnnouncementKind, string> = {
   promo: "Code promo",
   new: "Nouveau",
-  update: "MAJ",
+  update: "Mise à jour",
   info: "Info",
 };
 
+/* Les 4 clés d'accent sont persistées en base ; seules les teintes
+   changent — remappées sur les états Prisme, désaturés. */
 export const ACCENT_STYLES: Record<AnnouncementAccent, { color: string; bg: string; border: string }> = {
-  coral: { color: "#FF6B7D", bg: "#FF6B7D14", border: "#FF6B7D33" },
-  orange: { color: "#FF7B4B", bg: "#FF7B4B14", border: "#FF7B4B33" },
-  yellow: { color: "#FFD166", bg: "#FFD16612", border: "#FFD16633" },
-  green: { color: "#4ADE80", bg: "#4ADE8012", border: "#4ADE8033" },
+  coral: { color: "#F08A85", bg: "#F08A8514", border: "#F08A8533" },
+  orange: { color: "#E5C36E", bg: "#E5C36E14", border: "#E5C36E33" },
+  yellow: { color: "#B4A8FF", bg: "#B4A8FF12", border: "#B4A8FF33" },
+  green: { color: "#7ED4A6", bg: "#7ED4A612", border: "#7ED4A633" },
 };
 
 export function isAnnouncementKind(value: unknown): value is AnnouncementKind {

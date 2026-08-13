@@ -1,18 +1,20 @@
 "use client";
 
-import { useRef, useState } from "react";
-import {
-  AlertTriangle,
-  Check,
-  Loader2,
-  Mail,
-  Radio,
-  Send,
-  Sparkles,
-  Users,
-  X,
-} from "lucide-react";
+import { useState } from "react";
+import { AlertTriangle, Mail, Send, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input, Label, Textarea } from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
+import { useToasts, ToastViewport } from "@/components/ui/toast";
+import { PageHeader } from "@/components/admin/PageHeader";
+import { StatTile } from "@/components/admin/StatTile";
+
+/*
+ * Newsletter — composer à gauche, aperçu fidèle de l'e-mail à droite
+ * (void, verre, pilule blanche sous halo spectral). L'envoi réel reste
+ * verrouillé derrière la saisie exacte de « UPGRADE ».
+ */
 
 type Audience = "all" | "free" | "paid";
 type SendMode = "test" | "broadcast";
@@ -25,48 +27,22 @@ type Stats = {
   fromEmail: string;
 };
 
-type Toast = {
-  id: number;
-  message: string;
-  type: "success" | "error";
-};
-
 const AUDIENCES: Array<{ id: Audience; label: string; description: string }> = [
-  { id: "free", label: "Free", description: "Utilisateurs a convertir en priorite." },
+  { id: "free", label: "Gratuits", description: "Utilisateurs à convertir en priorité." },
   { id: "all", label: "Tous", description: "Toute la base avec un compte." },
-  { id: "paid", label: "Payants", description: "Creators et studios actifs." },
+  { id: "paid", label: "Payants", description: "Créateurs et studios actifs." },
 ];
 
-const DEFAULT_MESSAGE = `Salut,
+const DEFAULT_MESSAGE = `Bonjour,
 
-Neva AI evolue vite: Neva Design, Enhance, Audit et Character deviennent beaucoup plus puissants pour produire des visuels FiveM propres, coherents et prets a poster.
+Neva Design évolue vite : Design Studio, Enhance, Audit et Character deviennent beaucoup plus puissants pour produire des visuels FiveM propres, cohérents et prêts à publier.
 
-Passe sur un plan superieur pour debloquer plus de creations, des exports plus ambitieux et un workflow plus fluide pour ton serveur.`;
+Passez sur un plan supérieur pour débloquer plus de créations, des exports plus ambitieux et un flux de travail plus fluide pour votre serveur.`;
 
 function countForAudience(stats: Stats, audience: Audience) {
   if (audience === "free") return stats.free;
   if (audience === "paid") return stats.paid;
   return stats.total;
-}
-
-function Toasts({ items }: { items: Toast[] }) {
-  return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
-      {items.map((toast) => (
-        <div
-          key={toast.id}
-          className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium shadow-xl backdrop-blur-sm ${
-            toast.type === "success"
-              ? "border-[#4ADE80]/30 bg-[#4ADE80]/10 text-[#4ADE80]"
-              : "border-[#FF6B7D]/30 bg-[#FF6B7D]/10 text-[#FF6B7D]"
-          }`}
-        >
-          {toast.type === "success" ? <Check size={13} /> : <X size={13} />}
-          {toast.message}
-        </div>
-      ))}
-    </div>
-  );
 }
 
 export function AdminNewsletterClient({
@@ -78,27 +54,19 @@ export function AdminNewsletterClient({
 }) {
   const [stats, setStats] = useState(initialStats);
   const [audience, setAudience] = useState<Audience>("free");
-  const [subject, setSubject] = useState("Upgrade ton compte Neva AI");
-  const [preheader, setPreheader] = useState("Plus de creations, plus de formats, plus de visuels prets a poster.");
+  const [subject, setSubject] = useState("Passez au niveau supérieur avec Neva Design");
+  const [preheader, setPreheader] = useState("Plus de créations, plus de formats, plus de visuels prêts à publier.");
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
-  const [ctaLabel, setCtaLabel] = useState("Upgrade maintenant");
+  const [ctaLabel, setCtaLabel] = useState("Passer au niveau supérieur");
   const [ctaUrl, setCtaUrl] = useState("/dashboard/billing");
   const [testRecipient, setTestRecipient] = useState(adminEmail);
   const [confirmation, setConfirmation] = useState("");
   const [loading, setLoading] = useState<SendMode | "refresh" | null>(null);
-  const [toasts, setToasts] = useState<Toast[]>([]);
-  const toastIdRef = useRef(0);
+  const { toasts, push } = useToasts();
 
   const audienceCount = countForAudience(stats, audience);
   const canBroadcast = stats.resendConfigured && subject.trim() && message.trim() && confirmation === "UPGRADE";
   const previewParagraphs = message.split(/\n{2,}/).map((part) => part.trim()).filter(Boolean);
-
-  function addToast(messageText: string, type: Toast["type"]) {
-    toastIdRef.current += 1;
-    const id = toastIdRef.current;
-    setToasts((prev) => [...prev, { id, message: messageText, type }]);
-    setTimeout(() => setToasts((prev) => prev.filter((toast) => toast.id !== id)), 3200);
-  }
 
   async function refreshStats() {
     setLoading("refresh");
@@ -106,20 +74,20 @@ export function AdminNewsletterClient({
       const res = await fetch("/api/admin/newsletter");
       const data = await res.json();
       if (!res.ok || data.error) {
-        addToast(data.error ?? "Erreur stats", "error");
+        push(data.error ?? "Erreur lors du chargement des statistiques", "error");
         return;
       }
       setStats(data);
-      addToast("Stats mises a jour", "success");
+      push("Statistiques mises à jour", "success");
     } catch {
-      addToast("Erreur reseau", "error");
+      push("Erreur réseau", "error");
     } finally {
       setLoading(null);
     }
   }
 
   async function send(mode: SendMode) {
-    if (mode === "broadcast" && !confirm(`Envoyer cette newsletter a ${audienceCount} utilisateur(s) ?`)) return;
+    if (mode === "broadcast" && !confirm(`Envoyer cette newsletter à ${audienceCount} utilisateur(s) ?`)) return;
 
     setLoading(mode);
     try {
@@ -140,75 +108,71 @@ export function AdminNewsletterClient({
       });
       const data = await res.json();
       if (!res.ok || data.error) {
-        addToast(data.error ?? "Erreur envoi", "error");
+        push(data.error ?? "Erreur lors de l'envoi", "error");
         return;
       }
 
-      addToast(
+      push(
         mode === "test"
-          ? `Email test envoye a ${testRecipient}`
-          : `Newsletter envoyee a ${data.sent} utilisateur(s)`,
+          ? `E-mail de test envoyé à ${testRecipient}`
+          : `Newsletter envoyée à ${data.sent} utilisateur(s)`,
         "success"
       );
       if (mode === "broadcast") setConfirmation("");
     } catch {
-      addToast("Erreur reseau", "error");
+      push("Erreur réseau", "error");
     } finally {
       setLoading(null);
     }
   }
 
   return (
-    <div>
-      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <div className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest text-[#FF7B4B]">
-            <Radio size={12} />
-            Newsletter admin
-          </div>
-          <h1 className="text-xl font-bold text-[#F5F0E8]">Campagne upgrade</h1>
-          <p className="mt-1 max-w-2xl text-sm text-[#555]">
-            Prepare un email, teste-le sur ta boite, puis envoie-le a une audience precise.
-          </p>
-        </div>
+    <div className="relative">
+      <div aria-hidden className="pv-halo -top-24 right-[-4%] h-[340px] w-[460px] opacity-50" />
 
-        <div className="flex flex-wrap items-center gap-2">
-          <div className={`rounded-lg border px-3 py-2 text-xs ${stats.resendConfigured ? "border-[#4ADE80]/25 bg-[#4ADE80]/8 text-[#4ADE80]" : "border-[#FFD166]/25 bg-[#FFD166]/8 text-[#FFD166]"}`}>
-            {stats.resendConfigured ? `From ${stats.fromEmail}` : "Resend non configure"}
-          </div>
-          <Button variant="outline" size="sm" onClick={refreshStats} disabled={loading !== null}>
-            {loading === "refresh" ? <Loader2 size={12} className="animate-spin" /> : <Users size={12} />}
-            Actualiser
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Newsletter"
+        title={
+          <>
+            Campagne de <span className="pv-beam-text">conversion.</span>
+          </>
+        }
+        description="Préparez un e-mail, testez-le sur votre boîte, puis envoyez-le à une audience précise."
+      >
+        <span
+          className={`inline-flex h-9 items-center rounded-full border px-4 font-mono text-[10px] font-medium uppercase tracking-[0.12em] ${
+            stats.resendConfigured
+              ? "border-[#C4E3D2] bg-[#EFF7F2] text-[#3E7A5C]"
+              : "border-[#EAD9A8] bg-[#FBF6E9] text-[#8A6D1F]"
+          }`}
+        >
+          {stats.resendConfigured ? `Expéditeur · ${stats.fromEmail}` : "Resend non configuré"}
+        </span>
+        <Button variant="outline" onClick={refreshStats} disabled={loading !== null}>
+          {loading === "refresh" ? <Spinner className="h-3.5 w-3.5" /> : <Users size={13} strokeWidth={1.8} />}
+          Actualiser
+        </Button>
+      </PageHeader>
 
-      <div className="mb-6 grid gap-3 sm:grid-cols-3">
-        {[
-          { label: "Total", value: stats.total, color: "#F5F0E8" },
-          { label: "Free", value: stats.free, color: "#FFD166" },
-          { label: "Payants", value: stats.paid, color: "#4ADE80" },
-        ].map((item) => (
-          <div key={item.label} className="rounded-xl border border-white/[0.07] bg-white/[0.02] px-4 py-3">
-            <div className="text-[10px] font-semibold uppercase tracking-widest text-[#444]">{item.label}</div>
-            <div className="mt-1 text-2xl font-bold" style={{ color: item.color }}>
-              {item.value.toLocaleString()}
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* ── Tuiles d'audience ─────────────────────────────────── */}
+      <section className="relative mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <StatTile label="Comptes au total" value={stats.total.toLocaleString()} />
+        <StatTile label="Plan gratuit" value={stats.free.toLocaleString()} />
+        <StatTile label="Plans payants" value={stats.paid.toLocaleString()} />
+      </section>
 
-      <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
-        <section className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-4">
-          <div className="mb-4 flex items-center gap-2">
-            <Mail size={14} className="text-[#FF7B4B]" />
-            <h2 className="text-sm font-semibold text-[#F5F0E8]">Composer</h2>
+      <div className="relative grid gap-5 lg:grid-cols-[420px_1fr]">
+        {/* ── Composer ──────────────────────────────────────────── */}
+        <Card className="h-fit p-6">
+          <div className="mb-6 flex items-center gap-2.5 border-b border-[color:var(--hairline)] pb-5">
+            <Mail size={14} strokeWidth={1.8} className="text-[color:var(--num-color)]" />
+            <h2 className="pv-label">Composer</h2>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
-              <label className="mb-1.5 block text-[11px] text-[#666]">Audience</label>
-              <div className="grid grid-cols-3 gap-1.5">
+              <Label>Audience</Label>
+              <div className="grid grid-cols-3 gap-2">
                 {AUDIENCES.map((item) => {
                   const active = audience === item.id;
                   return (
@@ -216,148 +180,172 @@ export function AdminNewsletterClient({
                       key={item.id}
                       type="button"
                       onClick={() => setAudience(item.id)}
-                      className={`rounded-lg border px-2 py-2 text-left transition-all ${
+                      className={`min-h-10 rounded-lg border px-2.5 py-2 text-left transition-colors duration-300 ${
                         active
-                          ? "border-[#FF7B4B]/50 bg-[#FF7B4B]/10 text-[#FF7B4B]"
-                          : "border-white/[0.07] text-[#666] hover:border-white/[0.15] hover:text-[#CCCCC0]"
+                          ? "border-[rgba(109,91,232,0.35)] bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]"
+                          : "border-[color:var(--hairline)] text-steel hover:border-[#C9C9C0] hover:text-ink"
                       }`}
                     >
-                      <div className="text-xs font-semibold">{item.label}</div>
-                      <div className="mt-0.5 text-[9px] leading-tight text-current opacity-60">{countForAudience(stats, item.id).toLocaleString()}</div>
+                      <span className="block text-xs font-medium">{item.label}</span>
+                      <span className="mt-0.5 block font-mono text-[10px] tracking-[0.06em] opacity-70">
+                        {countForAudience(stats, item.id).toLocaleString()}
+                      </span>
                     </button>
                   );
                 })}
               </div>
-              <p className="mt-1.5 text-[11px] text-[#444]">
+              <p className="mt-2 text-xs text-dusk">
                 {AUDIENCES.find((item) => item.id === audience)?.description}
               </p>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-[11px] text-[#666]">Sujet</label>
-              <input
+              <Label htmlFor="newsletter-subject">Sujet</Label>
+              <Input
+                id="newsletter-subject"
                 value={subject}
                 onChange={(event) => setSubject(event.target.value)}
-                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-[#F5F0E8] outline-none transition-colors placeholder:text-[#333] focus:border-white/[0.16]"
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-[11px] text-[#666]">Preheader</label>
-              <input
+              <Label htmlFor="newsletter-preheader">Texte d&apos;aperçu</Label>
+              <Input
+                id="newsletter-preheader"
                 value={preheader}
                 onChange={(event) => setPreheader(event.target.value)}
-                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-[#F5F0E8] outline-none transition-colors placeholder:text-[#333] focus:border-white/[0.16]"
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-[11px] text-[#666]">Message</label>
-              <textarea
+              <Label htmlFor="newsletter-message">Message</Label>
+              <Textarea
+                id="newsletter-message"
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
                 rows={10}
-                className="w-full resize-none rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs leading-relaxed text-[#F5F0E8] outline-none transition-colors placeholder:text-[#333] focus:border-white/[0.16]"
+                className="leading-relaxed"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="mb-1.5 block text-[11px] text-[#666]">Bouton</label>
-                <input
+                <Label htmlFor="newsletter-cta-label">Libellé du bouton</Label>
+                <Input
+                  id="newsletter-cta-label"
                   value={ctaLabel}
                   onChange={(event) => setCtaLabel(event.target.value)}
-                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-[#F5F0E8] outline-none transition-colors focus:border-white/[0.16]"
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-[11px] text-[#666]">Lien</label>
-                <input
+                <Label htmlFor="newsletter-cta-url">Lien du bouton</Label>
+                <Input
+                  id="newsletter-cta-url"
                   value={ctaUrl}
                   onChange={(event) => setCtaUrl(event.target.value)}
-                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-[#F5F0E8] outline-none transition-colors focus:border-white/[0.16]"
                 />
               </div>
             </div>
 
-            <div className="rounded-xl border border-white/[0.07] bg-black/20 p-3">
-              <label className="mb-1.5 block text-[11px] text-[#666]">Email de test</label>
+            <div className="rounded-xl border border-[color:var(--hairline)] bg-abyss p-4">
+              <Label htmlFor="newsletter-test-recipient">E-mail de test</Label>
               <div className="flex gap-2">
-                <input
+                <Input
+                  id="newsletter-test-recipient"
                   type="email"
                   value={testRecipient}
                   onChange={(event) => setTestRecipient(event.target.value)}
-                  className="min-w-0 flex-1 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-[#F5F0E8] outline-none transition-colors focus:border-white/[0.16]"
+                  className="min-w-0 flex-1"
                 />
-                <Button variant="outline" size="sm" onClick={() => send("test")} disabled={loading !== null || !stats.resendConfigured}>
-                  {loading === "test" ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                <Button
+                  variant="outline"
+                  onClick={() => send("test")}
+                  disabled={loading !== null || !stats.resendConfigured}
+                >
+                  {loading === "test" ? <Spinner className="h-3.5 w-3.5" /> : <Send size={13} strokeWidth={1.8} />}
                   Tester
                 </Button>
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#FFD166]/20 bg-[#FFD166]/5 p-3">
-              <div className="mb-2 flex items-start gap-2 text-xs text-[#FFD166]">
-                <AlertTriangle size={13} className="mt-0.5 flex-shrink-0" />
-                <span>Envoi reel vers {audienceCount.toLocaleString()} utilisateur(s). Tape UPGRADE pour deverrouiller.</span>
+            <div className="rounded-xl border border-warn/25 bg-warn/[0.06] p-4">
+              <div className="mb-3 flex items-start gap-2 text-xs leading-relaxed text-warn">
+                <AlertTriangle size={13} strokeWidth={1.8} className="mt-0.5 shrink-0" />
+                <span>
+                  Envoi réel vers {audienceCount.toLocaleString()} utilisateur(s). Saisissez
+                  UPGRADE pour déverrouiller l&apos;envoi.
+                </span>
               </div>
               <div className="flex gap-2">
-                <input
+                <Input
                   value={confirmation}
                   onChange={(event) => setConfirmation(event.target.value)}
                   placeholder="UPGRADE"
-                  className="min-w-0 flex-1 rounded-lg border border-[#FFD166]/20 bg-black/20 px-3 py-2 text-xs text-[#F5F0E8] outline-none transition-colors placeholder:text-[#5f5131] focus:border-[#FFD166]/40"
+                  aria-label="Confirmation d'envoi"
+                  className="min-w-0 flex-1 font-mono tracking-[0.08em]"
                 />
-                <Button variant="gradient" size="sm" onClick={() => send("broadcast")} disabled={loading !== null || !canBroadcast}>
-                  {loading === "broadcast" ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                <Button onClick={() => send("broadcast")} disabled={loading !== null || !canBroadcast}>
+                  {loading === "broadcast" ? <Spinner className="h-3.5 w-3.5" /> : <Send size={13} strokeWidth={1.8} />}
                   Envoyer
                 </Button>
               </div>
             </div>
           </div>
-        </section>
+        </Card>
 
-        <section className="rounded-2xl border border-white/[0.07] bg-[#0c0c0c] p-5">
-          <div className="mb-4 flex items-center justify-between gap-3 border-b border-white/[0.05] pb-4">
-            <div>
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-[#444]">Preview</div>
-              <div className="mt-1 text-sm font-semibold text-[#F5F0E8]">{subject || "Sujet de la newsletter"}</div>
+        {/* ── Aperçu de l'e-mail — le mockup posé sur sa lueur ──── */}
+        <Card className="h-fit p-6">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--hairline)] pb-5">
+            <div className="min-w-0">
+              <p className="pv-label">Aperçu</p>
+              <p className="mt-1.5 truncate text-sm font-medium text-ink">
+                {subject || "Sujet de la newsletter"}
+              </p>
             </div>
-            <div className="rounded-lg border border-white/[0.07] px-3 py-1.5 text-[11px] text-[#666]">
+            <span className="shrink-0 font-mono text-[11px] tracking-[0.06em] text-dusk">
               {audienceCount.toLocaleString()} destinataire(s)
-            </div>
+            </span>
           </div>
 
-          <div className="mx-auto max-w-2xl overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111]">
-            <div className="border-b border-white/[0.07] px-6 py-5">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[#FF7B4B]">Neva AI</div>
-              <div className="mt-1 text-2xl font-bold text-[#F5F0E8]">Passe au niveau superieur</div>
-              {preheader && <div className="mt-2 text-sm text-[#666]">{preheader}</div>}
+          <div className="relative mx-auto max-w-2xl">
+            <div className="relative z-10 overflow-hidden rounded-2xl border border-[color:var(--hairline)] bg-abyss shadow-[var(--shadow-glass)]">
+              <div className="relative overflow-hidden border-b border-[color:var(--hairline)] px-7 py-7">
+                <div aria-hidden className="pv-halo right-[-70px] top-[-100px] h-[240px] w-[320px] opacity-70" />
+                <p className="pv-label relative text-[color:var(--num-color)]">Neva Design</p>
+                <p className="pv-display relative mt-2.5 text-2xl text-ink">
+                  Passez au niveau supérieur
+                </p>
+                {preheader && (
+                  <p className="relative mt-2.5 text-sm leading-relaxed text-steel">{preheader}</p>
+                )}
+              </div>
+              <div className="px-7 py-7">
+                {previewParagraphs.length === 0 ? (
+                  <p className="text-sm text-ink/35">Votre message apparaîtra ici.</p>
+                ) : (
+                  previewParagraphs.map((paragraph, index) => (
+                    <p key={index} className="mb-4 text-sm leading-relaxed text-ink/80 last:mb-0">
+                      {paragraph}
+                    </p>
+                  ))
+                )}
+                {ctaUrl && (
+                  <div className="mt-6 inline-flex h-11 items-center rounded-full bg-ink px-6 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(124,106,255,0.4),0_4px_24px_rgba(124,106,255,0.28)]">
+                    {ctaLabel || "Passer au niveau supérieur"}
+                  </div>
+                )}
+              </div>
+              <div className="border-t border-[color:var(--hairline)] px-7 py-4 text-xs leading-relaxed text-dusk">
+                Vous recevez cet e-mail car vous disposez d&apos;un compte Neva Design. Pour toute
+                question, répondez simplement à cet e-mail.
+              </div>
             </div>
-            <div className="px-6 py-6">
-              {previewParagraphs.length === 0 ? (
-                <p className="text-sm text-[#444]">Ton message apparaitra ici.</p>
-              ) : (
-                previewParagraphs.map((paragraph, index) => (
-                  <p key={index} className="mb-4 text-sm leading-relaxed text-[#d8d2c8]">
-                    {paragraph}
-                  </p>
-                ))
-              )}
-              {ctaUrl && (
-                <div className="mt-3 inline-flex rounded-lg bg-[#FF7B4B] px-4 py-3 text-sm font-bold text-white">
-                  {ctaLabel || "Upgrade maintenant"}
-                </div>
-              )}
-            </div>
-            <div className="border-t border-white/[0.06] px-6 py-4 text-xs leading-relaxed text-[#666]">
-              Tu recois cet email car tu as un compte Neva AI. Pour toute question, reponds simplement a cet email.
-            </div>
+            <div aria-hidden className="pv-underglow" />
           </div>
-        </section>
+        </Card>
       </div>
 
-      <Toasts items={toasts} />
+      <ToastViewport toasts={toasts} />
     </div>
   );
 }

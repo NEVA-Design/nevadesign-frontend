@@ -2,192 +2,104 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Home, Images, MessageCircle, ShoppingBag, UserRound, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { PORTFOLIO_CATEGORIES, type NevaDesignPortfolioItem } from "@/lib/neva-design-portfolio";
+import { ArrowRight, ArrowUpRight, X } from "lucide-react";
+import PrismShell from "@/components/prisme/Shell";
+import { Brand } from "@/components/prisme/Brand";
+import CreationsMarquee from "@/components/prisme/CreationsMarquee";
+import { RevealBlock } from "@/components/prisme/Motion";
+import SilverSilk from "@/components/prisme/SilverSilk";
+import GlassLens from "@/components/prisme/GlassLens";
+import { CLIENT_LOGOS } from "@/lib/client-logos";
+import {
+  PORTFOLIO_CATEGORIES,
+  type NevaDesignPortfolioItem,
+} from "@/lib/neva-design-portfolio";
 import { cn } from "@/lib/utils";
 
-const filters = ["Tout", ...PORTFOLIO_CATEGORIES];
+/*
+ * Vitrine Neva Design — la galerie dans la lumière Givre.
+ * Le noir a quitté la page : quatre scènes claires alternées
+ * (dawn, dawn-calm, glacier, dawn), un cadre éditorial en filets
+ * blancs sur le hero, pagination 01/04, typo Outfit légère en
+ * encre ardoise — l'accent est un contraste de graisse, jamais
+ * du gras. Les œuvres sont la seule vraie couleur de la page :
+ * tirages à l'ombre mauve posés sur la brume. Un seul canal de
+ * conversion : Discord. La lightbox reste la salle de projection —
+ * l'unique îlot sombre autorisé.
+ */
 
+const DISCORD_URL = "https://discord.gg/nevadesign";
+
+/* Images de secours pour les items sans image_path (rotation). */
 const previewAssets = [
   "/Prime_-_preview_serveur_pack_15.png",
-  "/postergrandfivem.png",
   "/Prime_-_preview_serveur_pack_4.png",
-  "/posterlarya.png",
   "/Prime_-_preview_serveur_pack_7.png",
-  "/affiche1.png",
   "/Prime_-_preview_serveur_pack_8.png",
   "/Prime_-_preview_serveur_pack_9.png",
+  "/postergrandfivem.png",
+  "/postergrandfivem2.png",
+  "/posterlarya.png",
+  "/affiche1.png",
   "/affiche2.png",
   "/affiche3.png",
-  "/postergrandfivem2.png",
 ];
 
-const clientLogos = [
-  "/neva-design/work-logos/A.png",
-  "/neva-design/work-logos/astologo.png",
-  "/neva-design/work-logos/Dlogo.png",
-  "/neva-design/work-logos/EVlogo.png",
-  "/neva-design/work-logos/flashhh.png",
-  "/neva-design/work-logos/gtavice.png",
-  "/neva-design/work-logos/logo.png",
-  "/neva-design/work-logos/logo2.png",
-  "/neva-design/work-logos/logoeffet.png",
-  "/neva-design/work-logos/logosmallv.png",
-  "/neva-design/work-logos/S.png",
-  "/neva-design/work-logos/sansfondlabete.png",
-  "/neva-design/work-logos/Slogo.png",
-  "/neva-design/work-logos/starkkk.png",
-  "/neva-design/work-logos/Studio%20V.png",
-  "/neva-design/work-logos/tbnloo.png",
-  "/neva-design/work-logos/YTEA.png",
-  "/neva-design/work-logos/Z.png",
+const NAV_ANCHORS = [
+  { label: "Accueil", href: "#top" },
+  { label: "Portfolio", href: "#portfolio" },
+  { label: "Services", href: "#services" },
+  { label: "Contact", href: "#contact" },
 ];
 
-const studioSignals = [
-  { value: "01", label: "Direction", detail: "Identite premium" },
-  { value: "02", label: "Production", detail: "Assets sur mesure" },
-  { value: "03", label: "Delivery", detail: "Pret a publier" },
+const SERVICES = [
+  {
+    title: "Branding",
+    description:
+      "Logo, palette, direction artistique et système visuel complet pour votre serveur.",
+    image: "/affiche3.png",
+    span: "lg:col-span-5",
+  },
+  {
+    title: "Affiches & posters",
+    description:
+      "Visuels marketing, annonces Discord et images de lancement qui donnent envie de rejoindre.",
+    image: "/postergrandfivem2.png",
+    span: "lg:col-span-7",
+  },
+  {
+    title: "Packs GFX",
+    description:
+      "Templates, previews, overlays et assets prêts à l'emploi pour votre équipe.",
+    image: "/Prime_-_preview_serveur_pack_7.png",
+    span: "lg:col-span-7",
+  },
+  {
+    title: "Landing pages",
+    description:
+      "Pages courtes, sombres et précises pour poser votre image avant le lancement.",
+    image: "/ordi.png",
+    span: "lg:col-span-5",
+  },
 ];
 
-const serviceRail = [
-  { number: "01", label: "Logo" },
-  { number: "02", label: "Pack" },
-  { number: "03", label: "Poster" },
-  { number: "04", label: "Launch" },
-];
+type DisplayItem = NevaDesignPortfolioItem & { displayImage: string };
 
-const navItems = [
-  { label: "Accueil", href: "#top", icon: Home },
-  { label: "Portfolio", href: "#portfolio", icon: Images },
-  { label: "Services", href: "#services", icon: ShoppingBag },
-  { label: "Contact", href: "#contact", icon: UserRound },
-];
-
-function WorkImage({
-  item,
-}: {
-  item: Pick<NevaDesignPortfolioItem, "title" | "category" | "image_path">;
-}) {
-  const isLogo = item.category === "Logos";
-  const isContain = isLogo || item.category === "Branding";
-
-  return (
-    <Image
-      src={item.image_path || previewAssets[0]}
-      alt={item.title}
-      fill
-      sizes="(max-width: 768px) 100vw, 33vw"
-      className={cn(
-        "transition duration-500 group-hover:scale-[1.035]",
-        isContain ? "object-contain p-8 sm:p-10" : "object-cover"
-      )}
-    />
-  );
-}
-
-function StudioSignalPanel() {
-  return (
-    <motion.aside
-      className="studio-signal-panel hidden lg:block"
-      initial={{ opacity: 0, x: -28 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <p className="signal-eyebrow">Neva system</p>
-      <div className="signal-line" />
-      {studioSignals.map((signal) => (
-        <div key={signal.value} className="signal-row">
-          <span className="signal-value">{signal.value}</span>
-          <span className="signal-copy">
-            <span className="signal-label">{signal.label}</span>
-            <span className="signal-detail">{signal.detail}</span>
-          </span>
-        </div>
-      ))}
-      <div className="signal-orbit">
-        {clientLogos.slice(0, 4).map((logo, index) => (
-          <motion.span
-            key={logo}
-            className="orbit-logo"
-            animate={{ y: [0, index % 2 === 0 ? -5 : 5, 0], opacity: [0.38, 0.82, 0.38] }}
-            transition={{ duration: 3.5 + index * 0.35, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <Image src={logo} alt="" width={24} height={24} className="h-full w-full object-contain" />
-          </motion.span>
-        ))}
-      </div>
-    </motion.aside>
-  );
-}
-
-function ServiceRail() {
-  return (
-    <motion.aside
-      className="service-rail hidden lg:flex"
-      initial={{ opacity: 0, x: 28 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.8, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <span className="service-rail-glow" />
-      <p className="service-rail-title">Creative stack</p>
-      <div className="service-rail-list">
-        {serviceRail.map((item) => (
-          <a key={item.number} href="#services" className="service-rail-item">
-            <span>{item.number}</span>
-            {item.label}
-          </a>
-        ))}
-      </div>
-    </motion.aside>
-  );
-}
-
-const cardTransition = {
-  duration: 0.38,
-  ease: [0.22, 1, 0.36, 1] as const,
-};
-
-const workCardVariants = {
-  hidden: { opacity: 0, y: 18, filter: "blur(10px)", scale: 0.98 },
-  visible: { opacity: 1, y: 0, filter: "blur(0px)", scale: 1, transition: cardTransition },
-  exit: { opacity: 0, y: -12, filter: "blur(8px)", scale: 0.985, transition: { duration: 0.2 } },
-};
-
-function LogoMarquee({ inHero = false }: { inHero?: boolean }) {
-  return (
-    <div className={cn("logo-marquee-wrapper", !inHero && "relative inset-auto py-8")}>
-      <motion.div
-        className="logo-marquee-track"
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
-      >
-        {[...clientLogos, ...clientLogos, ...clientLogos, ...clientLogos].map((logo, index) => (
-          <div key={`${logo}-${index}`} className="logo-marquee-item">
-            <Image src={logo} alt="" width={72} height={72} className="object-contain" />
-          </div>
-        ))}
-      </motion.div>
-    </div>
-  );
-}
-
-function HeroSlider() {
-  return (
-    <>
-      <div className="slider-fade-left" />
-      <div className="slider-fade-right" />
-      <motion.div
-        className="slider-track"
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 36, repeat: Infinity, ease: "linear" }}
-      >
-        {[...previewAssets, ...previewAssets].map((asset, index) => (
-          <Image key={`${asset}-${index}`} src={asset} alt="" width={420} height={340} className="hero-slide-img" priority={index < 4} />
-        ))}
-      </motion.div>
-    </>
+function frameClasses(item: DisplayItem) {
+  const isLogo = item.category === "Logos" || item.category === "Branding";
+  const isPack = item.category === "Packs";
+  if (isLogo) return "col-span-1 lg:col-span-3 [&_.pv-frame]:aspect-square";
+  if (isPack) {
+    return cn(
+      "col-span-2 lg:col-span-6 [&_.pv-frame]:aspect-video",
+      item.layout === "wide" && "lg:col-span-12"
+    );
+  }
+  // Affiches et autres
+  return cn(
+    "col-span-1 lg:col-span-4 [&_.pv-frame]:aspect-[4/5]",
+    item.layout === "wide" && "col-span-2 lg:col-span-8 [&_.pv-frame]:aspect-video"
   );
 }
 
@@ -196,978 +108,506 @@ export default function NevaDesignPage({
 }: {
   initialPortfolioItems?: NevaDesignPortfolioItem[];
 }) {
-  const [activeFilter, setActiveFilter] = useState("Tout");
-  const [activeNav, setActiveNav] = useState("#top");
-  const [fullscreenItem, setFullscreenItem] = useState<NevaDesignPortfolioItem | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string>("Tout");
+  const [fullscreenItem, setFullscreenItem] = useState<DisplayItem | null>(null);
 
-  const portfolioItems = useMemo(
+  const portfolioItems = useMemo<DisplayItem[]>(
     () =>
       initialPortfolioItems.map((item, index) => ({
         ...item,
-        image_path: item.image_path ?? previewAssets[index % previewAssets.length],
+        displayImage: item.image_path ?? previewAssets[index % previewAssets.length],
       })),
     [initialPortfolioItems]
   );
 
-  const filteredPortfolio = useMemo(
+  const filters = ["Tout", ...PORTFOLIO_CATEGORIES];
+  const filteredItems = useMemo(
     () =>
       activeFilter === "Tout"
         ? portfolioItems
-        : portfolioItems.filter((item) => item.category === activeFilter || item.tag === activeFilter),
-    [activeFilter, portfolioItems]
+        : portfolioItems.filter(
+            (item) => item.category === activeFilter || item.tag === activeFilter
+          ),
+    [portfolioItems, activeFilter]
   );
-  const activeFilterIndex = filters.indexOf(activeFilter);
 
+  // Lightbox : Échap + verrou du scroll
   useEffect(() => {
     if (!fullscreenItem) return;
-
-    function handleKeyDown(event: KeyboardEvent) {
+    function onKey(event: KeyboardEvent) {
       if (event.key === "Escape") setFullscreenItem(null);
     }
-
+    document.addEventListener("keydown", onKey);
+    const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", handleKeyDown);
-
     return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previous;
     };
   }, [fullscreenItem]);
 
+  const isLogoPreview =
+    fullscreenItem?.category === "Logos" || fullscreenItem?.category === "Branding";
+
   return (
-    <div id="top" className="neva-ediz-page">
-      <style>{`
-        .neva-ediz-page {
-          min-height: 100vh;
-          overflow: hidden;
-          background: #000;
-          color: #fff;
-          font-family: var(--font-geist-sans), "DM Sans", sans-serif;
-          position: relative;
-        }
-        .neva-ediz-page::before {
-          content: "";
-          position: fixed;
-          inset: 0;
-          background-image: url("/bglanding.png");
-          background-size: cover;
-          background-position: center;
-          opacity: 0.035;
-          pointer-events: none;
-          z-index: 0;
-        }
-        .neva-noise {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          opacity: 0.055;
-          background-image:
-            radial-gradient(circle at 20% 30%, rgba(255,255,255,0.24) 0 1px, transparent 1px),
-            radial-gradient(circle at 80% 70%, rgba(255,255,255,0.18) 0 1px, transparent 1px);
-          background-size: 28px 28px, 36px 36px;
-        }
-        .neva-top-nav {
-          position: fixed;
-          top: 28px;
-          left: 50%;
-          transform: translateX(-50%);
-          z-index: 50;
-        }
-        .neva-nav-links {
-          display: flex;
-          align-items: center;
-          list-style: none;
-        }
-        .neva-nav-links li {
-          position: relative;
-        }
-        .neva-nav-links li + li::before {
-          content: "";
-          position: absolute;
-          left: 0;
-          top: 50%;
-          height: 12px;
-          width: 1px;
-          transform: translateY(-50%);
-          background: rgba(255,255,255,0.12);
-        }
-        .neva-nav-link {
-          position: relative;
-          display: flex;
-          align-items: center;
-          gap: 7px;
-          padding: 6px 18px;
-          color: rgba(255,255,255,0.35);
-          font-size: 0.82rem;
-          font-weight: 400;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          transition: color 0.25s ease;
-        }
-        .neva-nav-link svg {
-          width: 13px;
-          height: 13px;
-          opacity: 0.6;
-        }
-        .neva-nav-link:hover,
-        .neva-nav-link.active {
-          color: rgba(255,255,255,0.88);
-        }
-        .neva-nav-underline {
-          position: absolute;
-          bottom: -2px;
-          left: 18px;
-          right: 18px;
-          height: 1px;
-          background: rgba(240,182,120,0.7);
-          box-shadow: 0 0 18px rgba(240,182,120,0.34);
-        }
-        .neva-login-fixed {
-          position: fixed;
-          top: 28px;
-          right: 72px;
-          z-index: 50;
-        }
-        .service-rail {
-          position: fixed;
-          top: 50%;
-          right: 46px;
-          z-index: 40;
-          width: 128px;
-          transform: translateY(-50%);
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 18px;
-        }
-        .service-rail-glow {
-          position: absolute;
-          left: -18px;
-          top: -32px;
-          width: 1px;
-          height: 260px;
-          background: linear-gradient(180deg, transparent, rgba(240,182,120,0.75), rgba(255,123,75,0.24), transparent);
-          box-shadow: 0 0 26px rgba(240,182,120,0.28);
-        }
-        .service-rail-title {
-          writing-mode: vertical-rl;
-          transform: rotate(180deg);
-          color: rgba(255,255,255,0.22);
-          font-size: .7rem;
-          letter-spacing: .22em;
-          text-transform: uppercase;
-        }
-        .service-rail-list {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-        .service-rail-item {
-          display: flex;
-          align-items: center;
-          gap: 9px;
-          color: rgba(255,255,255,0.34);
-          font-size: .74rem;
-          letter-spacing: .12em;
-          text-transform: uppercase;
-          transition: color .25s ease, transform .25s ease;
-        }
-        .service-rail-item span {
-          color: rgba(240,182,120,0.55);
-          font-size: .68rem;
-        }
-        .service-rail-item:hover {
-          color: rgba(255,255,255,0.86);
-          transform: translateX(-4px);
-        }
-        .home-section {
-          position: relative;
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-        }
-        .slider-track {
-          position: absolute;
-          top: 50%;
-          left: 0;
-          display: flex;
-          gap: 24px;
-          pointer-events: none;
-          z-index: 2;
-          will-change: transform;
-        }
-        .hero-slide-img {
-          height: 340px;
-          width: auto;
-          border-radius: 12px;
-          opacity: 0.16;
-          object-fit: cover;
-          flex-shrink: 0;
-          -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.7) 8%, black 20%, black 80%, rgba(0,0,0,0.7) 92%, transparent 100%);
-          mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.7) 8%, black 20%, black 80%, rgba(0,0,0,0.7) 92%, transparent 100%);
-        }
-        .slider-fade-left,
-        .slider-fade-right {
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          width: 180px;
-          pointer-events: none;
-          z-index: 3;
-        }
-        .slider-fade-left { left: 0; background: linear-gradient(to right, #000, transparent); }
-        .slider-fade-right { right: 0; background: linear-gradient(to left, #000, transparent); }
-        .glow-left,
-        .glow-right,
-        .glow-center {
-          position: absolute;
-          border-radius: 50%;
-          pointer-events: none;
-          z-index: 4;
-        }
-        .glow-left {
-          bottom: -280px;
-          left: -120px;
-          width: 800px;
-          height: 800px;
-          background: radial-gradient(circle, rgba(255,123,75,.26), rgba(255,123,75,.08) 58%, transparent 76%);
-          filter: blur(72px);
-        }
-        .glow-right {
-          bottom: -260px;
-          right: -120px;
-          width: 860px;
-          height: 860px;
-          background: radial-gradient(circle, rgba(240,182,120,.22), rgba(255,107,125,.08) 56%, transparent 76%);
-          filter: blur(82px);
-        }
-        .glow-center {
-          bottom: -180px;
-          left: 50%;
-          width: 500px;
-          height: 500px;
-          transform: translateX(-50%);
-          background: radial-gradient(circle, rgba(240,182,120,.12), transparent 70%);
-          filter: blur(60px);
-        }
-        .rim {
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          width: 80%;
-          height: 2px;
-          transform: translateX(-50%);
-          background: linear-gradient(90deg, transparent, rgba(255,123,75,.6), rgba(240,182,120,.45), transparent);
-          filter: blur(1px);
-          z-index: 5;
-        }
-        .hero-content {
-          position: relative;
-          z-index: 10;
-          text-align: center;
-          animation: blockIn .9s .25s cubic-bezier(.22,1,.36,1) both;
-        }
-        .hero-kicker {
-          margin-bottom: 18px;
-          color: rgba(240,182,120,0.64);
-          font-size: .72rem;
-          font-weight: 500;
-          letter-spacing: .28em;
-          text-transform: uppercase;
-        }
-        @keyframes blockIn {
-          from { opacity: 0; transform: translateY(40px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .title-line {
-          display: block;
-          font-size: clamp(4.4rem, 10vw, 9.4rem);
-          font-weight: 200;
-          line-height: 0.92;
-          letter-spacing: -0.04em;
-          background: linear-gradient(135deg, rgba(130,130,130,0.62), rgba(255,255,255,0.9) 38%, rgba(240,182,120,0.82) 58%, rgba(110,110,110,0.5));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          filter: drop-shadow(0 0 36px rgba(240,182,120,0.16)) drop-shadow(0 2px 4px rgba(0,0,0,0.65));
-        }
-        .home-subtitle {
-          margin: 18px auto 0;
-          max-width: 620px;
-          font-size: 1rem;
-          font-weight: 300;
-          line-height: 1.8;
-          color: rgba(255,255,255,0.38);
-        }
-        .hero-cta {
-          margin-top: 30px;
-          display: flex;
-          justify-content: center;
-          gap: 18px;
-          flex-wrap: wrap;
-        }
-        .ediz-cta {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          padding: 7px 18px;
-          border-radius: 6px;
-          color: rgba(240,182,120,0.78);
-          font-size: .82rem;
-          letter-spacing: .06em;
-          text-transform: uppercase;
-          transition: color .25s ease, background .25s ease;
-        }
-        .ediz-cta:hover {
-          color: rgba(255,255,255,0.92);
-          background: rgba(255,255,255,0.045);
-        }
-        .hero-proof {
-          margin: 26px auto 0;
-          display: flex;
-          justify-content: center;
-          gap: 10px;
-          flex-wrap: wrap;
-        }
-        .proof-pill {
-          display: inline-flex;
-          align-items: center;
-          min-height: 30px;
-          padding: 0 13px;
-          border: 1px solid rgba(255,255,255,0.07);
-          border-radius: 999px;
-          background: rgba(255,255,255,0.025);
-          color: rgba(255,255,255,0.42);
-          font-size: .72rem;
-          letter-spacing: .08em;
-          text-transform: uppercase;
-          backdrop-filter: blur(14px);
-        }
-        .studio-signal-panel {
-          position: absolute;
-          left: 70px;
-          top: 50%;
-          z-index: 10;
-          transform: translateY(-50%);
-          width: 220px;
-          margin-top: -112px;
-          padding: 18px;
-          border: 1px solid rgba(255,255,255,0.075);
-          border-radius: 18px;
-          background: linear-gradient(145deg, rgba(255,255,255,0.055), rgba(255,255,255,0.018));
-          backdrop-filter: blur(18px);
-          box-shadow: 0 26px 80px rgba(0,0,0,0.32);
-        }
-        .signal-eyebrow {
-          color: rgba(240,182,120,0.62);
-          font-size: .68rem;
-          letter-spacing: .24em;
-          text-transform: uppercase;
-        }
-        .signal-line {
-          height: 1px;
-          margin: 14px 0 10px;
-          background: linear-gradient(90deg, rgba(240,182,120,0.46), rgba(255,255,255,0.06), transparent);
-        }
-        .signal-row {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 13px 0;
-          border-bottom: 1px solid rgba(255,255,255,0.055);
-        }
-        .signal-value {
-          color: rgba(255,255,255,0.84);
-          font-size: 1.25rem;
-          font-weight: 200;
-        }
-        .signal-copy {
-          display: flex;
-          flex-direction: column;
-          min-width: 0;
-        }
-        .signal-label {
-          color: rgba(255,255,255,0.76);
-          font-size: .78rem;
-          letter-spacing: .1em;
-          text-transform: uppercase;
-        }
-        .signal-detail {
-          margin-top: 3px;
-          color: rgba(255,255,255,0.3);
-          font-size: .72rem;
-        }
-        .signal-orbit {
-          display: flex;
-          gap: 10px;
-          padding-top: 15px;
-        }
-        .orbit-logo {
-          width: 34px;
-          height: 34px;
-          display: grid;
-          place-items: center;
-          padding: 6px;
-          border: 1px solid rgba(255,255,255,0.075);
-          border-radius: 50%;
-          background: rgba(255,255,255,0.03);
-        }
-        .logo-marquee-wrapper {
-          position: absolute;
-          bottom: 52px;
-          left: 0;
-          right: 0;
-          z-index: 10;
-          overflow: hidden;
-          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
-          mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
-        }
-        .logo-marquee-track {
-          display: flex;
-          gap: 32px;
-          width: max-content;
-          will-change: transform;
-        }
-        .logo-marquee-item {
-          flex-shrink: 0;
-          width: 72px;
-          height: 72px;
-          padding: 10px;
-          opacity: 0.38;
-          transition: opacity .4s ease, transform .4s ease;
-        }
-        .logo-marquee-item:hover {
-          opacity: 0.95;
-          transform: scale(1.06);
-        }
-        .work-section {
-          position: relative;
-          z-index: 8;
-          min-height: 100vh;
-          padding: 120px 40px;
-        }
-        .section-label {
-          display: block;
-          text-align: center;
-          margin-bottom: 18px;
-          color: rgba(240,182,120,0.6);
-          font-size: .75rem;
-          letter-spacing: .18em;
-          text-transform: uppercase;
-        }
-        .section-title {
-          text-align: center;
-          font-size: clamp(2.2rem,5vw,3.8rem);
-          font-weight: 200;
-          color: rgba(255,255,255,.88);
-          line-height: 1.1;
-        }
-        .filter-bar {
-          margin: 26px auto 38px;
-          display: flex;
-          justify-content: center;
-          gap: 8px;
-          flex-wrap: wrap;
-        }
-        .filter-button {
-          position: relative;
-          overflow: hidden;
-          height: 34px;
-          padding: 0 14px;
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 6px;
-          color: rgba(255,255,255,0.35);
-          font-size: .78rem;
-          transition: color .25s ease, background .25s ease, border-color .25s ease;
-        }
-        .filter-button span {
-          position: relative;
-          z-index: 2;
-        }
-        .filter-active-bg {
-          position: absolute;
-          inset: 0;
-          z-index: 1;
-          border-radius: inherit;
-          background: linear-gradient(135deg, rgba(240,182,120,0.16), rgba(255,123,75,0.07));
-          box-shadow: inset 0 0 0 1px rgba(240,182,120,0.22), 0 0 24px rgba(240,182,120,0.09);
-        }
-        .filter-button.active,
-        .filter-button:hover {
-          color: rgba(255,255,255,0.85);
-          border-color: rgba(240,182,120,0.28);
-          background: rgba(240,182,120,0.06);
-        }
-        .work-grid {
-          max-width: 1160px;
-          margin: 0 auto;
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0,1fr));
-          gap: 18px;
-        }
-        .work-grid.pack-grid {
-          max-width: 980px;
-          grid-template-columns: repeat(2, minmax(0,1fr));
-        }
-        .work-card {
-          position: relative;
-          overflow: hidden;
-          min-height: 300px;
-          aspect-ratio: 1 / 1;
-          border-radius: 14px;
-          background: rgba(15,15,18,0.95);
-          border: 1px solid rgba(255,255,255,0.08);
-          transition: transform .28s ease, border-color .28s ease, box-shadow .28s ease;
-        }
-        .work-card.logo-card {
-          background:
-            radial-gradient(circle at 50% 45%, rgba(240,182,120,0.12), transparent 58%),
-            linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
-        }
-        .work-card.pack-card {
-          aspect-ratio: 16 / 9;
-          min-height: auto;
-        }
-        .work-card.poster-card {
-          aspect-ratio: 4 / 5;
-        }
-        .work-card:hover {
-          transform: translateY(-4px);
-          border-color: rgba(240,182,120,0.22);
-          box-shadow: 0 18px 60px rgba(0,0,0,0.35);
-        }
-        .work-card.tall { grid-row: span 2; aspect-ratio: 1 / 2.04; min-height: 620px; }
-        .work-card.wide { grid-column: span 2; aspect-ratio: 2.05 / 1; }
-        .work-card.logo-card.tall,
-        .work-card.logo-card.wide {
-          aspect-ratio: 1 / 1;
-          grid-column: auto;
-          grid-row: auto;
-          min-height: 300px;
-        }
-        .work-card.pack-card.tall,
-        .work-card.pack-card.wide {
-          aspect-ratio: 16 / 9;
-          grid-column: auto;
-          grid-row: auto;
-          min-height: auto;
-        }
-        .work-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(to top, rgba(0,0,0,0.86), rgba(0,0,0,0.16), transparent);
-        }
-        .work-meta {
-          position: absolute;
-          left: 20px;
-          right: 20px;
-          bottom: 20px;
-        }
-        .work-cat {
-          color: rgba(240,182,120,0.72);
-          font-size: 10px;
-          letter-spacing: .22em;
-          text-transform: uppercase;
-        }
-        .work-title {
-          margin-top: 8px;
-          font-size: 1.45rem;
-          font-weight: 500;
-        }
-        .work-arrow {
-          position: absolute;
-          right: 18px;
-          top: 18px;
-          width: 34px;
-          height: 34px;
-          display: grid;
-          place-items: center;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.06);
-          color: rgba(255,255,255,0.58);
-          opacity: 0;
-          transform: translateY(8px);
-          transition: opacity .25s ease, transform .25s ease;
-          backdrop-filter: blur(12px);
-        }
-        .work-arrow:hover {
-          color: rgba(255,255,255,0.95);
-          background: rgba(240,182,120,0.18);
-        }
-        .work-card:hover .work-arrow {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        .fullscreen-preview {
-          position: fixed;
-          inset: 0;
-          z-index: 120;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 34px;
-          background:
-            radial-gradient(circle at 50% 20%, rgba(240,182,120,0.16), transparent 34%),
-            rgba(0,0,0,0.9);
-          backdrop-filter: blur(20px);
-        }
-        .fullscreen-shell {
-          position: relative;
-          width: min(92vw, 1500px);
-          aspect-ratio: 16 / 9;
-          overflow: hidden;
-          border-radius: 18px;
-          border: 1px solid rgba(255,255,255,0.11);
-          background: rgba(8,8,8,0.92);
-          box-shadow: 0 38px 120px rgba(0,0,0,0.72);
-        }
-        .fullscreen-shell.logo-preview,
-        .fullscreen-shell.poster-preview {
-          width: min(82vw, 1000px);
-          height: min(82vh, 820px);
-          aspect-ratio: auto;
-        }
-        .fullscreen-close {
-          position: fixed;
-          right: 28px;
-          top: 28px;
-          z-index: 122;
-          width: 42px;
-          height: 42px;
-          display: grid;
-          place-items: center;
-          border-radius: 50%;
-          border: 1px solid rgba(255,255,255,0.12);
-          background: rgba(10,10,10,0.68);
-          color: rgba(255,255,255,0.74);
-          backdrop-filter: blur(16px);
-          transition: color .25s ease, background .25s ease, transform .25s ease;
-        }
-        .fullscreen-close:hover {
-          color: #fff;
-          background: rgba(255,255,255,0.08);
-          transform: scale(1.04);
-        }
-        .fullscreen-meta {
-          position: fixed;
-          left: 34px;
-          bottom: 28px;
-          z-index: 122;
-          color: rgba(255,255,255,0.72);
-        }
-        .fullscreen-meta span {
-          display: block;
-          margin-bottom: 6px;
-          color: rgba(240,182,120,0.7);
-          font-size: .7rem;
-          letter-spacing: .18em;
-          text-transform: uppercase;
-        }
-        .fullscreen-meta strong {
-          font-size: .95rem;
-          font-weight: 500;
-        }
-        .services-grid {
-          max-width: 1100px;
-          margin: 44px auto 0;
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0,1fr));
-          gap: 18px;
-        }
-        .service-card {
-          background: rgba(15,15,18,0.95);
-          border-radius: 18px;
-          padding: 30px 24px;
-          border: 1px solid rgba(255,255,255,0.08);
-        }
-        .service-number {
-          display: block;
-          margin-bottom: 28px;
-          color: rgba(240,182,120,0.42);
-          font-size: .74rem;
-          letter-spacing: .18em;
-        }
-        .service-card h3 {
-          font-size: 1.05rem;
-          font-weight: 500;
-          color: rgba(255,255,255,0.86);
-        }
-        .service-card p {
-          margin-top: 10px;
-          color: rgba(255,255,255,0.36);
-          font-size: .88rem;
-          line-height: 1.65;
-        }
-        @media (max-width: 1100px) {
-          .service-rail,
-          .studio-signal-panel {
-            display: none;
-          }
-          .work-grid,
-          .services-grid {
-            grid-template-columns: repeat(2, minmax(0,1fr));
-          }
-        }
-        @media (max-width: 720px) {
-          .neva-top-nav,
-          .neva-login-fixed {
-            display: none;
-          }
-          .home-section {
-            padding: 0 18px;
-          }
-          .hero-slide-img {
-            height: 240px;
-          }
-          .home-subtitle {
-            font-size: .95rem;
-          }
-          .logo-marquee-wrapper {
-            bottom: 28px;
-          }
-          .work-section {
-            padding: 90px 18px;
-          }
-          .work-grid,
-          .services-grid {
-            grid-template-columns: 1fr;
-          }
-          .work-card.wide,
-          .work-card.tall {
-            grid-column: auto;
-            grid-row: auto;
-            min-height: 330px;
-          }
-          .work-card.pack-card,
-          .work-card.pack-card.wide,
-          .work-card.pack-card.tall {
-            grid-column: auto;
-            min-height: auto;
-            aspect-ratio: 16 / 9;
-          }
-        }
-      `}</style>
-
-      <div className="neva-noise" />
-
-      <header className="neva-top-nav">
-        <nav>
-          <ul className="neva-nav-links">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    onClick={() => setActiveNav(item.href)}
-                    className={cn("neva-nav-link", activeNav === item.href && "active")}
-                  >
-                    <Icon />
-                    {item.label}
-                    {activeNav === item.href ? (
-                      <motion.span layoutId="neva-nav-underline" className="neva-nav-underline" />
-                    ) : null}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-      </header>
-
-      <div className="neva-login-fixed">
-        <Link href="#contact" className="neva-nav-link">
-          <MessageCircle />
-          Discord
-        </Link>
-      </div>
-
-      <ServiceRail />
-
-      <main>
-        <section id="home" className="home-section">
-          <HeroSlider />
-          <div className="glow-left" />
-          <div className="glow-right" />
-          <div className="glow-center" />
-          <div className="rim" />
-
-          <StudioSignalPanel />
-
-          <div className="hero-content">
-            <p className="hero-kicker">FiveM creative studio</p>
-            <div className="title-block">
-              <span className="title-line">Neva</span>
-              <span className="title-line">Design</span>
+    <PrismShell>
+      <div id="top" className="relative bg-frost text-ink">
+        {/* ── En-tête — pilule de verre ───────────────────────── */}
+        <header className="fixed inset-x-0 top-0 z-[90] flex flex-col items-center px-4 pt-4 sm:px-6">
+          <nav className="relative flex h-[56px] w-full max-w-[1080px] items-center justify-between rounded-full border border-[color:var(--hairline-glass)] bg-[rgba(248,249,252,0.66)] px-3 pl-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(29,35,64,0.05),0_12px_36px_rgba(29,35,64,0.1)] backdrop-blur-xl">
+            <Brand size={20} tone="ink" sub="Studio graphique" />
+            <div className="hidden items-center gap-7 lg:flex">
+              {NAV_ANCHORS.map((anchor) => (
+                <a
+                  key={anchor.href}
+                  href={anchor.href}
+                  className="text-[13px] text-slate transition-colors duration-300 hover:text-ink"
+                >
+                  {anchor.label}
+                </a>
+              ))}
             </div>
-            <p className="home-subtitle">
-              Identites visuelles, posters et packs GFX pour les serveurs FiveM qui veulent une image nette, rare et memorable.
-            </p>
-            <div className="hero-cta">
-              <Link href="#portfolio" className="ediz-cta" onClick={() => setActiveNav("#portfolio")}>
-                Voir les projets <ArrowUpRight size={14} />
+            <div className="flex items-center gap-4">
+              <Link
+                href="/"
+                className="hidden text-[13px] text-slate transition-colors duration-300 hover:text-ink sm:block"
+              >
+                Le produit
               </Link>
-              <Link href="#contact" className="ediz-cta" onClick={() => setActiveNav("#contact")}>
-                Commander <ArrowUpRight size={14} />
-              </Link>
+              <a href="#contact" className="pv-btn min-h-[38px] px-5 text-[13px]">
+                Commander
+              </a>
             </div>
-            <div className="hero-proof" aria-label="Neva Design proofs">
-              <span className="proof-pill">Branding serveur</span>
-              <span className="proof-pill">Packs launch</span>
-              <span className="proof-pill">Direction premium</span>
-            </div>
-          </div>
-
-          <LogoMarquee inHero />
-        </section>
-
-        <section id="portfolio" className="work-section">
-          <span className="section-label">Portfolio selectionne</span>
-          <h2 className="section-title">Identites recentes</h2>
-
-          {portfolioItems.length > 0 ? (
-            <>
-              <div className="filter-bar" data-active-index={activeFilterIndex}>
-                {filters.map((filter) => (
-                  <button
-                    key={filter}
-                    onClick={() => {
-                      setActiveFilter(filter);
-                      setActiveNav("#portfolio");
-                    }}
-                    className={cn("filter-button", activeFilter === filter && "active")}
-                  >
-                    {activeFilter === filter ? <motion.span layoutId="neva-filter-bg" className="filter-active-bg" /> : null}
-                    <span>{filter}</span>
-                  </button>
-                ))}
-              </div>
-
-              <motion.div layout className={cn("work-grid", activeFilter === "Packs" && "pack-grid")}>
-                <AnimatePresence mode="popLayout">
-                  {filteredPortfolio.map((item) => (
-                    <motion.article
-                      layout
-                      key={`${activeFilter}-${item.id}`}
-                      variants={workCardVariants}
-                      initial="hidden"
-                      animate="visible"
-                      exit="exit"
-                      className={cn(
-                        "work-card group",
-                        item.category === "Logos" && "logo-card",
-                        item.category === "Packs" && "pack-card",
-                        item.category === "Affiches" && "poster-card",
-                        item.category === "Branding" && "logo-card",
-                        item.layout === "tall" && "tall",
-                        item.layout === "wide" && "wide"
-                      )}
-                    >
-                      <WorkImage item={item} />
-                      <div className="work-overlay" />
-                      <button
-                        type="button"
-                        className="work-arrow"
-                        onClick={() => setFullscreenItem(item)}
-                        aria-label={`Ouvrir ${item.title} en plein ecran`}
-                      >
-                        <ArrowUpRight size={15} />
-                      </button>
-                      <div className="work-meta">
-                        <p className="work-cat">{item.category}</p>
-                        <h3 className="work-title">{item.title}</h3>
-                      </div>
-                    </motion.article>
-                  ))}
-                </AnimatePresence>
-              </motion.div>
-            </>
-          ) : null}
-        </section>
-
-        <section id="services" className="work-section">
-          <span className="section-label">Services</span>
-          <h2 className="section-title">Ce que nous produisons</h2>
-          <div className="services-grid">
-            {[
-              ["Branding", "Logo, palette, direction artistique et systeme visuel complet."],
-              ["Posters", "Visuels marketing, annonces Discord et images de lancement."],
-              ["Packs GFX", "Templates, previews, overlays et assets pour votre equipe."],
-              ["Landing", "Pages courtes, sombres et propres pour poser votre image."],
-            ].map(([title, text], index) => (
-              <div key={title} className="service-card">
-                <span className="service-number">{String(index + 1).padStart(2, "0")}</span>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </div>
+          </nav>
+          {/* Ancres mobiles — la nav ne disparaît jamais */}
+          <div className="mt-2 flex w-full max-w-[1080px] items-center justify-center gap-6 overflow-x-auto rounded-full border border-[color:var(--hairline-glass)] bg-[rgba(248,249,252,0.55)] px-5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-lg lg:hidden">
+            {NAV_ANCHORS.map((anchor) => (
+              <a
+                key={anchor.href}
+                href={anchor.href}
+                className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.16em] text-slate"
+              >
+                {anchor.label}
+              </a>
             ))}
           </div>
-        </section>
+        </header>
 
-        <section id="contact" className="work-section">
-          <span className="section-label">Contact</span>
-          <h2 className="section-title">Ready to build your visual identity?</h2>
-          <div className="mt-10 flex justify-center">
-            <a href="https://discord.gg/nevadesign" target="_blank" rel="noopener noreferrer" className="ediz-cta">
-              Commander sur Discord <ArrowUpRight size={14} />
-            </a>
+        {/* ── 01 · Hero — le wordmark dans la scène dawn ──────── */}
+        <section className="pv-scene">
+          <div aria-hidden className="pv-scene-bg pv-scene-bg--dawn" />
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              maskImage:
+                "linear-gradient(180deg, black 0%, black 55%, transparent 88%)",
+              WebkitMaskImage:
+                "linear-gradient(180deg, black 0%, black 55%, transparent 88%)",
+            }}
+          >
+            <SilverSilk variant="hero" className="opacity-80" />
+          </div>
+          <div aria-hidden className="pv-windowlight" />
+          <div aria-hidden className="pv-caustics" />
+
+          {/* Le premier écran, serti dans le cadre éditorial */}
+          <div className="relative flex min-h-[100svh] flex-col pt-[120px]">
+            {/* Cadre — filets blancs, la page comme objet imprimé */}
+            <div
+              aria-hidden
+              className="pv-fade-up pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.68)] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_2px_6px_rgba(96,84,140,0.07),0_30px_80px_rgba(96,84,140,0.13)]"
+              style={{
+                inset: "var(--frame-inset)",
+                background:
+                  "radial-gradient(115% 115% at 50% 50%, rgba(255,255,255,0) 72%, rgba(255,255,255,0.1) 100%)",
+                animationDelay: "0.2s",
+              }}
+            />
+
+            <div className="absolute left-[6%] top-[20%] hidden lg:block">
+              <GlassLens size={130} floatY={-10} floatDur={9} groundShadow={false} />
+            </div>
+
+            <div className="relative mx-auto flex w-full max-w-[1200px] flex-1 flex-col items-center justify-center px-5 text-center sm:px-8">
+              <RevealBlock className="mb-8">
+                <span className="inline-flex min-h-[32px] items-center gap-2.5 rounded-full border border-[color:var(--hairline-glass)] bg-[rgba(255,255,255,0.6)] px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(29,35,64,0.05),0_10px_24px_rgba(29,35,64,0.06)]">
+                  <span className="pv-breathe h-[5px] w-[5px] rounded-full bg-periwinkle" />
+                  <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
+                    Studio graphique · FiveM & GTA RP
+                  </span>
+                </span>
+              </RevealBlock>
+              <RevealBlock delay={0.1}>
+                <h1 className="pv-display text-[clamp(3.4rem,12vw,10rem)] leading-[0.98]">
+                  Neva <span className="pv-display-strong">Design</span>
+                </h1>
+              </RevealBlock>
+              <RevealBlock delay={0.22}>
+                <p className="mx-auto mt-7 max-w-xl text-[15px] leading-[1.75] text-slate sm:text-[16px]">
+                  Identités visuelles, affiches et packs GFX pour les serveurs qui
+                  veulent une image nette, rare et mémorable.
+                </p>
+              </RevealBlock>
+              <RevealBlock
+                delay={0.34}
+                className="mt-10 flex flex-wrap items-center justify-center gap-4"
+              >
+                <a href="#portfolio" className="pv-btn">
+                  Voir les projets
+                </a>
+                <a href="#contact" className="pv-btn pv-btn--ghost">
+                  Commander
+                  <ArrowRight size={15} />
+                </a>
+              </RevealBlock>
+            </div>
+
+            {/* Pagination — le folio de la page imprimée */}
+            <div
+              className="pv-page-num absolute hidden lg:flex"
+              style={{
+                left: "calc(var(--frame-inset) + 28px)",
+                bottom: "calc(var(--frame-inset) + 22px)",
+              }}
+            >
+              <b>01</b>
+              <span>/04</span>
+            </div>
+          </div>
+
+          {/* Fleuve de créations — serti de deux filets blancs */}
+          <RevealBlock delay={0.3} className="relative mt-4">
+            <div aria-hidden className="h-px w-full bg-[rgba(255,255,255,0.55)]" />
+            <CreationsMarquee duration={58} />
+            <div aria-hidden className="h-px w-full bg-[rgba(255,255,255,0.55)]" />
+          </RevealBlock>
+
+          {/* Logos clients — encre noire sur la brume */}
+          <div className="relative py-5">
+            <div
+              className="overflow-hidden"
+              style={{
+                maskImage:
+                  "linear-gradient(90deg, transparent 0%, black 12%, black 88%, transparent 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(90deg, transparent 0%, black 12%, black 88%, transparent 100%)",
+              }}
+            >
+              <div
+                className="pv-marquee"
+                style={{ "--marquee-duration": "44s" } as React.CSSProperties}
+              >
+                {[false, true].map((hidden) => (
+                  <div
+                    key={hidden ? "b" : "a"}
+                    aria-hidden={hidden}
+                    className="flex shrink-0 items-center gap-14 pr-14"
+                  >
+                    {CLIENT_LOGOS.map((logo) => (
+                      <span
+                        key={`${logo.src}-${hidden ? "b" : "a"}`}
+                        className="flex h-9 w-24 items-center justify-center"
+                      >
+                        <Image
+                          src={logo.src}
+                          alt={hidden ? "" : logo.alt}
+                          width={96}
+                          height={36}
+                          className="max-h-9 w-auto object-contain opacity-40 [filter:brightness(0)] transition-opacity duration-300 hover:opacity-70"
+                        />
+                      </span>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
-      </main>
 
-      <AnimatePresence>
-        {fullscreenItem ? (
-          <motion.div
-            className="fullscreen-preview"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.22 }}
-            onClick={() => setFullscreenItem(null)}
-          >
-            <button
-              type="button"
-              className="fullscreen-close"
-              onClick={() => setFullscreenItem(null)}
-              aria-label="Fermer l'aperçu plein écran"
-            >
-              <X size={18} />
-            </button>
-            <motion.div
-              className={cn(
-                "fullscreen-shell",
-                fullscreenItem.category === "Logos" && "logo-preview",
-                fullscreenItem.category === "Branding" && "logo-preview",
-                fullscreenItem.category === "Affiches" && "poster-preview"
-              )}
-              initial={{ opacity: 0, scale: 0.96, y: 18 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.97, y: 12 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              onClick={(event) => event.stopPropagation()}
-            >
-              <Image
-                src={fullscreenItem.image_path || previewAssets[0]}
-                alt={fullscreenItem.title}
-                fill
-                sizes="100vw"
-                className={cn(
-                  fullscreenItem.category === "Packs" || fullscreenItem.category === "Affiches"
-                    ? "object-contain"
-                    : "object-contain p-8"
-                )}
-                priority
-              />
-            </motion.div>
-            <div className="fullscreen-meta">
-              <span>{fullscreenItem.category}</span>
-              <strong>{fullscreenItem.title}</strong>
+        {/* ── 02 · Portfolio — la grille sur la brume calme ───── */}
+        {portfolioItems.length > 0 ? (
+          <section id="portfolio" className="pv-scene">
+            <div aria-hidden className="pv-scene-bg pv-scene-bg--dawn-calm" />
+            <div aria-hidden className="pv-caustics" />
+            <div className="relative mx-auto max-w-[1200px] px-5 pb-28 pt-28 sm:px-8 lg:pb-36 lg:pt-32">
+              <div className="flex flex-wrap items-end justify-between gap-10">
+                <RevealBlock>
+                  <div className="pv-page-num [&>b]:text-[52px]">
+                    <b>02</b>
+                    <span>/04</span>
+                  </div>
+                  <p className="mt-6 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
+                    Portfolio sélectionné
+                  </p>
+                  <h2 className="mt-4 font-display text-[clamp(2rem,4.6vw,3.4rem)] font-light leading-[1.08] tracking-[-0.015em] text-slate">
+                    Chaque serveur,{" "}
+                    <span className="font-medium text-ink">une signature.</span>
+                  </h2>
+                </RevealBlock>
+                {/* Filtres — pilules translucides, l'actif porte l'encre */}
+                <RevealBlock delay={0.15} className="flex flex-wrap items-center gap-2 pb-2">
+                  {filters.map((filter) => (
+                    <button
+                      key={filter}
+                      onClick={() => setActiveFilter(filter)}
+                      className={cn(
+                        "cursor-pointer rounded-full border px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] transition-all duration-300",
+                        activeFilter === filter
+                          ? "border-transparent bg-ink text-white shadow-[0_1px_2px_rgba(29,35,64,0.18),0_8px_20px_rgba(29,35,64,0.2)]"
+                          : "border-[color:var(--hairline-glass)] bg-[rgba(255,255,255,0.6)] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] hover:bg-white/80 hover:text-ink"
+                      )}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </RevealBlock>
+              </div>
+
+              {/* Grille — les œuvres, seule vraie couleur de la page */}
+              <div className="mt-14 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-12 lg:gap-6">
+                {filteredItems.map((item) => {
+                  const isLogo = item.category === "Logos" || item.category === "Branding";
+                  return (
+                    <figure key={item.id} className={cn("group", frameClasses(item))}>
+                      <button
+                        type="button"
+                        onClick={() => setFullscreenItem(item)}
+                        aria-label={`Ouvrir ${item.title} en plein écran`}
+                        className="block w-full cursor-pointer text-left"
+                      >
+                        <span
+                          className={cn(
+                            "pv-frame pv-print pv-shadow-mauve relative block w-full overflow-hidden !rounded-[16px]",
+                            isLogo && "!bg-[rgba(255,255,255,0.66)]"
+                          )}
+                        >
+                          <Image
+                            src={item.displayImage}
+                            alt={item.title}
+                            fill
+                            sizes="(max-width: 1024px) 50vw, 30vw"
+                            className={cn(
+                              "transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]",
+                              isLogo ? "object-contain p-7" : "object-cover"
+                            )}
+                          />
+                          <span
+                            aria-hidden
+                            className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(255,255,255,0.7)] bg-[rgba(255,255,255,0.85)] opacity-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_2px_6px_rgba(29,35,64,0.12)] transition-opacity duration-300 group-hover:opacity-100"
+                          >
+                            <ArrowUpRight size={14} className="text-ink" />
+                          </span>
+                        </span>
+                      </button>
+                      <figcaption className="mt-3 flex items-baseline justify-between gap-3">
+                        <span className="truncate text-[13px] text-slate transition-colors duration-300 group-hover:text-ink">
+                          {item.title}
+                        </span>
+                        <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.16em] text-mist">
+                          {item.category}
+                        </span>
+                      </figcaption>
+                    </figure>
+                  );
+                })}
+              </div>
             </div>
-          </motion.div>
+          </section>
         ) : null}
-      </AnimatePresence>
-    </div>
+
+        {/* ── 03 · Services — tirages posés sur le glacier ────── */}
+        <section id="services" className="pv-scene">
+          <div aria-hidden className="pv-scene-bg pv-scene-bg--glacier" />
+          <div aria-hidden className="pv-caustics" />
+          <div className="relative mx-auto max-w-[1200px] px-5 pb-28 pt-28 sm:px-8 lg:pb-32 lg:pt-32">
+            <div className="flex flex-wrap items-end justify-between gap-10">
+              <RevealBlock>
+                <p className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
+                  Services
+                </p>
+                <h2 className="mt-4 font-display text-[clamp(2rem,4.6vw,3.4rem)] font-light leading-[1.08] tracking-[-0.015em] text-slate">
+                  Quatre métiers,{" "}
+                  <span className="font-medium text-ink">une exigence.</span>
+                </h2>
+              </RevealBlock>
+              {/* Pagination à droite — miroir du portfolio */}
+              <RevealBlock delay={0.1}>
+                <div className="pv-page-num [&>b]:text-[52px]">
+                  <b>03</b>
+                  <span>/04</span>
+                </div>
+              </RevealBlock>
+            </div>
+            <div className="mt-14 grid gap-x-5 gap-y-10 lg:grid-cols-12">
+              {SERVICES.map((service, index) => {
+                const wide = service.span === "lg:col-span-7";
+                return (
+                  <RevealBlock
+                    key={service.title}
+                    delay={(index % 2) * 0.08}
+                    className={service.span}
+                  >
+                    <a href="#contact" className="group block">
+                      {/* L'œuvre plein cadre — plus aucun voile d'encre */}
+                      <span
+                        className={cn(
+                          "pv-print pv-shadow-mauve relative block w-full overflow-hidden",
+                          wide ? "aspect-video" : "aspect-[4/3]"
+                        )}
+                      >
+                        <Image
+                          src={service.image}
+                          alt=""
+                          fill
+                          sizes="(max-width: 1024px) 90vw, 45vw"
+                          className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+                        />
+                      </span>
+                      {/* La légende respire sur la scène */}
+                      <span className="mt-4 flex items-start justify-between gap-4">
+                        <span className="block">
+                          <span className="block text-[17px] font-medium tracking-[-0.01em] text-ink">
+                            {service.title}
+                          </span>
+                          <span className="mt-1.5 block max-w-md text-[13.5px] leading-[1.65] text-slate">
+                            {service.description}
+                          </span>
+                        </span>
+                        <ArrowUpRight
+                          size={17}
+                          className="mt-1 shrink-0 text-mist transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink"
+                        />
+                      </span>
+                    </a>
+                  </RevealBlock>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* ── 04 · Contact — la finale, scène dawn rendue au calme ── */}
+        <section id="contact" className="pv-scene">
+          <div aria-hidden className="pv-scene-bg pv-scene-bg--dawn" />
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-80"
+            style={{
+              maskImage:
+                "radial-gradient(88% 76% at 50% 54%, black 40%, transparent 100%)",
+              WebkitMaskImage:
+                "radial-gradient(88% 76% at 50% 54%, black 40%, transparent 100%)",
+            }}
+          >
+            <SilverSilk variant="finale" />
+          </div>
+          <div aria-hidden className="pv-windowlight opacity-60" />
+          <div aria-hidden className="pv-caustics" />
+          <hr className="pv-rule--beam relative" />
+
+          <div className="relative mx-auto max-w-[1200px] px-5 py-32 text-center sm:px-8 lg:py-44">
+            <RevealBlock>
+              <div className="flex justify-center">
+                <div className="pv-page-num [&>b]:text-[52px]">
+                  <b>04</b>
+                  <span>/04</span>
+                </div>
+              </div>
+              <p className="mt-6 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
+                Contact
+              </p>
+              <h2 className="mx-auto mt-5 max-w-4xl font-display text-[clamp(2.2rem,5.6vw,4.6rem)] font-light leading-[1.08] tracking-[-0.015em] text-slate">
+                Votre image mérite{" "}
+                <span className="font-medium text-ink">un studio.</span>
+              </h2>
+            </RevealBlock>
+            <RevealBlock delay={0.15}>
+              <p className="mx-auto mt-7 max-w-md text-[15px] leading-[1.75] text-slate">
+                La commande et le suivi se font sur Discord : décrivez votre
+                serveur, le studio s’occupe du reste.
+              </p>
+            </RevealBlock>
+            <RevealBlock delay={0.28} className="mt-11">
+              <a
+                href={DISCORD_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pv-btn"
+              >
+                Commander sur Discord
+                <ArrowUpRight size={16} />
+              </a>
+            </RevealBlock>
+          </div>
+
+          {/* Bas de page — un filet blanc sur la scène */}
+          <div className="relative border-t border-[rgba(255,255,255,0.55)]">
+            <div className="mx-auto flex max-w-[1200px] flex-col items-start justify-between gap-4 px-5 py-7 sm:flex-row sm:items-center sm:px-8">
+              <Brand size={18} tone="ink" />
+              <p className="font-mono text-[11px] tracking-[0.1em] text-mist">
+                © {new Date().getFullYear()} Neva Design · Tous droits réservés.
+              </p>
+              <Link href="/" className="pv-link inline-flex items-center gap-2 text-[13px]">
+                Découvrir le produit Neva Design
+                <ArrowRight size={14} className="text-[color:var(--num-color)]" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Lightbox — la salle de projection reste sombre ──── */}
+        {fullscreenItem ? (
+          <div
+            className="pv-dark-island fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8"
+            role="dialog"
+            aria-modal="true"
+            aria-label={fullscreenItem.title}
+          >
+            <div
+              className="absolute inset-0 bg-[rgba(12,14,28,0.9)] backdrop-blur-md"
+              onClick={() => setFullscreenItem(null)}
+              aria-hidden
+            />
+            <div className="pv-scale-in relative w-full max-w-5xl">
+              <button
+                onClick={() => setFullscreenItem(null)}
+                aria-label="Fermer l'aperçu plein écran"
+                className="absolute -top-12 right-0 cursor-pointer rounded-full p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                <X size={20} />
+              </button>
+              <div
+                className={cn(
+                  "pv-edge relative overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.12)] bg-abyss shadow-[0_6px_14px_rgba(0,0,0,0.4),0_52px_120px_rgba(0,0,0,0.6)]",
+                  isLogoPreview ? "aspect-square sm:aspect-[4/3]" : "aspect-video"
+                )}
+              >
+                <Image
+                  src={fullscreenItem.displayImage}
+                  alt={fullscreenItem.title}
+                  fill
+                  sizes="90vw"
+                  className={cn("object-contain", isLogoPreview && "p-10")}
+                />
+              </div>
+              <div className="mt-4 flex items-baseline justify-between gap-4">
+                <p className="text-lg font-medium tracking-[-0.01em] text-white">
+                  {fullscreenItem.title}
+                </p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[color:var(--num-color)]">
+                  {fullscreenItem.category}
+                </p>
+              </div>
+              {fullscreenItem.description ? (
+                <p className="mt-1 max-w-xl text-sm text-[color:var(--text-2)]">
+                  {fullscreenItem.description}
+                </p>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </PrismShell>
   );
 }

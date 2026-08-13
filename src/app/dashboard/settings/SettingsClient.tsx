@@ -1,16 +1,24 @@
 "use client"
 import { useState, useRef } from "react"
-import { User, Bell, Shield, Palette, Upload, Check, Loader2, AlertCircle } from "lucide-react"
+import { Loader2, Upload } from "lucide-react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import { FormMessage, Input, Label, Textarea } from "@/components/ui/field"
+import { Switch } from "@/components/ui/switch"
 import { createClient } from "@/lib/supabase/client"
 import { readApiResponse } from "@/lib/api/client"
-import Image from "next/image"
+
+/*
+ * Paramètres — navigation d'onglets en filets, panneaux éditoriaux.
+ * Toute la mécanique (profil, avatar, notifications avec miroir
+ * localStorage, mot de passe Supabase) est conservée à l'identique.
+ */
 
 const tabs = [
-  { id: "profile",       label: "Profil",        icon: User },
-  { id: "notifications", label: "Notifications",  icon: Bell },
-  { id: "security",      label: "Sécurité",       icon: Shield },
-  { id: "appearance",    label: "Apparence",      icon: Palette },
+  { id: "profile", label: "Profil" },
+  { id: "notifications", label: "Notifications" },
+  { id: "security", label: "Sécurité" },
+  { id: "appearance", label: "Apparence" },
 ]
 
 interface Props {
@@ -24,31 +32,12 @@ interface Props {
 
 type Status = { type: 'success' | 'error'; message: string } | null
 
-function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <button
-      type="button"
-      onClick={() => onChange(!checked)}
-      className={`relative w-9 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${checked ? "bg-[#FF7B4B]" : "bg-white/10"}`}
-    >
-      <span
-        className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform duration-200 ${checked ? "translate-x-4" : "translate-x-0"}`}
-      />
-    </button>
-  )
-}
-
-function StatusMsg({ status }: { status: Status }) {
+function StatusMessage({ status }: { status: Status }) {
   if (!status) return null
   return (
-    <div className={`flex items-center gap-2 text-xs px-3 py-2 rounded-lg ${
-      status.type === 'success'
-        ? 'bg-[#4ADE80]/10 border border-[#4ADE80]/20 text-[#4ADE80]'
-        : 'bg-red-500/10 border border-red-500/20 text-red-400'
-    }`}>
-      {status.type === 'success' ? <Check size={11} /> : <AlertCircle size={11} />}
+    <FormMessage tone={status.type === 'success' ? 'success' : 'error'} className="mt-6">
       {status.message}
-    </div>
+    </FormMessage>
   )
 }
 
@@ -86,7 +75,7 @@ export default function SettingsClient({
 
   const initials = (displayName || email).charAt(0).toUpperCase()
 
-  // ── Profile ──────────────────────────────────────────────────────────────────
+  // ── Profil ────────────────────────────────────────────────────────────────────
 
   const saveProfile = async () => {
     setProfileSaving(true)
@@ -98,7 +87,7 @@ export default function SettingsClient({
         body: JSON.stringify({ display_name: displayName, discord_handle: discordHandle, bio }),
       })
       await readApiResponse<{ ok: boolean }>(res)
-      setProfileStatus({ type: 'success', message: 'Profil sauvegardé !' })
+      setProfileStatus({ type: 'success', message: 'Profil enregistré.' })
     } catch (e: unknown) {
       setProfileStatus({ type: 'error', message: (e as Error).message ?? 'Erreur' })
     } finally {
@@ -115,9 +104,9 @@ export default function SettingsClient({
       const res = await fetch('/api/profile/avatar', { method: 'POST', body: form })
       const data = await readApiResponse<{ url: string }>(res)
       setAvatarUrl(data.url)
-      setProfileStatus({ type: 'success', message: 'Photo de profil mise à jour !' })
+      setProfileStatus({ type: 'success', message: 'Photo de profil mise à jour.' })
     } catch (e: unknown) {
-      setProfileStatus({ type: 'error', message: (e as Error).message ?? 'Erreur upload' })
+      setProfileStatus({ type: 'error', message: (e as Error).message ?? 'Erreur de téléversement' })
     } finally {
       setAvatarUploading(false)
     }
@@ -137,7 +126,7 @@ export default function SettingsClient({
       if (Notification.permission === 'denied') {
         setNotifStatus({
           type: 'error',
-          message: 'Notifications bloquées — autorise-les dans les paramètres du navigateur.',
+          message: 'Notifications bloquées — autorisez-les dans les paramètres de votre navigateur.',
         })
         return
       }
@@ -157,10 +146,10 @@ export default function SettingsClient({
         body: JSON.stringify({ notification_prefs: prefs }),
       })
       await readApiResponse<{ ok: boolean }>(res)
-      // Mirror to localStorage so DesignPageClient reads them instantly
+      // Miroir localStorage : DesignPageClient lit ces clés instantanément
       localStorage.setItem('neva_notif_sound', notifSound ? 'true' : 'false')
       localStorage.setItem('neva_notif_browser', notifBrowser ? 'true' : 'false')
-      setNotifStatus({ type: 'success', message: 'Préférences sauvegardées !' })
+      setNotifStatus({ type: 'success', message: 'Préférences enregistrées.' })
     } catch (e: unknown) {
       setNotifStatus({ type: 'error', message: (e as Error).message ?? 'Erreur' })
     } finally {
@@ -168,7 +157,7 @@ export default function SettingsClient({
     }
   }
 
-  // ── Security ──────────────────────────────────────────────────────────────────
+  // ── Sécurité ──────────────────────────────────────────────────────────────────
 
   const changePassword = async () => {
     if (!newPassword) return
@@ -188,7 +177,7 @@ export default function SettingsClient({
       if (error) throw new Error(error.message)
       setNewPassword('')
       setConfirmPassword('')
-      setSecStatus({ type: 'success', message: 'Mot de passe mis à jour !' })
+      setSecStatus({ type: 'success', message: 'Mot de passe mis à jour.' })
     } catch (e: unknown) {
       setSecStatus({ type: 'error', message: (e as Error).message ?? 'Erreur' })
     } finally {
@@ -196,295 +185,321 @@ export default function SettingsClient({
     }
   }
 
-  // ── Render ────────────────────────────────────────────────────────────────────
+  // ── Rendu ─────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-3xl">
-      <div className="mb-10">
-        <h1 className="text-2xl font-bold text-[#F5F0E8] mb-1">Paramètres</h1>
-        <p className="text-sm text-[#666]">Gère ton compte et tes préférences.</p>
-      </div>
+    <div className="relative mx-auto w-full max-w-[1440px] flex-1 px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
+      <div
+        aria-hidden
+        className="pv-halo--violet pv-halo right-[-10%] top-[-8%] h-[440px] w-[500px]"
+        style={{ opacity: 0.5 }}
+      />
 
-      <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
-        {/* Tab list */}
-        <div className="flex sm:flex-col gap-1 sm:w-44 sm:flex-shrink-0 overflow-x-auto sm:overflow-x-visible pb-1 sm:pb-0 border-b sm:border-b-0 border-white/[0.06]">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left whitespace-nowrap ${
-                activeTab === tab.id
-                  ? "bg-white/[0.07] text-[#F5F0E8] font-medium"
-                  : "text-[#666] hover:text-[#CCCCC0] hover:bg-white/[0.04]"
-              }`}
-            >
-              <tab.icon size={14} />
-              {tab.label}
-            </button>
-          ))}
+      <div className="relative w-full max-w-3xl">
+        {/* ── En-tête ───────────────────────────────────────────── */}
+        <p className="pv-label text-[color:var(--num-color)]">Compte</p>
+        <h1 className="pv-display mt-4 text-[clamp(2rem,4vw,2.8rem)] text-ink">Paramètres</h1>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-steel">
+          Gérez votre profil, vos préférences et la sécurité de votre compte.
+        </p>
+
+        {/* ── Navigation d'onglets en filets ────────────────────── */}
+        <div
+          role="tablist"
+          aria-label="Sections des paramètres"
+          className="mt-9 flex gap-1 overflow-x-auto border-b border-[color:var(--hairline)]"
+        >
+          {tabs.map((tab, index) => {
+            const active = activeTab === tab.id
+            return (
+              <button
+                key={tab.id}
+                role="tab"
+                aria-selected={active}
+                onClick={() => setActiveTab(tab.id)}
+                className={`-mb-px flex min-h-[44px] items-baseline gap-2 whitespace-nowrap border-b-2 px-3 py-3 text-[13px] transition-colors duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] ${
+                  active
+                    ? "border-violet font-medium text-ink"
+                    : "border-transparent text-steel hover:text-ink/80"
+                }`}
+              >
+                <span
+                  className={`font-mono text-[10px] tracking-[0.12em] ${
+                    active ? "text-[color:var(--num-color)]" : "text-ink/25"
+                  }`}
+                >
+                  0{index + 1}
+                </span>
+                {tab.label}
+              </button>
+            )
+          })}
         </div>
 
-        {/* Tab panels */}
-        <div className="flex-1 min-w-0">
-
-          {/* ── PROFIL ── */}
-          {activeTab === "profile" && (
-            <div className="flex flex-col gap-6">
-              {/* Avatar upload */}
-              <div className="glass-card rounded-2xl p-6 border border-white/[0.06]">
-                <h3 className="text-sm font-semibold text-[#F5F0E8] mb-4">Photo de profil</h3>
-                <div className="flex items-center gap-4">
-                  <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-                    {avatarUrl ? (
-                      <Image src={avatarUrl} alt="avatar" fill sizes="64px" className="object-cover" />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-[#FF6B7D] to-[#FFD166] flex items-center justify-center text-2xl font-bold text-white">
-                        {initials}
-                      </div>
-                    )}
-                    {avatarUploading && (
-                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center rounded-full">
-                        <Loader2 size={16} className="animate-spin text-white" />
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={avatarUploading}
-                    >
-                      <Upload size={12} className="mr-1.5" />
-                      {avatarUploading ? 'Upload...' : 'Upload Photo'}
-                    </Button>
-                    <p className="text-xs text-[#555] mt-1.5">JPG, PNG ou WebP — max 4 Mo</p>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0]
-                        if (file) uploadAvatar(file)
-                        e.target.value = ''
-                      }}
-                    />
-                  </div>
+        {/* ── PROFIL ────────────────────────────────────────────── */}
+        {activeTab === "profile" && (
+          <div className="pt-9">
+            {/* Photo de profil */}
+            <section className="border-b border-[color:var(--hairline)] pb-9">
+              <h2 className="pv-label mb-6">Photo de profil</h2>
+              <div className="flex items-center gap-5">
+                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-[color:var(--hairline-strong)] bg-white">
+                  {avatarUrl ? (
+                    <Image src={avatarUrl} alt="Photo de profil" fill sizes="64px" className="object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-[rgba(124,106,255,0.08)]">
+                      <span className="pv-display text-2xl text-[color:var(--num-color)]">{initials}</span>
+                    </div>
+                  )}
+                  {avatarUploading && (
+                    <div className="absolute inset-0 flex items-center justify-center rounded-full bg-ink/60">
+                      <Loader2 size={16} className="animate-spin text-[color:var(--num-color)]" />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <Button
+                    variant="secondary"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={avatarUploading}
+                  >
+                    <Upload size={13} />
+                    {avatarUploading ? 'Téléversement…' : 'Téléverser une photo'}
+                  </Button>
+                  <p className="mt-2 font-mono text-[10px] tracking-[0.08em] text-dusk">
+                    JPG, PNG ou WebP — 4 Mo max
+                  </p>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) uploadAvatar(file)
+                      e.target.value = ''
+                    }}
+                  />
                 </div>
               </div>
+            </section>
 
-              {/* Profile fields */}
-              <div className="glass-card rounded-2xl p-6 border border-white/[0.06]">
-                <h3 className="text-sm font-semibold text-[#F5F0E8] mb-5">Informations</h3>
-                <div className="flex flex-col gap-4">
+            {/* Informations */}
+            <section className="pt-9">
+              <h2 className="pv-label mb-6">Informations</h2>
+              <div className="flex flex-col gap-5">
+                <div className="grid gap-5 sm:grid-cols-2">
                   <div>
-                    <label className="block text-xs font-medium text-[#9A9A9A] mb-1.5">
-                      {"Nom d'affichage"}
-                    </label>
-                    <input
+                    <Label htmlFor="display-name">Nom d&apos;affichage</Label>
+                    <Input
+                      id="display-name"
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
-                      placeholder="Ton nom"
+                      placeholder="Votre nom"
                       maxLength={100}
-                      className="w-full px-3.5 py-2.5 bg-white/5 border border-white/[0.08] rounded-xl text-sm text-[#F5F0E8] placeholder-[#444] outline-none focus:border-[#FF7B4B]/40 transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-[#9A9A9A] mb-1.5">Email</label>
-                    <input
+                    <Label htmlFor="settings-email">Adresse e-mail</Label>
+                    <Input
+                      id="settings-email"
                       value={email}
                       readOnly
-                      className="w-full px-3.5 py-2.5 bg-white/[0.02] border border-white/[0.05] rounded-xl text-sm text-[#555] outline-none cursor-default select-all"
+                      className="cursor-default select-all text-steel"
                     />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-[#9A9A9A] mb-1.5">Discord</label>
-                    <input
-                      value={discordHandle}
-                      onChange={(e) => setDiscordHandle(e.target.value)}
-                      placeholder="@username ou user#0001"
-                      maxLength={50}
-                      className="w-full px-3.5 py-2.5 bg-white/5 border border-white/[0.08] rounded-xl text-sm text-[#F5F0E8] placeholder-[#444] outline-none focus:border-[#FF7B4B]/40 transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-[#9A9A9A] mb-1.5">Bio</label>
-                    <textarea
-                      rows={3}
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      placeholder="Parle-nous de tes projets FiveM..."
-                      maxLength={500}
-                      className="w-full px-3.5 py-2.5 bg-white/5 border border-white/[0.08] rounded-xl text-sm text-[#F5F0E8] placeholder-[#444] outline-none focus:border-[#FF7B4B]/40 transition-colors resize-none"
-                    />
-                    <div className="text-right text-[10px] text-[#333] mt-1">{bio.length}/500</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 justify-between mt-5 flex-wrap">
-                  <StatusMsg status={profileStatus} />
-                  <Button
-                    variant="gradient"
-                    size="sm"
-                    onClick={saveProfile}
-                    disabled={profileSaving}
-                    className="ml-auto"
-                  >
-                    {profileSaving ? (
-                      <><Loader2 size={11} className="animate-spin mr-1.5" />Sauvegarde...</>
-                    ) : (
-                      'Sauvegarder'
-                    )}
-                  </Button>
+                <div>
+                  <Label htmlFor="discord-handle">Discord</Label>
+                  <Input
+                    id="discord-handle"
+                    value={discordHandle}
+                    onChange={(e) => setDiscordHandle(e.target.value)}
+                    placeholder="@pseudo ou pseudo#0001"
+                    maxLength={50}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="settings-bio">Bio</Label>
+                  <Textarea
+                    id="settings-bio"
+                    rows={3}
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="Parlez-nous de vos projets FiveM…"
+                    maxLength={500}
+                  />
+                  <p className="mt-1.5 text-right font-mono text-[10px] tracking-[0.08em] text-dusk">
+                    {bio.length}/500
+                  </p>
                 </div>
               </div>
-            </div>
-          )}
 
-          {/* ── NOTIFICATIONS ── */}
-          {activeTab === "notifications" && (
-            <div className="glass-card rounded-2xl p-6 border border-white/[0.06]">
-              <h3 className="text-sm font-semibold text-[#F5F0E8] mb-2">Notifications Neva Design</h3>
-              <p className="text-xs text-[#555] mb-5 leading-relaxed">
-                {"Reçois une alerte quand ton image est prête — même si tu es sur un autre onglet."}
-              </p>
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center justify-between py-3.5 border-b border-white/[0.04]">
-                  <div>
-                    <div className="text-sm font-medium text-[#CCCCC0]">Son de notification</div>
-                    <div className="text-xs text-[#555] mt-0.5">{"Joue un son quand l'image est prête"}</div>
-                  </div>
-                  <Toggle checked={notifSound} onChange={setNotifSound} />
-                </div>
-                <div className="flex items-center justify-between py-3.5">
-                  <div>
-                    <div className="text-sm font-medium text-[#CCCCC0]">Notification navigateur</div>
-                    <div className="text-xs text-[#555] mt-0.5">Alerte visible sur un autre onglet</div>
-                  </div>
-                  <Toggle checked={notifBrowser} onChange={handleBrowserNotifToggle} />
-                </div>
-              </div>
-              <div className="flex items-center gap-3 justify-between mt-5 flex-wrap">
-                <StatusMsg status={notifStatus} />
-                <Button
-                  variant="gradient"
-                  size="sm"
-                  onClick={saveNotifications}
-                  disabled={notifSaving}
-                  className="ml-auto"
-                >
-                  {notifSaving ? (
-                    <><Loader2 size={11} className="animate-spin mr-1.5" />Sauvegarde...</>
+              <StatusMessage status={profileStatus} />
+              <div className="mt-6 flex justify-end">
+                <Button onClick={saveProfile} disabled={profileSaving}>
+                  {profileSaving ? (
+                    <><Loader2 size={13} className="animate-spin" />Enregistrement…</>
                   ) : (
-                    'Sauvegarder'
+                    'Enregistrer les modifications'
                   )}
                 </Button>
               </div>
-            </div>
-          )}
+            </section>
+          </div>
+        )}
 
-          {/* ── SECURITE ── */}
-          {activeTab === "security" && (
-            <div className="flex flex-col gap-4">
-              <div className="glass-card rounded-2xl p-6 border border-white/[0.06]">
-                <h3 className="text-sm font-semibold text-[#F5F0E8] mb-5">Changer le mot de passe</h3>
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-[#9A9A9A] mb-1.5">
-                      Nouveau mot de passe
-                    </label>
-                    <input
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full px-3.5 py-2.5 bg-white/5 border border-white/[0.08] rounded-xl text-sm text-[#F5F0E8] placeholder-[#444] outline-none focus:border-[#FF7B4B]/40 transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-[#9A9A9A] mb-1.5">
-                      Confirmer le mot de passe
-                    </label>
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full px-3.5 py-2.5 bg-white/5 border border-white/[0.08] rounded-xl text-sm text-[#F5F0E8] placeholder-[#444] outline-none focus:border-[#FF7B4B]/40 transition-colors"
-                    />
-                  </div>
-                  <div className="flex items-center gap-3 justify-between flex-wrap">
-                    <StatusMsg status={secStatus} />
-                    <Button
-                      variant="gradient"
-                      size="sm"
-                      onClick={changePassword}
-                      disabled={secSaving || !newPassword || !confirmPassword}
-                      className="ml-auto"
-                    >
-                      {secSaving ? (
-                        <><Loader2 size={11} className="animate-spin mr-1.5" />Mise à jour...</>
-                      ) : (
-                        'Mettre à jour'
-                      )}
-                    </Button>
-                  </div>
+        {/* ── NOTIFICATIONS ─────────────────────────────────────── */}
+        {activeTab === "notifications" && (
+          <div className="pt-9">
+            <h2 className="pv-display text-lg text-ink">Alertes de création</h2>
+            <p className="mt-2 max-w-lg text-sm leading-relaxed text-steel">
+              Recevez une alerte dès que votre image est prête — même si vous êtes
+              sur un autre onglet.
+            </p>
+
+            <ul className="mt-7">
+              <li className="pv-row flex items-center justify-between gap-4 px-2 py-4">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-ink">Son de notification</p>
+                  <p className="mt-0.5 text-xs text-steel">Joue un son lorsque l&apos;image est prête</p>
+                </div>
+                <Switch
+                  checked={notifSound}
+                  onChange={setNotifSound}
+                  aria-label="Activer le son de notification"
+                />
+              </li>
+              <li className="pv-row flex items-center justify-between gap-4 px-2 py-4">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-ink">Notification navigateur</p>
+                  <p className="mt-0.5 text-xs text-steel">Alerte visible depuis un autre onglet</p>
+                </div>
+                <Switch
+                  checked={notifBrowser}
+                  onChange={handleBrowserNotifToggle}
+                  aria-label="Activer les notifications du navigateur"
+                />
+              </li>
+            </ul>
+
+            <StatusMessage status={notifStatus} />
+            <div className="mt-6 flex justify-end">
+              <Button onClick={saveNotifications} disabled={notifSaving}>
+                {notifSaving ? (
+                  <><Loader2 size={13} className="animate-spin" />Enregistrement…</>
+                ) : (
+                  'Enregistrer les préférences'
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* ── SÉCURITÉ ──────────────────────────────────────────── */}
+        {activeTab === "security" && (
+          <div className="flex flex-col gap-10 pt-9">
+            <section>
+              <h2 className="pv-display text-lg text-ink">Changer le mot de passe</h2>
+              <p className="mt-2 max-w-lg text-sm leading-relaxed text-steel">
+                Six caractères minimum. La modification prend effet immédiatement.
+              </p>
+              <div className="mt-7 grid gap-5 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="new-password">Nouveau mot de passe</Label>
+                  <Input
+                    id="new-password"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="••••••••"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="confirm-password">Confirmation</Label>
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                  />
                 </div>
               </div>
 
-              <div className="glass-card rounded-2xl p-6 border border-[#FF6B7D]/20 bg-[#FF6B7D]/5">
-                <div className="text-sm font-semibold text-[#FF6B7D] mb-1">Zone dangereuse</div>
-                <p className="text-xs text-[#9A9A9A] mb-4">
-                  {"Une fois supprimé, ton compte et toutes tes données sont définitivement effacés."}
-                </p>
+              <StatusMessage status={secStatus} />
+              <div className="mt-6 flex justify-end">
                 <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-[#FF6B7D]/30 text-[#FF6B7D] hover:bg-[#FF6B7D]/10"
+                  onClick={changePassword}
+                  disabled={secSaving || !newPassword || !confirmPassword}
                 >
-                  Supprimer le compte
+                  {secSaving ? (
+                    <><Loader2 size={13} className="animate-spin" />Mise à jour…</>
+                  ) : (
+                    'Mettre à jour le mot de passe'
+                  )}
                 </Button>
               </div>
-            </div>
-          )}
+            </section>
 
-          {/* ── APPARENCE ── */}
-          {activeTab === "appearance" && (
-            <div className="glass-card rounded-2xl p-6 border border-white/[0.06]">
-              <h3 className="text-sm font-semibold text-[#F5F0E8] mb-5">Apparence</h3>
-              <div>
-                <div className="text-xs font-medium text-[#9A9A9A] mb-3">Thème</div>
-                <div className="grid grid-cols-3 gap-3">
-                  {["Sombre (défaut)", "Plus sombre", "OLED Noir"].map((theme, i) => (
-                    <button
-                      key={theme}
-                      className={`p-3 rounded-xl border text-xs font-medium transition-all ${
-                        i === 0
-                          ? "border-[#FF7B4B]/40 bg-[#FF7B4B]/10 text-[#FF7B4B]"
-                          : "border-white/[0.06] text-[#666] hover:border-white/10 hover:text-[#CCCCC0]"
-                      }`}
-                    >
-                      {theme}
-                    </button>
-                  ))}
-                </div>
+            {/* Zone sensible — action volontairement non câblée */}
+            <section className="rounded-xl border border-err/20 bg-err/[0.04] p-6">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-err/80">
+                Zone sensible
+              </p>
+              <p className="mt-3 max-w-md text-sm leading-relaxed text-steel">
+                Une fois supprimé, votre compte et l&apos;ensemble de vos données
+                sont définitivement effacés.
+              </p>
+              <Button variant="outline" disabled className="mt-5 border-err/30 text-err">
+                Supprimer le compte
+              </Button>
+              <p className="mt-3 font-mono text-[10px] tracking-[0.1em] text-dusk">
+                Indisponible pour le moment — contactez le support pour cette opération.
+              </p>
+            </section>
+          </div>
+        )}
+
+        {/* ── APPARENCE — décoratif, rien n'est câblé ───────────── */}
+        {activeTab === "appearance" && (
+          <div className="pt-9">
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h2 className="pv-display text-lg text-ink">Thème de l&apos;atelier</h2>
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-dusk">
+                Bientôt disponible
+              </span>
+            </div>
+            <p className="mt-2 max-w-lg text-sm leading-relaxed text-steel">
+              Le studio vit en Prisme. D&apos;autres ambiances arriveront
+              prochainement — elles ne sont pas encore activables.
+            </p>
+
+            <div className="mt-7 grid gap-4 sm:grid-cols-3">
+              <div className="rounded-xl border border-[rgba(109,91,232,0.35)] bg-[rgba(124,106,255,0.06)] p-4">
+                <div className="h-12 rounded-lg border border-[color:var(--hairline)] bg-[#07070D]" />
+                <p className="mt-3 text-[13px] font-medium text-ink">Prisme</p>
+                <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-[color:var(--num-color)]">
+                  Actif
+                </p>
               </div>
-              <div className="mt-6">
-                <div className="text-xs font-medium text-[#9A9A9A] mb-3">{"Couleur d'accent"}</div>
-                <div className="flex gap-2">
-                  {["#FF7B4B", "#FF6B7D", "#FFD166", "#FFB5C8", "#4ADE80", "#60A5FA"].map((color, i) => (
-                    <button
-                      key={color}
-                      className={`w-8 h-8 rounded-full transition-all hover:scale-110 ${i === 0 ? "ring-2 ring-offset-2 ring-offset-[#0f0f0f] ring-[#FF7B4B]" : ""}`}
-                      style={{ background: color }}
-                    />
-                  ))}
-                </div>
+              <div className="rounded-xl border border-[color:var(--hairline)] p-4 opacity-55">
+                <div className="h-12 rounded-lg border border-[color:var(--hairline)] bg-abyss" />
+                <p className="mt-3 text-[13px] font-medium text-ink/70">Encre profonde</p>
+                <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-dusk">
+                  Bientôt disponible
+                </p>
+              </div>
+              <div className="rounded-xl border border-[color:var(--hairline)] p-4 opacity-55">
+                <div className="h-12 rounded-lg border border-[color:var(--hairline)] bg-white/90" />
+                <p className="mt-3 text-[13px] font-medium text-ink/70">Ivoire jour</p>
+                <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-dusk">
+                  Bientôt disponible
+                </p>
               </div>
             </div>
-          )}
-
-        </div>
+          </div>
+        )}
       </div>
     </div>
   )

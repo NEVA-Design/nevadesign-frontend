@@ -129,36 +129,36 @@ function buildEmailHtml({
     .split(/\n{2,}/)
     .map((paragraph) => paragraph.trim())
     .filter(Boolean)
-    .map((paragraph) => `<p style="margin:0 0 16px;color:#d8d2c8;line-height:1.65;font-size:15px;">${escapeHtml(paragraph).replace(/\n/g, '<br>')}</p>`)
+    .map((paragraph) => `<p style="margin:0 0 16px;color:#d9d4c9;line-height:1.65;font-size:15px;">${escapeHtml(paragraph).replace(/\n/g, '<br>')}</p>`)
     .join('')
 
   const button = ctaUrl
-    ? `<a href="${escapeHtml(ctaUrl)}" style="display:inline-block;margin-top:8px;background:#ff7b4b;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:10px;">${escapeHtml(ctaLabel || 'Upgrade maintenant')}</a>`
+    ? `<a href="${escapeHtml(ctaUrl)}" style="display:inline-block;margin-top:8px;background:#C9A961;color:#0B0908;text-decoration:none;font-weight:600;padding:12px 20px;border-radius:6px;">${escapeHtml(ctaLabel || 'Passer au niveau supérieur')}</a>`
     : ''
 
   return `<!doctype html>
 <html>
-  <body style="margin:0;background:#080808;font-family:Inter,Arial,sans-serif;">
+  <body style="margin:0;background:#0B0908;font-family:Georgia,'Times New Roman',serif;">
     <span style="display:none!important;opacity:0;color:transparent;height:0;width:0;overflow:hidden;">${escapeHtml(preheader)}</span>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#080808;padding:32px 16px;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#0B0908;padding:32px 16px;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#111111;border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#161310;border:1px solid rgba(243,239,230,.1);border-radius:12px;overflow:hidden;">
             <tr>
-              <td style="padding:22px 24px;border-bottom:1px solid rgba(255,255,255,.07);">
-                <div style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#ff7b4b;font-weight:800;">Neva AI</div>
-                <div style="margin-top:6px;color:#f5f0e8;font-size:22px;font-weight:800;">Passe au niveau superieur</div>
+              <td style="padding:24px;border-bottom:1px solid rgba(243,239,230,.08);">
+                <div style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#C9A961;font-weight:600;">Neva Design</div>
+                <div style="margin-top:8px;color:#F3EFE6;font-size:24px;font-weight:500;">Passez au niveau supérieur</div>
               </td>
             </tr>
             <tr>
-              <td style="padding:24px;">
+              <td style="padding:24px;font-family:Inter,Arial,sans-serif;">
                 ${paragraphs}
                 ${button}
               </td>
             </tr>
             <tr>
-              <td style="padding:18px 24px;border-top:1px solid rgba(255,255,255,.06);color:#666;font-size:12px;line-height:1.5;">
-                Tu recois cet email car tu as un compte Neva AI. Pour toute question, reponds simplement a cet email.
+              <td style="padding:18px 24px;border-top:1px solid rgba(243,239,230,.07);color:#8a857c;font-family:Inter,Arial,sans-serif;font-size:12px;line-height:1.5;">
+                Vous recevez cet e-mail car vous disposez d'un compte Neva Design. Pour toute question, répondez simplement à ce message.
               </td>
             </tr>
           </table>
@@ -170,7 +170,7 @@ function buildEmailHtml({
 }
 
 function buildTextEmail(message: string, ctaLabel: string, ctaUrl: string) {
-  return [message.trim(), ctaUrl ? `${ctaLabel || 'Upgrade maintenant'}: ${ctaUrl}` : '', 'Tu recois cet email car tu as un compte Neva AI.'].filter(Boolean).join('\n\n')
+  return [message.trim(), ctaUrl ? `${ctaLabel || 'Passer au niveau supérieur'}: ${ctaUrl}` : '', 'Vous recevez cet e-mail car vous disposez d\'un compte Neva Design.'].filter(Boolean).join('\n\n')
 }
 
 async function sendBatch(payload: Array<Record<string, unknown>>, idempotencyKey: string) {

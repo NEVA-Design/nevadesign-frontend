@@ -1,25 +1,49 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AlertTriangle, Check, Loader2, ShieldCheck, ShieldX, X } from "lucide-react";
+import { AlertTriangle, Check, ShieldCheck, ShieldX } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { FormMessage } from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
+import { Table, TableHeader, TableRow } from "@/components/ui/table";
+import { PageHeader } from "@/components/admin/PageHeader";
+import { StatTile } from "@/components/admin/StatTile";
 import type { SignupSecurityEvent, SignupSecurityStatus } from "@/lib/signup-security";
 
+/*
+ * Alertes de sécurité — surveillance des créations gratuites suspectes :
+ * compteurs en tuiles de verre, filtres en pilules, registre six
+ * colonnes avec décision par ligne.
+ */
+
 const STATUS_LABELS: Record<SignupSecurityStatus, string> = {
-  allowed: "Allowed",
-  blocked: "Blocked",
-  pending_review: "Pending",
-  approved_by_admin: "Approved",
-  rejected_by_admin: "Rejected",
+  allowed: "Autorisé",
+  blocked: "Bloqué",
+  pending_review: "En attente",
+  approved_by_admin: "Approuvé",
+  rejected_by_admin: "Rejeté",
 };
 
-const STATUS_COLORS: Record<SignupSecurityStatus, string> = {
-  allowed: "#4ADE80",
-  blocked: "#FF6B7D",
-  pending_review: "#FFD166",
-  approved_by_admin: "#4ADE80",
-  rejected_by_admin: "#FF6B7D",
+/* États système désaturés : warn = à traiter, err = refusé, ok = accordé. */
+const STATUS_BADGES: Record<SignupSecurityStatus, string> = {
+  allowed: "border-[#C4E3D2] bg-[#EFF7F2] text-[#3E7A5C]",
+  blocked: "border-[#EFC9C6] bg-[#FBEFEE] text-[#9E4A45]",
+  pending_review: "border-[#EAD9A8] bg-[#FBF6E9] text-[#8A6D1F]",
+  approved_by_admin: "border-[#C4E3D2] bg-[#EFF7F2] text-[#3E7A5C]",
+  rejected_by_admin: "border-[#EFC9C6] bg-[#FBEFEE] text-[#9E4A45]",
 };
+
+const STATUS_ICON_COLORS: Record<SignupSecurityStatus, string> = {
+  allowed: "text-ok",
+  blocked: "text-err",
+  pending_review: "text-warn",
+  approved_by_admin: "text-ok",
+  rejected_by_admin: "text-err",
+};
+
+const TABLE_GRID =
+  "min-w-[1060px] grid-cols-[minmax(210px,1.1fr)_120px_80px_minmax(200px,1fr)_130px_230px]";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("fr-FR", {
@@ -55,7 +79,7 @@ export function SecurityAlertsClient({ initialAlerts }: { initialAlerts: SignupS
       }
       setAlerts((prev) => prev.map((item) => (item.id === alert.id ? data.alert : item)));
     } catch {
-      setError("Erreur reseau");
+      setError("Erreur réseau");
     } finally {
       setSavingId(null);
     }
@@ -65,118 +89,160 @@ export function SecurityAlertsClient({ initialAlerts }: { initialAlerts: SignupS
   const blockedCount = alerts.filter((alert) => alert.status === "blocked").length;
 
   return (
-    <div>
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#FF7B4B]">Abuse prevention</p>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-[#F5F0E8]">Security Alerts</h1>
-          <p className="mt-1 text-sm text-[#666]">
-            Controle les credits gratuits suspects sans bloquer les comptes.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <div className="rounded-xl border border-[#FFD166]/25 bg-[#FFD166]/10 px-3 py-2 text-xs text-[#FFD166]">
-            {pendingCount} pending
-          </div>
-          <div className="rounded-xl border border-[#FF6B7D]/25 bg-[#FF6B7D]/10 px-3 py-2 text-xs text-[#FF6B7D]">
-            {blockedCount} blocked
-          </div>
-        </div>
+    <div className="relative overflow-x-clip">
+      <div aria-hidden className="pv-halo right-[-10%] top-[-140px] h-[380px] w-[520px] opacity-50" />
+
+      <PageHeader
+        eyebrow="Prévention des abus"
+        title={
+          <>
+            Alertes de <span className="pv-beam-text">sécurité.</span>
+          </>
+        }
+        description="Contrôlez l'attribution des créations gratuites suspectes sans bloquer les comptes."
+      />
+
+      {/* Compteurs en tuiles de verre */}
+      <div className="mb-7 grid max-w-lg grid-cols-2 gap-4">
+        <StatTile
+          label="En attente"
+          value={pendingCount}
+          tone={pendingCount > 0 ? "warn" : "default"}
+          detail="dossiers à trancher"
+        />
+        <StatTile
+          label="Bloquées"
+          value={blockedCount}
+          tone={blockedCount > 0 ? "err" : "default"}
+          detail="dotations retenues"
+        />
       </div>
 
+      {/* Bannière d'erreur */}
       {error && (
-        <div className="mb-4 flex items-center gap-2 rounded-xl border border-[#FF6B7D]/25 bg-[#FF6B7D]/10 px-4 py-3 text-sm text-[#FF6B7D]">
-          <X size={14} />
+        <FormMessage tone="error" className="mb-4">
           {error}
-        </div>
+        </FormMessage>
       )}
 
-      <div className="mb-4 flex flex-wrap gap-2">
+      {/* Filtres */}
+      <div className="mb-5 flex flex-wrap gap-2">
         {(["pending_review", "blocked", "allowed", "approved_by_admin", "rejected_by_admin", "all"] as const).map((status) => (
           <button
             key={status}
+            type="button"
             onClick={() => setFilter(status)}
-            className={`rounded-xl border px-3 py-2 text-xs font-medium transition-all ${
+            className={`h-10 rounded-full border px-4 font-mono text-[10px] font-medium uppercase tracking-[0.12em] transition-colors duration-300 ${
               filter === status
-                ? "border-[#FF7B4B]/40 bg-[#FF7B4B]/10 text-[#FF7B4B]"
-                : "border-white/[0.07] text-[#777] hover:border-white/[0.14] hover:text-[#F5F0E8]"
+                ? "border-[rgba(109,91,232,0.35)] bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]"
+                : "border-[color:var(--hairline)] text-steel hover:text-ink"
             }`}
           >
-            {status === "all" ? "All" : STATUS_LABELS[status]}
+            {status === "all" ? "Tout" : STATUS_LABELS[status]}
           </button>
         ))}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-white/[0.07]">
-        <div className="grid grid-cols-[1.1fr_130px_100px_1fr_130px_240px] gap-4 border-b border-white/[0.05] bg-white/[0.02] px-5 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-[#444]">
-          <span>Email</span>
-          <span>IP</span>
-          <span>Risk</span>
-          <span>Reason</span>
-          <span>Date</span>
-          <span className="text-right">Actions</span>
-        </div>
-
+      {/* Registre */}
+      <Card className="overflow-hidden">
         {visibleAlerts.length === 0 ? (
-          <div className="py-16 text-center text-sm text-[#444]">Aucune alerte dans ce filtre</div>
+          <div className="py-14 text-center text-sm text-dusk">
+            Aucune alerte dans ce filtre.
+          </div>
         ) : (
-          visibleAlerts.map((alert, index) => {
-            const color = STATUS_COLORS[alert.status];
-            const pendingAction = savingId === alert.id;
-            const canReview = alert.status === "pending_review" || alert.status === "blocked";
+          <Table>
+            <TableHeader className={TABLE_GRID}>
+              <span>E-mail</span>
+              <span>IP</span>
+              <span>Risque</span>
+              <span>Motif</span>
+              <span>Date</span>
+              <span className="text-right">Actions</span>
+            </TableHeader>
+            {visibleAlerts.map((alert) => {
+              const pendingAction = savingId === alert.id;
+              const canReview = alert.status === "pending_review" || alert.status === "blocked";
 
-            return (
-              <div
-                key={alert.id}
-                className={`grid grid-cols-[1.1fr_130px_100px_1fr_130px_240px] items-center gap-4 px-5 py-3 text-sm ${
-                  index < visibleAlerts.length - 1 ? "border-b border-white/[0.04]" : ""
-                }`}
-              >
-                <div className="min-w-0">
-                  <div className="truncate text-[#E8E3DB]">{alert.email}</div>
-                  <div className="mt-1 flex items-center gap-2 text-[10px] text-[#555]">
-                    <span className="rounded-md border px-1.5 py-0.5 font-semibold" style={{ color, borderColor: `${color}40`, background: `${color}12` }}>
-                      {STATUS_LABELS[alert.status]}
-                    </span>
-                    {alert.matching_user_ids.length} match{alert.matching_user_ids.length !== 1 ? "es" : ""}
+              return (
+                <TableRow key={alert.id} className={TABLE_GRID}>
+                  <div className="min-w-0">
+                    <div className="truncate text-ink/85">{alert.email}</div>
+                    <div className="mt-1.5 flex items-center gap-2">
+                      <span
+                        className={`inline-flex items-center rounded-full border px-2 py-[2px] font-mono text-[9px] font-medium uppercase tracking-[0.12em] ${STATUS_BADGES[alert.status]}`}
+                      >
+                        {STATUS_LABELS[alert.status]}
+                      </span>
+                      <span className="font-mono text-[10px] tracking-[0.04em] text-dusk">
+                        {alert.matching_user_ids.length} correspondance{alert.matching_user_ids.length !== 1 ? "s" : ""}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="truncate font-mono text-xs text-[#777]">{alert.ip_address}</div>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle size={13} style={{ color }} />
-                  <span className="font-semibold text-[#F5F0E8]">{alert.risk_score}</span>
-                </div>
-                <div className="line-clamp-2 text-xs leading-5 text-[#888]">{alert.reason}</div>
-                <div className="text-xs text-[#666]">{formatDate(alert.created_at)}</div>
-                <div className="flex justify-end gap-2">
-                  {canReview ? (
-                    <>
-                      <Button size="sm" variant="outline" onClick={() => act(alert, "reject")} disabled={pendingAction}>
-                        {pendingAction ? <Loader2 size={12} className="animate-spin" /> : <ShieldX size={12} />}
-                        Reject
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => act(alert, "abuse")} disabled={pendingAction}>
-                        <ShieldX size={12} />
-                        Abuse
-                      </Button>
-                      <Button size="sm" variant="secondary" onClick={() => act(alert, "safe")} disabled={pendingAction}>
-                        <ShieldCheck size={12} />
-                        Safe
-                      </Button>
-                      <Button size="sm" variant="gradient" onClick={() => act(alert, "approve")} disabled={pendingAction}>
-                        <Check size={12} />
-                        Approve
-                      </Button>
-                    </>
-                  ) : (
-                    <span className="text-xs text-[#555]">Reviewed</span>
-                  )}
-                </div>
-              </div>
-            );
-          })
+
+                  <div className="truncate font-mono text-xs text-steel">{alert.ip_address}</div>
+
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle size={13} strokeWidth={1.8} aria-hidden className={STATUS_ICON_COLORS[alert.status]} />
+                    <span className="font-mono text-xs text-ink/85">{alert.risk_score}</span>
+                  </div>
+
+                  <div className="line-clamp-2 text-xs leading-5 text-steel">{alert.reason}</div>
+
+                  <div className="font-mono text-[11px] text-dusk">{formatDate(alert.created_at)}</div>
+
+                  <div className="flex flex-wrap justify-end gap-2">
+                    {canReview ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => act(alert, "reject")}
+                          disabled={pendingAction}
+                          className="inline-flex h-10 items-center gap-1.5 rounded-full border border-err/30 px-3.5 text-xs font-medium text-err transition-colors duration-300 hover:bg-err/10 disabled:pointer-events-none disabled:opacity-45"
+                        >
+                          {pendingAction ? <Spinner className="h-3.5 w-3.5" /> : <ShieldX size={12} strokeWidth={1.8} aria-hidden />}
+                          Rejeter
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => act(alert, "abuse")}
+                          disabled={pendingAction}
+                          className="inline-flex h-10 items-center gap-1.5 rounded-full border border-err/30 px-3.5 text-xs font-medium text-err transition-colors duration-300 hover:bg-err/10 disabled:pointer-events-none disabled:opacity-45"
+                        >
+                          <AlertTriangle size={12} strokeWidth={1.8} aria-hidden />
+                          Abus
+                        </button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="h-10"
+                          onClick={() => act(alert, "safe")}
+                          disabled={pendingAction}
+                        >
+                          <ShieldCheck size={12} strokeWidth={1.8} aria-hidden />
+                          Fiable
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="h-10"
+                          onClick={() => act(alert, "approve")}
+                          disabled={pendingAction}
+                        >
+                          <Check size={12} strokeWidth={1.8} aria-hidden />
+                          Approuver
+                        </Button>
+                      </>
+                    ) : (
+                      <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">
+                        Traité
+                      </span>
+                    )}
+                  </div>
+                </TableRow>
+              );
+            })}
+          </Table>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

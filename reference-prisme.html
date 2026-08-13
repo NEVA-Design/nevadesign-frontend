@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neva Design — Le studio créatif des serveurs qui recrutent</title>
+<!--
+  ═══════════════════════════════════════════════════════════════
+  RÉFÉRENCE PRISME v2 — CE FICHIER EST LA LOI.
+  Direction artistique, typographie, espacements, lumière,
+  motion, composants et textes : tout part d'ici. On réplique,
+  on n'interprète pas.
+
+  Placeholders à remplacer lors de l'intégration :
+  · Le monogramme SVG "N" → NEVA_Logo_BlancPlan_de_travail_1
+  · Les œuvres en dégradé (marquee, mockup, bento) → vraies
+    créations du portfolio, traitées : overlay sombre en bas,
+    léger étalonnage froid, jamais posées brutes.
+
+  Règles absolues :
+  · Le dégradé spectral sur du texte n'existe QU'UNE fois,
+    sur le mot du hero.
+  · Toutes les animations sont sur transform/opacity (GPU).
+  · prefers-reduced-motion coupe tout proprement.
+  · AUCUN effet piloté par la position de la souris (pas de
+    curseur custom, pas de parallaxe, pas de tilt, pas de
+    spotlight). Le motion vit au chargement, au scroll et en
+    boucles autonomes. Les hovers restent simples : bordure,
+    élévation, éclat.
+  ═══════════════════════════════════════════════════════════════
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Tokens ─────────────────────────────────────────────── */
+:root{
+  --bg:#07070B;
+  --panel:#0C0C13;
+  --glass:rgba(255,255,255,.04);
+  --glass-2:rgba(255,255,255,.06);
+  --line:rgba(255,255,255,.08);
+  --line-soft:rgba(255,255,255,.05);
+  --txt:#F5F6F8;
+  --txt-2:#9EA1AC;
+  --txt-3:#5E616C;
+  --violet:#7C6AFF;
+  --cyan:#4CC9F0;
+  --magenta:#E879F9;
+  --grad:linear-gradient(96deg,var(--violet) 10%,var(--cyan) 90%);
+  --font:'Geist','Inter',system-ui,-apple-system,sans-serif;
+  --mono:'Geist Mono','JetBrains Mono',ui-monospace,monospace;
+  --r-s:10px; --r-m:16px; --r-l:22px;
+  --ease:cubic-bezier(.16,.66,.22,1);
+  --out:cubic-bezier(.16,1,.3,1);
+  --container:1200px;
+}
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--txt);
+  font-family:var(--font);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:rgba(124,106,255,.35);color:#fff}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.10);border-radius:99px;border:3px solid var(--bg)}
+::-webkit-scrollbar-track{background:var(--bg)}
+
+/* Lumière ambiante fixe */
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(900px 600px at 18% -8%, rgba(124,106,255,.10), transparent 60%),
+    radial-gradient(800px 520px at 88% 4%, rgba(76,201,240,.07), transparent 60%);
+}
+/* Grain film */
+.noise{position:fixed;inset:0;pointer-events:none;z-index:60;opacity:.038;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.container{max-width:var(--container);margin:0 auto;padding:0 32px;position:relative;z-index:1}
+
+/* ── Preloader ──────────────────────────────────────────── */
+.loader{position:fixed;inset:0;z-index:120;background:#060609;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .8s var(--out) .15s}
+body.loaded .loader{transform:translateY(-101%)}
+.loader-inner{display:flex;flex-direction:column;align-items:center;gap:22px;width:200px}
+.loader-bar{width:100%;height:1px;background:rgba(255,255,255,.10);overflow:hidden}
+.loader-bar i{display:block;height:100%;width:0%;background:var(--grad)}
+.loader-count{font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--txt-3)}
+
+/* ── Typo utilitaires ───────────────────────────────────── */
+.kicker{
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--txt-3);
+  display:flex;align-items:center;gap:10px;
+}
+.kicker::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--grad);flex:none}
+h1,h2{font-weight:600;letter-spacing:-.045em;line-height:1.02;text-wrap:balance}
+h2{font-size:clamp(34px,4.6vw,56px);letter-spacing:-.035em}
+.lede{color:var(--txt-2);font-size:17px;max-width:560px;line-height:1.65}
+.mono-note{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--txt-3)}
+
+/* Le seul texte en dégradé de toute la page — il coule lentement */
+.grad-word{background:linear-gradient(96deg,var(--violet),var(--cyan),var(--magenta),var(--violet));
+  background-size:280% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:flow 7s ease-in-out infinite}
+@keyframes flow{0%,100%{background-position:0% 0}50%{background-position:100% 0}}
+
+/* ── Boutons ────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);
+  font-size:14.5px;font-weight:500;padding:12px 22px;border-radius:var(--r-s);
+  border:1px solid transparent;cursor:pointer;text-decoration:none;
+  position:relative;overflow:hidden;
+  transition:transform .35s var(--ease),box-shadow .35s var(--ease),background .35s var(--ease),border-color .35s var(--ease)}
+.btn::after{content:'';position:absolute;top:0;left:-70%;width:45%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);
+  transform:skewX(-20deg);transition:left .65s var(--ease)}
+.btn:hover::after{left:130%}
+.btn-primary{background:#fff;color:#0A0A0F}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(255,255,255,.16)}
+.btn-ghost{background:var(--glass);color:var(--txt);border-color:var(--line)}
+.btn-ghost::after{background:linear-gradient(100deg,transparent,rgba(255,255,255,.14),transparent)}
+.btn-ghost:hover{border-color:rgba(255,255,255,.18);background:var(--glass-2)}
+.btn .arrow{transition:transform .35s var(--ease)}
+.btn:hover .arrow{transform:translateX(3px)}
+
+/* ── Nav ────────────────────────────────────────────────── */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;
+  background:rgba(7,7,11,.62);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--line-soft);
+  transform:translateY(-100%);transition:transform .9s var(--out) .9s}
+body.loaded nav{transform:none}
+.nav-inner{max-width:var(--container);margin:0 auto;padding:0 32px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--txt)}
+.brand svg{display:block}
+.brand-name{font-size:15px;font-weight:600;letter-spacing:-.02em}
+.brand-name em{font-style:normal;color:var(--txt-2);font-weight:500}
+.nav-links{display:flex;gap:30px;list-style:none}
+.nav-links a{color:var(--txt-2);text-decoration:none;font-size:14px;transition:color .25s}
+.nav-links a:hover{color:var(--txt)}
+.nav-right{display:flex;align-items:center;gap:18px}
+.lang{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--txt-3)}
+.lang b{color:var(--txt);font-weight:500}
+.nav-login{color:var(--txt-2);font-size:14px;text-decoration:none;transition:color .25s}
+.nav-login:hover{color:var(--txt)}
+.nav .btn{padding:9px 18px;font-size:13.5px}
+
+/* ── Hero ───────────────────────────────────────────────── */
+.hero{padding:176px 0 0;text-align:center;position:relative;overflow:hidden}
+.hero-sky{position:absolute;inset:0;pointer-events:none}
+.blob{position:absolute;border-radius:50%;filter:blur(110px);will-change:transform}
+.b1{width:520px;height:520px;left:6%;top:-6%;background:rgba(124,106,255,.20);animation:float1 22s ease-in-out infinite alternate}
+.b2{width:460px;height:460px;right:4%;top:6%;background:rgba(76,201,240,.14);animation:float2 26s ease-in-out infinite alternate}
+@keyframes float1{to{transform:translate(70px,50px) scale(1.12)}}
+@keyframes float2{to{transform:translate(-60px,70px) scale(.92)}}
+.beam{position:absolute;left:50%;top:-42%;width:1100px;height:1100px;margin-left:-550px;
+  background:conic-gradient(from 0deg,transparent 0 41%,rgba(124,106,255,.10) 47%,rgba(76,201,240,.12) 50%,rgba(124,106,255,.10) 53%,transparent 59% 100%);
+  filter:blur(34px);animation:spin 30s linear infinite;
+  -webkit-mask-image:radial-gradient(closest-side,#000 30%,transparent 72%);
+  mask-image:radial-gradient(closest-side,#000 30%,transparent 72%)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero-grid{position:absolute;left:-10%;right:-10%;bottom:-6%;height:52%;
+  background:
+    repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 90px),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0 1px,transparent 1px 74px);
+  transform:perspective(700px) rotateX(58deg);transform-origin:center top;
+  -webkit-mask-image:radial-gradient(60% 90% at 50% 0%,#000 30%,transparent 78%);
+  mask-image:radial-gradient(60% 90% at 50% 0%,#000 30%,transparent 78%);
+  opacity:.5;will-change:transform}
+
+.hero .kicker{justify-content:center;margin-bottom:28px}
+.hero h1{font-size:clamp(52px,8.2vw,120px);margin:0 auto 26px;max-width:14ch}
+.hline{display:block;overflow:hidden;padding-bottom:.06em;margin-bottom:-.06em}
+.hline>span{display:inline-block;transform:translateY(115%);transition:transform 1.15s var(--out)}
+body.loaded .hline:nth-child(1)>span{transition-delay:.35s;transform:none}
+body.loaded .hline:nth-child(2)>span{transition-delay:.46s;transform:none}
+.hero .fade{opacity:0;transform:translateY(18px);transition:opacity .9s var(--out),transform .9s var(--out)}
+body.loaded .hero .fade{opacity:1;transform:none}
+body.loaded .f1{transition-delay:.25s}
+body.loaded .f2{transition-delay:.75s}
+body.loaded .f3{transition-delay:.88s}
+body.loaded .f4{transition-delay:1s}
+.hero .lede{margin:0 auto 38px;text-align:center;max-width:520px}
+.hero-cta{display:flex;justify-content:center;gap:14px;margin-bottom:18px}
+.hero-proof{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--txt-3)}
+.hero-proof i{font-style:normal;padding:0 8px}
+
+/* ── Mockup produit ─────────────────────────────────────── */
+.stage{position:relative;padding:80px 0 0;perspective:1700px;z-index:2}
+.stage-glow{position:absolute;left:50%;bottom:-34px;transform:translateX(-50%);
+  width:min(680px,72%);height:150px;border-radius:50%;
+  background:linear-gradient(96deg,rgba(124,106,255,.5),rgba(76,201,240,.4));
+  filter:blur(95px);opacity:.5;pointer-events:none;animation:pulse 6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.42}50%{opacity:.62}}
+.frame-shell{position:relative;margin:0 auto;width:min(940px,100%);border-radius:calc(var(--r-l) + 1px)}
+.frame-shell::before{content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;
+  background:conic-gradient(from var(--ang),transparent 0 8%,rgba(124,106,255,.9) 16%,rgba(76,201,240,.9) 24%,transparent 32% 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  animation:turn 7s linear infinite;opacity:.5;pointer-events:none}
+@keyframes turn{to{--ang:360deg}}
+.frame{position:relative;background:rgba(12,12,19,.92);border:1px solid var(--line);border-radius:var(--r-l);
+  box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 40px 90px rgba(0,0,0,.55);
+  overflow:hidden;will-change:transform;
+  transform:rotateX(9deg) scale(.965);transform-origin:center top;
+  transition:transform 1.4s var(--out)}
+.stage.up .frame{transform:rotateX(0deg) scale(1)}
+.frame-bar{display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--line-soft)}
+.dots{display:flex;gap:6px}
+.dots i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.10)}
+.frame-title{flex:1;text-align:center;font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--txt-3)}
+.frame-badge{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--txt-2);
+  border:1px solid var(--line);border-radius:99px;padding:4px 10px}
+.frame-body{display:grid;grid-template-columns:188px 1fr 1.05fr;min-height:380px}
+.f-side{border-right:1px solid var(--line-soft);padding:18px 14px;display:flex;flex-direction:column;gap:4px}
+.f-side .mini-logo{margin:2px 6px 14px}
+.f-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;
+  color:var(--txt-3);font-size:13px;font-weight:500}
+.f-item i{width:7px;height:7px;border-radius:2.5px;background:currentColor;opacity:.55;flex:none}
+.f-item.on{background:var(--glass-2);color:var(--txt)}
+.f-item.on i{background:var(--grad);opacity:1}
+.f-side .f-foot{margin-top:auto;padding:10px 10px 4px;border-top:1px solid var(--line-soft)}
+.f-foot .mono-note{font-size:9.5px;display:flex;justify-content:space-between}
+.f-foot .bar{height:2px;border-radius:2px;background:rgba(255,255,255,.08);margin-top:8px;overflow:hidden}
+.f-foot .bar i{display:block;height:100%;width:64%;background:var(--grad)}
+.f-brief{padding:24px;border-right:1px solid var(--line-soft);display:flex;flex-direction:column;text-align:left}
+.f-label{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--txt-3);margin-bottom:14px;text-transform:uppercase}
+.f-brief p{font-size:14px;line-height:1.7;color:var(--txt-2)}
+.f-brief p b{color:var(--txt);font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--txt-2);
+  border:1px solid var(--line);border-radius:99px;padding:5px 11px}
+.f-brief .btn{align-self:flex-start;margin-top:auto;padding:10px 18px;font-size:13.5px}
+.f-render{position:relative;overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 80% 10%, rgba(76,201,240,.32), transparent 55%),
+    radial-gradient(130% 110% at 12% 95%, rgba(124,106,255,.42), transparent 60%),
+    linear-gradient(160deg,#191627 0%,#0D0D16 70%);}
+.f-render .art-word{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%) rotate(-8deg);
+  font-weight:700;font-size:74px;letter-spacing:-.04em;color:rgba(255,255,255,.09);white-space:nowrap}
+.f-render .shimmer{position:absolute;inset:0;
+  background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.07) 45%,transparent 60%);
+  background-size:260% 100%;animation:sheen 5.5s ease-in-out infinite}
+@keyframes sheen{0%{background-position:120% 0}100%{background-position:-140% 0}}
+.f-render::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 55%,rgba(7,7,11,.75))}
+.f-meta{position:absolute;left:18px;bottom:14px;right:18px;z-index:2;
+  display:flex;justify-content:space-between;align-items:center}
+.f-meta .mono-note{font-size:9.5px}
+.f-status{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--txt-2)}
+.f-status i{width:6px;height:6px;border-radius:50%;background:#5CE6A8;box-shadow:0 0 10px rgba(92,230,168,.8);
+  animation:blink 2.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* ── Marquee créations ──────────────────────────────────── */
+.wall{padding:100px 0 0}
+.wall .mono-note{text-align:center;display:block;margin-bottom:34px}
+.marquee{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.track{display:flex;gap:16px;width:max-content;animation:scroll 44s linear infinite}
+.marquee:hover .track{animation-play-state:paused}
+@keyframes scroll{to{transform:translateX(-50%)}}
+.art{position:relative;width:248px;height:156px;border-radius:14px;overflow:hidden;
+  border:1px solid var(--line);flex:none;
+  box-shadow:0 1px 0 rgba(255,255,255,.05) inset;
+  transition:transform .5s var(--ease),border-color .5s}
+.art:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.2)}
+.art .aw{position:absolute;top:42%;left:50%;transform:translate(-50%,-50%) rotate(-7deg);
+  font-weight:700;font-size:34px;letter-spacing:-.03em;color:rgba(255,255,255,.12);white-space:nowrap}
+.art::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(7,7,11,.8))}
+.art .cap{position:absolute;left:13px;bottom:10px;z-index:2;font-family:var(--mono);
+  font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--txt-2)}
+.a1{background:radial-gradient(120% 100% at 80% 0%,rgba(124,106,255,.5),transparent 60%),linear-gradient(150deg,#171425,#0C0C13)}
+.a2{background:radial-gradient(120% 100% at 15% 10%,rgba(76,201,240,.42),transparent 60%),linear-gradient(200deg,#101722,#0C0C13)}
+.a3{background:radial-gradient(130% 110% at 85% 90%,rgba(232,121,249,.34),transparent 60%),linear-gradient(160deg,#1A1220,#0C0C13)}
+.a4{background:radial-gradient(120% 100% at 50% -10%,rgba(255,255,255,.16),transparent 55%),linear-gradient(180deg,#15151D,#0C0C13)}
+.a5{background:radial-gradient(140% 120% at 10% 100%,rgba(124,106,255,.38),transparent 55%),radial-gradient(100% 80% at 95% 0%,rgba(76,201,240,.3),transparent 55%),#0C0C13}
+.a6{background:radial-gradient(120% 100% at 70% 20%,rgba(92,230,168,.22),transparent 60%),linear-gradient(170deg,#121822,#0C0C13)}
+
+/* ── Marquee typographique géant ────────────────────────── */
+.word-marquee{overflow:hidden;padding:110px 0 0;user-select:none}
+.wm-track{display:flex;gap:70px;width:max-content;white-space:nowrap;animation:scroll 36s linear infinite}
+.wm-track span{font-size:clamp(64px,9.5vw,148px);font-weight:700;letter-spacing:-.035em;line-height:1;
+  color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.11)}
+.wm-track span.full{color:rgba(255,255,255,.05);-webkit-text-stroke:0}
+
+/* ── Sections communes ──────────────────────────────────── */
+section.block{padding:clamp(110px,12vw,176px) 0 0}
+.head{margin-bottom:56px}
+.head .kicker{margin-bottom:20px}
+.head h2{max-width:16ch}
+.head .lede{margin-top:18px}
+
+/* ── Bento modules ──────────────────────────────────────── */
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{position:relative;border:1px solid var(--line);border-radius:var(--r-m);
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+  box-shadow:0 1px 0 rgba(255,255,255,.06) inset;
+  padding:22px;overflow:hidden;display:flex;flex-direction:column;gap:16px;
+  transition:border-color .4s var(--ease),transform .5s var(--ease),box-shadow .5s var(--ease)}
+.card:hover{border-color:rgba(255,255,255,.16);transform:translateY(-4px);
+  box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 24px 60px rgba(0,0,0,.4)}
+.card h3{font-size:17px;font-weight:600;letter-spacing:-.015em}
+.card>p{font-size:13.5px;color:var(--txt-2);line-height:1.6;margin-top:-8px}
+.card .demo{border:1px solid var(--line-soft);border-radius:12px;background:rgba(7,7,11,.5);
+  padding:16px;flex:1;position:relative;overflow:hidden;text-align:left}
+.c-a{grid-column:span 7}
+.c-b{grid-column:span 5}
+.c-c,.c-d,.c-e{grid-column:span 4}
+.demo .f-label{margin-bottom:10px}
+.demo .brief-line{font-size:13px;color:var(--txt-2);line-height:1.65}
+.demo .brief-line b{color:var(--txt);font-weight:500}
+.renders{display:flex;gap:10px;margin-top:16px}
+.r{position:relative;flex:1;height:96px;border-radius:9px;overflow:hidden;border:1px solid var(--line-soft)}
+.r .cap{position:absolute;left:9px;bottom:7px;font-family:var(--mono);font-size:8.5px;
+  letter-spacing:.14em;color:var(--txt-2);z-index:2;text-transform:uppercase}
+.r::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(7,7,11,.7))}
+.split{display:grid;grid-template-columns:1fr 1fr;height:150px;border-radius:9px;overflow:hidden;
+  border:1px solid var(--line-soft);position:relative}
+.split>div{position:relative}
+.split .tag{position:absolute;top:9px;left:9px;z-index:2;font-family:var(--mono);font-size:8.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--txt-2);
+  background:rgba(7,7,11,.6);border:1px solid var(--line-soft);border-radius:99px;padding:3px 8px}
+.sp-1{background:linear-gradient(150deg,#26242C,#131317);filter:saturate(.4) brightness(.75)}
+.sp-2{background:radial-gradient(120% 100% at 70% 10%,rgba(76,201,240,.4),transparent 60%),linear-gradient(150deg,#1B1830,#0D0D16)}
+.split::after{content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;background:rgba(255,255,255,.35);
+  box-shadow:0 0 14px rgba(255,255,255,.35)}
+.bubbles{display:flex;flex-direction:column;gap:9px}
+.bubble{font-size:12.5px;line-height:1.55;padding:10px 13px;border-radius:11px;max-width:92%}
+.bu{background:var(--glass-2);color:var(--txt-2);align-self:flex-end;border:1px solid var(--line-soft)}
+.ba{background:rgba(124,106,255,.10);border:1px solid rgba(124,106,255,.22);color:var(--txt)}
+.idcard{border:1px solid var(--line-soft);border-radius:11px;padding:14px;background:rgba(7,7,11,.5)}
+.idcard .idh{display:flex;justify-content:space-between;font-family:var(--mono);font-size:8.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--txt-3);
+  border-bottom:1px solid var(--line-soft);padding-bottom:9px;margin-bottom:11px}
+.idrow{display:flex;gap:12px;align-items:center}
+.avatar{width:52px;height:64px;border-radius:7px;flex:none;
+  background:radial-gradient(100% 80% at 50% 0%,rgba(232,121,249,.35),transparent 60%),linear-gradient(170deg,#1C1626,#0D0D16);
+  border:1px solid var(--line-soft)}
+.idrow dl{font-size:11px;line-height:1.7}
+.idrow dt{font-family:var(--mono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--txt-3)}
+.idrow dd{color:var(--txt);font-weight:500;margin-bottom:5px}
+.score{display:flex;align-items:baseline;gap:8px}
+.score b{font-size:52px;font-weight:600;letter-spacing:-.04em;line-height:1}
+.score .mono-note{font-size:10px}
+.bars{display:flex;flex-direction:column;gap:11px;margin-top:16px}
+.bars .row{display:grid;grid-template-columns:96px 1fr 26px;align-items:center;gap:12px;
+  font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--txt-3)}
+.bars .tr{height:2px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
+.bars .tr i{display:block;height:100%;background:var(--grad);width:0;transition:width 1.4s var(--ease) .3s}
+.in .bars .tr i{width:var(--w)}
+.bars .val{color:var(--txt-2);text-align:right}
+
+/* ── Stats ──────────────────────────────────────────────── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line-soft);
+  border-bottom:1px solid var(--line-soft);position:relative;overflow:hidden}
+.stats::before{content:'';position:absolute;top:-1px;left:0;width:240px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(124,106,255,.7),rgba(76,201,240,.7),transparent);
+  animation:sweep 7s ease-in-out infinite}
+@keyframes sweep{0%{transform:translateX(-260px)}60%,100%{transform:translateX(calc(100vw))}}
+.stat{padding:48px 28px;text-align:left}
+.stat+.stat{border-left:1px solid var(--line-soft)}
+.stat b{display:block;font-size:clamp(44px,5vw,68px);font-weight:600;letter-spacing:-.04em;line-height:1;margin-bottom:12px}
+.stat span{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--txt-3)}
+
+/* ── Pricing ────────────────────────────────────────────── */
+.plans{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.plan{border:1px solid var(--line);border-radius:var(--r-m);padding:26px 24px;
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
+  box-shadow:0 1px 0 rgba(255,255,255,.05) inset;
+  display:flex;flex-direction:column;transition:border-color .4s var(--ease),transform .5s var(--ease)}
+.plan:hover{border-color:rgba(255,255,255,.16);transform:translateY(-4px)}
+.plan h3{font-size:15.5px;font-weight:600;margin-bottom:6px}
+.plan .for{font-size:12.5px;color:var(--txt-3);min-height:38px;line-height:1.5}
+.price{display:flex;align-items:baseline;gap:7px;margin:18px 0 4px}
+.price b{font-size:40px;font-weight:600;letter-spacing:-.04em;line-height:1}
+.price span{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--txt-3)}
+.plan .quota{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--txt-2);
+  padding-bottom:18px;border-bottom:1px solid var(--line-soft);margin-bottom:18px}
+.plan ul{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:26px}
+.plan li{font-size:13px;color:var(--txt-2);padding-left:16px;position:relative}
+.plan li::before{content:'·';position:absolute;left:2px;color:var(--txt-3);font-weight:700}
+.plan .btn{margin-top:auto;justify-content:center}
+.plan-hot{position:relative;background:linear-gradient(180deg,rgba(124,106,255,.09),rgba(255,255,255,.015));
+  border-color:transparent;
+  box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 24px 70px rgba(124,106,255,.15)}
+.plan-hot::before{content:'';position:absolute;inset:-1px;border-radius:calc(var(--r-m) + 1px);padding:1px;
+  background:conic-gradient(from var(--ang),rgba(124,106,255,.15) 0%,rgba(124,106,255,.95) 12%,rgba(76,201,240,.95) 25%,rgba(124,106,255,.15) 40% 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  animation:turn 5s linear infinite;pointer-events:none}
+.plan-hot .flag{position:absolute;top:-11px;left:24px;font-family:var(--mono);font-size:9px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--txt);
+  background:#14121F;border:1px solid rgba(124,106,255,.45);border-radius:99px;padding:5px 11px;z-index:2}
+
+/* ── CTA finale ─────────────────────────────────────────── */
+.final{position:relative;text-align:center;padding:clamp(120px,13vw,190px) 0;overflow:hidden}
+.final::before{content:'';position:absolute;left:50%;top:0;transform:translateX(-50%);
+  width:min(720px,86%);height:1px;
+  background:linear-gradient(90deg,transparent,rgba(124,106,255,.55),rgba(76,201,240,.55),transparent);
+  box-shadow:0 0 44px 6px rgba(100,150,255,.16)}
+.final .blob{filter:blur(130px)}
+.final .b3{width:600px;height:340px;left:50%;bottom:-40%;transform:translateX(-50%);
+  background:rgba(124,106,255,.13);animation:pulse 7s ease-in-out infinite}
+.final h2{max-width:17ch;margin:0 auto 22px;position:relative}
+.final .lede{margin:0 auto 36px;text-align:center;position:relative}
+.final-cta{display:flex;justify-content:center;gap:14px;position:relative}
+
+/* ── Footer ─────────────────────────────────────────────── */
+footer{border-top:1px solid var(--line-soft);padding-top:70px;overflow:hidden}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;margin-bottom:90px}
+.foot-brand p{color:var(--txt-3);font-size:13.5px;max-width:26ch;margin-top:16px;line-height:1.65}
+footer h4{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--txt-3);margin-bottom:18px;font-weight:500}
+footer ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+footer ul a{color:var(--txt-2);font-size:13.5px;text-decoration:none;transition:color .25s}
+footer ul a:hover{color:var(--txt)}
+.megaword{font-size:clamp(84px,13.5vw,196px);font-weight:700;letter-spacing:-.05em;line-height:.82;
+  text-align:center;user-select:none;white-space:nowrap;transform:translateY(12%);
+  background:linear-gradient(100deg,rgba(255,255,255,.045) 42%,rgba(255,255,255,.16) 50%,rgba(255,255,255,.045) 58%);
+  background-size:240% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:sheen 9s linear infinite}
+.foot-line{display:flex;justify-content:space-between;border-top:1px solid var(--line-soft);
+  padding:22px 0 26px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--txt-3)}
+
+/* ── Reveals au scroll ──────────────────────────────────── */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media(max-width:1020px){
+  .nav-links,.lang{display:none} /* intégration : menu burger glass ici */
+  .frame-body{grid-template-columns:1fr 1.05fr}
+  .f-side{display:none}
+  .c-a,.c-b{grid-column:span 12}
+  .c-c,.c-d,.c-e{grid-column:span 6}
+  .plans{grid-template-columns:1fr 1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat:nth-child(3){border-left:none}
+  .stat:nth-child(n+3){border-top:1px solid var(--line-soft)}
+  .foot-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  .container{padding:0 20px}
+  .hero{padding-top:140px}
+  .hero-cta,.final-cta{flex-direction:column;align-items:center}
+  .frame{transform:none}
+  .frame-body{grid-template-columns:1fr}
+  .f-brief{border-right:none;border-bottom:1px solid var(--line-soft)}
+  .f-render{min-height:230px}
+  .c-c,.c-d,.c-e{grid-column:span 12}
+  .plans{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr}
+  .stat+.stat{border-left:none;border-top:1px solid var(--line-soft)}
+  .foot-grid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal,.hero .fade{opacity:1;transform:none}
+  .hline>span{transform:none}
+  .loader{display:none}
+  .frame{transform:none}
+  nav{transform:none}
+}
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+<div class="noise"></div>
+<div class="loader"><div class="loader-inner">
+  <!-- ⬇ remplacer par NEVA_Logo_BlancPlan_de_travail_1 -->
+  <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M4 20V4l16 16V4" stroke="#F5F6F8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div class="loader-bar"><i id="lbar"></i></div>
+  <span class="loader-count" id="lcount">00</span>
+</div></div>
+<nav>
+  <div class="nav-inner">
+    <a class="brand" href="#">
+      <!-- ⬇ remplacer par NEVA_Logo_BlancPlan_de_travail_1 (h. 22px) -->
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 20V4l16 16V4" stroke="#F5F6F8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="brand-name">Neva <em>Design</em></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#modules">Modules</a></li>
+      <li><a href="#creations">Créations</a></li>
+      <li><a href="#tarifs">Tarifs</a></li>
+      <li><a href="#">Le studio</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="lang"><b>FR</b> / EN</span>
+      <a class="nav-login" href="#">Connexion</a>
+      <a class="btn btn-primary" href="#">Commencer</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-sky">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="beam"></div>
+    <div class="hero-grid"></div>
+  </div>
+  <div class="container">
+    <p class="kicker fade f1">Studio créatif IA — FiveM &amp; GTA RP</p>
+    <h1>
+      <span class="hline"><span>Le studio créatif</span></span>
+      <span class="hline"><span>des serveurs qui <span class="grad-word">recrutent</span>.</span></span>
+    </h1>
+    <p class="lede fade f2">Un directeur artistique IA compose vos affiches, logos et identités. Brief en français, rendus prêts à publier, exports jusqu'en 8K.</p>
+    <div class="hero-cta fade f3">
+      <a class="btn btn-primary" href="#">Créer mon premier visuel <span class="arrow">→</span></a>
+      <a class="btn btn-ghost" href="#creations">Voir les créations</a>
+    </div>
+    <p class="hero-proof fade f4">5 créations offertes<i>·</i>Sans carte bancaire</p>
+  </div>
+
+  <div class="container stage fade f4" id="stage">
+    <div class="stage-glow"></div>
+    <div class="frame-shell">
+    <div class="frame" id="frame">
+      <div class="frame-bar">
+        <div class="dots"><i></i><i></i><i></i></div>
+        <span class="frame-title">DESIGN STUDIO — NEVA</span>
+        <span class="frame-badge">NEVA PRO</span>
+      </div>
+      <div class="frame-body">
+        <aside class="f-side">
+          <div class="mini-logo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 20V4l16 16V4" stroke="#9EA1AC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="f-item on"><i></i>Design Studio</div>
+          <div class="f-item"><i></i>Creative Director</div>
+          <div class="f-item"><i></i>Enhance</div>
+          <div class="f-item"><i></i>Character</div>
+          <div class="f-item"><i></i>Audit</div>
+          <div class="f-foot">
+            <div class="mono-note"><span>Créations</span><span>87 / 100</span></div>
+            <div class="bar"><i></i></div>
+          </div>
+        </aside>
+        <div class="f-brief">
+          <p class="f-label">Brief</p>
+          <p>Affiche de lancement pour <b>Horizon RP</b> — nuit sur Vinewood, néons violets, Mustang au premier plan, titre <b>« Grand Opening »</b>, typographie chrome.</p>
+          <div class="chips">
+            <span class="chip">Affiche · 4:5</span>
+            <span class="chip">Neva Pro</span>
+            <span class="chip">8K</span>
+          </div>
+          <a class="btn btn-primary" href="#">Composer le visuel <span class="arrow">→</span></a>
+        </div>
+        <div class="f-render">
+          <!-- ⬇ remplacer par une vraie création (affiche verticale traitée) -->
+          <span class="art-word">HORIZON</span>
+          <div class="shimmer"></div>
+          <div class="f-meta">
+            <span class="mono-note">Rendu 01 · 4096×5120</span>
+            <span class="f-status"><i></i>Prêt à publier</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</header>
+
+<section class="wall" id="creations">
+  <span class="mono-note reveal">Produites par le studio — publiées par 2 400+ créateurs</span>
+  <div class="marquee reveal d1">
+    <div class="track">
+      <!-- ⬇ remplacer chaque tuile par une vraie création traitée -->
+      <div class="art a1"><span class="aw">DOSSIER LÉGAL</span><span class="cap">Affiche — 001</span></div>
+      <div class="art a2"><span class="aw">VIBE</span><span class="cap">Pack serveur — 002</span></div>
+      <div class="art a3"><span class="aw">RECRUTEMENT</span><span class="cap">Campagne — 003</span></div>
+      <div class="art a4"><span class="aw">MAIN TEAM</span><span class="cap">Identité — 004</span></div>
+      <div class="art a5"><span class="aw">UNSET</span><span class="cap">Loading — 005</span></div>
+      <div class="art a6"><span class="aw">MARINA</span><span class="cap">Bannière — 006</span></div>
+      <div class="art a1"><span class="aw">DOSSIER LÉGAL</span><span class="cap">Affiche — 001</span></div>
+      <div class="art a2"><span class="aw">VIBE</span><span class="cap">Pack serveur — 002</span></div>
+      <div class="art a3"><span class="aw">RECRUTEMENT</span><span class="cap">Campagne — 003</span></div>
+      <div class="art a4"><span class="aw">MAIN TEAM</span><span class="cap">Identité — 004</span></div>
+      <div class="art a5"><span class="aw">UNSET</span><span class="cap">Loading — 005</span></div>
+      <div class="art a6"><span class="aw">MARINA</span><span class="cap">Bannière — 006</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="word-marquee" aria-hidden="true">
+  <div class="wm-track">
+    <span>Affiches</span><span class="full">·</span><span>Logos</span><span class="full">·</span><span>Identités</span><span class="full">·</span><span>Bannières</span><span class="full">·</span><span>Campagnes</span><span class="full">·</span>
+    <span>Affiches</span><span class="full">·</span><span>Logos</span><span class="full">·</span><span>Identités</span><span class="full">·</span><span>Bannières</span><span class="full">·</span><span>Campagnes</span><span class="full">·</span>
+  </div>
+</div>
+
+<section class="block" id="modules" style="padding-top:clamp(80px,9vw,130px)">
+  <div class="container">
+    <div class="head">
+      <p class="kicker reveal">Modules</p>
+      <h2 class="reveal d1">Six modules. Une seule direction artistique.</h2>
+      <p class="lede reveal d2">Chaque module travaille la même matière : l'image de votre serveur. Du poster au dossier RP, sans jamais perdre la ligne.</p>
+    </div>
+    <div class="bento">
+      <div class="card c-a reveal">
+        <div class="demo">
+          <p class="f-label">Brief</p>
+          <p class="brief-line">« Bannière de saison pour <b>Larya RP</b> — été, jetski à la marina, logo au centre, palette corail. »</p>
+          <div class="renders">
+            <div class="r a5"><span class="cap">Rendu 01</span></div>
+            <div class="r a2"><span class="cap">Rendu 02</span></div>
+          </div>
+        </div>
+        <h3>Design Studio</h3>
+        <p>Un brief en français, des visuels prêts à publier. Affiches, bannières, campagnes complètes.</p>
+      </div>
+      <div class="card c-b reveal d1">
+        <div class="demo" style="padding:0;border:none;background:none">
+          <div class="split">
+            <div class="sp-1"><span class="tag">Avant</span></div>
+            <div class="sp-2"><span class="tag">Après · 8K</span></div>
+          </div>
+        </div>
+        <h3>Enhance</h3>
+        <p>Vos anciens visuels repassent au studio : netteté, lumière, étalonnage — jusqu'au 8K.</p>
+      </div>
+      <div class="card c-c reveal">
+        <div class="demo">
+          <div class="bubbles">
+            <div class="bubble bu">Il me faut un concept pour la saison 3 du serveur.</div>
+            <div class="bubble ba">Trois pistes : « Heat Wave » néon crépusculaire, « Blackout » minimal chrome, « Riviera » pastel 90s. Je compose la première ?</div>
+          </div>
+        </div>
+        <h3>Creative Director</h3>
+        <p>Le directeur artistique qui répond, propose des concepts et lance la génération.</p>
+      </div>
+      <div class="card c-d reveal d1">
+        <div class="demo">
+          <div class="idcard">
+            <div class="idh"><span>État de San Andreas</span><span>ID-2947</span></div>
+            <div class="idrow">
+              <div class="avatar"></div>
+              <dl>
+                <dt>Nom</dt><dd>V. Moretti</dd>
+                <dt>Profession</dt><dd>Import-export</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+        <h3>Character</h3>
+        <p>Chaque personnage devient un dossier : carte d'identité, casier, portrait studio.</p>
+      </div>
+      <div class="card c-e reveal d2">
+        <div class="demo">
+          <div class="score"><b>84</b><span class="mono-note">/ 100 · Solide</span></div>
+          <div class="bars">
+            <div class="row"><span>Composition</span><span class="tr"><i style="--w:88%"></i></span><span class="val">88</span></div>
+            <div class="row"><span>Typographie</span><span class="tr"><i style="--w:74%"></i></span><span class="val">74</span></div>
+            <div class="row"><span>Impact</span><span class="tr"><i style="--w:91%"></i></span><span class="val">91</span></div>
+          </div>
+        </div>
+        <h3>Audit</h3>
+        <p>Un verdict chiffré sur vos designs — et la version corrigée qui va avec.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="container">
+    <div class="stats">
+      <div class="stat reveal"><b data-count="2400" data-suffix="+">0</b><span>Créateurs FiveM</span></div>
+      <div class="stat reveal d1"><b data-count="18000" data-suffix="+">0</b><span>Visuels exportés</span></div>
+      <div class="stat reveal d2"><b data-count="8" data-suffix="K">0</b><span>Définition max</span></div>
+      <div class="stat reveal d3"><b data-count="24" data-suffix="/7">0</b><span>Studio ouvert</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="tarifs">
+  <div class="container">
+    <div class="head">
+      <p class="kicker reveal">Tarifs</p>
+      <h2 class="reveal d1">Un prix simple. Des rendus signés.</h2>
+      <p class="lede reveal d2">Commencez gratuitement. Passez au plan supérieur quand le studio devient indispensable — sans engagement.</p>
+    </div>
+    <div class="plans">
+      <div class="plan reveal">
+        <h3>Découverte</h3>
+        <p class="for">Pour tester le studio, sans carte bancaire.</p>
+        <div class="price"><b>0 €</b><span>/ mois</span></div>
+        <p class="quota">5 créations / mois</p>
+        <ul>
+          <li>Previews basse résolution</li>
+          <li>Filigrane Neva</li>
+          <li>Historique limité</li>
+        </ul>
+        <a class="btn btn-ghost" href="#">Tester en preview</a>
+      </div>
+      <div class="plan plan-hot reveal d1">
+        <span class="flag">Le plus choisi</span>
+        <h3>Creator</h3>
+        <p class="for">Pour les créateurs actifs et les fondateurs de serveurs.</p>
+        <div class="price"><b>19 €</b><span>/ mois</span></div>
+        <p class="quota">100 créations / mois</p>
+        <ul>
+          <li>Exports HD sans filigrane</li>
+          <li>Usage commercial inclus</li>
+          <li>Personnages sauvegardés</li>
+        </ul>
+        <a class="btn btn-primary" href="#">Choisir Creator</a>
+      </div>
+      <div class="plan reveal d2">
+        <h3>Studio</h3>
+        <p class="for">Pour les équipes qui publient chaque semaine.</p>
+        <div class="price"><b>49 €</b><span>/ mois</span></div>
+        <p class="quota">350 créations / mois</p>
+        <ul>
+          <li>Générations premium</li>
+          <li>Exports 2K / 4K</li>
+          <li>Collections et projets</li>
+        </ul>
+        <a class="btn btn-ghost" href="#">Choisir Studio</a>
+      </div>
+      <div class="plan reveal d3">
+        <h3>Agence</h3>
+        <p class="for">Pour les studios et la production client à gros volume.</p>
+        <div class="price"><b>99 €</b><span>/ mois</span></div>
+        <p class="quota">900 créations / mois</p>
+        <ul>
+          <li>Exports 8K prioritaires</li>
+          <li>Multi-références</li>
+          <li>Support prioritaire</li>
+        </ul>
+        <a class="btn btn-ghost" href="#">Choisir Agence</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="blob b3"></div>
+  <div class="container">
+    <h2 class="reveal">Votre serveur mérite une image de studio.</h2>
+    <p class="lede reveal d1">Décrivez votre univers. Le premier visuel est prêt dans la minute.</p>
+    <div class="final-cta reveal d2">
+      <a class="btn btn-primary" href="#">Créer mon premier visuel <span class="arrow">→</span></a>
+      <a class="btn btn-ghost" href="#tarifs">Voir les tarifs</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 20V4l16 16V4" stroke="#F5F6F8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="brand-name">Neva <em>Design</em></span>
+        </a>
+        <p>Le studio créatif IA des serveurs FiveM. Une filiale de Neva Agency.</p>
+      </div>
+      <div>
+        <h4>Produit</h4>
+        <ul><li><a href="#modules">Modules</a></li><li><a href="#tarifs">Tarifs</a></li><li><a href="#creations">Créations</a></li></ul>
+      </div>
+      <div>
+        <h4>Studio</h4>
+        <ul><li><a href="#">Le studio</a></li><li><a href="#">Portfolio</a></li><li><a href="#">Discord</a></li></ul>
+      </div>
+      <div>
+        <h4>Légal</h4>
+        <ul><li><a href="#">Mentions légales</a></li><li><a href="#">CGV</a></li><li><a href="#">Confidentialité</a></li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="megaword">NEVA DESIGN</div>
+  <div class="container">
+    <div class="foot-line">
+      <span>© 2026 Neva Agency</span>
+      <span>Fait de nuit. Publié de jour.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ── Preloader ── */
+if(reduce){document.body.classList.add('loaded')}
+else{
+  const bar=document.getElementById('lbar'),cnt=document.getElementById('lcount'),t0=performance.now(),dur=850;
+  (function tick(t){
+    const p=Math.min((t-t0)/dur,1),e=1-Math.pow(1-p,3),v=Math.round(e*100);
+    bar.style.width=v+'%';cnt.textContent=String(v).padStart(2,'0')+' — 100';
+    if(p<1)requestAnimationFrame(tick);else document.body.classList.add('loaded');
+  })(t0);
+}
+
+/* ── Révélations au scroll ── */
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.18});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ── Compteurs ── */
+const co=new IntersectionObserver(es=>{es.forEach(e=>{
+  if(!e.isIntersecting)return;co.unobserve(e.target);
+  const el=e.target,end=+el.dataset.count,suf=el.dataset.suffix||'',t0=performance.now(),dur=1600;
+  const fmt=n=>n.toLocaleString('fr-FR').replace(/\u202f|\u00a0/g,'\u2009');
+  (function tick(t){const p=Math.min((t-t0)/dur,1),v=Math.round(end*(1-Math.pow(1-p,3)));
+    el.textContent=fmt(v)+suf;if(p<1)requestAnimationFrame(tick)})(t0);
+})},{threshold:.6});
+document.querySelectorAll('[data-count]').forEach(el=>co.observe(el));
+
+/* ── Le mockup se redresse en entrant dans le viewport ── */
+const stage=document.getElementById('stage');
+if(stage&&!reduce){
+  const so=new IntersectionObserver(es=>{es.forEach(e=>{
+    if(e.isIntersecting){stage.classList.add('up');so.unobserve(stage)}
+  })},{threshold:.35});
+  so.observe(stage);
+}else if(stage){stage.classList.add('up')}
+</script>
+</body>
+</html>

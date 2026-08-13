@@ -1,91 +1,154 @@
-﻿import { Wand2, ArrowRight, Copy, Sparkles } from "lucide-react";
+import { ArrowUpRight, Copy, Wand2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Label, Textarea } from "@/components/ui/field";
+import { ModuleHeader } from "@/components/dashboard/ModuleHeader";
 
-const stylePresets = [
-  { label: "Cinematic Dark", color: "#FF6B7D" },
-  { label: "Miami Sunset", color: "#FF7B4B" },
-  { label: "Golden Hour", color: "#FFD166" },
-  { label: "Urban Gritty", color: "#9A9A9A" },
-  { label: "Luxury Editorial", color: "#FFB5C8" },
-  { label: "Neon Noir", color: "#60A5FA" },
-];
+/*
+ * Neva Prompt — maquette sans logique. Le futur atelier de prompts :
+ * intention, moteur et style à gauche, prompt généré à droite.
+ * Actions désactivées tant que le module est en préparation.
+ */
 
 const nevaEngines = ["Neva Core", "Neva Vision", "Neva Studio"];
 
+/* Noms de styles transmis tels quels aux moteurs — ne pas traduire */
+const stylePresets = [
+  "Cinematic Dark",
+  "Miami Sunset",
+  "Golden Hour",
+  "Urban Gritty",
+  "Luxury Editorial",
+  "Neon Noir",
+];
+
 export default function PromptPage() {
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
-      <div className="flex items-start justify-between mb-10">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Wand2 size={16} className="text-[#FFD166]" />
-            <h1 className="text-2xl font-bold text-[#F5F0E8]">Neva Prompt</h1>
-          </div>
-          <p className="text-sm text-[#666]">Generate ultra-precise AI image prompts crafted for GTA RP and FiveM aesthetics.</p>
-        </div>
-        <div className="flex items-center gap-1.5 text-xs text-[#9A9A9A] bg-white/5 border border-white/[0.08] rounded-lg px-3 py-1.5">
-          <Sparkles size={10} className="text-[#FFD166]" />
-          1 création / prompt
-        </div>
+    <div className="relative mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-6 lg:px-10">
+      {/* Profondeur — jamais d'aplat noir nu */}
+      <div aria-hidden className="pv-halo--violet pv-halo -top-24 left-[18%] h-72 w-72" />
+
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+        <Badge variant="subtle">En préparation</Badge>
+        <span className="font-mono text-[10px] tracking-[0.1em] text-dusk">
+          Ce module ouvrira prochainement dans l&apos;atelier
+        </span>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Left: Config */}
-        <div className="flex flex-col gap-5">
-          <div className="glass-card rounded-2xl p-5 border border-white/[0.08]">
-            <label className="block text-xs font-medium text-[#9A9A9A] mb-2">What to generate</label>
-            <textarea
-              rows={4}
-              placeholder="e.g. A cinematic recruitment poster for a luxury FiveM server, urban photography style, Los Santos skyline..."
-              className="w-full bg-transparent text-sm text-[#F5F0E8] placeholder-[#444] outline-none resize-none leading-relaxed"
+      <ModuleHeader
+        icon={Wand2}
+        eyebrow="Neva Prompt"
+        title="Des prompts d'une précision chirurgicale"
+        description="Décrivez votre intention : Neva Prompt la traduira en prompt taillé pour l'esthétique GTA RP et FiveM, prêt pour vos moteurs de génération."
+        accent="#7C6AFF"
+        meta="1 création / prompt"
+        activeStep={0}
+        steps={[
+          { label: "Décrire", detail: "Votre intention visuelle" },
+          { label: "Affiner", detail: "Moteur et style" },
+          { label: "Copier", detail: "Prompt prêt à l'emploi" },
+        ]}
+      />
+
+      <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
+        {/* Configuration */}
+        <div className="flex flex-col gap-6">
+          <div className="pv-glass pv-edge rounded-2xl p-5 sm:p-6">
+            <Label htmlFor="prompt-intent">Que voulez-vous générer&nbsp;?</Label>
+            <Textarea
+              id="prompt-intent"
+              rows={5}
+              placeholder="Ex. : une affiche de recrutement cinématographique pour un serveur FiveM haut de gamme, photographie urbaine, ligne d'horizon de Los Santos…"
             />
           </div>
 
-          <div className="glass-card rounded-2xl p-5 border border-white/[0.08]">
-            <label className="block text-xs font-medium text-[#9A9A9A] mb-3">Neva Engine</label>
-            <div className="grid grid-cols-2 gap-2">
-              {nevaEngines.map((m, i) => (
-                <button key={m} className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${i === 0 ? "bg-[#FF7B4B]/15 border border-[#FF7B4B]/30 text-[#FF7B4B]" : "bg-white/5 border border-white/[0.06] text-[#666] hover:text-[#CCCCC0]"}`}>
-                  {m}
+          <div className="pv-glass pv-edge rounded-2xl p-5 sm:p-6">
+            <p className="pv-label mb-4">Moteur Neva</p>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+              {nevaEngines.map((engine, index) => (
+                <button
+                  key={engine}
+                  type="button"
+                  disabled
+                  className={`h-10 rounded-lg border px-3 text-[13px] transition-colors duration-300 disabled:cursor-not-allowed ${
+                    index === 0
+                      ? "border-[rgba(109,91,232,0.5)] bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]"
+                      : "border-[color:var(--hairline)] text-steel"
+                  }`}
+                >
+                  {engine}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="glass-card rounded-2xl p-5 border border-white/[0.08]">
-            <label className="block text-xs font-medium text-[#9A9A9A] mb-3">Style Presets</label>
+          <div className="pv-glass pv-edge rounded-2xl p-5 sm:p-6">
+            <p className="pv-label mb-4">Styles prédéfinis</p>
             <div className="flex flex-wrap gap-2">
-              {stylePresets.map((s, i) => (
-                <button key={s.label} className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${i === 0 ? "text-white" : "bg-white/5 border border-white/[0.06] text-[#666] hover:text-[#CCCCC0]"}`} style={i === 0 ? { background: s.color } : {}}>
-                  {s.label}
+              {stylePresets.map((preset, index) => (
+                <button
+                  key={preset}
+                  type="button"
+                  disabled
+                  className={`h-10 rounded-lg border px-3.5 font-mono text-[11px] tracking-[0.06em] transition-colors duration-300 disabled:cursor-not-allowed ${
+                    index === 0
+                      ? "border-[rgba(109,91,232,0.5)] bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]"
+                      : "border-[color:var(--hairline)] text-steel"
+                  }`}
+                >
+                  {preset}
                 </button>
               ))}
             </div>
           </div>
 
-          <Button variant="gradient" size="md" className="w-full">
-            <Wand2 size={14} />
-            Generate Prompt
-          </Button>
+          <div>
+            <Button variant="primary" size="md" disabled className="w-full">
+              Générer le prompt
+              <ArrowUpRight size={14} />
+            </Button>
+            <p className="mt-3 text-center font-mono text-[10px] tracking-[0.08em] text-dusk">
+              L&apos;action sera activée à l&apos;ouverture du module.
+            </p>
+          </div>
         </div>
 
-        {/* Right: Output */}
-        <div className="glass-card rounded-2xl p-5 border border-white/[0.08] flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-medium text-[#9A9A9A]">Generated Prompt</span>
-            <button className="flex items-center gap-1 text-xs text-[#666] hover:text-[#F5F0E8] transition-colors">
-              <Copy size={11} /> Copy
+        {/* Sortie */}
+        <div className="pv-glass pv-edge rounded-2xl flex min-h-[420px] flex-col overflow-hidden">
+          <div className="flex items-center justify-between border-b border-[color:var(--hairline)] bg-abyss px-5 py-3">
+            <span className="pv-label">Prompt généré</span>
+            <button
+              type="button"
+              disabled
+              className="inline-flex h-10 items-center gap-1.5 rounded-lg px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-dusk disabled:cursor-not-allowed"
+            >
+              <Copy size={11} />
+              Copier
             </button>
           </div>
-          <div className="flex-1 p-4 bg-[#0a0a0a] rounded-xl border border-white/[0.06] text-sm text-[#CCCCC0] leading-relaxed font-mono">
-            <span className="text-[#444]">Your prompt will appear here after generationâ€¦</span>
+
+          <div className="relative flex-1 bg-abyss p-5 font-mono text-[13px] leading-relaxed sm:p-6">
+            <div aria-hidden className="pv-halo--violet pv-halo right-8 top-10 h-40 w-40 opacity-60" />
+            <p className="text-dusk">Votre prompt s&apos;affichera ici après la génération…</p>
+            <div className="mt-8 flex flex-col gap-2.5" aria-hidden>
+              <div className="pv-skeleton h-3 w-full" />
+              <div className="pv-skeleton h-3 w-5/6" />
+              <div className="pv-skeleton h-3 w-2/3" />
+              <div className="pv-skeleton h-3 w-1/2" />
+            </div>
           </div>
-          <div className="mt-3 flex gap-2">
-            <button className="flex-1 px-3 py-2 text-xs text-[#666] bg-white/5 border border-white/[0.06] rounded-lg hover:text-[#F5F0E8] hover:border-white/10 transition-all">Regenerate</button>
-            <button className="flex-1 px-3 py-2 text-xs text-[#666] bg-white/5 border border-white/[0.06] rounded-lg hover:text-[#F5F0E8] hover:border-white/10 transition-all">Save Prompt</button>
-            <button className="flex items-center gap-1 px-3 py-2 text-xs bg-gradient-to-r from-[#FF6B7D] to-[#FFD166] text-white rounded-lg hover:opacity-90 transition-opacity">
-              Use <ArrowRight size={11} />
-            </button>
+
+          <div className="flex flex-col gap-2 border-t border-[color:var(--hairline)] p-4 sm:flex-row">
+            <Button variant="secondary" size="md" disabled className="flex-1">
+              Régénérer
+            </Button>
+            <Button variant="secondary" size="md" disabled className="flex-1">
+              Enregistrer le prompt
+            </Button>
+            <Button variant="primary" size="md" disabled className="flex-1">
+              Utiliser
+              <ArrowUpRight size={13} />
+            </Button>
           </div>
         </div>
       </div>

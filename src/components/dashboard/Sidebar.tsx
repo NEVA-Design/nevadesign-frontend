@@ -1,11 +1,24 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { BookOpen, CreditCard, Home, LogOut, MessageSquare, Palette, Settings, X } from "lucide-react";
+import {
+  BookOpen,
+  CreditCard,
+  Home,
+  LogOut,
+  MessageSquare,
+  Palette,
+  ScanSearch,
+  Settings,
+  UserRound,
+  Wand2,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout } from "@/app/auth/actions";
+import { Gauge } from "@/components/ui/gauge";
 import { cn } from "@/lib/utils";
 
 interface UserProfile {
@@ -19,106 +32,121 @@ interface UserProfile {
   plan: string;
 }
 
+/*
+ * Sidebar Givre — un panneau de verre dépoli qui flotte sur la
+ * scène d'aube et la floute réellement. Arête haute allumée,
+ * filets intérieurs très doux, ombre mauve. Le monogramme noir
+ * (nevanoir) signe la tête, l'item actif porte la pilule encre,
+ * les crédits vivent dans une pilule de verre au liseré spectral.
+ */
 const navGroups = [
   {
-    label: "Overview",
+    label: "Atelier",
+    items: [{ href: "/dashboard", icon: Home, label: "Vue d'ensemble" }],
+  },
+  {
+    label: "Création",
     items: [
-      { href: "/dashboard", icon: Home, label: "Dashboard", accent: "#55D18A" },
+      { href: "/dashboard/design", icon: Palette, label: "Design Studio" },
+      { href: "/dashboard/chat", icon: MessageSquare, label: "Creative Director" },
+      { href: "/dashboard/enhance", icon: Wand2, label: "Enhance" },
+      { href: "/dashboard/character", icon: UserRound, label: "Character" },
+      { href: "/dashboard/audit", icon: ScanSearch, label: "Audit" },
     ],
   },
   {
-    label: "Studio",
-    items: [
-      { href: "/dashboard/design", icon: Palette, label: "Neva Design", accent: "#FF7B4B" },
-    ],
+    label: "Bibliothèque",
+    items: [{ href: "/dashboard/downloads", icon: BookOpen, label: "Ressources" }],
   },
   {
-    label: "Direction",
+    label: "Compte",
     items: [
-      { href: "/dashboard/chat", icon: MessageSquare, label: "Creative Director", accent: "#FFB5C8" },
-    ],
-  },
-  {
-    label: "Library",
-    items: [
-      { href: "/dashboard/downloads", icon: BookOpen, label: "Ressources", accent: "#9BD7FF" },
-    ],
-  },
-  {
-    label: "Account",
-    items: [
-      { href: "/dashboard/billing", icon: CreditCard, label: "Billing", accent: "#FFD166" },
-      { href: "/dashboard/settings", icon: Settings, label: "Parametres", accent: "#BBA7FF" },
+      { href: "/dashboard/billing", icon: CreditCard, label: "Abonnement" },
+      { href: "/dashboard/settings", icon: Settings, label: "Paramètres" },
     ],
   },
 ];
 
 export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?: () => void }) {
   const pathname = usePathname();
-  const creditPct = Math.min(100, Math.round((user.credits / Math.max(user.maxCredits, 1)) * 100));
 
   const isActive = (href: string) =>
     href === "/dashboard" ? pathname === href : pathname.startsWith(href);
 
   return (
-    <aside className="flex h-screen w-[252px] flex-col border-r border-white/[0.07] bg-[#050505]/96 shadow-[18px_0_60px_rgba(0,0,0,0.35)] backdrop-blur-2xl">
-      <div className="flex h-16 items-center gap-3 px-4">
-        <Link href="/dashboard" onClick={onClose} className="group flex min-w-0 flex-1 items-center gap-3">
-          <div className="relative h-9 w-9 overflow-hidden rounded-xl border border-white/[0.09] bg-white/[0.03]">
-            <Image src="/nevalogooo.png" alt="Neva AI" fill sizes="36px" className="object-contain p-1.5" />
-          </div>
-          <div className="min-w-0">
-            <div className="text-sm font-semibold tracking-tight text-[#F5F0E8]">Neva AI</div>
-            <div className="truncate text-[11px] text-[#777]">Creative OS for FiveM</div>
-          </div>
+    <aside className="pv-glass pv-edge flex h-full w-[264px] flex-col overflow-hidden rounded-[24px] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_2px_6px_rgba(96,84,140,0.08),0_24px_56px_rgba(96,84,140,0.14)]">
+      {/* Marque — le monogramme noir signe le panneau */}
+      <div className="flex h-[68px] items-center justify-between border-b border-[rgba(29,35,64,0.06)] px-5">
+        <Link
+          href="/dashboard"
+          onClick={onClose}
+          aria-label="Neva Design — vue d'ensemble"
+          className="flex items-center gap-3"
+        >
+          <Image
+            src="/nevanoir.jpg"
+            alt=""
+            width={32}
+            height={32}
+            className="h-8 w-8 rounded-lg object-cover shadow-[0_1px_2px_rgba(29,35,64,0.2)]"
+          />
+          <span className="flex flex-col leading-none">
+            <span className="text-[15px] font-medium tracking-[-0.02em] text-ink">
+              Neva Design
+            </span>
+            <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.2em] text-mist">
+              Studio créatif
+            </span>
+          </span>
         </Link>
-        {onClose && (
+        {onClose ? (
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl p-2 text-[#666] transition-colors hover:bg-white/[0.06] hover:text-[#F5F0E8] lg:hidden"
+            className="cursor-pointer rounded-lg p-2 text-slate transition-colors duration-[var(--dur-base)] hover:bg-ink/5 hover:text-ink lg:hidden"
             aria-label="Fermer le menu"
           >
             <X size={16} />
           </button>
-        )}
+        ) : null}
       </div>
 
-      <div className="px-3">
-        <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-[11px] font-medium text-[#A9A39B]">Credits</span>
-            <span className="text-[11px] font-semibold text-[#FFD166]">{creditPct}%</span>
-          </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-black/35">
-            <motion.div
-              className="h-full rounded-full bg-[linear-gradient(90deg,#FF6B7D,#FF7B4B,#FFD166)]"
-              initial={{ width: 0 }}
-              animate={{ width: `${creditPct}%` }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-            />
-          </div>
-          <div className="mt-2 flex items-end justify-between">
-            <motion.div
-              key={user.credits}
-              initial={{ opacity: 0.4, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-lg font-semibold tracking-tight text-[#F5F0E8]"
-            >
-              {user.credits.toLocaleString()}
-            </motion.div>
-            <div className="pb-0.5 text-[10px] uppercase tracking-[0.16em] text-[#777]">{user.plan}</div>
-          </div>
+      {/* Créations — la pilule de verre au liseré spectral */}
+      <div className="border-b border-[rgba(29,35,64,0.06)] px-5 py-5">
+        <div className="mb-3 flex items-baseline justify-between">
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
+            Créations
+          </span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[color:var(--num-color)]">
+            {user.plan}
+          </span>
         </div>
+        <motion.p
+          key={user.credits}
+          initial={{ opacity: 0.4, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="pv-credit-pill px-4 py-2"
+        >
+          <span className="pv-display text-[26px] leading-none text-ink">
+            {user.credits.toLocaleString("fr-FR")}
+          </span>
+          <span className="font-mono text-[11px] tracking-[0.08em] text-mist">
+            / {user.maxCredits.toLocaleString("fr-FR")}
+          </span>
+        </motion.p>
+        <Gauge value={user.credits} max={user.maxCredits} className="mt-4" />
       </div>
 
-      <nav className="mt-5 flex-1 overflow-y-auto px-3 pb-3">
+      {/* Navigation — scrollbar fine et transparente : rien ne raye le verre */}
+      <nav className="flex-1 overflow-y-auto px-3 py-4 [scrollbar-color:rgba(29,35,64,0.14)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-0 [&::-webkit-scrollbar-thumb]:bg-[rgba(29,35,64,0.14)] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-[5px]">
         {navGroups.map((group) => (
           <div key={group.label} className="mb-5">
-            <div className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#4B4B4B]">
-              {group.label}
+            <div className="mb-2 px-2">
+              <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
+                {group.label}
+              </span>
             </div>
-            <div className="space-y-1">
+            <div className="flex flex-col gap-1">
               {group.items.map((item) => {
                 const active = isActive(item.href);
                 return (
@@ -127,30 +155,28 @@ export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?
                     href={item.href}
                     onClick={onClose}
                     className={cn(
-                      "group relative flex h-11 items-center gap-3 rounded-xl px-3 text-sm transition-all duration-[250ms]",
+                      "group relative flex h-9 items-center gap-3 rounded-full px-4 text-[13px] transition-colors duration-[var(--dur-base)]",
                       active
-                        ? "bg-white/[0.08] text-[#F5F0E8] shadow-[0_10px_30px_rgba(0,0,0,0.28)]"
-                        : "text-[#85817B] hover:bg-white/[0.045] hover:text-[#F5F0E8]"
+                        ? "font-medium text-white"
+                        : "text-slate hover:bg-ink/[0.04] hover:text-ink"
                     )}
                   >
-                    {active && (
+                    {active ? (
                       <motion.span
                         layoutId="sidebar-active"
-                        className="absolute inset-y-2 left-0 w-1 rounded-r-full"
-                        style={{ background: item.accent }}
+                        className="absolute inset-0 rounded-full bg-ink shadow-[0_1px_2px_rgba(29,35,64,0.18),0_6px_16px_rgba(29,35,64,0.2)]"
+                        transition={{ type: "spring", stiffness: 420, damping: 34 }}
                       />
-                    )}
-                    <span
-                      className="flex h-8 w-8 items-center justify-center rounded-xl border transition-all"
-                      style={{
-                        color: active ? item.accent : undefined,
-                        borderColor: active ? `${item.accent}42` : "rgba(255,255,255,0.06)",
-                        background: active ? `${item.accent}16` : "rgba(255,255,255,0.025)",
-                      }}
-                    >
-                      <item.icon size={15} />
-                    </span>
-                    <span className="truncate font-medium">{item.label}</span>
+                    ) : null}
+                    <item.icon
+                      size={15}
+                      strokeWidth={1.8}
+                      className={cn(
+                        "relative shrink-0 transition-colors duration-[var(--dur-base)]",
+                        active ? "text-white" : "text-mist group-hover:text-slate"
+                      )}
+                    />
+                    <span className="relative truncate">{item.label}</span>
                   </Link>
                 );
               })}
@@ -159,23 +185,34 @@ export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?
         ))}
       </nav>
 
-      <div className="border-t border-white/[0.07] p-3">
-        <div className="flex items-center gap-3 rounded-2xl bg-white/[0.03] p-2">
-          <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#FF6B7D,#FFD166)]">
+      {/* Utilisateur */}
+      <div className="border-t border-[rgba(29,35,64,0.06)] p-3">
+        <div className="flex items-center gap-3 rounded-[20px] border border-[color:var(--hairline-glass)] bg-white/60 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_8px_20px_rgba(96,84,140,0.08)]">
+          <div className="h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-ink">
             {user.avatarUrl ? (
-              <Image src={user.avatarUrl} alt={user.name} width={36} height={36} className="h-full w-full object-cover" />
+              <Image
+                src={user.avatarUrl}
+                alt={user.name}
+                width={36}
+                height={36}
+                className="h-full w-full object-cover"
+              />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-xs font-bold text-white">
+              <div className="flex h-full w-full items-center justify-center font-mono text-[11px] font-semibold text-white">
                 {user.initials}
               </div>
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-xs font-semibold text-[#F5F0E8]">{user.name}</div>
-            <div className="truncate text-[10px] text-[#666]">{user.email}</div>
+            <div className="truncate text-xs font-medium text-ink">{user.name}</div>
+            <div className="truncate font-mono text-[10px] text-mist">{user.email}</div>
           </div>
           <form action={logout}>
-            <button type="submit" className="rounded-xl p-2 text-[#555] transition-colors hover:bg-white/[0.06] hover:text-[#FF6B7D]" aria-label="Se deconnecter">
+            <button
+              type="submit"
+              className="cursor-pointer rounded-lg p-2 text-mist transition-colors duration-[var(--dur-base)] hover:bg-ink/5 hover:text-err"
+              aria-label="Se déconnecter"
+            >
               <LogOut size={14} />
             </button>
           </form>

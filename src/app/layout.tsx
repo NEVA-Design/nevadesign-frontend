@@ -1,18 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { geist, geistMono, outfit } from "./fonts";
 import LanguageProvider from "@/components/LanguageProvider";
 import { defaultSeo, siteName, siteUrl } from "@/lib/seo";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -30,9 +20,9 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   icons: {
-    icon: "/favicon-4.ico",
-    shortcut: "/favicon-4.ico",
-    apple: "/favicon-4.ico",
+    icon: "/brand/favicon.png",
+    shortcut: "/brand/favicon.png",
+    apple: "/brand/apple-icon.png",
   },
   robots: {
     index: true,
@@ -52,10 +42,10 @@ export const metadata: Metadata = {
     siteName,
     images: [
       {
-        url: "/bglanding.png",
+        url: "/brand/og.png",
         width: 1200,
         height: 630,
-        alt: "Neva AI - IA créative pour serveurs FiveM",
+        alt: "Neva Design — studio créatif IA : miniatures, logos, identités, gaming",
       },
     ],
     locale: "fr_FR",
@@ -65,7 +55,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: defaultSeo.title,
     description: defaultSeo.description,
-    images: ["/bglanding.png"],
+    images: ["/brand/og.png"],
   },
 };
 
@@ -77,10 +67,10 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${geistSans.variable} ${geistMono.variable} dark`}
+      className={`${geist.variable} ${geistMono.variable} ${outfit.variable} dark`}
       style={{ colorScheme: "dark" }}
     >
-      <body className="bg-[#080808] text-[#F5F0E8] min-h-screen antialiased">
+      <body className="bg-void text-white min-h-screen antialiased">
         <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>

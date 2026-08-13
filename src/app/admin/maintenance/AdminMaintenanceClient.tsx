@@ -1,11 +1,23 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import { AlertTriangle, Check, Clock, Loader2, Power, ShieldCheck, X } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Check, Power, ShieldCheck, TriangleAlert } from "lucide-react";
+import { BrandMark } from "@/components/prisme/Brand";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { FormMessage, Input, Label, Textarea } from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
+import { Switch } from "@/components/ui/switch";
+import { useToasts, ToastViewport } from "@/components/ui/toast";
+import { PageHeader } from "@/components/admin/PageHeader";
 import { isMaintenanceActive, type MaintenanceMode } from "@/lib/maintenance";
 
-interface Toast { id: number; message: string; type: "success" | "error" }
+/*
+ * Maintenance — le rideau du studio. Deux gros interrupteurs
+ * (Ouvert / Maintenance) qui enregistrent immédiatement, le message
+ * public, la fenêtre programmée et un aperçu fidèle de la page
+ * publique : void, verre, lumière spectrale.
+ */
 
 type FormState = {
   enabled: boolean;
@@ -35,26 +47,6 @@ function fromMaintenance(item: MaintenanceMode): FormState {
   };
 }
 
-function Toasts({ items }: { items: Toast[] }) {
-  return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
-      {items.map((toast) => (
-        <div
-          key={toast.id}
-          className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium shadow-xl backdrop-blur-sm ${
-            toast.type === "success"
-              ? "border-[#4ADE80]/30 bg-[#4ADE80]/10 text-[#4ADE80]"
-              : "border-[#FF6B7D]/30 bg-[#FF6B7D]/10 text-[#FF6B7D]"
-          }`}
-        >
-          {toast.type === "success" ? <Check size={13} /> : <X size={13} />}
-          {toast.message}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export function AdminMaintenanceClient({
   initialMaintenance,
   tableMissing,
@@ -65,17 +57,9 @@ export function AdminMaintenanceClient({
   const [maintenance, setMaintenance] = useState(initialMaintenance);
   const [form, setForm] = useState<FormState>(() => fromMaintenance(initialMaintenance));
   const [saving, setSaving] = useState(false);
-  const [toasts, setToasts] = useState<Toast[]>([]);
-  const toastIdRef = useRef(0);
+  const { toasts, push } = useToasts();
 
   const active = useMemo(() => isMaintenanceActive(maintenance), [maintenance]);
-
-  function addToast(message: string, type: Toast["type"]) {
-    toastIdRef.current += 1;
-    const id = toastIdRef.current;
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => setToasts((prev) => prev.filter((toast) => toast.id !== id)), 3200);
-  }
 
   function updateForm<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -83,7 +67,7 @@ export function AdminMaintenanceClient({
 
   async function save(nextForm = form) {
     if (!nextForm.title.trim() || !nextForm.message.trim()) {
-      addToast("Titre et message requis", "error");
+      push("Le titre et le message sont requis.", "error");
       return;
     }
 
@@ -97,15 +81,20 @@ export function AdminMaintenanceClient({
       const data = await res.json();
 
       if (!res.ok || data.error) {
-        addToast(data.error ?? "Erreur serveur", "error");
+        push(data.error ?? "Erreur serveur. Réessayez.", "error");
         return;
       }
 
       setMaintenance(data.maintenance as MaintenanceMode);
       setForm(fromMaintenance(data.maintenance as MaintenanceMode));
-      addToast((data.maintenance as MaintenanceMode).enabled ? "Maintenance mise a jour" : "Maintenance desactivee", "success");
+      push(
+        (data.maintenance as MaintenanceMode).enabled
+          ? "Maintenance mise à jour."
+          : "Maintenance désactivée.",
+        "success"
+      );
     } catch {
-      addToast("Erreur reseau", "error");
+      push("Erreur réseau. Vérifiez votre connexion.", "error");
     } finally {
       setSaving(false);
     }
@@ -118,175 +107,221 @@ export function AdminMaintenanceClient({
   }
 
   return (
-    <div>
-      <Toasts items={toasts} />
+    <div className="pv-fade-up relative overflow-x-clip">
+      <div aria-hidden className="pv-halo -top-24 right-[-6%] h-[340px] w-[460px] opacity-50" />
+      <ToastViewport toasts={toasts} />
 
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-[#F5F0E8]">Maintenance</h1>
-          <p className="mt-0.5 text-sm text-[#555]">
-            Coupe l acces public au site, personnalise le message et programme une fenetre.
-          </p>
-        </div>
-        <div
-          className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold ${
+      <PageHeader
+        eyebrow="Console"
+        title={
+          <>
+            Fermer le <span className="pv-beam-text">rideau.</span>
+          </>
+        }
+        description="Coupez l'accès public au site, personnalisez le message affiché et programmez une fenêtre d'intervention."
+      >
+        <p
+          className={`inline-flex h-10 items-center gap-2 rounded-full border px-4 font-mono text-[11px] uppercase tracking-[0.14em] ${
             active
-              ? "border-[#FFD166]/30 bg-[#FFD166]/10 text-[#FFD166]"
-              : "border-[#4ADE80]/30 bg-[#4ADE80]/10 text-[#4ADE80]"
+              ? "border-warn/40 bg-warn/10 text-warn"
+              : "border-ok/40 bg-ok/10 text-ok"
           }`}
         >
-          <Power size={13} />
+          <Power size={13} strokeWidth={1.8} />
           {active ? "Maintenance active" : "Site ouvert"}
-        </div>
-      </div>
+        </p>
+      </PageHeader>
 
       {tableMissing && (
-        <div className="mb-6 rounded-2xl border border-[#FFD166]/25 bg-[#FFD166]/10 p-4 text-sm text-[#FFD166]">
-          <div className="flex items-start gap-2">
-            <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
-            <p>
-              La table <code className="font-mono text-[#F5F0E8]">site_maintenance</code> n existe pas encore.
-              Applique la migration <code className="font-mono text-[#F5F0E8]">011_site_maintenance.sql</code> dans Supabase avant d activer le mode.
-            </p>
-          </div>
-        </div>
+        <FormMessage tone="warning" className="relative mb-8">
+          <span className="flex items-start gap-2.5">
+            <TriangleAlert size={16} strokeWidth={1.8} className="mt-0.5 shrink-0" />
+            <span>
+              La table <code className="font-mono text-ink">site_maintenance</code> n&apos;existe pas
+              encore. Appliquez la migration{" "}
+              <code className="font-mono text-ink">011_site_maintenance.sql</code> dans Supabase
+              avant d&apos;activer le mode.
+            </span>
+          </span>
+        </FormMessage>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
-        <section className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-4">
-          <div className="mb-4 flex items-center gap-2">
-            <Power size={14} className="text-[#FF7B4B]" />
-            <h2 className="text-sm font-semibold text-[#F5F0E8]">Controle global</h2>
-          </div>
+      <div className="relative grid gap-5 lg:grid-cols-[420px_1fr]">
+        {/* ── Contrôle global ───────────────────────────────────── */}
+        <Card className="h-fit p-6">
+          <p className="pv-label mb-6">Contrôle global</p>
 
-          <div className="mb-5 grid grid-cols-2 gap-2">
+          <div className="mb-7 grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => setEnabled(false)}
               disabled={saving}
-              className={`rounded-xl border px-3 py-3 text-left transition-all ${
+              aria-pressed={!form.enabled}
+              className={`rounded-xl border px-4 py-4 text-left transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-60 ${
                 !form.enabled
-                  ? "border-[#4ADE80]/40 bg-[#4ADE80]/10 text-[#4ADE80]"
-                  : "border-white/[0.07] text-[#777] hover:border-white/[0.15]"
+                  ? "border-ok/40 bg-ok/10"
+                  : "border-[color:var(--hairline)] hover:border-[#C9C9C0]"
               }`}
             >
-              <Check size={14} className="mb-2" />
-              <span className="block text-sm font-semibold">Ouvert</span>
-              <span className="block text-[11px] text-[#666]">Acces normal</span>
+              <Check size={14} strokeWidth={1.8} className={`mb-2.5 ${!form.enabled ? "text-ok" : "text-ink/30"}`} />
+              <span className={`block text-sm font-medium ${!form.enabled ? "text-ok" : "text-ink/70"}`}>
+                Ouvert
+              </span>
+              <span className="mt-1 block font-mono text-[10px] tracking-[0.08em] text-dusk">
+                Accès normal
+              </span>
             </button>
             <button
               type="button"
               onClick={() => setEnabled(true)}
               disabled={saving}
-              className={`rounded-xl border px-3 py-3 text-left transition-all ${
+              aria-pressed={form.enabled}
+              className={`rounded-xl border px-4 py-4 text-left transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-60 ${
                 form.enabled
-                  ? "border-[#FFD166]/40 bg-[#FFD166]/10 text-[#FFD166]"
-                  : "border-white/[0.07] text-[#777] hover:border-white/[0.15]"
+                  ? "border-warn/40 bg-warn/10"
+                  : "border-[color:var(--hairline)] hover:border-[#C9C9C0]"
               }`}
             >
-              <AlertTriangle size={14} className="mb-2" />
-              <span className="block text-sm font-semibold">Maintenance</span>
-              <span className="block text-[11px] text-[#666]">Bloque le public</span>
+              <TriangleAlert
+                size={14}
+                strokeWidth={1.8}
+                className={`mb-2.5 ${form.enabled ? "text-warn" : "text-ink/30"}`}
+              />
+              <span className={`block text-sm font-medium ${form.enabled ? "text-warn" : "text-ink/70"}`}>
+                Maintenance
+              </span>
+              <span className="mt-1 block font-mono text-[10px] tracking-[0.08em] text-dusk">
+                Bloque le public
+              </span>
             </button>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-5">
             <div>
-              <label className="mb-1.5 block text-[11px] text-[#666]">Titre public</label>
-              <input
+              <div className="flex items-baseline justify-between">
+                <Label htmlFor="maintenance-title">Titre public</Label>
+                <span className="font-mono text-[10px] tracking-[0.06em] text-dusk">{form.title.length}/90</span>
+              </div>
+              <Input
+                id="maintenance-title"
                 value={form.title}
                 onChange={(event) => updateForm("title", event.target.value)}
                 maxLength={90}
-                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-[#F5F0E8] outline-none transition-colors placeholder:text-[#333] focus:border-white/[0.16]"
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] text-[#666]">Message public</label>
-              <textarea
+              <div className="flex items-baseline justify-between">
+                <Label htmlFor="maintenance-message">Message public</Label>
+                <span className="font-mono text-[10px] tracking-[0.06em] text-dusk">{form.message.length}/360</span>
+              </div>
+              <Textarea
+                id="maintenance-message"
                 value={form.message}
                 onChange={(event) => updateForm("message", event.target.value)}
                 maxLength={360}
                 rows={5}
-                className="w-full resize-none rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-[#F5F0E8] outline-none transition-colors placeholder:text-[#333] focus:border-white/[0.16]"
               />
             </div>
 
-            <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-white/[0.07] bg-white/[0.03] px-3 py-3">
-              <span className="flex items-center gap-2 text-sm text-[#CCCCC0]">
-                <ShieldCheck size={14} className="text-[#FF7B4B]" />
-                Garder l acces admin
+            <div className="flex min-h-[48px] items-center justify-between gap-4 rounded-xl border border-[color:var(--hairline)] bg-abyss px-4 py-3">
+              <span className="flex items-center gap-2.5 text-sm text-ink/80">
+                <ShieldCheck size={14} strokeWidth={1.8} className="shrink-0 text-[color:var(--num-color)]" />
+                Conserver l&apos;accès administrateur
               </span>
-              <input
-                type="checkbox"
+              <Switch
                 checked={form.allow_admin_access}
-                onChange={(event) => updateForm("allow_admin_access", event.target.checked)}
-                className="h-4 w-4 accent-[#FF7B4B]"
+                onChange={(next) => updateForm("allow_admin_access", next)}
+                aria-label="Conserver l'accès administrateur"
               />
-            </label>
+            </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1.5 block text-[11px] text-[#666]">Debut optionnel</label>
-                <input
+                <Label htmlFor="maintenance-starts">Début (optionnel)</Label>
+                <Input
+                  id="maintenance-starts"
                   type="datetime-local"
                   value={form.starts_at}
                   onChange={(event) => updateForm("starts_at", event.target.value)}
-                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-[#F5F0E8] outline-none transition-colors focus:border-white/[0.16]"
+                  className="text-xs"
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-[11px] text-[#666]">Fin optionnelle</label>
-                <input
+                <Label htmlFor="maintenance-ends">Fin (optionnelle)</Label>
+                <Input
+                  id="maintenance-ends"
                   type="datetime-local"
                   value={form.ends_at}
                   onChange={(event) => updateForm("ends_at", event.target.value)}
-                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-[#F5F0E8] outline-none transition-colors focus:border-white/[0.16]"
+                  className="text-xs"
                 />
               </div>
             </div>
 
-            <Button variant="gradient" size="md" className="w-full" onClick={() => save()} disabled={saving}>
-              {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-              Sauvegarder
+            <Button size="md" className="w-full" onClick={() => save()} disabled={saving}>
+              {saving ? <Spinner className="h-3.5 w-3.5" /> : <Check size={14} strokeWidth={1.8} />}
+              Enregistrer les modifications
             </Button>
           </div>
-        </section>
+        </Card>
 
-        <section className="space-y-4">
-          <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-4">
-            <div className="mb-4 flex items-center gap-2">
-              <Clock size={14} className="text-[#FF7B4B]" />
-              <h2 className="text-sm font-semibold text-[#F5F0E8]">Etat actuel</h2>
+        {/* ── État actuel + aperçu de la page publique ──────────── */}
+        <section className="space-y-5">
+          <Card className="p-6">
+            <p className="pv-label mb-5">État actuel</p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-xl border border-[color:var(--hairline)] bg-abyss px-4 py-4">
+                <p className="pv-label text-[10px]">Mode</p>
+                <p className={`mt-2 text-sm font-medium ${maintenance.enabled ? "text-warn" : "text-ok"}`}>
+                  {maintenance.enabled ? "Activé" : "Désactivé"}
+                </p>
+              </div>
+              <div className="rounded-xl border border-[color:var(--hairline)] bg-abyss px-4 py-4">
+                <p className="pv-label text-[10px]">Fenêtre</p>
+                <p className="mt-2 text-sm font-medium text-ink">
+                  {active ? "En cours" : "Hors période"}
+                </p>
+              </div>
+              <div className="rounded-xl border border-[color:var(--hairline)] bg-abyss px-4 py-4">
+                <p className="pv-label text-[10px]">Dernière modification</p>
+                <p className="mt-2 truncate text-sm font-medium text-ink">
+                  {maintenance.updated_by ?? "Jamais"}
+                </p>
+              </div>
             </div>
-            <div className="grid gap-3 md:grid-cols-3">
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
-                <span className="text-[11px] uppercase tracking-wider text-[#555]">Mode</span>
-                <p className="mt-1 text-sm font-semibold text-[#F5F0E8]">{maintenance.enabled ? "Active" : "Desactive"}</p>
-              </div>
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
-                <span className="text-[11px] uppercase tracking-wider text-[#555]">Fenetre</span>
-                <p className="mt-1 text-sm font-semibold text-[#F5F0E8]">{active ? "En cours" : "Hors periode"}</p>
-              </div>
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
-                <span className="text-[11px] uppercase tracking-wider text-[#555]">Derniere edition</span>
-                <p className="mt-1 truncate text-sm font-semibold text-[#F5F0E8]">{maintenance.updated_by ?? "Jamais"}</p>
-              </div>
-            </div>
-          </div>
+          </Card>
 
-          <div className="rounded-2xl border border-white/[0.07] bg-[#101010] p-6">
-            <span className="mb-4 inline-flex rounded-full border border-[#FFD166]/25 bg-[#FFD166]/10 px-3 py-1 text-xs font-semibold text-[#FFD166]">
-              Preview page publique
-            </span>
-            <div className="flex min-h-[280px] flex-col items-center justify-center rounded-2xl border border-white/[0.08] bg-[#080808] px-6 text-center">
-              <AlertTriangle size={28} className="mb-5 text-[#FF7B4B]" />
-              <h3 className="text-2xl font-bold tracking-tight text-[#F5F0E8]">{form.title}</h3>
-              <p className="mt-3 max-w-md text-sm leading-relaxed text-[#9A9A9A]">{form.message}</p>
-              <div className="mt-6 rounded-full border border-white/[0.08] px-3 py-1.5 text-[11px] text-[#555]">
-                Neva AI
+          {/* Aperçu fidèle de la page publique de maintenance — Prisme */}
+          <Card className="overflow-hidden">
+            <div className="flex items-center justify-between gap-4 border-b border-[color:var(--hairline)] px-6 py-4">
+              <p className="pv-label">Aperçu — page publique</p>
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-dusk">
+                Mis à jour en direct
+              </span>
+            </div>
+            <div className="relative flex min-h-[340px] flex-col items-center justify-center overflow-hidden bg-abyss px-6 py-16 text-center">
+              <div aria-hidden className="pv-blueprint absolute inset-0" />
+              <div
+                aria-hidden
+                className="pv-halo left-1/2 top-[-80px] h-[300px] w-[480px] -translate-x-1/2 opacity-80"
+              />
+              <div className="relative flex flex-col items-center">
+                <BrandMark size={30} />
+                <p className="pv-label mt-7 text-[color:var(--num-color)]">Neva Design</p>
+                <h3 className="pv-display mt-4 max-w-lg text-[clamp(1.6rem,3.2vw,2.3rem)] text-ink">
+                  {form.title}
+                </h3>
+                <p className="mt-5 max-w-md text-sm leading-[1.8] text-steel">{form.message}</p>
+                <div className="mt-10 flex items-center gap-4">
+                  <span aria-hidden className="pv-rule--beam h-px w-12" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-dusk">
+                    Le studio revient très vite
+                  </span>
+                  <span aria-hidden className="pv-rule--beam h-px w-12" />
+                </div>
               </div>
             </div>
-          </div>
+          </Card>
         </section>
       </div>
     </div>

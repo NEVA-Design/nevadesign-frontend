@@ -3,30 +3,35 @@
 import Image from "next/image";
 import { useRef, useState } from "react";
 import {
+  ArrowUpRight,
   Check,
   Edit3,
   Eye,
   EyeOff,
   Image as ImageIcon,
-  Loader2,
   Plus,
-  Sparkles,
   Trash2,
   UploadCloud,
-  X,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { FormMessage, Input, Label, Select, Textarea } from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
+import { Switch } from "@/components/ui/switch";
+import { useToasts, ToastViewport } from "@/components/ui/toast";
+import { PageHeader } from "@/components/admin/PageHeader";
 import {
   PORTFOLIO_CATEGORIES,
   type NevaDesignPortfolioCategory,
   type NevaDesignPortfolioItem,
 } from "@/lib/neva-design-portfolio";
 
-interface Toast {
-  id: number;
-  message: string;
-  type: "success" | "error";
-}
+/*
+ * Portfolio Neva Design — formulaire de projet à gauche (téléversement
+ * validé côté client), registre des projets à droite : vignettes de
+ * verre, méta mono, œil de visibilité.
+ */
 
 interface FormState {
   title: string;
@@ -66,26 +71,6 @@ function fromItem(item: NevaDesignPortfolioItem): FormState {
   };
 }
 
-function Toasts({ items }: { items: Toast[] }) {
-  return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
-      {items.map((toast) => (
-        <div
-          key={toast.id}
-          className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium shadow-xl backdrop-blur-sm ${
-            toast.type === "success"
-              ? "border-[#4ADE80]/30 bg-[#4ADE80]/10 text-[#4ADE80]"
-              : "border-[#FF6B7D]/30 bg-[#FF6B7D]/10 text-[#FF6B7D]"
-          }`}
-        >
-          {toast.type === "success" ? <Check size={13} /> : <X size={13} />}
-          {toast.message}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export function AdminNevaDesignClient({
   initialItems,
   tableMissing = false,
@@ -98,17 +83,9 @@ export function AdminNevaDesignClient({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [toasts, setToasts] = useState<Toast[]>([]);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
-  const toastIdRef = useRef(0);
+  const { toasts, push } = useToasts();
   const editing = items.find((item) => item.id === editingId) ?? null;
-
-  function addToast(message: string, type: Toast["type"]) {
-    toastIdRef.current += 1;
-    const id = toastIdRef.current;
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => setToasts((prev) => prev.filter((toast) => toast.id !== id)), 3200);
-  }
 
   function updateForm<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -131,15 +108,15 @@ export function AdminNevaDesignClient({
   async function uploadPortfolioImage(file: File | null | undefined) {
     if (!file) return;
     if (tableMissing) {
-      addToast("Ajoute la migration Supabase avant d'uploader", "error");
+      push("Ajoutez la migration Supabase avant de téléverser", "error");
       return;
     }
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      addToast("Format invalide: JPG, PNG ou WebP", "error");
+      push("Format invalide : JPG, PNG ou WebP", "error");
       return;
     }
     if (file.size > 12 * 1024 * 1024) {
-      addToast("Image trop lourde: max 12 Mo", "error");
+      push("Image trop lourde : 12 Mo maximum", "error");
       return;
     }
 
@@ -155,14 +132,14 @@ export function AdminNevaDesignClient({
       const data = await res.json();
 
       if (!res.ok || data.error || !data.image_path) {
-        addToast(data.error ?? "Upload impossible", "error");
+        push(data.error ?? "Téléversement impossible", "error");
         return;
       }
 
       updateForm("image_path", data.image_path);
-      addToast("Image uploadee", "success");
+      push("Image téléversée", "success");
     } catch {
-      addToast("Erreur reseau pendant l'upload", "error");
+      push("Erreur réseau pendant le téléversement", "error");
     } finally {
       setUploadingImage(false);
       if (imageInputRef.current) imageInputRef.current.value = "";
@@ -171,11 +148,11 @@ export function AdminNevaDesignClient({
 
   async function saveItem() {
     if (tableMissing) {
-      addToast("Ajoute la migration Supabase avant de sauvegarder", "error");
+      push("Ajoutez la migration Supabase avant d'enregistrer", "error");
       return;
     }
     if (!form.title.trim() || !form.tag.trim()) {
-      addToast("Titre et tag requis", "error");
+      push("Titre et tag requis", "error");
       return;
     }
 
@@ -195,16 +172,16 @@ export function AdminNevaDesignClient({
       const data = await res.json();
 
       if (!res.ok || data.error) {
-        addToast(data.error ?? "Erreur serveur", "error");
+        push(data.error ?? "Erreur serveur", "error");
         return;
       }
 
       const next = data.item as NevaDesignPortfolioItem;
       setItems((prev) => sortItems(editingId ? prev.map((item) => (item.id === next.id ? next : item)) : [next, ...prev]));
-      addToast(editingId ? "Projet mis a jour" : "Projet ajoute", "success");
+      push(editingId ? "Projet mis à jour" : "Projet ajouté", "success");
       resetForm();
     } catch {
-      addToast("Erreur reseau", "error");
+      push("Erreur réseau", "error");
     } finally {
       setLoading(false);
     }
@@ -212,24 +189,24 @@ export function AdminNevaDesignClient({
 
   async function deleteItem(item: NevaDesignPortfolioItem) {
     if (tableMissing) {
-      addToast("Ajoute la migration Supabase avant de supprimer", "error");
+      push("Ajoutez la migration Supabase avant de supprimer", "error");
       return;
     }
-    if (!confirm(`Supprimer "${item.title}" ?`)) return;
+    if (!confirm(`Supprimer « ${item.title} » ?`)) return;
 
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/neva-design/portfolio/${item.id}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok || data.error) {
-        addToast(data.error ?? "Erreur suppression", "error");
+        push(data.error ?? "Erreur lors de la suppression", "error");
         return;
       }
       setItems((prev) => prev.filter((entry) => entry.id !== item.id));
       if (editingId === item.id) resetForm();
-      addToast("Projet supprime", "success");
+      push("Projet supprimé", "success");
     } catch {
-      addToast("Erreur reseau", "error");
+      push("Erreur réseau", "error");
     } finally {
       setLoading(false);
     }
@@ -243,7 +220,7 @@ export function AdminNevaDesignClient({
 
   async function saveDirect(item: NevaDesignPortfolioItem) {
     if (tableMissing) {
-      addToast("Ajoute la migration Supabase avant de modifier", "error");
+      push("Ajoutez la migration Supabase avant de modifier", "error");
       return;
     }
     setLoading(true);
@@ -265,129 +242,136 @@ export function AdminNevaDesignClient({
       });
       const data = await res.json();
       if (!res.ok || data.error) {
-        addToast(data.error ?? "Erreur mise a jour", "error");
+        push(data.error ?? "Erreur lors de la mise à jour", "error");
         return;
       }
       const next = data.item as NevaDesignPortfolioItem;
       setItems((prev) => prev.map((entry) => (entry.id === next.id ? next : entry)));
-      addToast(next.is_active ? "Projet visible" : "Projet masque", "success");
+      push(next.is_active ? "Projet visible" : "Projet masqué", "success");
       resetForm();
     } catch {
-      addToast("Erreur reseau", "error");
+      push("Erreur réseau", "error");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div>
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-[#F5F0E8]">Neva Design</h1>
-          <p className="mt-0.5 text-sm text-[#555]">
-            Portfolio public, visuels et projets affiches sur /neva-design.
-          </p>
-        </div>
-        <a
-          href="/neva-design#portfolio"
-          className="inline-flex h-9 items-center justify-center rounded-lg border border-white/[0.08] px-3 text-xs text-[#999] transition hover:border-[#FF7B4B]/35 hover:text-white"
-        >
+    <div className="relative">
+      <div aria-hidden className="pv-halo -top-24 right-[-4%] h-[340px] w-[460px] opacity-50" />
+
+      <PageHeader
+        eyebrow="Portfolio"
+        title={
+          <>
+            <span className="pv-beam-text">Vitrine</span> Neva Design.
+          </>
+        }
+        description="Les visuels et projets publics affichés sur la page Neva Design."
+      >
+        <a href="/neva-design#portfolio" className="pv-link inline-flex items-center gap-2 text-[13px]">
           Voir le portfolio
+          <ArrowUpRight size={13} strokeWidth={1.8} className="text-[color:var(--num-color)]" />
         </a>
-      </div>
+      </PageHeader>
 
       {tableMissing ? (
-        <div className="mb-6 rounded-xl border border-[#FFD166]/25 bg-[#FFD166]/10 px-4 py-3 text-sm text-[#FFD166]">
-          Table Supabase absente. Lance le SQL ajoute dans `src/lib/supabase/schema.sql` ou la migration dediee.
-        </div>
+        <FormMessage tone="warning" className="relative mb-6">
+          Table Supabase absente. Lancez le SQL ajouté dans{" "}
+          <code className="font-mono text-xs">src/lib/supabase/schema.sql</code> ou la migration
+          dédiée.
+        </FormMessage>
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-[410px_1fr]">
-        <section className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-4">
-          <div className="mb-4 flex items-center gap-2">
-            {editing ? <Edit3 size={14} className="text-[#FF7B4B]" /> : <Plus size={14} className="text-[#FF7B4B]" />}
-            <h2 className="text-sm font-semibold text-[#F5F0E8]">
-              {editing ? "Modifier le projet" : "Nouveau projet portfolio"}
-            </h2>
+      <div className="relative grid gap-5 lg:grid-cols-[410px_1fr]">
+        {/* ── Formulaire de projet ──────────────────────────────── */}
+        <Card className="h-fit p-6">
+          <div className="mb-6 flex items-center gap-2.5 border-b border-[color:var(--hairline)] pb-5">
+            {editing ? (
+              <Edit3 size={14} strokeWidth={1.8} className="text-[color:var(--num-color)]" />
+            ) : (
+              <Plus size={14} strokeWidth={1.8} className="text-[color:var(--num-color)]" />
+            )}
+            <h2 className="pv-label">{editing ? "Modifier le projet" : "Nouveau projet"}</h2>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-5">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1.5 block text-[11px] text-[#666]">Titre</label>
-                <input
+                <Label htmlFor="portfolio-title">Titre</Label>
+                <Input
+                  id="portfolio-title"
                   value={form.title}
                   onChange={(event) => updateForm("title", event.target.value)}
                   placeholder="Vespucci Nights"
-                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-[#F5F0E8] outline-none placeholder:text-[#333] focus:border-white/[0.16]"
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-[11px] text-[#666]">Tag</label>
-                <input
+                <Label htmlFor="portfolio-tag">Tag</Label>
+                <Input
+                  id="portfolio-tag"
                   value={form.tag}
                   onChange={(event) => updateForm("tag", event.target.value)}
                   placeholder="FiveM"
-                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-[#F5F0E8] outline-none placeholder:text-[#333] focus:border-white/[0.16]"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1.5 block text-[11px] text-[#666]">Categorie</label>
-                <select
+                <Label htmlFor="portfolio-category">Catégorie</Label>
+                <Select
+                  id="portfolio-category"
                   value={form.category}
                   onChange={(event) => updateForm("category", event.target.value as NevaDesignPortfolioCategory)}
-                  className="w-full rounded-lg border border-white/[0.08] bg-[#111] px-3 py-2 text-xs text-[#F5F0E8] outline-none focus:border-white/[0.16]"
                 >
                   {PORTFOLIO_CATEGORIES.map((category) => (
                     <option key={category} value={category}>
                       {category}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div>
-                <label className="mb-1.5 block text-[11px] text-[#666]">Layout</label>
-                <select
+                <Label htmlFor="portfolio-layout">Disposition</Label>
+                <Select
+                  id="portfolio-layout"
                   value={form.layout}
                   onChange={(event) => updateForm("layout", event.target.value as NevaDesignPortfolioItem["layout"])}
-                  className="w-full rounded-lg border border-white/[0.08] bg-[#111] px-3 py-2 text-xs text-[#F5F0E8] outline-none focus:border-white/[0.16]"
                 >
-                  <option value="normal">Normal</option>
-                  <option value="tall">Tall</option>
-                  <option value="wide">Wide</option>
-                </select>
+                  <option value="normal">Normale</option>
+                  <option value="tall">Haute (tall)</option>
+                  <option value="wide">Large (wide)</option>
+                </Select>
               </div>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-[11px] text-[#666]">Image du projet</label>
-              <div className="overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.03]">
-                <div className="relative flex min-h-36 items-center justify-center bg-black/30">
+              <Label>Image du projet</Label>
+              <div className="overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-abyss">
+                <div className="relative flex min-h-36 items-center justify-center">
                   {form.image_path ? (
                     <Image
                       src={form.image_path}
-                      alt="Apercu projet"
+                      alt="Aperçu du projet"
                       fill
                       sizes="410px"
                       className="object-cover"
                     />
                   ) : (
-                    <div className="flex flex-col items-center gap-2 py-8 text-center text-xs text-[#555]">
-                      <ImageIcon size={22} className="text-[#FF7B4B]" />
-                      Upload une image pour ce projet
+                    <div className="flex flex-col items-center gap-2.5 py-8 text-center text-xs text-dusk">
+                      <ImageIcon size={20} strokeWidth={1.8} className="text-[color:var(--num-color)]" />
+                      Téléversez une image pour ce projet
                     </div>
                   )}
                   {uploadingImage ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-xs text-white">
-                      <Loader2 size={15} className="mr-2 animate-spin" />
-                      Upload...
+                    <div className="absolute inset-0 z-10 flex items-center justify-center gap-2.5 bg-ink/70 text-xs text-ink backdrop-blur-sm">
+                      <Spinner className="h-4 w-4" />
+                      Téléversement…
                     </div>
                   ) : null}
                 </div>
-                <div className="flex items-center justify-between gap-2 border-t border-white/[0.06] p-2">
+                <div className="flex items-center justify-between gap-2 border-t border-[color:var(--hairline)] p-2">
                   <input
                     ref={imageInputRef}
                     type="file"
@@ -398,19 +382,17 @@ export function AdminNevaDesignClient({
                   <Button
                     type="button"
                     variant="outline"
-                    size="sm"
                     className="flex-1"
                     onClick={() => imageInputRef.current?.click()}
                     disabled={uploadingImage || loading}
                   >
-                    {uploadingImage ? <Loader2 size={12} className="animate-spin" /> : <UploadCloud size={12} />}
-                    {form.image_path ? "Remplacer image" : "Uploader une image"}
+                    {uploadingImage ? <Spinner className="h-3.5 w-3.5" /> : <UploadCloud size={13} strokeWidth={1.8} />}
+                    {form.image_path ? "Remplacer l'image" : "Téléverser une image"}
                   </Button>
                   {form.image_path ? (
                     <Button
                       type="button"
                       variant="ghost"
-                      size="sm"
                       onClick={() => updateForm("image_path", "")}
                       disabled={uploadingImage || loading}
                     >
@@ -422,125 +404,148 @@ export function AdminNevaDesignClient({
             </div>
 
             <div>
-              <label className="mb-1.5 block text-[11px] text-[#666]">Description</label>
-              <textarea
+              <Label htmlFor="portfolio-description">Description</Label>
+              <Textarea
+                id="portfolio-description"
                 value={form.description}
                 onChange={(event) => updateForm("description", event.target.value)}
                 placeholder="Contexte du projet"
                 rows={3}
-                className="w-full resize-none rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-[#F5F0E8] outline-none placeholder:text-[#333] focus:border-white/[0.16]"
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label className="mb-1.5 block text-[11px] text-[#666]">Priorite</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={form.priority}
-                  onChange={(event) => updateForm("priority", event.target.value)}
-                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-[#F5F0E8] outline-none focus:border-white/[0.16]"
+            <div>
+              <Label htmlFor="portfolio-priority">Priorité</Label>
+              <Input
+                id="portfolio-priority"
+                type="number"
+                min={0}
+                value={form.priority}
+                onChange={(event) => updateForm("priority", event.target.value)}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-[color:var(--hairline)] bg-abyss px-4 py-3">
+                <span className="text-[13px] text-ink/80">Actif</span>
+                <Switch
+                  checked={form.is_active}
+                  onChange={(next) => updateForm("is_active", next)}
+                  aria-label="Rendre le projet visible"
                 />
               </div>
-              <label className="flex items-end gap-2 pb-2 text-[11px] text-[#777]">
-                <input
-                  type="checkbox"
-                  checked={form.is_active}
-                  onChange={(event) => updateForm("is_active", event.target.checked)}
-                  className="accent-[#FF7B4B]"
-                />
-                Actif
-              </label>
-              <label className="flex items-end gap-2 pb-2 text-[11px] text-[#777]">
-                <input
-                  type="checkbox"
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-[color:var(--hairline)] bg-abyss px-4 py-3">
+                <span className="text-[13px] text-ink/80">Hero</span>
+                <Switch
                   checked={form.is_featured}
-                  onChange={(event) => updateForm("is_featured", event.target.checked)}
-                  className="accent-[#FF7B4B]"
+                  onChange={(next) => updateForm("is_featured", next)}
+                  aria-label="Mettre le projet en vedette"
                 />
-                Hero
-              </label>
+              </div>
             </div>
 
             <div className="flex gap-2 pt-1">
-              <Button variant="gradient" size="sm" className="flex-1" onClick={saveItem} disabled={loading || uploadingImage}>
-                {loading || uploadingImage ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+              <Button className="flex-1" onClick={saveItem} disabled={loading || uploadingImage}>
+                {loading || uploadingImage ? <Spinner className="h-3.5 w-3.5" /> : <Check size={13} strokeWidth={1.8} />}
                 {editing ? "Enregistrer" : "Ajouter"}
               </Button>
               {editing ? (
-                <Button variant="outline" size="sm" onClick={resetForm} disabled={loading}>
+                <Button variant="outline" onClick={resetForm} disabled={loading}>
                   Annuler
                 </Button>
               ) : null}
             </div>
           </div>
-        </section>
+        </Card>
 
-        <section className="overflow-hidden rounded-2xl border border-white/[0.07]">
-          <div className="flex items-center justify-between border-b border-white/[0.05] bg-white/[0.02] px-5 py-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[#F5F0E8]">
-              <ImageIcon size={14} className="text-[#FF7B4B]" />
-              Projets configures
+        {/* ── Registre des projets ──────────────────────────────── */}
+        <Card className="h-fit overflow-hidden">
+          <div className="flex items-center justify-between gap-3 border-b border-[color:var(--hairline)] px-6 py-4">
+            <div className="flex items-center gap-2.5">
+              <ImageIcon size={14} strokeWidth={1.8} className="text-[color:var(--num-color)]" />
+              <h2 className="pv-label">Projets configurés</h2>
             </div>
-            <span className="text-xs text-[#444]">{items.length} total</span>
+            <span className="font-mono text-[11px] text-dusk">{items.length} au total</span>
           </div>
 
           {items.length === 0 ? (
-            <div className="px-5 py-14 text-center text-sm text-[#444]">Aucun projet pour le moment.</div>
+            <div className="px-6 py-16 text-center">
+              <p className="text-lg font-semibold tracking-[-0.01em] text-ink/90">
+                Aucun projet pour le moment.
+              </p>
+              <p className="mt-3 font-mono text-xs tracking-[0.04em] text-dusk">
+                Ajoutez votre première création dans le formulaire.
+              </p>
+            </div>
           ) : (
-            <div className="divide-y divide-white/[0.04]">
+            <div className="divide-y divide-[color:var(--hairline)]">
               {items.map((item) => (
-                <div key={item.id} className="px-5 py-4 transition-colors hover:bg-white/[0.02]">
-                  <div className="flex items-start gap-3">
-                    <div className="relative flex h-14 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/[0.08] bg-white/[0.03] text-[#FF7B4B]">
+                <div
+                  key={item.id}
+                  className="px-5 py-5 transition-colors duration-300 hover:bg-ink/[0.03] sm:px-6"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-lg border border-[color:var(--hairline)] bg-abyss">
                       {item.image_path ? (
-                        <Image src={item.image_path} alt="" fill sizes="80px" className="object-cover" />
+                        <Image src={item.image_path} alt="" fill sizes="96px" className="object-cover" />
                       ) : (
-                        <ImageIcon size={18} />
+                        <span className="flex h-full items-center justify-center text-ink/25">
+                          <ImageIcon size={16} strokeWidth={1.8} />
+                        </span>
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="mb-1 flex flex-wrap items-center gap-2">
-                        <span className="rounded-md border border-[#FF7B4B]/25 bg-[#FF7B4B]/10 px-1.5 py-0.5 text-[10px] font-bold uppercase text-[#FF7B4B]">
-                          {item.category}
-                        </span>
-                        <span className="text-sm font-semibold text-[#F5F0E8]">{item.title}</span>
-                        {item.is_featured ? <span className="text-[10px] text-[#FFD166]">Hero</span> : null}
-                        <span className={`text-[10px] ${item.is_active ? "text-[#4ADE80]" : "text-[#777]"}`}>
-                          {item.is_active ? "Visible" : "Masque"}
+                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+                        <Badge variant="neva">{item.category}</Badge>
+                        <span className="text-sm font-medium text-ink">{item.title}</span>
+                        {item.is_featured ? <Badge variant="popular">Hero</Badge> : null}
+                        <span
+                          className={`font-mono text-[10px] uppercase tracking-[0.12em] ${
+                            item.is_active ? "text-ok" : "text-dusk"
+                          }`}
+                        >
+                          {item.is_active ? "Visible" : "Masqué"}
                         </span>
                       </div>
-                      <p className="text-sm leading-relaxed text-[#9A9A9A]">{item.description || item.tag}</p>
-                      <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] text-[#444]">
-                        <span>Priorite {item.priority}</span>
-                        <span>Layout {item.layout}</span>
-                        {item.image_path ? <span className="font-mono">{item.image_path}</span> : <span>Placeholder</span>}
-                      </div>
+                      <p className="mt-1.5 text-sm leading-relaxed text-steel">
+                        {item.description || item.tag}
+                      </p>
                     </div>
-                    <div className="flex flex-shrink-0 items-center gap-1">
+                  </div>
+
+                  <div className="mt-3.5 flex flex-wrap items-center justify-between gap-3 sm:pl-[112px]">
+                    <div className="flex min-w-0 flex-wrap items-center gap-3 font-mono text-[10px] tracking-[0.06em] text-dusk">
+                      <span>Priorité {item.priority}</span>
+                      <span>Disposition {item.layout}</span>
+                      {item.image_path ? (
+                        <span className="break-all">{item.image_path}</span>
+                      ) : (
+                        <span>Sans image</span>
+                      )}
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1">
                       <button
                         onClick={() => toggleActive(item)}
                         disabled={loading}
-                        className="rounded-lg p-1.5 text-[#555] transition-colors hover:bg-white/[0.05] hover:text-[#F5F0E8]"
+                        className="flex h-10 w-10 items-center justify-center rounded-full text-steel transition-colors duration-300 hover:bg-ink/5 hover:text-ink disabled:pointer-events-none disabled:opacity-45"
                         aria-label={item.is_active ? "Masquer" : "Afficher"}
                       >
-                        {item.is_active ? <EyeOff size={13} /> : <Eye size={13} />}
+                        {item.is_active ? <EyeOff size={14} strokeWidth={1.8} /> : <Eye size={14} strokeWidth={1.8} />}
                       </button>
                       <button
                         onClick={() => startEdit(item)}
-                        className="rounded-lg p-1.5 text-[#555] transition-colors hover:bg-white/[0.05] hover:text-[#F5F0E8]"
+                        className="flex h-10 w-10 items-center justify-center rounded-full text-steel transition-colors duration-300 hover:bg-ink/5 hover:text-ink"
                         aria-label="Modifier"
                       >
-                        <Edit3 size={13} />
+                        <Edit3 size={14} strokeWidth={1.8} />
                       </button>
                       <button
                         onClick={() => deleteItem(item)}
                         disabled={loading}
-                        className="rounded-lg p-1.5 text-[#555] transition-colors hover:bg-red-500/10 hover:text-[#FF6B7D]"
+                        className="flex h-10 w-10 items-center justify-center rounded-full text-steel transition-colors duration-300 hover:bg-err/10 hover:text-err disabled:pointer-events-none disabled:opacity-45"
                         aria-label="Supprimer"
                       >
-                        <Trash2 size={13} />
+                        <Trash2 size={14} strokeWidth={1.8} />
                       </button>
                     </div>
                   </div>
@@ -548,10 +553,10 @@ export function AdminNevaDesignClient({
               ))}
             </div>
           )}
-        </section>
+        </Card>
       </div>
 
-      <Toasts items={toasts} />
+      <ToastViewport toasts={toasts} />
     </div>
   );
 }

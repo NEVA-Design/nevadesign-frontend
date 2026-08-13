@@ -2,10 +2,28 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Badge, BriefcaseBusiness, Download, FileBadge, IdCard, ImageIcon, Loader2, ScanFace, Shield, Upload, UserRound } from "lucide-react";
+import {
+  Badge,
+  BriefcaseBusiness,
+  Download,
+  FileBadge,
+  IdCard,
+  ScanFace,
+  Shield,
+  Upload,
+  UserRound,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FormMessage, Input, Label, Textarea } from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
 import { ModuleHeader } from "@/components/dashboard/ModuleHeader";
 import { readApiResponse } from "@/lib/api/client";
+
+/*
+ * Character — le bureau des identités : la table d'examen du dossier à
+ * gauche, le panneau de composition numéroté à droite. L'identité du
+ * personnage est la matière première, violet la seule lumière.
+ */
 
 type SourceImage = { data: string; mimeType: string; preview: string };
 type SavedCharacter = { id: string; name: string; description?: string; image_preview?: string | null; role?: string | null; server?: string | null; style?: string | null };
@@ -27,16 +45,17 @@ type AssetOption = {
   icon: typeof IdCard;
 };
 
+/* Les libellés sont affichés à l'écran uniquement — seul l'id part vers l'API. */
 const ASSETS: AssetOption[] = [
-  { id: "rp_identity_card", label: "RP Identity Card", description: "Civil RP profile card", icon: IdCard },
-  { id: "passport", label: "Passport", description: "Fictional RP travel prop", icon: FileBadge },
-  { id: "driver_license", label: "Driver License", description: "In-universe driving card", icon: Badge },
-  { id: "criminal_record", label: "Criminal Record", description: "Dark dossier asset", icon: Shield },
-  { id: "police_file", label: "Police File", description: "Case file presentation", icon: Shield },
-  { id: "employee_file", label: "Employee File", description: "Company HR profile", icon: BriefcaseBusiness },
-  { id: "business_profile", label: "Business Profile", description: "Founder or owner asset", icon: BriefcaseBusiness },
-  { id: "character_poster", label: "Character Poster", description: "Premium promo artwork", icon: UserRound },
-  { id: "studio_portrait", label: "Studio Portrait", description: "Polished RP portrait", icon: ScanFace },
+  { id: "rp_identity_card", label: "Carte d'identité RP", description: "Profil civil du personnage", icon: IdCard },
+  { id: "passport", label: "Passeport", description: "Document de voyage RP fictif", icon: FileBadge },
+  { id: "driver_license", label: "Permis de conduire", description: "Carte de conduite en jeu", icon: Badge },
+  { id: "criminal_record", label: "Casier judiciaire", description: "Dossier à l'ambiance sombre", icon: Shield },
+  { id: "police_file", label: "Dossier de police", description: "Présentation de dossier d'enquête", icon: Shield },
+  { id: "employee_file", label: "Dossier employé", description: "Profil RH d'entreprise", icon: BriefcaseBusiness },
+  { id: "business_profile", label: "Profil d'entreprise", description: "Visuel fondateur ou propriétaire", icon: BriefcaseBusiness },
+  { id: "character_poster", label: "Affiche de personnage", description: "Visuel promotionnel premium", icon: UserRound },
+  { id: "studio_portrait", label: "Portrait studio", description: "Portrait RP soigné", icon: ScanFace },
 ];
 
 export default function CharacterPageClient() {
@@ -66,11 +85,11 @@ export default function CharacterPageClient() {
   const handleFile = (file: File | null) => {
     if (!file) return;
     if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
-      setError("Format non supporté. Utilise PNG, JPG ou WEBP.");
+      setError("Format non pris en charge. Utilisez PNG, JPG ou WEBP.");
       return;
     }
     if (file.size > 8 * 1024 * 1024) {
-      setError("Ton image est trop lourde. Compresse-la ou utilise une image plus légère.");
+      setError("Votre image est trop lourde. Compressez-la ou utilisez un fichier plus léger.");
       return;
     }
 
@@ -88,7 +107,7 @@ export default function CharacterPageClient() {
 
   const generate = async () => {
     if (!sourceImage && !selectedMemory?.image_preview) {
-      setError("Ajoute ton personnage avant de générer un dossier.");
+      setError("Ajoutez votre personnage avant de générer un dossier.");
       return;
     }
 
@@ -183,230 +202,336 @@ export default function CharacterPageClient() {
     setShowBetterResultGuide(false);
   };
 
-  return (
-    <div className="mx-auto min-h-full max-w-[1320px] p-4 sm:p-6 lg:p-8">
-      <ModuleHeader
-        icon={ScanFace}
-        eyebrow="Neva Character"
-        title="Transformez un personnage en dossier RP complet"
-        description="Importez votre personnage, choisissez un document, puis générez une identité cohérente."
-        accent="#FF6B7D"
-        meta="2 créations / document"
-        activeStep={activeStep}
-        steps={[
-          { label: "Importer", detail: "Personnage source" },
-          { label: "Choisir", detail: ASSETS.find((asset) => asset.id === assetType)?.label ?? "Document" },
-          { label: "Exporter", detail: "Dossier prêt" },
-        ]}
-      />
-      <div className="hidden">
-        <div>
-          <div className="mb-2 inline-flex items-center gap-2 rounded-lg border border-[#FF6B7D]/25 bg-[#FF6B7D]/10 px-2.5 py-1 text-xs font-semibold text-[#FFB5C8]">
-            <ScanFace size={13} />
-            NEVA CHARACTER
-          </div>
-          <h1 className="text-2xl font-bold text-[#F5F0E8]">Create FiveM RP identity assets</h1>
-          <p className="mt-1 max-w-2xl text-sm text-[#777]">
-            Upload a character and generate clean premium RP files, posters, cards, dossiers and portraits while preserving identity.
-          </p>
-        </div>
-        <div className="text-xs text-[#666]">2 créations / asset</div>
-      </div>
+  const activeAsset = ASSETS.find((asset) => asset.id === assetType);
 
-      <div className="grid gap-5 xl:grid-cols-[1fr_430px]">
-        <section className="order-2 rounded-[16px] border border-white/[0.08] bg-[linear-gradient(135deg,rgba(255,255,255,0.055),rgba(255,255,255,0.018))] p-4 shadow-[0_24px_70px_rgba(0,0,0,0.24)] xl:order-2">
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-lg border border-dashed border-white/[0.12] bg-white/[0.025] transition-colors hover:border-[#FF6B7D]/45"
-          >
-            {sourceImage ? (
-              <Image src={sourceImage.preview} alt="Uploaded character" fill sizes="430px" className="object-contain" />
+  return (
+    <div className="relative mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-6 lg:px-10">
+      {/* Halo — la profondeur de la scène */}
+      <div
+        aria-hidden
+        className="pv-halo--violet pv-halo right-[-140px] top-[-140px] h-[440px] w-[600px]"
+        style={{ opacity: 0.55 }}
+      />
+
+      <div className="relative">
+        <ModuleHeader
+          icon={ScanFace}
+          eyebrow="Neva Character"
+          title="Transformez un personnage en dossier RP complet"
+          description="Importez votre personnage, choisissez un document, puis générez une identité cohérente."
+          accent="violet"
+          meta="2 créations / document"
+          activeStep={activeStep}
+          steps={[
+            { label: "Importer", detail: "Personnage source" },
+            { label: "Choisir", detail: activeAsset?.label ?? "Document" },
+            { label: "Exporter", detail: "Dossier prêt" },
+          ]}
+        />
+
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+          {/* ── Table d'examen — le dossier ─────────────────────── */}
+          <section className="pv-glass pv-edge rounded-2xl min-h-[560px] overflow-hidden xl:min-h-[640px]">
+            {!result ? (
+              <div className="flex h-full min-h-[560px] flex-col items-center justify-center px-5 py-10 text-center xl:min-h-[640px]">
+                {sourceImage ? (
+                  <div className="relative mb-6 aspect-[4/5] w-full max-w-[480px] overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-abyss">
+                    <Image src={sourceImage.preview} alt="Personnage téléversé" fill sizes="620px" className="object-contain" />
+                  </div>
+                ) : (
+                  <span className="mb-5 flex h-14 w-14 items-center justify-center rounded-lg border border-violet/25 bg-[rgba(124,106,255,0.08)] text-[color:var(--num-color)]">
+                    <UserRound size={22} />
+                  </span>
+                )}
+                <p className="pv-display text-lg text-ink/85">Le dossier RP apparaîtra ici.</p>
+                <p className="pv-meta mt-3 max-w-sm">
+                  Le visage, les tatouages et les accessoires restent la base du rendu.
+                </p>
+              </div>
             ) : (
-              <div className="flex flex-col items-center gap-2 text-center">
-                <Upload size={24} className="text-[#FF6B7D]" />
-                <div className="text-sm font-medium text-[#CCCCC0]">Ajouter le personnage</div>
-                <div className="text-xs text-[#666]">Visage, tatouages et accessoires restent la base.</div>
+              <div className="flex h-full flex-col">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--hairline)] px-5 py-4">
+                  <div>
+                    <h2 className="pv-label text-[color:var(--num-color)]">Dossier généré</h2>
+                    <p className="mt-1 text-[13px] text-steel">{activeAsset?.label}</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="min-h-[40px]"
+                      onClick={() => setShowBetterResultGuide((value) => !value)}
+                    >
+                      Je ne suis pas satisfait
+                    </Button>
+                    <Button size="sm" className="min-h-[40px]" onClick={download}>
+                      <Download size={12} />
+                      Télécharger
+                    </Button>
+                  </div>
+                </div>
+
+                {showBetterResultGuide ? (
+                  <div className="border-b border-[color:var(--hairline)] px-5 py-5">
+                    <p className="pv-display mb-4 text-lg text-ink">Comment obtenir un meilleur résultat</p>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {[
+                        "Ajoutez une référence claire du personnage.",
+                        "Décrivez le document RP attendu et son contexte.",
+                        "Précisez le rôle, l'organisation et le serveur.",
+                        "Indiquez ce qui ne doit pas changer : visage, tatouages, coiffure, tenue.",
+                      ].map((item, index) => (
+                        <div
+                          key={item}
+                          className="rounded-lg border border-[color:var(--hairline)] bg-abyss p-3 text-xs leading-relaxed text-steel"
+                        >
+                          <span className="pv-num mr-2">0{index + 1}</span>
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="mt-4 min-h-[40px]"
+                      onClick={improveCharacterPrompt}
+                    >
+                      Améliorer mon prompt automatiquement
+                    </Button>
+                  </div>
+                ) : null}
+
+                <div className="relative m-5 min-h-[480px] flex-1 overflow-hidden rounded-xl bg-abyss">
+                  <Image src={result} alt="Dossier de personnage généré" fill sizes="1000px" className="object-contain" />
+                </div>
               </div>
             )}
-          </button>
-          <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleFile(e.target.files?.[0] ?? null)} />
+          </section>
 
-          {savedCharacters.length > 0 && (
-            <div className="mt-5">
-              <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-[#555]">Personnages mémorisés</div>
-              <div className="grid gap-2">
-                {savedCharacters.map((character) => (
-                  <div
-                    key={character.id}
-                    className={`flex items-center gap-3 rounded-[16px] border p-2 transition-colors ${
-                      selectedMemory?.id === character.id
-                        ? "border-[#A78BFA]/45 bg-[#A78BFA]/10"
-                        : "border-white/[0.07] bg-white/[0.025]"
-                    }`}
-                  >
-                    <button type="button" onClick={() => selectMemory(character)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
-                      {character.image_preview ? (
-                        <span className="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-lg border border-white/[0.08]">
-                          <Image src={character.image_preview} alt={character.name} fill sizes="44px" className="object-cover" />
-                        </span>
-                      ) : (
-                        <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03]">
-                          <UserRound size={15} className="text-[#A78BFA]" />
-                        </span>
-                      )}
+          {/* ── Panneau de composition ──────────────────────────── */}
+          <section className="pv-glass pv-edge rounded-2xl self-start overflow-hidden">
+            <div className="flex items-baseline justify-between border-b border-[color:var(--hairline)] px-5 py-4">
+              <h2 className="pv-label text-[color:var(--num-color)]">Composition</h2>
+              <span className="pv-meta">{activeAsset?.label}</span>
+            </div>
+
+            {/* 01 — Personnage */}
+            <div className="border-b border-[color:var(--hairline)] p-5">
+              <p className="pv-label mb-3">
+                <span className="pv-num mr-2">01</span>
+                Personnage
+              </p>
+              <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                className="group relative flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-lg border border-dashed border-[color:var(--hairline-strong)] bg-abyss transition-colors duration-300 hover:border-[rgba(109,91,232,0.45)]"
+              >
+                {sourceImage ? (
+                  <Image src={sourceImage.preview} alt="Personnage téléversé" fill sizes="430px" className="object-contain" />
+                ) : (
+                  <span className="flex flex-col items-center gap-2 px-6 text-center">
+                    <Upload size={20} className="text-dusk transition-colors duration-300 group-hover:text-[color:var(--num-color)]" />
+                    <span className="text-sm font-medium text-ink/80">Téléverser le personnage</span>
+                    <span className="text-xs leading-relaxed text-steel">
+                      Visage, tatouages et accessoires restent la base.
+                    </span>
+                  </span>
+                )}
+              </button>
+              <input
+                ref={inputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+              />
+
+              {savedCharacters.length > 0 ? (
+                <div className="mt-5">
+                  <p className="pv-label mb-2">Personnages mémorisés</p>
+                  <ul>
+                    {savedCharacters.map((character) => {
+                      const isSelected = selectedMemory?.id === character.id;
+                      return (
+                        <li
+                          key={character.id}
+                          className={`pv-row flex items-center gap-3 px-1 py-2.5 ${
+                            isSelected ? "bg-[rgba(124,106,255,0.06)]" : ""
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => selectMemory(character)}
+                            className="flex min-h-[44px] min-w-0 flex-1 items-center gap-3 text-left"
+                          >
+                            {character.image_preview ? (
+                              <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-[color:var(--hairline)]">
+                                <Image src={character.image_preview} alt={character.name} fill sizes="44px" className="object-cover" />
+                              </span>
+                            ) : (
+                              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[color:var(--hairline)] bg-abyss">
+                                <UserRound size={14} className="text-[color:var(--num-color)]/70" />
+                              </span>
+                            )}
+                            <span className="min-w-0">
+                              <span
+                                className={`block truncate text-[13px] font-medium ${
+                                  isSelected ? "text-[color:var(--num-color)]" : "text-ink"
+                                }`}
+                              >
+                                {character.name}
+                              </span>
+                              <span className="block truncate text-xs text-steel">
+                                {character.role ?? character.style ?? "Référence identité"}
+                              </span>
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => renameMemory(character)}
+                            className="min-h-[40px] shrink-0 px-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-steel transition-colors duration-300 hover:text-ink"
+                          >
+                            Renommer
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => deleteMemory(character.id)}
+                            className="min-h-[40px] shrink-0 px-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-err/80 transition-colors duration-300 hover:text-err"
+                          >
+                            Supprimer
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+
+            {/* 02 — Document */}
+            <div className="border-b border-[color:var(--hairline)] p-5">
+              <p className="pv-label mb-3">
+                <span className="pv-num mr-2">02</span>
+                Document
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {ASSETS.map((asset) => {
+                  const isActive = assetType === asset.id;
+                  return (
+                    <button
+                      key={asset.id}
+                      type="button"
+                      onClick={() => setAssetType(asset.id)}
+                      aria-pressed={isActive}
+                      className={`flex min-h-[64px] items-start gap-2.5 rounded-lg border px-3 py-2.5 text-left transition-colors duration-300 ${
+                        isActive
+                          ? "border-[rgba(109,91,232,0.5)] bg-[rgba(124,106,255,0.08)]"
+                          : "border-[color:var(--hairline)] hover:border-[#C9C9C0]"
+                      }`}
+                    >
+                      <asset.icon
+                        size={14}
+                        className={`mt-0.5 shrink-0 ${isActive ? "text-[color:var(--num-color)]" : "text-dusk"}`}
+                      />
                       <span className="min-w-0">
-                        <span className="block truncate text-sm font-medium text-[#F5F0E8]">{character.name}</span>
-                        <span className="block truncate text-xs text-[#666]">{character.role ?? character.style ?? "Référence identité"}</span>
+                        <span
+                          className={`block text-[13px] font-medium ${
+                            isActive ? "text-[color:var(--num-color)]" : "text-ink/80"
+                          }`}
+                        >
+                          {asset.label}
+                        </span>
+                        <span className="mt-0.5 block text-[11px] leading-snug text-steel">
+                          {asset.description}
+                        </span>
                       </span>
                     </button>
-                    <button type="button" onClick={() => renameMemory(character)} className="text-[10px] text-[#777] hover:text-[#F5F0E8]">Renommer</button>
-                    <button type="button" onClick={() => deleteMemory(character.id)} className="text-[10px] text-[#FF6B7D] hover:text-[#FFB5C8]">Supprimer</button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
-          )}
 
-          <div className="mt-5">
-            <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-[#555]">Templates visuels</div>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {ASSETS.map((asset) => (
-                <button
-                  key={asset.id}
-                  type="button"
-                  onClick={() => setAssetType(asset.id)}
-                  className={`flex min-h-[86px] items-start gap-2 rounded-[16px] border px-3 py-3 text-left transition-colors ${
-                    assetType === asset.id
-                      ? "border-[#FF6B7D]/50 bg-[#FF6B7D]/10 text-[#F5F0E8]"
-                      : "border-white/[0.07] bg-white/[0.025] text-[#777] hover:text-[#CCCCC0]"
-                  }`}
-                >
-                  <asset.icon size={15} className="mt-0.5 flex-shrink-0" />
-                  <span className="min-w-0">
-                    <span className="block text-sm font-medium">{asset.label}</span>
-                    <span className="block text-xs text-[#666]">{asset.description}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-5 grid gap-3">
-            <Field label="Nom RP" value={characterName} onChange={setCharacterName} placeholder="Jason Carter" />
-            <Field label="Métier / rôle" value={role} onChange={setRole} placeholder="Officier LSPD, mécano, CEO..." />
-            <Field label="Organization" value={organization} onChange={setOrganization} placeholder="LSPD, Benny's, cartel, business..." />
-            <Field label="Ville / serveur" value={city} onChange={setCity} placeholder="Los Santos, Neva RP..." />
-            <label>
-              <span className="mb-1.5 block text-xs font-medium text-[#777]">Extra notes</span>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Ambiance, couleurs, histoire, faction..."
-                className="min-h-20 w-full resize-none rounded-lg border border-white/[0.08] bg-white/[0.035] px-3 py-2 text-sm text-[#F5F0E8] outline-none transition-colors placeholder:text-[#444] focus:border-[#FF6B7D]/45"
-              />
-            </label>
-          </div>
-
-          {error && (
-            <div className="mt-4 rounded-lg border border-[#FF6B7D]/25 bg-[#FF6B7D]/10 px-3 py-2 text-sm text-[#FFB5C8]">
-              {error}
-            </div>
-          )}
-
-          <Button onClick={generate} disabled={loading || (!sourceImage && !selectedMemory)} variant="gradient" className="mt-5 w-full">
-            {loading ? <Loader2 size={16} className="mr-2 animate-spin" /> : <ScanFace size={16} className="mr-2" />}
-            Générer le dossier
-          </Button>
-        </section>
-
-        <section className="order-1 min-h-[640px] rounded-[16px] border border-white/[0.08] bg-[#080808] p-4 shadow-[0_24px_70px_rgba(0,0,0,0.24)] sm:p-5 xl:order-1">
-          {!result ? (
-            <div className="flex h-full min-h-[600px] flex-col items-center justify-center text-center">
-              {sourceImage ? (
-                <div className="relative mb-5 aspect-[4/5] w-full max-w-[520px] overflow-hidden rounded-[16px] border border-white/[0.08] bg-black">
-                  <Image src={sourceImage.preview} alt="Uploaded character" fill sizes="620px" className="object-contain" />
-                </div>
-              ) : (
-                <>
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03]">
-                <ImageIcon size={24} className="text-[#555]" />
-              </div>
-                </>
-              )}
-              <div className="text-sm font-medium text-[#9A9A9A]">Le dossier RP apparaîtra ici</div>
-              <div className="mt-1 max-w-sm text-xs leading-relaxed text-[#555]">
-                Le visage, les tatouages et les accessoires restent la base du rendu.
-              </div>
-            </div>
-          ) : (
-            <div className="flex h-full flex-col">
-              <div className="mb-4 flex items-center justify-between gap-3">
+            {/* 03 — Identité */}
+            <div className="p-5">
+              <p className="pv-label mb-3">
+                <span className="pv-num mr-2">03</span>
+                Identité
+              </p>
+              <div className="grid gap-4">
                 <div>
-                  <div className="text-sm font-semibold text-[#F5F0E8]">Dossier généré</div>
-                  <div className="text-xs text-[#666]">{ASSETS.find((asset) => asset.id === assetType)?.label}</div>
+                  <Label htmlFor="character-name">Nom RP</Label>
+                  <Input
+                    id="character-name"
+                    value={characterName}
+                    onChange={(e) => setCharacterName(e.target.value)}
+                    placeholder="Jason Carter"
+                  />
                 </div>
-                <button
-                  type="button"
-                  onClick={download}
-                  className="inline-flex items-center gap-2 rounded-lg border border-white/[0.09] px-3 py-1.5 text-xs text-[#CCCCC0] hover:text-[#F5F0E8]"
-                >
-                  <Download size={13} />
-                  Download
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowBetterResultGuide((value) => !value)}
-                  className="inline-flex items-center gap-2 rounded-lg border border-white/[0.09] px-3 py-1.5 text-xs text-[#CCCCC0] hover:text-[#F5F0E8]"
-                >
-                  Je ne suis pas satisfait
-                </button>
-              </div>
-              {showBetterResultGuide && (
-                <div className="mb-4 rounded-[16px] border border-white/[0.07] bg-white/[0.025] p-4">
-                  <div className="mb-2 text-sm font-semibold text-[#F5F0E8]">Comment obtenir un meilleur résultat</div>
-                  <div className="grid gap-2 text-xs leading-relaxed text-[#777] sm:grid-cols-2">
-                    {[
-                      "Ajoute une référence claire du personnage.",
-                      "Décris le document RP attendu et son contexte.",
-                      "Précise le rôle, l’organisation et le serveur.",
-                      "Indique ce qu’il ne faut pas changer : visage, tatouages, coiffure, tenue.",
-                    ].map((item, index) => (
-                      <div key={item} className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-2.5">
-                        <span className="mr-2 text-[#FF6B7D]">{index + 1}.</span>{item}
-                      </div>
-                    ))}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={improveCharacterPrompt}
-                    className="mt-3 rounded-lg border border-[#FF6B7D]/25 bg-[#FF6B7D]/10 px-3 py-2 text-xs font-medium text-[#FFB5C8] transition-all hover:bg-[#FF6B7D]/20"
-                  >
-                    Améliorer mon prompt automatiquement
-                  </button>
+                <div>
+                  <Label htmlFor="character-role">Métier / rôle</Label>
+                  <Input
+                    id="character-role"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    placeholder="Officier LSPD, mécano, CEO..."
+                  />
                 </div>
-              )}
-              <div className="relative min-h-[540px] flex-1 overflow-hidden rounded-lg bg-black">
-                <Image src={result} alt="Generated character asset" fill sizes="1000px" className="object-contain" />
+                <div>
+                  <Label htmlFor="character-organization">Organisation</Label>
+                  <Input
+                    id="character-organization"
+                    value={organization}
+                    onChange={(e) => setOrganization(e.target.value)}
+                    placeholder="LSPD, Benny's, cartel, business..."
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="character-city">Ville / serveur</Label>
+                  <Input
+                    id="character-city"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="Los Santos, Neva RP..."
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="character-notes">Notes</Label>
+                  <Textarea
+                    id="character-notes"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    rows={3}
+                    placeholder="Ambiance, couleurs, histoire, faction..."
+                  />
+                </div>
               </div>
+
+              {error ? (
+                <FormMessage tone="error" className="mt-4">
+                  {error}
+                </FormMessage>
+              ) : null}
+
+              <Button
+                onClick={generate}
+                disabled={loading || (!sourceImage && !selectedMemory)}
+                variant="gradient"
+                size="lg"
+                className="mt-5 w-full"
+              >
+                {loading ? (
+                  <>
+                    <Spinner className="h-4 w-4" />
+                    Génération en cours…
+                  </>
+                ) : (
+                  "Générer le dossier"
+                )}
+              </Button>
             </div>
-          )}
-        </section>
+          </section>
+        </div>
       </div>
     </div>
-  );
-}
-
-function Field({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (value: string) => void; placeholder: string }) {
-  return (
-    <label>
-      <span className="mb-1.5 block text-xs font-medium text-[#777]">{label}</span>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full rounded-lg border border-white/[0.08] bg-white/[0.035] px-3 py-2 text-sm text-[#F5F0E8] outline-none transition-colors placeholder:text-[#444] focus:border-[#FF6B7D]/45"
-      />
-    </label>
   );
 }

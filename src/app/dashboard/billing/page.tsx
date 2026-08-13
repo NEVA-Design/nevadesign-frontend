@@ -1,9 +1,17 @@
 "use client";
 import { useState, Suspense } from "react";
-import { CreditCard, Zap, Check, Loader2, ArrowRight, Plus } from "lucide-react";
+import { ArrowUpRight, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FormMessage } from "@/components/ui/field";
 import { PLANS, TOPUPS } from "@/lib/plans";
 import { useSearchParams } from "next/navigation";
+
+/*
+ * Abonnement — formules en cartes de verre (vedette Creator soulignée
+ * violet, comme la landing), packs de créations en rangées à filets.
+ * Toute la mécanique Stripe (checkout, portail, états de chargement)
+ * est conservée à l'identique.
+ */
 
 async function redirectToCheckout(priceId: string, mode: "subscription" | "payment"): Promise<string | null> {
   const res = await fetch("/api/stripe/checkout", {
@@ -12,7 +20,7 @@ async function redirectToCheckout(priceId: string, mode: "subscription" | "payme
     body: JSON.stringify({ priceId, mode }),
   });
   const text = await res.text();
-  if (!text) return "Erreur serveur (réponse vide). Vérifie les Price IDs dans .env.local.";
+  if (!text) return "Erreur serveur (réponse vide). Vérifiez les Price IDs dans .env.local.";
   const data = JSON.parse(text);
   if (data.url) { window.location.href = data.url; return null; }
   return data.error ?? "Erreur inconnue";
@@ -42,128 +50,153 @@ function BillingContent() {
   const planList = [PLANS.free, PLANS.creator, PLANS.studio, PLANS.pro];
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-5xl">
-      <div className="flex items-start justify-between mb-8">
+    <div className="relative mx-auto w-full max-w-[1440px] flex-1 px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
+      <div
+        aria-hidden
+        className="pv-halo--violet pv-halo right-[-12%] top-[-6%] h-[480px] w-[540px]"
+        style={{ opacity: 0.55 }}
+      />
+
+      {/* ── En-tête ─────────────────────────────────────────────── */}
+      <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <CreditCard size={16} className="text-[#FF7B4B]" />
-            <h1 className="text-2xl font-bold text-[#F5F0E8]">Billing</h1>
-          </div>
-          <p className="text-sm text-[#666]">Gère ton abonnement et tes créations disponibles.</p>
+          <p className="pv-label text-[color:var(--num-color)]">Compte</p>
+          <h1 className="pv-display mt-4 text-[clamp(2rem,4vw,2.8rem)] text-ink">Abonnement</h1>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-steel">
+            Gérez votre formule mensuelle et vos packs de créations. Facturation et
+            moyens de paiement se règlent depuis le portail sécurisé Stripe.
+          </p>
         </div>
-        <button
-          onClick={redirectToPortal}
-          className="text-xs px-3 py-1.5 rounded-lg bg-white/5 border border-white/[0.08] text-[#9A9A9A] hover:text-[#F5F0E8] transition-all"
-        >
+        <Button variant="secondary" onClick={redirectToPortal} className="w-fit shrink-0">
           Gérer mon abonnement
-        </button>
+          <ArrowUpRight size={14} className="text-[color:var(--num-color)]" />
+        </Button>
       </div>
 
-      {checkoutError && (
-        <div className="mb-6 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-sm text-red-400">
+      {checkoutError ? (
+        <FormMessage tone="error" className="relative mt-8">
           {checkoutError}
+        </FormMessage>
+      ) : null}
+
+      {success ? (
+        <FormMessage tone="success" className="relative mt-8">
+          Paiement confirmé. Vos créations ont été ajoutées à votre compte.
+        </FormMessage>
+      ) : null}
+
+      {/* ── Formules ────────────────────────────────────────────── */}
+      <section className="relative mt-12">
+        <div className="mb-6 flex items-baseline justify-between gap-4">
+          <h2 className="pv-display text-xl text-ink">Formules mensuelles</h2>
+          <span className="pv-label">Sans engagement</span>
         </div>
-      )}
 
-      {success && (
-        <div className="mb-6 px-4 py-3 bg-green-500/10 border border-green-500/20 rounded-xl text-sm text-green-400 flex items-center gap-2">
-          <Check size={14} /> Paiement réussi ! Tes créations ont été ajoutées.
-        </div>
-      )}
-
-      {/* Plans */}
-      <h2 className="text-sm font-semibold text-[#9A9A9A] uppercase tracking-widest mb-4">Plans</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-10">
-        {planList.map((plan) => {
-          const isFree = plan.id === "free";
-          const isPopular = plan.id === "creator";
-          return (
-            <div
-              key={plan.id}
-              className={`glass-card rounded-2xl p-5 border flex flex-col gap-4 ${
-                isPopular ? "border-[#FF7B4B]/40 relative" : "border-white/[0.06]"
-              }`}
-            >
-              {isPopular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-[#FF6B7D] to-[#FFD166] text-[10px] font-bold text-white">
-                  LE PLUS POPULAIRE
-                </div>
-              )}
-              <div>
-                <div className="text-sm font-bold text-[#F5F0E8] mb-0.5">{plan.name}</div>
-                <div className="text-xs text-[#555]">{plan.description}</div>
-              </div>
-              <div className="flex items-end gap-1">
-                <span className="text-3xl font-bold text-[#F5F0E8]">${plan.price}</span>
-                {!isFree && <span className="text-xs text-[#555] mb-1">/mois</span>}
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-[#FF7B4B] font-semibold">
-                <Zap size={11} /> {plan.credits.toLocaleString()} créations{!isFree ? "/mois" : " offertes"}
-              </div>
-              <ul className="flex flex-col gap-1.5">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-xs text-[#9A9A9A]">
-                    <Check size={10} className="text-[#4ADE80] flex-shrink-0" /> {f}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-auto">
-                {isFree ? (
-                  <div className="w-full py-2 rounded-xl text-xs text-center text-[#444] border border-white/[0.06]">
-                    Inclus à l&apos;inscription
-                  </div>
-                ) : (
-                  <Button
-                    variant={isPopular ? "gradient" : "secondary"}
-                    size="sm"
-                    className="w-full"
-                    disabled={loadingId === plan.id}
-                    onClick={() => handle(plan.id, plan.priceId!, "subscription")}
-                  >
-                    {loadingId === plan.id ? (
-                      <Loader2 size={13} className="animate-spin" />
-                    ) : (
-                      <>Choisir {plan.name} <ArrowRight size={12} /></>
-                    )}
-                  </Button>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Top-ups */}
-      <h2 className="text-sm font-semibold text-[#9A9A9A] uppercase tracking-widest mb-4">
-        Créations supplémentaires
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {TOPUPS.map((topup) => (
-          <div key={topup.id} className="glass-card rounded-xl p-4 border border-white/[0.06] flex items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-1.5 text-sm font-semibold text-[#F5F0E8] mb-0.5">
-                <Plus size={13} className="text-[#FF7B4B]" />
-                {topup.credits.toLocaleString()} créations
-              </div>
-              <div className="text-xs text-[#555]">
-                {(topup.price / topup.credits).toFixed(2)}€ par création
-              </div>
-            </div>
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <span className="text-lg font-bold text-[#F5F0E8]">${topup.price}</span>
-              <Button
-                size="sm"
-                disabled={loadingId === topup.id}
-                onClick={() => handle(topup.id, topup.priceId, "payment")}
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+          {planList.map((plan) => {
+            const isFree = plan.id === "free";
+            const featured = plan.id === "creator";
+            return (
+              <article
+                key={plan.id}
+                className={
+                  "pv-glass pv-edge pv-ignite rounded-2xl relative flex h-full flex-col p-6 " +
+                  (featured ? "border-t-2 border-t-violet" : "")
+                }
               >
-                {loadingId === topup.id ? <Loader2 size={12} className="animate-spin" /> : "Acheter"}
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
+                {featured ? (
+                  <span className="absolute -top-3 left-6 rounded-full bg-ink px-2 py-[3px] font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-ink">
+                    Le plus choisi
+                  </span>
+                ) : null}
 
-      <p className="text-[11px] text-[#333] mt-8 text-center">
+                <h3 className="pv-display text-xl text-ink">{plan.name}</h3>
+                <p className="mt-2 min-h-[40px] text-[13px] leading-relaxed text-steel">
+                  {plan.description}
+                </p>
+
+                <p className="mt-5 flex items-baseline gap-2">
+                  <span className="pv-display text-[38px] leading-none text-ink">
+                    {plan.price}&nbsp;€
+                  </span>
+                  {!isFree ? <span className="pv-meta">/ mois</span> : null}
+                </p>
+                <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[color:var(--num-color)]">
+                  {plan.credits.toLocaleString("fr-FR")} créations{isFree ? " offertes" : " / mois"}
+                </p>
+
+                <ul className="mt-5 flex flex-col gap-2 border-t border-[color:var(--hairline)] pt-5">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2.5 text-[12.5px] leading-snug text-steel">
+                      <Check size={12} className="mt-[3px] shrink-0 text-[color:var(--num-color)]/70" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-auto pt-6">
+                  {isFree ? (
+                    <p className="flex h-10 items-center justify-center rounded-lg border border-dashed border-[color:var(--hairline-strong)] font-mono text-[10px] uppercase tracking-[0.14em] text-dusk">
+                      Inclus à l&apos;inscription
+                    </p>
+                  ) : (
+                    <Button
+                      variant={featured ? "primary" : "outline"}
+                      className="w-full"
+                      disabled={loadingId === plan.id}
+                      onClick={() => handle(plan.id, plan.priceId!, "subscription")}
+                    >
+                      {loadingId === plan.id ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <>Choisir {plan.name}</>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── Packs de créations ──────────────────────────────────── */}
+      <section className="relative mt-14">
+        <div className="mb-5 flex items-baseline justify-between gap-4">
+          <h2 className="pv-display text-xl text-ink">Packs de créations</h2>
+          <span className="pv-label">Paiement unique</span>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          {TOPUPS.map((topup) => (
+            <div key={topup.id} className="pv-glass pv-edge pv-ignite flex flex-col rounded-2xl p-6">
+              <p className="pv-display text-[34px] leading-none text-ink">
+                {topup.credits.toLocaleString("fr-FR")}
+              </p>
+              <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-steel">
+                créations · {(topup.price / topup.credits).toFixed(2)} € l’unité
+              </p>
+              <div className="mt-6 flex items-center justify-between gap-3 border-t border-[color:var(--hairline)] pt-5">
+                <span className="pv-display text-xl text-ink">{topup.price}&nbsp;€</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={loadingId === topup.id}
+                  onClick={() => handle(topup.id, topup.priceId, "payment")}
+                >
+                  {loadingId === topup.id ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    "Acheter"
+                  )}
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <p className="pv-meta relative mt-12 text-center">
         Paiements sécurisés via Stripe · Annulation à tout moment · Remboursement sous 7 jours
       </p>
     </div>
