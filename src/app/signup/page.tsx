@@ -5,6 +5,7 @@ import { ArrowLeft, MailCheck } from "lucide-react";
 import { useState } from "react";
 import { signup, loginWithGoogle } from "@/app/auth/actions";
 import { BrandMark } from "@/components/prisme/Brand";
+import SatinSphere from "@/components/givre/SatinSphere";
 import { Button } from "@/components/ui/button";
 import { Input, Label, FormMessage } from "@/components/ui/field";
 
@@ -42,6 +43,15 @@ export default function SignupPage() {
       <div aria-hidden className="pv-scene-bg--dawn-calm absolute inset-0" />
       <div aria-hidden className="pv-caustics" />
       <div aria-hidden className="pv-windowlight absolute inset-0 opacity-60" />
+      {/* Le halo aurore de l'atelier, à 60 % du gain du hero (D17) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(36% 44% at 34% 26%, rgba(164,139,232,0.21) 0%, rgba(164,139,232,0) 70%), radial-gradient(32% 40% at 68% 68%, rgba(239,184,148,0.2) 0%, rgba(239,184,148,0) 72%)",
+        }}
+      />
 
       {/* Cadre éditorial — la page comme objet imprimé */}
       <div
@@ -72,7 +82,11 @@ export default function SignupPage() {
       </header>
 
       <main className="relative z-10 flex min-h-[100svh] items-center justify-center px-6 py-24 sm:px-8">
-        <div className="w-full max-w-[420px]">
+        <div className="relative w-full max-w-[420px]">
+          <SatinSphere
+            size={150}
+            className="pointer-events-none absolute -right-[104px] -top-[70px] hidden lg:block"
+          />
           {/* La carte porteuse — verre fort, arête allumée, ombre mauve */}
           <section className="pv-glass pv-glass--strong pv-edge pv-shadow-mauve pv-fade-up px-6 py-8 sm:px-9 sm:py-10">
             <Link href="/" aria-label="Neva Design — accueil" className="inline-flex">
@@ -113,8 +127,8 @@ export default function SignupPage() {
                   Le studio compose, vous publiez — affiches, logos et identités
                   complètes pour votre serveur.
                 </p>
-                <p className="mt-4 text-balance font-mono text-[10px] tracking-[0.04em] text-mist">
-                  ( 5 créations offertes · Sans carte bancaire )
+                <p className="pv-pill mt-4 font-mono text-[10px] uppercase tracking-[0.13em] text-slate">
+                  5 créations offertes · Sans carte bancaire
                 </p>
 
                 {error ? (

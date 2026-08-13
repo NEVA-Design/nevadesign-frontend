@@ -43,7 +43,7 @@ const Select = React.forwardRef<
     className={cn("pv-field cursor-pointer appearance-none bg-no-repeat pr-9", className)}
     style={{
       backgroundImage:
-        "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23A1A1AA' stroke-width='1.2'/%3E%3C/svg%3E\")",
+        "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235C6488' stroke-width='1.2'/%3E%3C/svg%3E\")",
       backgroundPosition: "right 14px center",
     }}
     {...props}
@@ -69,7 +69,9 @@ function FormMessage({
         "rounded-lg border px-4 py-3 text-sm",
         {
           "border-[#EFC9C6] bg-[#FBEFEE] text-[#9E4A45]": tone === "error",
-          "border-[#C5DCD2] bg-[#EEF4F1] text-[#5E9B84]": tone === "success",
+          /* le fond et le liseré sauge portent le sens de la
+             validation ; le texte reste encre (AA) */
+          "border-[#C5DCD2] bg-[#EEF4F1] text-[color:var(--color-slate)]": tone === "success",
           "border-[#EAD9A8] bg-[#FBF6E9] text-[#8A6D1F]": tone === "warning",
           "border-[#C4DAEC] bg-[#EFF5FB] text-[#3E6C94]": tone === "info",
         },
