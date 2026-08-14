@@ -52,7 +52,7 @@ export default function GivrePricing() {
             <p className="mx-auto mt-5 max-w-[500px] text-[15px] leading-[1.7] text-slate">
               {t(
                 "pricing.subtitle",
-                "Commencez avec 5 créations offertes. Montez en volume quand vos publications s'enchaînent — sans engagement."
+                "Commencez avec 3 créations offertes à l'inscription. Passez en formule quand vos publications s'enchaînent — sans engagement."
               )}
             </p>
           </RevealBlock>
@@ -102,7 +102,9 @@ export default function GivrePricing() {
                       </p>
                       <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[color:var(--num-color)]">
                         {plan.credits.toLocaleString("fr-FR")}{" "}
-                        {t("pricing.creations", "créations / mois")}
+                        {planId === "free"
+                          ? t("pricing.creationsOnce", "créations à l'inscription")
+                          : t("pricing.creations", "créations / mois")}
                       </p>
                     </div>
 
@@ -137,7 +139,7 @@ export default function GivrePricing() {
                           {plan.price}
                         </span>
                         <span className="font-mono text-[11px] tracking-[0.08em] text-mist">
-                          €&nbsp;{t("pricing.perMonth", "/ mois")}
+                          €{planId === "free" ? "" : <>&nbsp;{t("pricing.perMonth", "/ mois")}</>}
                         </span>
                       </p>
                       <Link
@@ -162,12 +164,26 @@ export default function GivrePricing() {
           </div>
         </RevealBlock>
 
+        {/* Les règles de la grille — affichées avec elle (run 2) */}
+        <RevealBlock delay={0.18}>
+          <p className="mt-8 text-center font-mono text-[11.5px] leading-[1.9] tracking-[0.08em] text-slate">
+            {t(
+              "pricing.rules.retouches",
+              "5 retouches incluses par création — au-delà, 1 création"
+            )}
+            <span className="px-2 text-mist" aria-hidden>
+              ·
+            </span>
+            {t("pricing.rules.report", "Report des créations non utilisées : 1 mois")}
+          </p>
+        </RevealBlock>
+
         {/* La réassurance, sous le panneau */}
         <RevealBlock delay={0.22}>
-          <p className="mt-10 text-center font-mono text-[11px] tracking-[0.1em] text-mist">
+          <p className="mt-4 text-center font-mono text-[11px] tracking-[0.1em] text-mist">
             {t(
               "pricing.note",
-              "Sans engagement · Annulation en deux clics · Packs de créations additionnels depuis votre espace"
+              "Sans engagement · Annulation en deux clics · Recharges de créations depuis votre espace"
             )}
           </p>
         </RevealBlock>

@@ -63,7 +63,7 @@ const TYPE_LABELS: Record<string, string> = {
   character_asset: "Character",
   signup_bonus: "Créations offertes",
   subscription: "Abonnement",
-  topup: "Pack de créations",
+  topup: "Recharge de créations",
 };
 
 const TYPE_ICONS: Record<string, typeof ImageIcon> = {

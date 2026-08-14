@@ -45,7 +45,7 @@ interface AdminUser {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PLAN_LABELS: Record<Plan, string> = { free: "Free", creator: "Creator", studio: "Studio", pro: "Pro" };
-const PLAN_CREDITS: Record<Plan, number> = { free: 5, creator: 100, studio: 350, pro: 900 };
+const PLAN_CREDITS: Record<Plan, number> = { free: 3, creator: 12, studio: 25, pro: 45 };
 
 const TABLE_GRID =
   "min-w-[680px] grid-cols-[minmax(240px,1fr)_90px_110px_100px_90px]";

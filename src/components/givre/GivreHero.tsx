@@ -227,7 +227,7 @@ export default function GivreHero() {
               <span className="font-display text-[15px] font-medium normal-case tracking-normal text-ink">
                 0&nbsp;€
               </span>
-              {t("hero.proof", "5 créations offertes · Sans carte bancaire")}
+              {t("hero.proof", "3 créations offertes · Sans carte bancaire")}
             </a>
           </div>
         </div>
@@ -244,7 +244,7 @@ export default function GivreHero() {
             largeur, cibles tactiles ≥ 48px */}
         <div className="lg:hidden">
           <p className="gh-price pv-pill flex w-full items-center justify-center whitespace-nowrap px-4 py-2 text-center font-mono text-[9.5px] uppercase tracking-[0.13em] text-slate">
-            {t("hero.proof", "5 créations offertes · Sans carte bancaire")}
+            {t("hero.proof", "3 créations offertes · Sans carte bancaire")}
           </p>
           <div className="mt-3 flex flex-col gap-3">
             <Link

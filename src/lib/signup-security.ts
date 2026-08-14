@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-export const FREE_SIGNUP_CREDITS = 5
+export const FREE_SIGNUP_CREDITS = 3
 
 export type SignupSecurityStatus =
   | 'allowed'
@@ -36,7 +36,7 @@ function unique(values: string[]) {
 async function grantSignupCreditsOnce(
   service: SupabaseClient,
   userId: string,
-  description = '5 credits gratuits actives a l inscription',
+  description = '3 creations offertes a l inscription',
 ) {
   const { data: existing } = await service
     .from('credit_transactions')

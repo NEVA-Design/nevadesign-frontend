@@ -130,7 +130,7 @@ async function activateSubscriptionFromStripe(
     plan.credits,
     plan.id,
     'subscription',
-    `${plan.name} - ${plan.credits} creations mensuelles`,
+    `Abonnement ${plan.name} — ${plan.credits} créations`,
     subscription.id,
     subscription.status,
     skipIfSubscriptionAlreadyActive

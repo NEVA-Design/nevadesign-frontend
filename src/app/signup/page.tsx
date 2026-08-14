@@ -128,7 +128,7 @@ export default function SignupPage() {
                   complètes pour votre serveur.
                 </p>
                 <p className="pv-pill mt-4 font-mono text-[10px] uppercase tracking-[0.13em] text-slate">
-                  5 créations offertes · Sans carte bancaire
+                  3 créations offertes · Sans carte bancaire
                 </p>
 
                 {error ? (

@@ -2,22 +2,24 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Download } from "lucide-react";
+import { Check, Download, ArrowRight } from "lucide-react";
 import { useTranslations } from "@/components/LanguageProvider";
 import { Spinner } from "@/components/ui/spinner";
-import { RESOURCE_PACKS_PUBLIC } from "@/lib/resources";
+import { CREATION_PACKS_PUBLIC, RESOURCE_PACKS_PUBLIC } from "@/lib/resources";
 import { RevealBlock } from "@/components/prisme/Motion";
 import { cn } from "@/lib/utils";
 
-const packs = Object.values(RESOURCE_PACKS_PUBLIC);
+const creationPacks = Object.values(CREATION_PACKS_PUBLIC);
+const resourcePacks = Object.values(RESOURCE_PACKS_PUBLIC);
 
 /*
- * 08 — Packs. Deux panneaux asymétriques — rien à voir avec la
- * liste des tarifs : le Pack Brush en verre figé (~40 %), le
- * Neva Pack en vrai verre dépoli serti d'une arête chrome (~60 %).
- * Une seule lentille dérive dans le coin haut droit : l'unique
- * objet décoratif de la scène. Le flux Stripe est inchangé
- * (401 → connexion, déjà possédé → téléchargements).
+ * 09 — Packs de création (grille run 2). Trois prestations du
+ * studio — Identité 39 €, Lancement 89 € (vedette, anneau aurore),
+ * Marque 149 € — en cartes d'un même registre ; les ressources
+ * Photoshop historiques migrent dans une carte secondaire
+ * « Ressources du studio », prix inchangés. Une seule lentille
+ * décorative. Le flux Stripe est identique pour tout achat
+ * one-shot (401 → connexion, déjà possédé → téléchargements).
  */
 export default function GivrePacks() {
   const { t } = useTranslations();
@@ -88,7 +90,7 @@ export default function GivrePacks() {
         }
       />
 
-      <div className="relative mx-auto pv-container px-5 py-20 sm:px-8 lg:py-24">
+      <div className="pv-container relative mx-auto px-5 py-20 sm:px-8 lg:py-24">
         {/* En-tête latéral gauche — pagination, label, titre */}
         <RevealBlock>
           <div className="max-w-[700px]">
@@ -97,51 +99,44 @@ export default function GivrePacks() {
               <span>/10</span>
             </div>
             <p className="mt-6 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
-              {t("resources.label", "Packs du studio")}
+              {t("resources.label", "Packs de création")}
             </p>
-            <h2 className="pv-display mt-4 pv-section-title">
-              {t("resources.title.a", "Les outils du studio,")}{" "}
+            <h2 className="pv-display pv-section-title mt-4">
+              {t("resources.title.a", "Un pack, un prix,")}{" "}
               <span className="pv-display-strong">
-                {t("resources.title.beam", "dans vos mains.")}
+                {t("resources.title.beam", "une identité complète.")}
               </span>
             </h2>
-            <p className="mt-5 max-w-[500px] text-[15px] leading-[1.7] text-slate">
+            <p className="mt-5 max-w-[520px] text-[15px] leading-[1.7] text-slate">
               {t(
                 "resources.subtitle",
-                "Brushes, templates et systèmes graphiques taillés pour FiveM. Un paiement, un téléchargement, aucune limite."
+                "Logo, bannières, affiches, charte : des livrables assemblés par le studio, prêts à publier. Un paiement, des fichiers à vous."
               )}
             </p>
           </div>
         </RevealBlock>
 
-        {/* Grid asymétrique : verre figé ~40 % | verre chrome ~60 % */}
-        <div className="mt-12 grid gap-5 lg:grid-cols-10">
-          {packs.map((pack, index) => {
-            const isHighlight = pack.id === "neva-pack";
+        {/* Les trois packs — un même registre, Lancement en vedette */}
+        <div className="mt-12 grid gap-5 lg:grid-cols-3">
+          {creationPacks.map((pack, index) => {
+            const isHighlight = pack.id === "pack-lancement";
             return (
-              <RevealBlock
-                key={pack.id}
-                delay={index * 0.1}
-                className={cn(isHighlight ? "lg:col-span-6" : "lg:col-span-4")}
-              >
+              <RevealBlock key={pack.id} delay={index * 0.08}>
                 <article
                   className={cn(
-                    /* plus de chrome-edge : son ::before rectangulaire
-                       débordait des coins arrondis (l'artefact D14) —
-                       l'anneau aurore porte l'emphase, clippé au rayon */
                     "pv-card-hover relative flex h-full flex-col rounded-[22px] p-6 sm:p-7",
                     isHighlight
-                      ? "pv-glass pv-aurora-ring shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_2px_6px_rgba(96,84,140,0.1),0_16px_40px_rgba(96,84,140,0.13)] lg:p-8"
+                      ? "pv-glass pv-aurora-ring shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_2px_6px_rgba(96,84,140,0.1),0_16px_40px_rgba(96,84,140,0.13)]"
                       : "pv-glass pv-glass--still shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_2px_5px_rgba(96,84,140,0.08),0_12px_30px_rgba(96,84,140,0.1)]"
                   )}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                       <p className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
-                        {pack.tagline}
+                        {t(`resources.pack.${pack.id}.tagline`, pack.tagline)}
                       </p>
                       <h3 className="mt-3 font-display text-[20px] font-medium tracking-[-0.01em] text-ink">
-                        {pack.name}
+                        {t(`resources.pack.${pack.id}.name`, pack.name)}
                       </h3>
                     </div>
                     {pack.badge ? (
@@ -151,8 +146,8 @@ export default function GivrePacks() {
                     ) : null}
                   </div>
 
-                  <p className="mt-3 max-w-[420px] text-[13px] leading-[1.65] text-slate">
-                    {pack.description}
+                  <p className="mt-3 text-[13px] leading-[1.65] text-slate">
+                    {t(`resources.pack.${pack.id}.description`, pack.description)}
                   </p>
 
                   <p className="mt-6 flex items-baseline gap-3">
@@ -164,13 +159,8 @@ export default function GivrePacks() {
                     </span>
                   </p>
 
-                  <ul
-                    className={cn(
-                      "mt-6 grid flex-1 content-start gap-2.5 border-t border-[rgba(43,36,80,0.07)] pt-6",
-                      isHighlight && "sm:grid-cols-2"
-                    )}
-                  >
-                    {pack.features.map((feature) => (
+                  <ul className="mt-6 grid flex-1 content-start gap-2.5 border-t border-[rgba(43,36,80,0.07)] pt-6">
+                    {pack.features.map((feature, fi) => (
                       <li
                         key={feature}
                         className="flex items-start gap-3 text-[13px] leading-[1.5] text-slate"
@@ -180,7 +170,7 @@ export default function GivrePacks() {
                           strokeWidth={2.4}
                           className="mt-[2.5px] shrink-0 text-[color:var(--color-sauge)]"
                         />
-                        {feature}
+                        {t(`resources.pack.${pack.id}.f${fi + 1}`, feature)}
                       </li>
                     ))}
                   </ul>
@@ -188,7 +178,7 @@ export default function GivrePacks() {
                   <div className="mt-8">
                     <button
                       type="button"
-                      className="pv-btn w-full"
+                      className={cn("pv-btn w-full", !isHighlight && "pv-btn--ghost")}
                       onClick={() => handleBuy(pack.id)}
                       disabled={loading === pack.id}
                     >
@@ -199,22 +189,72 @@ export default function GivrePacks() {
                         </>
                       ) : (
                         <>
-                          <Download size={14} strokeWidth={1.6} />{" "}
                           {t("resources.buy", "Acheter")} — {pack.price}&nbsp;€
+                          <ArrowRight size={14} strokeWidth={1.8} />
                         </>
                       )}
                     </button>
-                    {!isHighlight ? (
-                      <p className="mt-3 font-mono text-[10px] tracking-[0.1em] text-mist">
-                        {t("resources.included", "Tout est inclus dans le Neva Pack")}
-                      </p>
-                    ) : null}
                   </div>
                 </article>
               </RevealBlock>
             );
           })}
         </div>
+
+        {/* Ressources du studio — les outils Photoshop, en carte
+            secondaire : deux rangées d'un même registre */}
+        <RevealBlock delay={0.18}>
+          <article className="pv-glass pv-glass--still mt-6 rounded-[22px] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_2px_5px_rgba(96,84,140,0.08),0_12px_30px_rgba(96,84,140,0.1)] sm:p-7">
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h3 className="font-display text-[17px] font-medium tracking-[-0.01em] text-ink">
+                {t("resources.tools.title", "Ressources du studio")}
+              </h3>
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-mist">
+                {t("resources.tools.tagline", "Les outils Photoshop de l'atelier")}
+              </p>
+            </div>
+            <div className="mt-5 flex flex-col">
+              {resourcePacks.map((pack) => (
+                <div
+                  key={pack.id}
+                  className="pv-row flex flex-col gap-3 px-1 py-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0">
+                    <p className="font-display text-[15px] font-medium text-ink">
+                      {pack.name}
+                      <span className="ml-3 font-mono text-[10px] uppercase tracking-[0.14em] text-mist">
+                        {t(`resources.pack.${pack.id}.tagline`, pack.tagline)}
+                      </span>
+                    </p>
+                    <p className="mt-1 max-w-[560px] text-[12.5px] leading-[1.6] text-slate">
+                      {pack.description}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-4">
+                    <span className="font-display text-[22px] font-light leading-none text-ink">
+                      {pack.price}&nbsp;€
+                    </span>
+                    <button
+                      type="button"
+                      className="pv-btn pv-btn--ghost h-10 min-h-0 whitespace-nowrap px-4 text-[12.5px]"
+                      onClick={() => handleBuy(pack.id)}
+                      disabled={loading === pack.id}
+                    >
+                      {loading === pack.id ? (
+                        <Spinner className="h-3.5 w-3.5" />
+                      ) : (
+                        <>
+                          <Download size={13} strokeWidth={1.6} />{" "}
+                          {t("resources.buy", "Acheter")}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </article>
+        </RevealBlock>
 
         {error ? (
           <p className="mt-8 text-center text-sm text-err" role="alert">
@@ -226,7 +266,7 @@ export default function GivrePacks() {
           <p className="mt-10 text-center font-mono text-[11px] tracking-[0.1em] text-mist">
             {t(
               "resources.trust",
-              "Paiement sécurisé Stripe · Téléchargement immédiat · Accès à vie depuis votre espace"
+              "Paiement sécurisé Stripe · Livraison dans votre espace · Fichiers à vous, pour toujours"
             )}
           </p>
         </RevealBlock>

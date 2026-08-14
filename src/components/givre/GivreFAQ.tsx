@@ -27,7 +27,7 @@ export default function GivreFAQ() {
       q: t("faq.q2", "Que vaut vraiment le plan gratuit ?"),
       a: t(
         "faq.a2",
-        "5 créations pour tester le flux complet, brief compris. Les rendus sortent en prévisualisation filigranée ; les plans payants débloquent les exports HD, l'usage commercial et la priorité de génération."
+        "3 créations offertes à l'inscription pour tester le flux complet, brief compris. Les rendus sortent en prévisualisation filigranée ; les formules débloquent les exports HD, l'usage commercial et la priorité de génération."
       ),
     },
     {

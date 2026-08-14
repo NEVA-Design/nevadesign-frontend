@@ -1,7 +1,7 @@
 -- Profiles table (linked to auth.users)
 CREATE TABLE IF NOT EXISTS profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  credits INTEGER NOT NULL DEFAULT 5,
+  credits INTEGER NOT NULL DEFAULT 3,
   plan TEXT NOT NULL DEFAULT 'free',
   stripe_customer_id TEXT,
   stripe_subscription_id TEXT,

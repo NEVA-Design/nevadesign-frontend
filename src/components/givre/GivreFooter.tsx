@@ -155,7 +155,7 @@ export default function GivreFooter() {
               </Link>
             </div>
             <p className="mt-7 font-mono text-[10.5px] uppercase tracking-[0.18em] text-mist">
-              {t("footer.cta.note", "5 créations offertes · Aucune carte demandée")}
+              {t("footer.cta.note", "3 créations offertes · Aucune carte demandée")}
             </p>
           </RevealBlock>
         </div>

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
-import { RESOURCE_PACKS } from '@/lib/resources'
+import { ONE_SHOT_PACKS } from '@/lib/resources'
 
 export async function POST(request: Request) {
   try {
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     const { packId } = await request.json() as { packId?: string }
     if (!packId) return NextResponse.json({ error: 'packId required' }, { status: 400 })
 
-    const pack = RESOURCE_PACKS[packId]
+    const pack = ONE_SHOT_PACKS[packId]
     if (!pack) return NextResponse.json({ error: 'Pack introuvable' }, { status: 404 })
 
     if (!pack.priceId || pack.priceId.startsWith('price_') === false) {
