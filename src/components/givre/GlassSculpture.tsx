@@ -1978,6 +1978,10 @@ export default function GlassSculpture({
      3440 en un seul bloc), le poster reste vivant, le loader lit
      la progression réelle */
   const [texReady, setTexReady] = useState(false);
+  /* le rendu ne démarre qu'après upload des textures + compile
+     ASYNCHRONE des shaders (KHR_parallel_shader_compile) : la
+     première frame ne gèle plus le crossfade poster → canvas */
+  const [booted, setBooted] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -2031,7 +2035,7 @@ export default function GlassSculpture({
         dpr={[1, 2]}
         flat
         fallback={null}
-        frameloop={inView ? "always" : "never"}
+        frameloop={booted && inView ? "always" : "never"}
         camera={{ position: [0.22, 0.58, 11.6], fov: 31 }}
         gl={{
           antialias: true,
@@ -2045,8 +2049,33 @@ export default function GlassSculpture({
           (
             state.gl as unknown as { transmissionResolutionScale: number }
           ).transmissionResolutionScale = 0.15;
-          setReady(true);
-          onReady?.();
+          /* démarrage sans gel : upload des textures du décor par
+             macro-tâches, puis compile parallèle des programmes ;
+             la boucle de rendu ne part qu'ensuite */
+          (async () => {
+            const next = () => new Promise((r) => setTimeout(r, 0));
+            try {
+              state.gl.initTexture(getWallTexture());
+              await next();
+              state.gl.initTexture(getFloorTexture());
+              await next();
+              await state.gl.compileAsync(state.scene, state.camera);
+            } catch {
+              /* compile sync de secours à la première frame */
+            }
+            setBooted(true);
+            setReady(true);
+            onReady?.();
+            try {
+              window.dispatchEvent(
+                new CustomEvent("neva:progress", {
+                  detail: { phase: "canvas", p: 1 },
+                })
+              );
+            } catch {
+              /* silencieux */
+            }
+          })();
           if (process.env.NODE_ENV === "development") {
             (window as unknown as { __sculpt?: unknown }).__sculpt = state;
             (window as unknown as { __sculptView?: unknown }).__sculptView = VIEW;
