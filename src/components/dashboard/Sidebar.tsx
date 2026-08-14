@@ -16,8 +16,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { logout } from "@/app/auth/actions";
+import { usePathname, useRouter } from "next/navigation";
+import { clearSession } from "@/lib/session";
 import { Gauge } from "@/components/ui/gauge";
 import { cn } from "@/lib/utils";
 
@@ -69,9 +69,16 @@ const navGroups = [
 
 export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?: () => void }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const isActive = (href: string) =>
     href === "/dashboard" ? pathname === href : pathname.startsWith(href);
+
+  function handleLogout() {
+    clearSession();
+    router.push("/");
+    router.refresh();
+  }
 
   return (
     <aside className="pv-glass pv-edge flex h-full w-[264px] flex-col overflow-hidden rounded-[24px] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_2px_6px_rgba(96,84,140,0.08),0_24px_56px_rgba(96,84,140,0.14)]">
@@ -207,15 +214,14 @@ export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?
             <div className="truncate text-xs font-medium text-ink">{user.name}</div>
             <div className="truncate font-mono text-[10px] text-mist">{user.email}</div>
           </div>
-          <form action={logout}>
-            <button
-              type="submit"
-              className="cursor-pointer rounded-lg p-2 text-mist transition-colors duration-[var(--dur-base)] hover:bg-ink/5 hover:text-err"
-              aria-label="Se déconnecter"
-            >
-              <LogOut size={14} />
-            </button>
-          </form>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="cursor-pointer rounded-lg p-2 text-mist transition-colors duration-[var(--dur-base)] hover:bg-ink/5 hover:text-err"
+            aria-label="Se déconnecter"
+          >
+            <LogOut size={14} />
+          </button>
         </div>
       </div>
     </aside>

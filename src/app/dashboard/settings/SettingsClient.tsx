@@ -5,8 +5,8 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { FormMessage, Input, Label, Textarea } from "@/components/ui/field"
 import { Switch } from "@/components/ui/switch"
-import { createClient } from "@/lib/supabase/client"
 import { readApiResponse } from "@/lib/api/client"
+import { backendFetch } from "@/lib/api/backend-client"
 
 /*
  * Paramètres — navigation d'onglets en filets, panneaux éditoriaux.
@@ -81,9 +81,8 @@ export default function SettingsClient({
     setProfileSaving(true)
     setProfileStatus(null)
     try {
-      const res = await fetch('/api/profile', {
+      const res = await backendFetch('/profile', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ display_name: displayName, discord_handle: discordHandle, bio }),
       })
       await readApiResponse<{ ok: boolean }>(res)
@@ -101,7 +100,7 @@ export default function SettingsClient({
     try {
       const form = new FormData()
       form.append('avatar', file)
-      const res = await fetch('/api/profile/avatar', { method: 'POST', body: form })
+      const res = await backendFetch('/profile/avatar', { method: 'POST', body: form })
       const data = await readApiResponse<{ url: string }>(res)
       setAvatarUrl(data.url)
       setProfileStatus({ type: 'success', message: 'Photo de profil mise à jour.' })
@@ -140,9 +139,8 @@ export default function SettingsClient({
     setNotifStatus(null)
     try {
       const prefs = { sound: notifSound, browser: notifBrowser }
-      const res = await fetch('/api/profile', {
+      const res = await backendFetch('/profile', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notification_prefs: prefs }),
       })
       await readApiResponse<{ ok: boolean }>(res)
@@ -172,9 +170,11 @@ export default function SettingsClient({
     setSecSaving(true)
     setSecStatus(null)
     try {
-      const supabase = createClient()
-      const { error } = await supabase.auth.updateUser({ password: newPassword })
-      if (error) throw new Error(error.message)
+      const res = await backendFetch('/profile/password', {
+        method: 'POST',
+        body: JSON.stringify({ password: newPassword }),
+      })
+      await readApiResponse<{ success: boolean }>(res)
       setNewPassword('')
       setConfirmPassword('')
       setSecStatus({ type: 'success', message: 'Mot de passe mis à jour.' })

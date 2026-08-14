@@ -10,6 +10,7 @@ import { Table, TableHeader, TableRow } from "@/components/ui/table";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { StatTile } from "@/components/admin/StatTile";
 import type { SignupSecurityEvent, SignupSecurityStatus } from "@/lib/signup-security";
+import { backendFetch } from "@/lib/api/backend-client";
 
 /*
  * Alertes de sécurité — surveillance des créations gratuites suspectes :
@@ -67,9 +68,8 @@ export function SecurityAlertsClient({ initialAlerts }: { initialAlerts: SignupS
     setSavingId(alert.id);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/security-alerts/${alert.id}`, {
+      const res = await backendFetch(`/admin/security-alerts/${alert.id}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action }),
       });
       const data = await res.json();

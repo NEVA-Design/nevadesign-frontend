@@ -10,6 +10,7 @@ import { FormMessage } from "@/components/ui/field";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ModuleHeader } from "@/components/dashboard/ModuleHeader";
 import { readApiResponse } from "@/lib/api/client";
+import { backendFetch } from "@/lib/api/backend-client";
 
 /*
  * Audit — le verdict comme une scène : grand score serif teinté
@@ -110,7 +111,7 @@ export default function AuditPageClient() {
     setError(null);
 
     try {
-      const res = await fetch("/api/audit-image", {
+      const res = await backendFetch("/audit-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

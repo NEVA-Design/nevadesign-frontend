@@ -10,10 +10,26 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ACCENT_STYLES, KIND_LABELS, type SiteAnnouncement } from "@/lib/announcements";
 import { PLANS } from "@/lib/plans";
-import { createClient } from "@/lib/supabase/server";
+import { backendGetJson } from "@/lib/api/backend-server";
 import LiveCreditMeter from "@/components/dashboard/LiveCreditMeter";
+
+type MeResponse = {
+  id: string
+  email: string
+  user_metadata?: { display_name?: string; full_name?: string; name?: string }
+  credits: number
+  plan: string
+}
+
+type OverviewResponse = {
+  todayCount: number
+  monthCount: number
+  announcements: SiteAnnouncement[]
+  recentActivity: Array<{ type: string; description: string; amount: number; created_at: string }>
+}
 
 /*
  * Accueil de l'atelier — tuiles de verre pour les statistiques,
@@ -94,63 +110,28 @@ function greeting() {
 }
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const [me, overview] = await Promise.all([
+    backendGetJson<MeResponse>("/me"),
+    backendGetJson<OverviewResponse>("/dashboard/overview"),
+  ]);
 
-  const meta = user?.user_metadata ?? {};
-  const firstName = (meta.display_name ?? meta.full_name ?? meta.name ?? user?.email?.split("@")[0] ?? "Créateur")
+  if (!me) redirect("/login");
+
+  const meta = me.user_metadata ?? {};
+  const firstName = (meta.display_name ?? meta.full_name ?? meta.name ?? me.email.split("@")[0] ?? "Créateur")
     .split(" ")[0];
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("credits, plan")
-    .eq("id", user!.id)
-    .single();
-
-  const credits = profile?.credits ?? 0;
-  const plan = (profile?.plan ?? "free") as keyof typeof PLANS;
+  const credits = me.credits;
+  const plan = (me.plan ?? "free") as keyof typeof PLANS;
   const planInfo = PLANS[plan] ?? PLANS.free;
   const maxCredits = planInfo.credits;
 
-  const monthStart = new Date();
-  monthStart.setDate(1);
-  monthStart.setHours(0, 0, 0, 0);
-
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-
   const usageTypes = ["chat", "image_generation", "image_enhancement", "image_audit", "image_audit_improved", "character_asset"];
 
-  const [{ count: todayCount }, { count: monthCount }, { data: announcementRaw }, { data: recentRaw }] = await Promise.all([
-    supabase
-      .from("credit_transactions")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user!.id)
-      .in("type", usageTypes)
-      .gte("created_at", todayStart.toISOString()),
-    supabase
-      .from("credit_transactions")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user!.id)
-      .in("type", usageTypes)
-      .gte("created_at", monthStart.toISOString()),
-    supabase
-      .from("site_announcements")
-      .select("*")
-      .eq("is_active", true)
-      .order("priority", { ascending: false })
-      .order("created_at", { ascending: false })
-      .limit(2),
-    supabase
-      .from("credit_transactions")
-      .select("type, description, amount, created_at")
-      .eq("user_id", user!.id)
-      .order("created_at", { ascending: false })
-      .limit(8),
-  ]);
-
-  const announcements = (announcementRaw ?? []) as SiteAnnouncement[];
-  const recentActivity = (recentRaw ?? []).filter((t) => usageTypes.includes(t.type));
+  const todayCount = overview?.todayCount ?? 0;
+  const monthCount = overview?.monthCount ?? 0;
+  const announcements = overview?.announcements ?? [];
+  const recentActivity = (overview?.recentActivity ?? []).filter((t) => usageTypes.includes(t.type));
   const conversionHint =
     plan === "free" ? "Le plan supérieur retire les limites d'aperçu" : "Espace de production actif";
 
@@ -211,7 +192,7 @@ export default async function DashboardPage() {
       {/* Tuiles de statistiques */}
       <section className="mt-10 grid gap-4 md:grid-cols-3">
         <div className="pv-glass pv-edge rounded-2xl p-6">
-          <LiveCreditMeter userId={user!.id} initialCredits={credits} maxCredits={maxCredits} />
+          <LiveCreditMeter userId={me.id} initialCredits={credits} maxCredits={maxCredits} />
         </div>
         <div className="pv-glass pv-edge rounded-2xl p-6">
           <p className="pv-label">Plan actuel</p>

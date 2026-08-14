@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Gauge } from "@/components/ui/gauge";
 
 /*
  * Jauge de créations en temps réel — grand chiffre Geist, jauge
- * spectrale. Écoute Realtime + l'événement « neva:credits-updated ».
+ * spectrale. Écoute l'événement « neva:credits-updated » (déclenché
+ * dans le même onglet après chaque génération).
  */
 export default function LiveCreditMeter({
-  userId,
   initialCredits,
   maxCredits,
 }: {
@@ -20,19 +19,6 @@ export default function LiveCreditMeter({
   const [credits, setCredits] = useState(initialCredits);
 
   useEffect(() => {
-    const supabase = createClient();
-    const channel = supabase
-      .channel(`dashboard-credit-meter-${userId}`)
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${userId}` },
-        (payload) => {
-          const next = payload.new as { credits?: number };
-          if (typeof next.credits === "number") setCredits(next.credits);
-        },
-      )
-      .subscribe();
-
     const handleCreditSync = (event: Event) => {
       const detail = (event as CustomEvent<{ credits?: number }>).detail;
       if (typeof detail?.credits === "number") setCredits(detail.credits);
@@ -42,9 +28,8 @@ export default function LiveCreditMeter({
 
     return () => {
       window.removeEventListener("neva:credits-updated", handleCreditSync);
-      supabase.removeChannel(channel);
     };
-  }, [userId]);
+  }, []);
 
   const remainingPct = useMemo(
     () => Math.min(100, Math.max(0, Math.round((credits / Math.max(maxCredits, 1)) * 100))),

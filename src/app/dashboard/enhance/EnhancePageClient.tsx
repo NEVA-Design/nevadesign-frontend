@@ -8,6 +8,7 @@ import { FormMessage, Label, Textarea } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import { ModuleHeader } from "@/components/dashboard/ModuleHeader";
 import { readApiResponse } from "@/lib/api/client";
+import { backendFetch } from "@/lib/api/backend-client";
 
 /*
  * Enhance — laboratoire de finition : panneau de réglages numéroté à
@@ -138,7 +139,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
     setResult(null);
 
     try {
-      const res = await fetch("/api/enhance-image", {
+      const res = await backendFetch("/enhance-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

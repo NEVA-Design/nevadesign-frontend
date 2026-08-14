@@ -1,18 +1,12 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { backendGetJson } from '@/lib/api/backend-server'
 import { EnhancePageClient } from './EnhancePageClient'
 
+type MeResponse = { plan: string }
+
 export default async function EnhancePage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const me = await backendGetJson<MeResponse>('/me')
+  if (!me) redirect('/login')
 
-  if (!user) redirect('/login')
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('plan')
-    .eq('id', user.id)
-    .single()
-
-  return <EnhancePageClient userPlan={profile?.plan ?? 'free'} />
+  return <EnhancePageClient userPlan={me.plan ?? 'free'} />
 }

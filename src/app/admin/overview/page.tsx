@@ -1,8 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
-import { verifyAdmin } from '@/lib/admin'
-import { createServiceClient } from '@/lib/supabase/server'
+import { backendGetJson } from '@/lib/api/backend-server'
 import { PLANS } from '@/lib/plans'
 import { PageHeader } from '@/components/admin/PageHeader'
 import { StatTile } from '@/components/admin/StatTile'
@@ -15,17 +14,23 @@ import { Gauge } from '@/components/ui/gauge'
  * spectrales sur pistes de verre, économie de crédits et file d'abus.
  */
 
-type ProfileRow = {
-  id: string
-  credits: number | null
-  plan: keyof typeof PLANS | string | null
-  created_at: string | null
-}
-
-type TransactionRow = {
-  amount: number | null
-  type: string | null
-  created_at: string | null
+type OverviewResponse = {
+  totalUsers: number
+  paidUsers: number
+  freeUsers: number
+  conversionRate: number
+  monthlyRevenue: number
+  creditsRemaining: number
+  creditsConsumed: number
+  purchasedCredits: number
+  dailyGenerations: number
+  monthlyGenerations: number
+  pendingSecurityAlerts: number
+  blockedFreeCreditAttempts: number
+  duplicateIpSignupsToday: number
+  estimatedCreditsSaved: number
+  generationSeries: Array<{ day: string; value: number }>
+  planCounts: Array<{ plan: keyof typeof PLANS; label: string; count: number }>
 }
 
 function money(value: number) {
@@ -36,65 +41,33 @@ function pct(value: number) {
   return `${Math.round(value)}%`
 }
 
-function dayKey(date: Date) {
-  return date.toISOString().slice(0, 10)
-}
-
-function lastDays(count: number) {
-  return Array.from({ length: count }, (_, index) => {
-    const date = new Date()
-    date.setDate(date.getDate() - (count - 1 - index))
-    return dayKey(date)
-  })
-}
-
 export default async function AdminOverviewPage() {
-  const admin = await verifyAdmin()
-  if (!admin) redirect('/dashboard')
-
-  const service = await createServiceClient()
-  const [{ data: profiles }, { data: transactions }, { data: authUsers }, { data: securityEvents }] = await Promise.all([
-    service.from('profiles').select('id, credits, plan, created_at'),
-    service.from('credit_transactions').select('amount, type, created_at').order('created_at', { ascending: false }).limit(700),
-    service.auth.admin.listUsers({ page: 1, perPage: 1000 }),
-    service.from('signup_security_events').select('status, ip_address, risk_score, created_at').order('created_at', { ascending: false }).limit(500),
+  const [admin, overview] = await Promise.all([
+    backendGetJson<{ email: string }>('/admin/verify'),
+    backendGetJson<OverviewResponse>('/admin/overview'),
   ])
+  if (!admin || !overview) redirect('/dashboard')
 
-  const profileRows = (profiles ?? []) as ProfileRow[]
-  const transactionRows = (transactions ?? []) as TransactionRow[]
-  const totalUsers = authUsers?.users.length ?? profileRows.length
-  const paidUsers = profileRows.filter((profile) => profile.plan && profile.plan !== 'free').length
-  const freeUsers = Math.max(totalUsers - paidUsers, 0)
-  const conversionRate = totalUsers > 0 ? (paidUsers / totalUsers) * 100 : 0
-  const monthlyRevenue = profileRows.reduce((sum, profile) => {
-    const plan = profile.plan && profile.plan in PLANS ? PLANS[profile.plan as keyof typeof PLANS] : null
-    return sum + (plan && plan.id !== 'free' ? plan.price : 0)
-  }, 0)
-  const creditsRemaining = profileRows.reduce((sum, profile) => sum + Math.max(profile.credits ?? 0, 0), 0)
-  const creditsConsumed = Math.abs(transactionRows.filter((tx) => (tx.amount ?? 0) < 0).reduce((sum, tx) => sum + (tx.amount ?? 0), 0))
-  const purchasedCredits = transactionRows.filter((tx) => (tx.amount ?? 0) > 0 && ['topup', 'purchase', 'subscription'].some((type) => (tx.type ?? '').includes(type))).reduce((sum, tx) => sum + (tx.amount ?? 0), 0)
-  const nowMs = new Date().getTime()
-  const dailyGenerations = transactionRows.filter((tx) => (tx.amount ?? 0) < 0 && tx.created_at && nowMs - new Date(tx.created_at).getTime() < 86400000).length
-  const monthlyGenerations = transactionRows.filter((tx) => (tx.amount ?? 0) < 0 && tx.created_at && nowMs - new Date(tx.created_at).getTime() < 30 * 86400000).length
-  const securityRows = securityEvents ?? []
-  const todayKey = dayKey(new Date())
-  const pendingSecurityAlerts = securityRows.filter((event) => event.status === 'pending_review').length
-  const blockedFreeCreditAttempts = securityRows.filter((event) => event.status === 'blocked' || event.status === 'rejected_by_admin').length
-  const duplicateIpSignupsToday = securityRows.filter((event) => event.created_at?.startsWith(todayKey) && (event.risk_score ?? 0) >= 60).length
-  const estimatedCreditsSaved = blockedFreeCreditAttempts * PLANS.free.credits
+  const {
+    totalUsers,
+    paidUsers,
+    freeUsers,
+    conversionRate,
+    monthlyRevenue,
+    creditsRemaining,
+    creditsConsumed,
+    purchasedCredits,
+    dailyGenerations,
+    monthlyGenerations,
+    pendingSecurityAlerts,
+    blockedFreeCreditAttempts,
+    duplicateIpSignupsToday,
+    estimatedCreditsSaved,
+    generationSeries,
+    planCounts,
+  } = overview
 
-  const days = lastDays(14)
-  const generationSeries = days.map((day) => ({
-    day,
-    value: transactionRows.filter((tx) => (tx.amount ?? 0) < 0 && tx.created_at?.startsWith(day)).length,
-  }))
   const maxSeries = Math.max(...generationSeries.map((entry) => entry.value), 1)
-
-  const planCounts = (Object.keys(PLANS) as Array<keyof typeof PLANS>).map((plan) => ({
-    plan,
-    label: PLANS[plan].name,
-    count: profileRows.filter((profile) => (profile.plan ?? 'free') === plan).length,
-  }))
 
   const primaryMetrics = [
     { label: 'MRR estimé', value: money(monthlyRevenue), detail: 'récurrence mensuelle estimée' },

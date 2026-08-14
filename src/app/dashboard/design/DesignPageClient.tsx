@@ -13,6 +13,7 @@ import Link from "next/link";
 import { IMAGE_MODELS, RESOLUTION_OPTIONS, type ImageModel } from "@/lib/ai/models";
 import { ASPECT_RATIOS as BASE_ASPECT_RATIOS } from "@/lib/ai/aspect-ratios";
 import { readApiResponse } from "@/lib/api/client";
+import { backendFetch } from "@/lib/api/backend-client";
 import { ModuleHeader } from "@/components/dashboard/ModuleHeader";
 
 // ─── Constantes ───────────────────────────────────────────────────────────────
@@ -379,7 +380,7 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
 
   // Chargement des personnages mémorisés au montage
   useEffect(() => {
-    fetch("/api/characters")
+    backendFetch("/characters")
       .then(r => readApiResponse<{ characters: SavedChar[] }>(r))
       .then(d => { if (d.characters) setSavedCharacters(d.characters); })
       .catch(() => {});
@@ -390,7 +391,7 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
     setCharSaving(true);
     setCharSaveStatus("idle");
     try {
-      const res = await fetch("/api/characters", {
+      const res = await backendFetch("/characters", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -418,14 +419,14 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
   };
 
   const deleteCharacter = async (id: string) => {
-    await fetch(`/api/characters/${id}`, { method: "DELETE" });
+    await backendFetch(`/characters/${id}`, { method: "DELETE" });
     setSavedCharacters(prev => prev.filter(c => c.id !== id));
     if (selectedCharacter?.id === id) setSelectedCharacter(null);
   };
 
   const selectSavedCharacter = async (char: SavedChar) => {
     setShowCharPicker(false);
-    const res = await fetch(`/api/characters/${char.id}`);
+    const res = await backendFetch(`/characters/${char.id}`);
     const data = await readApiResponse<{ character?: { id: string; name: string; description: string } }>(res);
     if (data.character) {
       setSelectedCharacter(data.character);
@@ -523,7 +524,7 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
       }
       if (selectedCharacter) body.savedCharacterDescription = selectedCharacter.description;
 
-      const res = await fetch("/api/generate-image", {
+      const res = await backendFetch("/generate-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

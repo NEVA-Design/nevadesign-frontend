@@ -4,7 +4,7 @@ import path from "path";
 import NevaDesignPage from "@/components/neva-design/NevaDesignPage";
 import { DEFAULT_NEVA_DESIGN_PORTFOLIO, type NevaDesignPortfolioItem } from "@/lib/neva-design-portfolio";
 import { siteUrl } from "@/lib/seo";
-import { createServiceClient } from "@/lib/supabase/server";
+import { BACKEND_URL } from "@/lib/api/backend-server";
 
 const title = "Neva Design - Studio graphique premium pour serveurs FiveM";
 const description =
@@ -173,25 +173,11 @@ export default function Page() {
     const localItems = await getLocalPortfolioItems();
     const fallbackItems = localItems.length ? localItems : DEFAULT_NEVA_DESIGN_PORTFOLIO;
 
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      return fallbackItems;
-    }
-
     try {
-      const service = await createServiceClient();
-      const { data, error } = await service
-        .from("neva_design_portfolio")
-        .select("*")
-        .eq("is_active", true)
-        .order("priority", { ascending: false })
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("[neva-design] portfolio load error:", error);
-        return fallbackItems;
-      }
-
-      return data?.length ? mergePortfolioItems(data as NevaDesignPortfolioItem[], fallbackItems) : fallbackItems;
+      const res = await fetch(`${BACKEND_URL}/portfolio`, { next: { revalidate: 3600 } });
+      if (!res.ok) return fallbackItems;
+      const data = (await res.json()) as { items: NevaDesignPortfolioItem[] };
+      return data.items.length ? mergePortfolioItems(data.items, fallbackItems) : fallbackItems;
     } catch (error) {
       console.error("[neva-design] portfolio fallback:", error);
       return fallbackItems;

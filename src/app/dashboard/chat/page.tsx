@@ -4,6 +4,7 @@ import { ChevronDown, Download, ImageIcon, Paperclip, Plus, Send, X } from "luci
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { IMAGE_BRIEF_MARKER, NEVA_MODELS, type NevaModel } from "@/lib/ai/models";
+import { backendFetch } from "@/lib/api/backend-client";
 
 /*
  * Creative Director — salon de conversation plein écran : en-tête fin
@@ -227,7 +228,7 @@ export default function ChatPage() {
   useEffect(() => {
     const loadHistory = async () => {
       try {
-        const res = await fetch("/api/chat/history");
+        const res = await backendFetch("/chat/history");
         if (!res.ok) return;
         const data = await res.json();
         if (data?.messages?.length) {
@@ -254,9 +255,8 @@ export default function ChatPage() {
 
   const persistHistory = async (messagesToSave: Message[]) => {
     try {
-      await fetch("/api/chat/history", {
+      await backendFetch("/chat/history", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: messagesToSave }),
       });
     } catch (error) {
@@ -287,9 +287,8 @@ export default function ChatPage() {
       prev.map((m, i) => (i === msgIndex ? { ...m, generatingImage: true } : m))
     );
     try {
-      const res = await fetch("/api/generate-image", {
+      const res = await backendFetch("/generate-image", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt, aspectRatio: "16:9", resolution: "hd", imageModelId: "neva-standard" }),
       });
       const data = await res.json();
@@ -339,9 +338,8 @@ export default function ChatPage() {
     const placeholderIdx = messages.length + 1;
 
     try {
-      const res = await fetch("/api/generate-image", {
+      const res = await backendFetch("/generate-image", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: content,
           aspectRatio: "16:9",
@@ -412,9 +410,8 @@ export default function ChatPage() {
     setStreamingContent("");
 
     try {
-      const res = await fetch("/api/chat", {
+      const res = await backendFetch("/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: newMessages.map((m) => ({
             role: m.role,

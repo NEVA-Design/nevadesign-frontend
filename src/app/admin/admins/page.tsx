@@ -1,27 +1,19 @@
+import { redirect } from 'next/navigation'
+import { backendGetJson } from '@/lib/api/backend-server'
 import { AdminsClient } from './AdminsClient'
-import { getBootstrapAdminEmails } from '@/lib/admin'
-import { createServiceClient } from '@/lib/supabase/server'
+
+type AdminEntry = {
+  id: string
+  email: string
+  is_active: boolean
+  source: 'env' | 'database'
+  created_at: string | null
+  created_by: string | null
+}
 
 export default async function AdminsPage() {
-  const service = await createServiceClient()
-  const { data } = await service
-    .from('admin_users')
-    .select('id, email, is_active, created_at, created_by')
-    .order('created_at', { ascending: false })
+  const data = await backendGetJson<{ admins: AdminEntry[] }>('/admin/admins')
+  if (!data) redirect('/dashboard')
 
-  const bootstrapAdmins = getBootstrapAdminEmails().map(email => ({
-    id: `env:${email}`,
-    email,
-    is_active: true,
-    source: 'env' as const,
-    created_at: null,
-    created_by: null,
-  }))
-
-  const databaseAdmins = (data ?? []).map(item => ({
-    ...item,
-    source: 'database' as const,
-  }))
-
-  return <AdminsClient initialAdmins={[...bootstrapAdmins, ...databaseAdmins]} />
+  return <AdminsClient initialAdmins={data.admins} />
 }

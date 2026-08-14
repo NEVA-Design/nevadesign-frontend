@@ -18,6 +18,7 @@ import { FormMessage, Input, Label, Textarea } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import { ModuleHeader } from "@/components/dashboard/ModuleHeader";
 import { readApiResponse } from "@/lib/api/client";
+import { backendFetch } from "@/lib/api/backend-client";
 
 /*
  * Character — le bureau des identités : la table d'examen du dossier à
@@ -76,7 +77,7 @@ export default function CharacterPageClient() {
   const activeStep = result ? 2 : sourceImage ? 1 : 0;
 
   useEffect(() => {
-    fetch("/api/characters")
+    backendFetch("/characters")
       .then((res) => readApiResponse<{ characters: SavedCharacter[] }>(res))
       .then((data) => setSavedCharacters(data.characters ?? []))
       .catch(() => {});
@@ -125,7 +126,7 @@ export default function CharacterPageClient() {
         ? { data: sourceImage.data, mimeType: sourceImage.mimeType }
         : memoryImage;
 
-      const res = await fetch("/api/character-assets", {
+      const res = await backendFetch("/character-assets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -160,7 +161,7 @@ export default function CharacterPageClient() {
   };
 
   const selectMemory = async (character: SavedCharacter) => {
-    const res = await fetch(`/api/characters/${character.id}`);
+    const res = await backendFetch(`/characters/${character.id}`);
     const data = await readApiResponse<{ character: SavedCharacter }>(res);
     setSelectedMemory(data.character);
     if (data.character.image_preview) {
@@ -180,7 +181,7 @@ export default function CharacterPageClient() {
   const renameMemory = async (character: SavedCharacter) => {
     const name = window.prompt("Nouveau nom du personnage", character.name)?.trim();
     if (!name) return;
-    const res = await fetch(`/api/characters/${character.id}`, {
+    const res = await backendFetch(`/characters/${character.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
@@ -191,7 +192,7 @@ export default function CharacterPageClient() {
   };
 
   const deleteMemory = async (id: string) => {
-    await readApiResponse<{ ok: boolean }>(await fetch(`/api/characters/${id}`, { method: "DELETE" }));
+    await readApiResponse<{ ok: boolean }>(await backendFetch(`/characters/${id}`, { method: "DELETE" }));
     setSavedCharacters((prev) => prev.filter((item) => item.id !== id));
     if (selectedMemory?.id === id) setSelectedMemory(null);
   };

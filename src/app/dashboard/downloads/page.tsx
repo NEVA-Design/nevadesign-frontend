@@ -1,43 +1,30 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { ONE_SHOT_PACKS } from "@/lib/resources";
+import { backendGetJson } from "@/lib/api/backend-server";
 import DownloadsClient from "./DownloadsClient";
+
+type OwnedPack = {
+  id: string
+  name: string
+  tagline: string
+  downloadUrl: string
+  purchasedAt: string | null
+}
 
 export default async function DownloadsPage({
   searchParams,
 }: {
   searchParams: Promise<{ success?: string }>;
 }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data: purchases } = await supabase
-    .from("resource_purchases")
-    .select("resource_id, created_at")
-    .eq("user_id", user.id);
-
-  const ownedIds = new Set((purchases ?? []).map((p) => p.resource_id));
-
-  // Build owned packs with download URLs (server-side only) —
-  // ressources Photoshop ET packs de création (run 2)
-  const ownedPacks = Object.values(ONE_SHOT_PACKS)
-    .filter((p) => ownedIds.has(p.id))
-    .map((p) => ({
-      id: p.id,
-      name: p.name,
-      tagline: p.tagline,
-      downloadUrl: p.downloadUrl,
-      purchasedAt: purchases?.find((pu) => pu.resource_id === p.id)?.created_at ?? null,
-    }));
+  const data = await backendGetJson<{ ownedPacks: OwnedPack[] }>("/dashboard/downloads");
+  if (!data) redirect("/login");
 
   const params = await searchParams;
 
   return (
     <Suspense>
       <DownloadsClient
-        ownedPacks={ownedPacks}
+        ownedPacks={data.ownedPacks}
         successPack={params.success ?? null}
       />
     </Suspense>

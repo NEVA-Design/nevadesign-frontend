@@ -9,6 +9,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useToasts, ToastViewport } from "@/components/ui/toast";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { StatTile } from "@/components/admin/StatTile";
+import { backendFetch } from "@/lib/api/backend-client";
 
 /*
  * Newsletter — composer à gauche, aperçu fidèle de l'e-mail à droite
@@ -71,7 +72,7 @@ export function AdminNewsletterClient({
   async function refreshStats() {
     setLoading("refresh");
     try {
-      const res = await fetch("/api/admin/newsletter");
+      const res = await backendFetch("/admin/newsletter");
       const data = await res.json();
       if (!res.ok || data.error) {
         push(data.error ?? "Erreur lors du chargement des statistiques", "error");
@@ -91,9 +92,8 @@ export function AdminNewsletterClient({
 
     setLoading(mode);
     try {
-      const res = await fetch("/api/admin/newsletter", {
+      const res = await backendFetch("/admin/newsletter", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           mode,
           audience,

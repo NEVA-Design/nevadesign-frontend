@@ -8,6 +8,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { CREATION_PACKS_PUBLIC, RESOURCE_PACKS_PUBLIC } from "@/lib/resources";
 import { RevealBlock } from "@/components/prisme/Motion";
 import { cn } from "@/lib/utils";
+import { backendFetch } from "@/lib/api/backend-client";
 
 const creationPacks = Object.values(CREATION_PACKS_PUBLIC);
 const resourcePacks = Object.values(RESOURCE_PACKS_PUBLIC);
@@ -31,9 +32,8 @@ export default function GivrePacks() {
     setLoading(packId);
     setError(null);
     try {
-      const res = await fetch("/api/stripe/resource-checkout", {
+      const res = await backendFetch("/stripe/resource-checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ packId }),
       });
 

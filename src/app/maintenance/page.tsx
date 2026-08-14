@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { DEFAULT_MAINTENANCE, isMaintenanceActive, type MaintenanceMode } from '@/lib/maintenance'
-import { createServiceClient } from '@/lib/supabase/server'
+import { backendGetJson } from '@/lib/api/backend-server'
 import { BrandMark } from '@/components/prisme/Brand'
 import SatinSphere from '@/components/givre/SatinSphere'
 import { Button } from '@/components/ui/button'
@@ -17,18 +17,8 @@ export const metadata: Metadata = {
 }
 
 async function getMaintenance() {
-  try {
-    const service = await createServiceClient()
-    const { data } = await service
-      .from('site_maintenance')
-      .select('*')
-      .eq('id', 'global')
-      .maybeSingle()
-
-    return (data ?? DEFAULT_MAINTENANCE) as MaintenanceMode
-  } catch {
-    return DEFAULT_MAINTENANCE
-  }
+  const data = await backendGetJson<{ maintenance: MaintenanceMode }>('/maintenance')
+  return data?.maintenance ?? DEFAULT_MAINTENANCE
 }
 
 /*

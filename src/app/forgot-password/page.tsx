@@ -6,7 +6,7 @@ import { useState } from "react";
 import { BrandMark } from "@/components/prisme/Brand";
 import { Button } from "@/components/ui/button";
 import { Input, Label, FormMessage } from "@/components/ui/field";
-import { createClient } from "@/lib/supabase/client";
+import { backendFetch } from "@/lib/api/backend-client";
 
 /*
  * Mot de passe oublié — le lien existait sur /login et menait à un
@@ -29,11 +29,11 @@ export default function ForgotPasswordPage() {
       return;
     }
     try {
-      const supabase = createClient();
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard/settings`,
+      const res = await backendFetch("/auth/forgot-password", {
+        method: "POST",
+        body: JSON.stringify({ email }),
       });
-      if (resetError) {
+      if (!res.ok) {
         setError("L'envoi a échoué. Réessayez dans un instant.");
       } else {
         setSent(true);

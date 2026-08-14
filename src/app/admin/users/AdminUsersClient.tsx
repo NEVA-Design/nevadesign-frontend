@@ -22,6 +22,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Table, TableHeader, TableRow } from "@/components/ui/table";
 import { useToasts, ToastViewport } from "@/components/ui/toast";
 import { PageHeader, HeaderMeta } from "@/components/admin/PageHeader";
+import { backendFetch } from "@/lib/api/backend-client";
 
 /*
  * Registre des utilisateurs — recherche débouncée, registre de verre,
@@ -90,9 +91,8 @@ function UserModal({
     setLoading(true);
     clearMessages();
     try {
-      const res = await fetch(path, {
+      const res = await backendFetch(path, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
       const data = await res.json();
@@ -110,7 +110,7 @@ function UserModal({
   }
 
   async function handleChangePlan() {
-    const data = await callAdmin(`/api/admin/users/${user.id}/plan`, {
+    const data = await callAdmin(`/admin/users/${user.id}/plan`, {
       plan: selectedPlan,
       resetCredits: resetOnChange,
     });
@@ -123,7 +123,7 @@ function UserModal({
   async function handleAddCredits() {
     const n = parseInt(addAmount, 10);
     if (!n || n <= 0) { setError("Montant invalide"); return; }
-    const data = await callAdmin(`/api/admin/users/${user.id}/credits`, { action: "add", amount: n });
+    const data = await callAdmin(`/admin/users/${user.id}/credits`, { action: "add", amount: n });
     if (data) {
       setSuccess(`+${n} créations ajoutées (total : ${data.credits})`);
       onUpdated({ ...user, credits: data.credits });
@@ -134,7 +134,7 @@ function UserModal({
   async function handleSetCredits() {
     const n = parseInt(setAmount, 10);
     if (n === undefined || n < 0) { setError("Montant invalide"); return; }
-    const data = await callAdmin(`/api/admin/users/${user.id}/credits`, { action: "set", amount: n });
+    const data = await callAdmin(`/admin/users/${user.id}/credits`, { action: "set", amount: n });
     if (data) {
       setSuccess(`Créations définies à ${data.credits}`);
       onUpdated({ ...user, credits: data.credits });
@@ -143,7 +143,7 @@ function UserModal({
   }
 
   async function handleResetCredits() {
-    const data = await callAdmin(`/api/admin/users/${user.id}/credits`, { action: "reset" });
+    const data = await callAdmin(`/admin/users/${user.id}/credits`, { action: "reset" });
     if (data) {
       setSuccess(`Créations réinitialisées à ${data.credits} (plan ${PLAN_LABELS[user.plan]})`);
       onUpdated({ ...user, credits: data.credits });
@@ -152,7 +152,7 @@ function UserModal({
 
   async function handleRemoveSub() {
     if (!confirm(`Résilier l'abonnement de ${user.email} et revenir au plan Free ?`)) return;
-    const data = await callAdmin(`/api/admin/users/${user.id}/plan`, {
+    const data = await callAdmin(`/admin/users/${user.id}/plan`, {
       plan: "free",
       resetCredits: false,
       cancelSubscription: true,
@@ -381,7 +381,7 @@ export function AdminUsersClient() {
     try {
       const params = new URLSearchParams({ page: String(page), perPage: String(PER_PAGE) });
       if (debouncedQ) params.set("q", debouncedQ);
-      const res = await fetch(`/api/admin/users?${params}`);
+      const res = await backendFetch(`/admin/users?${params}`);
       const data = await res.json();
       if (res.ok) {
         setUsers(data.users ?? []);

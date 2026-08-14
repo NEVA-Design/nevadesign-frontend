@@ -1,11 +1,9 @@
 export type AspectRatioId = "1:1" | "4:3" | "16:9" | "3:4" | "9:16";
-export type OpenAIImageSize = "1024x1024" | "1536x1024" | "1024x1536";
 
 export type AspectRatioDefinition = {
   id: AspectRatioId;
   label: string;
   orientation: "square" | "landscape" | "portrait" | "ultrawide";
-  openaiSize: OpenAIImageSize;
   w: number;
   h: number;
   promptLabel: string;
@@ -17,7 +15,6 @@ export const ASPECT_RATIOS: AspectRatioDefinition[] = [
     id: "1:1",
     label: "1:1",
     orientation: "square",
-    openaiSize: "1024x1024",
     w: 13,
     h: 13,
     promptLabel: "1:1 SQUARE (equal width and height)",
@@ -27,7 +24,6 @@ export const ASPECT_RATIOS: AspectRatioDefinition[] = [
     id: "4:3",
     label: "4:3",
     orientation: "landscape",
-    openaiSize: "1536x1024",
     w: 16,
     h: 12,
     promptLabel: "4:3 LANDSCAPE (classic horizontal frame)",
@@ -37,7 +33,6 @@ export const ASPECT_RATIOS: AspectRatioDefinition[] = [
     id: "16:9",
     label: "16:9",
     orientation: "landscape",
-    openaiSize: "1536x1024",
     w: 20,
     h: 11,
     promptLabel: "16:9 WIDE LANDSCAPE (horizontal, wider than tall)",
@@ -47,7 +42,6 @@ export const ASPECT_RATIOS: AspectRatioDefinition[] = [
     id: "3:4",
     label: "3:4",
     orientation: "portrait",
-    openaiSize: "1024x1536",
     w: 12,
     h: 16,
     promptLabel: "3:4 PORTRAIT (classic vertical frame)",
@@ -57,7 +51,6 @@ export const ASPECT_RATIOS: AspectRatioDefinition[] = [
     id: "9:16",
     label: "9:16",
     orientation: "portrait",
-    openaiSize: "1024x1536",
     w: 8,
     h: 14,
     promptLabel: "9:16 TALL PORTRAIT (vertical, taller than wide)",
@@ -72,10 +65,6 @@ export function normalizeAspectRatio(value: unknown): AspectRatioId | null {
 export function getAspectRatio(value: unknown) {
   const id = normalizeAspectRatio(value) ?? "1:1";
   return ASPECT_RATIOS.find((ratio) => ratio.id === id) ?? ASPECT_RATIOS[2];
-}
-
-export function aspectToOpenAIImageSize(value: unknown): OpenAIImageSize {
-  return getAspectRatio(value).openaiSize;
 }
 
 export function getAspectRatioInstruction(value: unknown) {

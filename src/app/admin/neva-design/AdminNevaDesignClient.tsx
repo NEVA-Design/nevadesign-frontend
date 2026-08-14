@@ -26,6 +26,7 @@ import {
   type NevaDesignPortfolioCategory,
   type NevaDesignPortfolioItem,
 } from "@/lib/neva-design-portfolio";
+import { backendFetch } from "@/lib/api/backend-client";
 
 /*
  * Portfolio Neva Design — formulaire de projet à gauche (téléversement
@@ -125,7 +126,7 @@ export function AdminNevaDesignClient({
 
     setUploadingImage(true);
     try {
-      const res = await fetch("/api/admin/neva-design/portfolio/upload", {
+      const res = await backendFetch("/admin/neva-design/portfolio/upload", {
         method: "POST",
         body,
       });
@@ -158,11 +159,10 @@ export function AdminNevaDesignClient({
 
     setLoading(true);
     try {
-      const res = await fetch(
-        editingId ? `/api/admin/neva-design/portfolio/${editingId}` : "/api/admin/neva-design/portfolio",
+      const res = await backendFetch(
+        editingId ? `/admin/neva-design/portfolio/${editingId}` : "/admin/neva-design/portfolio",
         {
           method: editingId ? "PATCH" : "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             ...form,
             priority: Number(form.priority || 0),
@@ -196,7 +196,7 @@ export function AdminNevaDesignClient({
 
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/neva-design/portfolio/${item.id}`, { method: "DELETE" });
+      const res = await backendFetch(`/admin/neva-design/portfolio/${item.id}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok || data.error) {
         push(data.error ?? "Erreur lors de la suppression", "error");
@@ -225,9 +225,8 @@ export function AdminNevaDesignClient({
     }
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/neva-design/portfolio/${item.id}`, {
+      const res = await backendFetch(`/admin/neva-design/portfolio/${item.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: item.title,
           category: item.category,

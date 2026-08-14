@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { FormMessage } from "@/components/ui/field";
 import { PLANS, TOPUPS } from "@/lib/plans";
 import { useSearchParams } from "next/navigation";
+import { backendFetch } from "@/lib/api/backend-client";
 
 /*
  * Abonnement — formules en cartes de verre (vedette Creator soulignée
@@ -14,9 +15,8 @@ import { useSearchParams } from "next/navigation";
  */
 
 async function redirectToCheckout(priceId: string, mode: "subscription" | "payment"): Promise<string | null> {
-  const res = await fetch("/api/stripe/checkout", {
+  const res = await backendFetch("/stripe/checkout", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ priceId, mode }),
   });
   const text = await res.text();
@@ -27,7 +27,7 @@ async function redirectToCheckout(priceId: string, mode: "subscription" | "payme
 }
 
 async function redirectToPortal() {
-  const res = await fetch("/api/stripe/portal", { method: "POST" });
+  const res = await backendFetch("/stripe/portal", { method: "POST" });
   const data = await res.json();
   if (data.url) window.location.href = data.url;
 }

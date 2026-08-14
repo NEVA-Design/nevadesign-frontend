@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { Menu } from "lucide-react";
 import { BrandMark } from "@/components/prisme/Brand";
-import { createClient } from "@/lib/supabase/client";
 
 interface UserProfile {
   id: string
@@ -23,8 +22,8 @@ interface UserProfile {
  * (scène fixe + caustiques discrètes) respire sous le plan de
  * travail : le produit est l'endroit le plus calme du site. La
  * sidebar est un panneau de verre flottant qui floute la scène.
- * Crédits synchronisés en temps réel (Realtime + événement
- * « neva:credits-updated »).
+ * Crédits synchronisés dans l'onglet via l'événement
+ * « neva:credits-updated ».
  */
 export default function DashboardShell({
   children,
@@ -38,20 +37,6 @@ export default function DashboardShell({
   const [livePlan, setLivePlan] = useState<string | null>(null);
 
   useEffect(() => {
-    const supabase = createClient();
-    const channel = supabase
-      .channel(`profile-credits-${user.email}`)
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${user.id}` },
-        (payload) => {
-          const next = payload.new as { credits?: number; plan?: string };
-          if (typeof next.credits === "number") setLiveCredits(next.credits);
-          if (next.plan) setLivePlan(next.plan);
-        },
-      )
-      .subscribe();
-
     const handleCreditSync = (event: Event) => {
       const detail = (event as CustomEvent<{ credits?: number; plan?: string }>).detail;
       if (!detail) return;
@@ -63,9 +48,8 @@ export default function DashboardShell({
 
     return () => {
       window.removeEventListener("neva:credits-updated", handleCreditSync);
-      supabase.removeChannel(channel);
     };
-  }, [user.email, user.id]);
+  }, []);
 
   const liveUser = useMemo(
     () => ({

@@ -1,21 +1,13 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { backendGetJson } from '@/lib/api/backend-server'
 import { DesignPageClient } from './DesignPageClient'
+
+type MeResponse = { plan: string }
 
 // Server component — fetches user plan then renders the client component
 export default async function DesignPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const me = await backendGetJson<MeResponse>('/me');
+  if (!me) redirect('/login');
 
-  if (!user) redirect('/login');
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('plan')
-    .eq('id', user.id)
-    .single();
-
-  const userPlan = profile?.plan ?? 'free';
-
-  return <DesignPageClient userPlan={userPlan} />;
+  return <DesignPageClient userPlan={me.plan ?? 'free'} />;
 }

@@ -10,6 +10,7 @@ import { LoadingBlock } from "@/components/ui/spinner";
 import { Table, TableHeader, TableRow } from "@/components/ui/table";
 import { useToasts, ToastViewport } from "@/components/ui/toast";
 import { PageHeader, HeaderMeta } from "@/components/admin/PageHeader";
+import { backendFetch } from "@/lib/api/backend-client";
 
 /*
  * Contrôle d'accès — fusion des administrateurs de la configuration
@@ -42,7 +43,7 @@ export function AdminsClient({ initialAdmins }: { initialAdmins: AdminEntry[] })
   const refreshAdmins = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/admins");
+      const res = await backendFetch("/admin/admins");
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur de chargement");
       setAdmins(data.admins ?? []);
@@ -62,9 +63,8 @@ export function AdminsClient({ initialAdmins }: { initialAdmins: AdminEntry[] })
 
     setSaving(true);
     try {
-      const res = await fetch("/api/admin/admins", {
+      const res = await backendFetch("/admin/admins", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: cleanEmail }),
       });
       const data = await res.json();
@@ -87,7 +87,7 @@ export function AdminsClient({ initialAdmins }: { initialAdmins: AdminEntry[] })
 
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/admins/${admin.id}`, { method: "DELETE" });
+      const res = await backendFetch(`/admin/admins/${admin.id}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur lors du retrait de l'administrateur");
       push("Administrateur retiré", "success");

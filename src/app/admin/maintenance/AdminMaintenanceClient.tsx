@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToasts, ToastViewport } from "@/components/ui/toast";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { isMaintenanceActive, type MaintenanceMode } from "@/lib/maintenance";
+import { backendFetch } from "@/lib/api/backend-client";
 
 /*
  * Maintenance — le rideau du studio. Deux gros interrupteurs
@@ -73,9 +74,8 @@ export function AdminMaintenanceClient({
 
     setSaving(true);
     try {
-      const res = await fetch("/api/admin/maintenance", {
+      const res = await backendFetch("/admin/maintenance", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nextForm),
       });
       const data = await res.json();

@@ -1,9 +1,12 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { verifyAdmin } from '@/lib/admin'
+import { backendGetJson } from '@/lib/api/backend-server'
 import { Brand, BrandMark } from '@/components/prisme/Brand'
 import { AdminRailNav, AdminSidebarNav } from '@/components/admin/AdminNav'
+
+// Depends on the request's session cookie — never prerender statically.
+export const dynamic = 'force-dynamic'
 
 /*
  * Console d'administration — le registre le plus calme du site.
@@ -26,7 +29,7 @@ const navItems = [
 ]
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const admin = await verifyAdmin()
+  const admin = await backendGetJson<{ email: string }>('/admin/verify')
   if (!admin) redirect('/dashboard')
 
   return (

@@ -1,21 +1,30 @@
 import { redirect } from 'next/navigation'
-import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { PLANS } from '@/lib/plans'
+import { backendGetJson } from '@/lib/api/backend-server'
 import DashboardShell from "@/components/dashboard/DashboardShell"
+
+// Depends on the request's session cookie — never prerender statically.
+export const dynamic = 'force-dynamic'
+
+type MeResponse = {
+  id: string
+  email: string
+  user_metadata?: { display_name?: string; full_name?: string; name?: string; avatar_url?: string; picture?: string }
+  credits: number
+  plan: string
+  maxCredits: number
+  creditReviewStatus: string | null
+}
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const me = await backendGetJson<MeResponse>('/me')
+  if (!me) redirect('/login')
 
-  if (!user) redirect('/login')
-
-  const meta = user.user_metadata ?? {}
-  const name = meta.display_name ?? meta.full_name ?? meta.name ?? user.email?.split('@')[0] ?? 'Créateur'
-  const email = user.email ?? ''
+  const meta = me.user_metadata ?? {}
+  const name = meta.display_name ?? meta.full_name ?? meta.name ?? me.email.split('@')[0] ?? 'Créateur'
   const avatarUrl = meta.avatar_url ?? meta.picture ?? null
   const initials = name
     .split(' ')
@@ -24,33 +33,20 @@ export default async function DashboardLayout({
     .toUpperCase()
     .slice(0, 2)
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('credits, plan')
-    .eq('id', user.id)
-    .single()
-
-  const credits = profile?.credits ?? 0
-  const plan = profile?.plan ?? 'free'
-  const maxCredits = PLANS[plan as keyof typeof PLANS]?.credits ?? PLANS.free.credits
-  let creditReviewStatus: string | null = null
-
-  try {
-    const service = await createServiceClient()
-    const { data: securityEvent } = await service
-      .from('signup_security_events')
-      .select('status')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-    creditReviewStatus = securityEvent?.status ?? null
-  } catch {
-    creditReviewStatus = null
-  }
-
   return (
-    <DashboardShell user={{ id: user.id, name, email, avatarUrl, initials, credits, maxCredits, plan, creditReviewStatus }}>
+    <DashboardShell
+      user={{
+        id: me.id,
+        name,
+        email: me.email,
+        avatarUrl,
+        initials,
+        credits: me.credits,
+        maxCredits: me.maxCredits,
+        plan: me.plan,
+        creditReviewStatus: me.creditReviewStatus,
+      }}
+    >
       {children}
     </DashboardShell>
   )

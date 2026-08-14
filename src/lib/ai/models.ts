@@ -5,7 +5,7 @@ export interface NevaModel {
   name: string
   badge: string
   description: string
-  openaiModel: string
+  geminiModel: string
   systemPrompt: string
   maxOutputTokens?: number
   temperature?: number
@@ -17,9 +17,7 @@ export interface ImageModel {
   badge: string
   badgeColor: string
   description: string
-  provider: 'openai' | 'gemini'
-  gptImageQuality?: 'low' | 'medium' | 'high'
-  geminiModel?: string
+  geminiModel: string
   maxResolution: 'HD' | '2K' | '4K'
   supportsReference: boolean
   requiredPlan: 'creator' | 'studio' | null
@@ -234,7 +232,7 @@ export const NEVA_MODELS: Record<string, NevaModel> = {
     name: 'Neva Studio',
     badge: 'STUDIO',
     description: 'Direction artistique, stratégie de lancement et briefs premium',
-    openaiModel: 'gpt-4o',
+    geminiModel: 'gemini-2.5-pro',
     maxOutputTokens: 2500,
     temperature: 0.4,
     systemPrompt: `Tu es Neva Pro — le directeur artistique IA de Neva AI, spécialisé FiveM/GTA RP et design premium.
@@ -277,7 +275,7 @@ ${OUTPUT_FORMAT}`,
     name: 'Neva Core',
     badge: 'CORE',
     description: 'Direction créative rapide et idées immédiatement actionnables',
-    openaiModel: 'gpt-4o-mini',
+    geminiModel: 'gemini-2.5-flash',
     maxOutputTokens: 1800,
     temperature: 0.45,
     systemPrompt: `Tu es Neva Flash — l'expert créatif rapide de Neva AI pour FiveM.
@@ -312,7 +310,6 @@ export const IMAGE_MODELS: Record<string, ImageModel> = {
     badge: 'CORE',
     badgeColor: '#93A0AB',
     description: 'Visuels propres pour poster, bannière et annonce serveur',
-    provider: 'gemini',
     geminiModel: 'gemini-2.5-flash-image',
     maxResolution: 'HD',
     supportsReference: true,
@@ -325,7 +322,6 @@ export const IMAGE_MODELS: Record<string, ImageModel> = {
     badge: 'VISION',
     badgeColor: '#C5904F',
     description: 'Rendus plus précis pour personnages, marques et scènes FiveM',
-    provider: 'gemini',
     geminiModel: 'gemini-3.1-flash-image',
     maxResolution: '2K',
     supportsReference: true,
@@ -338,7 +334,6 @@ export const IMAGE_MODELS: Record<string, ImageModel> = {
     badge: 'STUDIO',
     badgeColor: '#C9A961',
     description: 'Qualité studio pour campagnes, clients et assets premium',
-    provider: 'gemini',
     geminiModel: 'gemini-3-pro-image',
     maxResolution: '4K',
     supportsReference: true,

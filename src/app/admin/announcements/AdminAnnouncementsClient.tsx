@@ -16,6 +16,7 @@ import {
   type AnnouncementKind,
   type SiteAnnouncement,
 } from "@/lib/announcements";
+import { backendFetch } from "@/lib/api/backend-client";
 
 /*
  * Affichages — composer de verre à gauche, registre des messages à
@@ -122,9 +123,8 @@ export function AdminAnnouncementsClient({
 
     setLoading(true);
     try {
-      const res = await fetch(editingId ? `/api/admin/announcements/${editingId}` : "/api/admin/announcements", {
+      const res = await backendFetch(editingId ? `/admin/announcements/${editingId}` : "/admin/announcements", {
         method: editingId ? "PATCH" : "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
           priority: Number(form.priority || 0),
@@ -157,7 +157,7 @@ export function AdminAnnouncementsClient({
     if (!confirm(`Supprimer « ${item.title} » ?`)) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/announcements/${item.id}`, { method: "DELETE" });
+      const res = await backendFetch(`/admin/announcements/${item.id}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok || data.error) {
         push(data.error ?? "Erreur lors de la suppression", "error");
@@ -176,9 +176,8 @@ export function AdminAnnouncementsClient({
   async function toggleActive(item: SiteAnnouncement) {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/announcements/${item.id}`, {
+      const res = await backendFetch(`/admin/announcements/${item.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...fromAnnouncement(item),
           is_active: !item.is_active,
