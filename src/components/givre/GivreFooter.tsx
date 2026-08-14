@@ -38,7 +38,7 @@ export default function GivreFooter() {
       title: t("footer.company", "Studio"),
       links: [
         { label: t("footer.link.studio", "Neva Design Studio"), href: "/neva-design" },
-        { label: t("footer.link.agency", "Maison mère"), href: "https://neva-ia.com", external: true },
+        { label: t("footer.link.agency", "Maison mère"), href: "https://neva-agency.fr", external: true },
         { label: t("footer.link.discord", "Discord"), href: "https://discord.gg/nevadesign", external: true },
         { label: t("footer.link.contact", "Contact"), href: "mailto:nevapro@nevadesign.fr", external: true },
       ],
