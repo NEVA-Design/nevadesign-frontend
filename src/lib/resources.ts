@@ -21,7 +21,7 @@ export const CREATION_PACKS: Record<string, ResourcePack> = {
   'pack-identite': {
     id: 'pack-identite',
     name: 'Pack Identité',
-    price: 39,
+    price: 19,
     tagline: 'Identité visuelle',
     badge: null,
     description:
@@ -32,7 +32,7 @@ export const CREATION_PACKS: Record<string, ResourcePack> = {
       '2 bannières réseaux',
       '1 affiche',
     ],
-    // → Crée un produit Stripe (one-time 39 €) et mets le price_xxx ici
+    // → Crée un produit Stripe (one-time 19 €) et mets le price_xxx ici
     priceId: process.env.STRIPE_PRICE_PACK_IDENTITE ?? '',
     downloadUrl: process.env.PACK_IDENTITE_DOWNLOAD_URL ?? '',
   },
@@ -40,7 +40,7 @@ export const CREATION_PACKS: Record<string, ResourcePack> = {
   'pack-lancement': {
     id: 'pack-lancement',
     name: 'Pack Lancement',
-    price: 89,
+    price: 49,
     tagline: 'Tout pour démarrer',
     badge: 'LE PLUS COMPLET',
     description:
@@ -51,7 +51,7 @@ export const CREATION_PACKS: Record<string, ResourcePack> = {
       'Écran d’attente',
       '4 affiches',
     ],
-    // → Crée un produit Stripe (one-time 89 €) et mets le price_xxx ici
+    // → Crée un produit Stripe (one-time 49 €) et mets le price_xxx ici
     priceId: process.env.STRIPE_PRICE_PACK_LANCEMENT ?? '',
     downloadUrl: process.env.PACK_LANCEMENT_DOWNLOAD_URL ?? '',
   },
@@ -59,7 +59,7 @@ export const CREATION_PACKS: Record<string, ResourcePack> = {
   'pack-marque': {
     id: 'pack-marque',
     name: 'Pack Marque',
-    price: 149,
+    price: 79,
     tagline: 'La marque entière',
     badge: null,
     description:
@@ -70,7 +70,7 @@ export const CREATION_PACKS: Record<string, ResourcePack> = {
       '4 déclinaisons du logo',
       '8 templates éditables personnalisés',
     ],
-    // → Crée un produit Stripe (one-time 149 €) et mets le price_xxx ici
+    // → Crée un produit Stripe (one-time 79 €) et mets le price_xxx ici
     priceId: process.env.STRIPE_PRICE_PACK_MARQUE ?? '',
     downloadUrl: process.env.PACK_MARQUE_DOWNLOAD_URL ?? '',
   },

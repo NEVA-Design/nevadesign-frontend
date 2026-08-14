@@ -14,8 +14,8 @@ const resourcePacks = Object.values(RESOURCE_PACKS_PUBLIC);
 
 /*
  * 09 — Packs de création (grille run 2). Trois prestations du
- * studio — Identité 39 €, Lancement 89 € (vedette, anneau aurore),
- * Marque 149 € — en cartes d'un même registre ; les ressources
+ * studio — Identité 19 €, Lancement 49 € (vedette, anneau aurore),
+ * Marque 79 € — en cartes d'un même registre ; les ressources
  * Photoshop historiques migrent dans une carte secondaire
  * « Ressources du studio », prix inchangés. Une seule lentille
  * décorative. Le flux Stripe est identique pour tout achat
