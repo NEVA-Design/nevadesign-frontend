@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { RESOURCE_PACKS } from "@/lib/resources";
+import { ONE_SHOT_PACKS } from "@/lib/resources";
 import DownloadsClient from "./DownloadsClient";
 
 export default async function DownloadsPage({
@@ -20,8 +20,9 @@ export default async function DownloadsPage({
 
   const ownedIds = new Set((purchases ?? []).map((p) => p.resource_id));
 
-  // Build owned packs with download URLs (server-side only)
-  const ownedPacks = Object.values(RESOURCE_PACKS)
+  // Build owned packs with download URLs (server-side only) —
+  // ressources Photoshop ET packs de création (run 2)
+  const ownedPacks = Object.values(ONE_SHOT_PACKS)
     .filter((p) => ownedIds.has(p.id))
     .map((p) => ({
       id: p.id,

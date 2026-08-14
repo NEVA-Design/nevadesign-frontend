@@ -30,8 +30,8 @@ const mockUser = {
   email: "lea@nevadesign.fr",
   avatarUrl: null,
   initials: "LM",
-  credits: 64,
-  maxCredits: 100,
+  credits: 8,
+  maxCredits: 12,
   plan: "creator",
   creditReviewStatus: null,
 };
