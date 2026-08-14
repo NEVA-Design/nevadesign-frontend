@@ -1373,7 +1373,7 @@ function DawnBreath({ mid }: { mid: boolean }) {
          MID : la nappe se fige à sa valeur moyenne une fois posée
          (« statiques ou off ») */
       const t = sceneTime(state.clock.elapsedTime);
-      const breathe = mid ? 0 : 0.042 * Math.sin(t * 0.21);
+      const breathe = mid ? 0 : 0.042 * Math.sin((t * Math.PI * 2) / 19);
       matRef.current.opacity =
         (0.042 + breathe) * easeOutCubic(progress(t, 1.0, 3.0));
     }
@@ -1442,15 +1442,16 @@ function FloorCaustics({ mid }: { mid: boolean }) {
       /* opacité : jamais nulle, jamais > 0,05 d'apport perçu ;
          s'éveille avec l'assemblage (fenêtre 1,2 → 3,6 s).
          MID : caustiques STATIQUES — opacité moyenne, zéro dérive */
-      const shimmer = mid ? 0 : 0.016 * Math.sin((t * Math.PI * 2) / 38);
+      const shimmer = mid ? 0 : 0.016 * Math.sin((t * Math.PI * 2) / 22);
       matRef.current.opacity =
         (0.032 + shimmer) * easeOutCubic(progress(t, 1.2, 2.4));
     }
     if (mid) return;
     /* la nappe dérive en f(t) absolu — offset de texture, pas de
-       transform de mesh : le pattern glisse dans son cadre */
-    texture.offset.x = 0.012 * Math.sin((t * Math.PI * 2) / 71);
-    texture.offset.y = 0.01 * Math.sin((t * Math.PI * 2) / 53 + 1.7);
+       transform de mesh : le pattern glisse dans son cadre
+       (dérive amplifiée au retour client, run 3 bis) */
+    texture.offset.x = 0.022 * Math.sin((t * Math.PI * 2) / 41);
+    texture.offset.y = 0.018 * Math.sin((t * Math.PI * 2) / 29 + 1.7);
   });
 
   return (
@@ -1723,9 +1724,12 @@ function Monogram({ mid }: { mid: boolean }) {
 
   /* Assemblage : le monogramme monte du sol et se pose avec un
      très léger dépassement (settle), pendant le fondu d'entrée du
-     canvas. Vie : oscillation lente (±15°, période 80 s — un logo
-     vu de dos se lit en miroir : jamais de tour complet) et la
-     dispersion qui glisse doucement dans ses teintes.
+     canvas. Vie (amplifiée au retour client, run 3 bis) :
+     oscillation ±22° période 48 s (jamais de tour complet — un
+     logo vu de dos se lit en miroir), très léger roulis, une
+     respiration verticale d'un souffle, et la dispersion qui
+     glisse dans ses teintes. Tout reste une fonction ABSOLUE du
+     temps : déterminisme et preuves intacts.
      MID : dispersion 0 — le chunk natif de transmission passe de
      3 passes (une par canal RGB) à 1 : c'est LA simplification
      « render target réfraction ÷2 » de notre pipeline (le RT natif
@@ -1734,12 +1738,14 @@ function Monogram({ mid }: { mid: boolean }) {
     const t = sceneTime(state.clock.elapsedTime);
     if (!mesh.current) return;
     const rise = settle(progress(t, 0.15, 1.9));
-    mesh.current.position.y = MONO_REST_Y - (1 - rise) * 0.85;
-    mesh.current.rotation.y = -0.3 + 0.26 * Math.sin((t * Math.PI * 2) / 80);
+    mesh.current.position.y =
+      MONO_REST_Y - (1 - rise) * 0.85 + 0.025 * Math.sin((t * Math.PI * 2) / 14);
+    mesh.current.rotation.y = -0.3 + 0.38 * Math.sin((t * Math.PI * 2) / 32);
+    mesh.current.rotation.z = 0.014 * Math.sin((t * Math.PI * 2) / 21);
     if (mid) return;
     const mat = mesh.current.material as THREE.MeshPhysicalMaterial;
     if (mat && "dispersion" in mat) {
-      mat.dispersion = 0.55 + 0.12 * Math.sin((t * Math.PI * 2) / 45);
+      mat.dispersion = 0.55 + 0.12 * Math.sin((t * Math.PI * 2) / 28);
     }
   });
 
@@ -1779,31 +1785,38 @@ function Sculpture({ mid }: { mid: boolean }) {
     if (root.current) {
       root.current.position.y = -SCROLL.p * 0.55;
     }
+    /* vie amplifiée (run 3 bis) : la sphère orbite d'un souffle et
+       respire nettement, la bille flotte plus haut avec une dérive
+       latérale, l'anneau tangue davantage et tourne deux fois plus
+       vite — toujours des fonctions absolues du temps, jamais
+       nerveuses */
     if (sphere.current) {
       const arrive = easeOutCubic(progress(t, 0.85, 2.0));
-      sphere.current.position.x = SPHERE_X + (1 - arrive) * 0.35;
+      sphere.current.position.x =
+        SPHERE_X + (1 - arrive) * 0.35 + 0.06 * Math.sin((t * Math.PI * 2) / 31);
       sphere.current.position.y =
-        FLOOR_Y + 2.52 + (1 - arrive) * 0.95 + Math.sin(t * 0.3) * 0.038;
+        FLOOR_Y + 2.52 + (1 - arrive) * 0.95 + 0.11 * Math.sin((t * Math.PI * 2) / 21);
     }
     if (bead.current) {
       const arrive = easeOutCubic(progress(t, 1.15, 2.0));
+      bead.current.position.x = BEAD_X + 0.05 * Math.sin((t * Math.PI * 2) / 26 + 1.2);
       bead.current.position.y =
-        FLOOR_Y + 3.28 + (1 - arrive) * 0.6 + Math.sin(t * 0.27) * 0.07;
+        FLOOR_Y + 3.28 + (1 - arrive) * 0.6 + 0.16 * Math.sin((t * Math.PI * 2) / 17);
     }
-    /* précession : l'axe de l'anneau tangue très lentement pendant
-       que le tore tourne sur lui-même — orientation ABSOLUE f(t),
-       jamais incrémentale (preuve pixel) */
+    /* précession : l'axe de l'anneau tangue pendant que le tore
+       tourne sur lui-même — orientation ABSOLUE f(t), jamais
+       incrémentale (preuve pixel) */
     if (ring.current) {
       const arrive = easeOutCubic(progress(t, 0.55, 1.9));
       ring.current.position.x = RING_X - (1 - arrive) * 0.65;
       ring.current.position.y = FLOOR_Y + 0.61 + (1 - arrive) * 0.28;
       ring.current.position.z = RING_Z + (1 - arrive) * 0.35;
       ring.current.rotation.set(
-        Math.PI / 2 - 1.32 + 0.07 * Math.sin((t * Math.PI * 2) / 44),
-        0.05 * Math.sin((t * Math.PI * 2) / 61),
+        Math.PI / 2 - 1.32 + 0.11 * Math.sin((t * Math.PI * 2) / 33),
+        0.08 * Math.sin((t * Math.PI * 2) / 47),
         0.3
       );
-      ring.current.rotateZ((t * 0.05) % (Math.PI * 2));
+      ring.current.rotateZ((t * 0.11) % (Math.PI * 2));
     }
   });
 
@@ -2063,12 +2076,17 @@ function FpsGuard({
   const frames = useRef<number[]>([]);
   const armedAt = useRef(0);
   const fired = useRef(false);
+  /* retour client : DEUX fenêtres consécutives sous 30 fps avant de
+     descendre — un à-coup ponctuel (autre appli, GC) ne déclasse
+     plus la machine */
+  const strikes = useRef(0);
 
   useEffect(() => {
     /* nouveau tier → nouvelle fenêtre de mesure */
     frames.current = [];
     armedAt.current = 0;
     fired.current = false;
+    strikes.current = 0;
   }, [tier]);
 
   useFrame((state) => {
@@ -2081,6 +2099,7 @@ function FpsGuard({
     if (last !== undefined && now - last > 500) {
       frames.current = [];
       armedAt.current = now;
+      strikes.current = 0;
     }
     if (!armedAt.current) armedAt.current = now;
     frames.current.push(now);
@@ -2089,9 +2108,17 @@ function FpsGuard({
     }
     if (now - armedAt.current < 3000) return;
     const fps = Math.round(frames.current.length / 3);
+    /* verdict de fenêtre, puis fenêtre fraîche */
+    frames.current = [];
+    armedAt.current = now;
     if (fps < 30) {
-      fired.current = true;
-      onDemote(tier === "high" ? "mid" : "low", fps);
+      strikes.current += 1;
+      if (strikes.current >= 2) {
+        fired.current = true;
+        onDemote(tier === "high" ? "mid" : "low", fps);
+      }
+    } else {
+      strikes.current = 0;
     }
   });
 

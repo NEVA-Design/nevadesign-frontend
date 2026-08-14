@@ -82,7 +82,7 @@ export default function PrismLoader() {
     }
 
     /* ── la vraie progression ─────────────────────────────────── */
-    const marks = { dom: 0, fonts: 0, poster: 0, scene: 0 };
+    const marks = { dom: 0, fonts: 0, poster: 0, scene: 0, canvas: 0 };
     const cleanups: (() => void)[] = [];
 
     if (document.readyState !== "loading") {
@@ -140,8 +140,14 @@ export default function PrismLoader() {
     }
 
     const onScene = (e: Event) => {
-      const p = (e as CustomEvent<{ p?: number }>).detail?.p ?? 0;
+      const detail = (e as CustomEvent<{ p?: number; phase?: string }>).detail;
+      const p = detail?.p ?? 0;
       if (p > marks.scene) marks.scene = p;
+      /* retour client (run 3 bis) : la scène est « prête » quand le
+         CANVAS l'est (compile faite, fondu enclenché) — le
+         micro-rideau du F5 tient jusque-là, plus jamais de hero en
+         cours d'apparition à la levée */
+      if (detail?.phase === "canvas" && p >= 1) marks.canvas = 1;
     };
     window.addEventListener("neva:progress", onScene);
     cleanups.push(() => window.removeEventListener("neva:progress", onScene));
@@ -169,10 +175,17 @@ export default function PrismLoader() {
       /* ceinture — le script inline de la page masque déjà la pièce
          centrale avant le premier paint */
       if (coreRef.current) coreRef.current.style.display = "none";
+      /* filet canvas : WebGL absent ou boot lent (mesuré 14 s à
+         CPU ×6 en MID) — au-delà de 4 s le poster net prime, le
+         canvas arrivera en fondu ; le rideau ne retient jamais plus */
+      const canvasFallback = window.setTimeout(() => {
+        marks.canvas = 1;
+      }, 4000);
+      cleanups.push(() => window.clearTimeout(canvasFallback));
       let microRaf = 0;
       let microLeave = 0;
       const wait = () => {
-        if (realProgress() < 1) {
+        if (realProgress() < 1 || marks.canvas < 1) {
           microRaf = requestAnimationFrame(wait);
           return;
         }

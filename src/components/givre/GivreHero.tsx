@@ -63,12 +63,18 @@ export default function GivreHero() {
         const next = detectSceneTier().tier;
         setTier(next);
         /* en low, la scène n'émettra jamais : le loader reçoit sa
-           part tout de suite (le poster HQ EST la scène) */
+           part ET son signal « canvas » tout de suite (le poster HQ
+           EST la scène du tier low) */
         if (next === "low") {
           try {
             window.dispatchEvent(
               new CustomEvent("neva:progress", {
                 detail: { phase: "scene", p: 1 },
+              })
+            );
+            window.dispatchEvent(
+              new CustomEvent("neva:progress", {
+                detail: { phase: "canvas", p: 1 },
               })
             );
           } catch {

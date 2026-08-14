@@ -1758,12 +1758,14 @@ html[data-prism-seen="1"] .pv-overture-core {
     animation-timeline: scroll(root);
     animation-range: 0 100vh;
   }
+  /* retour client (run 3 bis) : scale réduit — le 1.045 se lisait
+     comme un poster « zoomé » au repos */
   @keyframes pv-hero-drift {
     from {
-      transform: translateY(0) scale(1.045);
+      transform: translateY(0) scale(1.03);
     }
     to {
-      transform: translateY(4.5%) scale(1.045);
+      transform: translateY(3%) scale(1.03);
     }
   }
 }

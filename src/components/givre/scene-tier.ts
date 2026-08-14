@@ -31,9 +31,14 @@ function classify(): { tier: SceneTier; reason: string } {
   }
 
   try {
-    const stored = window.localStorage.getItem(STORE_KEY);
+    /* retour client (run 3 bis) : la descente ne vaut que pour LA
+       session — un passage à vide ponctuel (autre appli qui charge,
+       onglet en arrière-plan) ne doit pas punir toutes les visites
+       suivantes. L'ancienne mémorisation localStorage est purgée. */
+    window.localStorage.removeItem(STORE_KEY);
+    const stored = window.sessionStorage.getItem(STORE_KEY);
     if (stored === "mid" || stored === "low") {
-      return { tier: stored, reason: "mémorisé (descente d'une visite précédente)" };
+      return { tier: stored, reason: "mémorisé (descente plus tôt dans la session)" };
     }
   } catch {
     /* stockage indisponible */
@@ -90,13 +95,14 @@ export function detectSceneTier(): { tier: SceneTier; reason: string } {
   return detected;
 }
 
-/* Descente en direct : mémorisée pour les prochains boots, loggée
-   (exigence LOT 4 §« si fps < 30 pendant 3 s → descente loggée »). */
+/* Descente en direct : mémorisée pour la SESSION (les F5 suivants
+   repartent du même tier ; une nouvelle session re-teste le
+   matériel), loggée. */
 export function demoteSceneTier(to: SceneTier, fps: number) {
   try {
-    window.localStorage.setItem(STORE_KEY, to);
+    window.sessionStorage.setItem(STORE_KEY, to);
   } catch {
-    /* stockage indisponible : la descente vaut pour cette session */
+    /* stockage indisponible : la descente vaut pour cette page */
   }
   detected = { tier: to, reason: `descente automatique (${fps} fps)` };
   console.info(`[scene] descente de tier → ${to} (${fps} fps médians sur 3 s)`);
