@@ -218,9 +218,16 @@ export default function LandingPage({ landing }: { landing: Landing }) {
                 </tbody>
               </table>
             </div>
-            <p className="mt-4 max-w-[640px] text-[13.5px] leading-[1.65] text-mist">
-              {landing.comparisonNote}
-            </p>
+            {/* la ligne d'honnêteté vit déjà dans le tableau : la
+                note ne s'affiche que si elle dit AUTRE chose */}
+            {landing.comparisonNote &&
+            !landing.comparisonNote.startsWith(
+              landing.comparison[landing.comparison.length - 1]?.criteria ?? " "
+            ) ? (
+              <p className="mt-4 max-w-[640px] text-[13.5px] leading-[1.65] text-mist">
+                {landing.comparisonNote}
+              </p>
+            ) : null}
           </section>
 
           {/* mini-FAQ — details natif : lisible sans JS, indexable */}
