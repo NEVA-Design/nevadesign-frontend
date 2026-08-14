@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowLeft } from 'lucide-react'
 import { backendGetJson } from '@/lib/api/backend-server'
 import { Brand, BrandMark } from '@/components/prisme/Brand'
@@ -29,8 +30,15 @@ const navItems = [
 ]
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const admin = await backendGetJson<{ email: string }>('/admin/verify')
+  const admin = await backendGetJson<{
+    email: string
+    displayName: string | null
+    avatarUrl: string | null
+  }>('/admin/verify')
   if (!admin) redirect('/dashboard')
+
+  const adminLabel = admin.displayName || admin.email
+  const adminInitial = adminLabel.charAt(0).toUpperCase()
 
   return (
     <div className="pv-light pv-atelier relative min-h-screen bg-paper text-ink">
@@ -75,9 +83,25 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 Neva Design — Console
               </p>
             </div>
-            <p className="flex min-w-0 shrink-0 items-center gap-2 rounded-full border border-[color:var(--hairline-glass)] bg-white/60 px-4 py-2 font-mono text-[11px] tracking-[0.06em] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_6px_16px_rgba(96,84,140,0.1)]">
-              <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-ok" />
-              <span className="max-w-[130px] truncate sm:max-w-[240px]">{admin.email}</span>
+            <p className="flex min-w-0 shrink-0 items-center gap-2.5 rounded-full border border-[color:var(--hairline-glass)] bg-white/60 py-1.5 pl-1.5 pr-4 font-mono text-[11px] tracking-[0.06em] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_6px_16px_rgba(96,84,140,0.1)]">
+              <span className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full bg-ink">
+                {admin.avatarUrl ? (
+                  <Image src={admin.avatarUrl} alt="" fill sizes="28px" className="object-cover" />
+                ) : (
+                  <span className="flex h-full w-full items-center justify-center text-[10px] font-semibold text-white">
+                    {adminInitial}
+                  </span>
+                )}
+              </span>
+              <span className="flex min-w-0 flex-col leading-tight">
+                <span className="max-w-[130px] truncate text-[11.5px] font-medium normal-case tracking-normal text-ink sm:max-w-[220px]">
+                  {adminLabel}
+                </span>
+                <span className="flex items-center gap-1.5 text-[9.5px] text-mist">
+                  <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-ok" />
+                  {adminLabel === admin.email ? 'Connecté' : admin.email}
+                </span>
+              </span>
             </p>
           </div>
         </header>

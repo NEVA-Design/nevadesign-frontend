@@ -1,12 +1,14 @@
 "use client"
-import { useState, useRef } from "react"
-import { Loader2, Upload } from "lucide-react"
+import { useEffect, useState, useRef } from "react"
+import { Loader2, Upload, Unlink, ShieldCheck, ShieldOff } from "lucide-react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { FormMessage, Input, Label, Textarea } from "@/components/ui/field"
 import { Switch } from "@/components/ui/switch"
 import { readApiResponse } from "@/lib/api/client"
-import { backendFetch } from "@/lib/api/backend-client"
+import { backendFetch, BACKEND_URL } from "@/lib/api/backend-client"
+import { getAccessToken } from "@/lib/session"
 
 /*
  * Paramètres — navigation d'onglets en filets, panneaux éditoriaux.
@@ -21,13 +23,16 @@ const tabs = [
   { id: "appearance", label: "Apparence" },
 ]
 
+type DiscordIdentity = { username: string; avatarUrl: string | null }
+
 interface Props {
   email: string
   initialDisplayName: string
   initialAvatarUrl: string | null
-  initialDiscordHandle: string
+  initialDiscord: DiscordIdentity | null
   initialBio: string
   initialNotificationPrefs: Record<string, unknown>
+  initialMfaEnabled: boolean
 }
 
 type Status = { type: 'success' | 'error'; message: string } | null
@@ -45,21 +50,38 @@ export default function SettingsClient({
   email,
   initialDisplayName,
   initialAvatarUrl,
-  initialDiscordHandle,
+  initialDiscord,
   initialBio,
   initialNotificationPrefs,
+  initialMfaEnabled,
 }: Props) {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState("profile")
 
   // Profile state
   const [displayName, setDisplayName] = useState(initialDisplayName)
-  const [discordHandle, setDiscordHandle] = useState(initialDiscordHandle)
   const [bio, setBio] = useState(initialBio)
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl)
   const [profileSaving, setProfileSaving] = useState(false)
   const [profileStatus, setProfileStatus] = useState<Status>(null)
   const [avatarUploading, setAvatarUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Discord linking state
+  const [discord, setDiscord] = useState(initialDiscord)
+  const [discordUnlinking, setDiscordUnlinking] = useState(false)
+  const [discordStatus, setDiscordStatus] = useState<Status>(null)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get("discordError")) {
+      setDiscordStatus({ type: "error", message: "La connexion à Discord a échoué. Réessayez." })
+      router.replace("/dashboard/settings")
+    } else if (params.get("discordLinked")) {
+      setDiscordStatus({ type: "success", message: "Discord connecté." })
+      router.replace("/dashboard/settings")
+    }
+  }, [router])
 
   // Notification state
   const [notifSound, setNotifSound] = useState(Boolean(initialNotificationPrefs.sound))
@@ -73,6 +95,24 @@ export default function SettingsClient({
   const [secSaving, setSecSaving] = useState(false)
   const [secStatus, setSecStatus] = useState<Status>(null)
 
+  // Email change state
+  const [newEmail, setNewEmail] = useState("")
+  const [emailPassword, setEmailPassword] = useState("")
+  const [emailCode, setEmailCode] = useState("")
+  const [emailSaving, setEmailSaving] = useState(false)
+  const [emailStatus, setEmailStatus] = useState<Status>(null)
+
+  // 2FA (TOTP) state
+  const [mfaEnabled, setMfaEnabled] = useState(initialMfaEnabled)
+  const [mfaEnrolling, setMfaEnrolling] = useState(false)
+  const [mfaFactorId, setMfaFactorId] = useState<string | null>(null)
+  const [mfaQrCode, setMfaQrCode] = useState<string | null>(null)
+  const [mfaSecret, setMfaSecret] = useState<string | null>(null)
+  const [mfaVerifyCode, setMfaVerifyCode] = useState("")
+  const [mfaDisableCode, setMfaDisableCode] = useState("")
+  const [mfaSaving, setMfaSaving] = useState(false)
+  const [mfaStatus, setMfaStatus] = useState<Status>(null)
+
   const initials = (displayName || email).charAt(0).toUpperCase()
 
   // ── Profil ────────────────────────────────────────────────────────────────────
@@ -83,7 +123,7 @@ export default function SettingsClient({
     try {
       const res = await backendFetch('/profile', {
         method: 'PATCH',
-        body: JSON.stringify({ display_name: displayName, discord_handle: discordHandle, bio }),
+        body: JSON.stringify({ display_name: displayName, bio }),
       })
       await readApiResponse<{ ok: boolean }>(res)
       setProfileStatus({ type: 'success', message: 'Profil enregistré.' })
@@ -91,6 +131,29 @@ export default function SettingsClient({
       setProfileStatus({ type: 'error', message: (e as Error).message ?? 'Erreur' })
     } finally {
       setProfileSaving(false)
+    }
+  }
+
+  // ── Discord ───────────────────────────────────────────────────────────────────
+
+  const connectDiscord = () => {
+    const token = getAccessToken()
+    if (!token) return
+    window.location.href = `${BACKEND_URL}/profile/discord/link?token=${encodeURIComponent(token)}`
+  }
+
+  const disconnectDiscord = async () => {
+    setDiscordUnlinking(true)
+    setDiscordStatus(null)
+    try {
+      const res = await backendFetch('/profile/discord/unlink', { method: 'POST' })
+      await readApiResponse<{ success: boolean }>(res)
+      setDiscord(null)
+      setDiscordStatus({ type: 'success', message: 'Discord déconnecté.' })
+    } catch (e: unknown) {
+      setDiscordStatus({ type: 'error', message: (e as Error).message ?? 'Erreur' })
+    } finally {
+      setDiscordUnlinking(false)
     }
   }
 
@@ -182,6 +245,110 @@ export default function SettingsClient({
       setSecStatus({ type: 'error', message: (e as Error).message ?? 'Erreur' })
     } finally {
       setSecSaving(false)
+    }
+  }
+
+  // ── Changement d'e-mail ──────────────────────────────────────────────────────
+
+  const changeEmail = async () => {
+    if (!newEmail) return
+    setEmailSaving(true)
+    setEmailStatus(null)
+    try {
+      const body: Record<string, string> = { newEmail }
+      if (mfaEnabled) {
+        body.code = emailCode
+      } else {
+        body.password = emailPassword
+      }
+      const res = await backendFetch('/profile/email', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      })
+      const data = await readApiResponse<{ success: boolean; message?: string }>(res)
+      setEmailStatus({
+        type: 'success',
+        message: data.message ?? 'Vérifie ta boîte mail pour confirmer le changement.',
+      })
+      setNewEmail("")
+      setEmailPassword("")
+      setEmailCode("")
+    } catch (e: unknown) {
+      setEmailStatus({ type: 'error', message: (e as Error).message ?? 'Erreur' })
+    } finally {
+      setEmailSaving(false)
+    }
+  }
+
+  // ── A2F (TOTP) ────────────────────────────────────────────────────────────────
+
+  const startMfaEnroll = async () => {
+    setMfaSaving(true)
+    setMfaStatus(null)
+    try {
+      const res = await backendFetch('/profile/2fa/enroll', { method: 'POST' })
+      const data = await readApiResponse<{ factorId: string; qrCode: string; secret: string }>(res)
+      setMfaFactorId(data.factorId)
+      setMfaQrCode(data.qrCode)
+      setMfaSecret(data.secret)
+      setMfaEnrolling(true)
+    } catch (e: unknown) {
+      setMfaStatus({ type: 'error', message: (e as Error).message ?? 'Erreur' })
+    } finally {
+      setMfaSaving(false)
+    }
+  }
+
+  const confirmMfaEnroll = async () => {
+    if (!mfaFactorId || !mfaVerifyCode) return
+    setMfaSaving(true)
+    setMfaStatus(null)
+    try {
+      const res = await backendFetch('/profile/2fa/enroll/verify', {
+        method: 'POST',
+        body: JSON.stringify({ factorId: mfaFactorId, code: mfaVerifyCode }),
+      })
+      await readApiResponse<{ success: boolean }>(res)
+      setMfaEnabled(true)
+      setMfaEnrolling(false)
+      setMfaFactorId(null)
+      setMfaQrCode(null)
+      setMfaSecret(null)
+      setMfaVerifyCode("")
+      setMfaStatus({ type: 'success', message: 'A2F activée.' })
+    } catch (e: unknown) {
+      setMfaStatus({ type: 'error', message: (e as Error).message ?? 'Code invalide' })
+    } finally {
+      setMfaSaving(false)
+    }
+  }
+
+  const cancelMfaEnroll = () => {
+    setMfaEnrolling(false)
+    setMfaFactorId(null)
+    setMfaQrCode(null)
+    setMfaSecret(null)
+    setMfaVerifyCode("")
+    setMfaStatus(null)
+  }
+
+  const disableMfa = async () => {
+    if (!mfaDisableCode) return
+    setMfaSaving(true)
+    setMfaStatus(null)
+    try {
+      const res = await backendFetch('/profile/2fa/disable', {
+        method: 'POST',
+        body: JSON.stringify({ code: mfaDisableCode }),
+      })
+      await readApiResponse<{ success: boolean }>(res)
+      setMfaEnabled(false)
+      setMfaDisableCode("")
+      setMfaStatus({ type: 'success', message: 'A2F désactivée.' })
+    } catch (e: unknown) {
+      setMfaStatus({ type: 'error', message: (e as Error).message ?? 'Code invalide' })
+    } finally {
+      setMfaSaving(false)
     }
   }
 
@@ -319,14 +486,48 @@ export default function SettingsClient({
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="discord-handle">Discord</Label>
-                  <Input
-                    id="discord-handle"
-                    value={discordHandle}
-                    onChange={(e) => setDiscordHandle(e.target.value)}
-                    placeholder="@pseudo ou pseudo#0001"
-                    maxLength={50}
-                  />
+                  <Label>Discord</Label>
+                  {discord ? (
+                    <div className="flex items-center gap-3 rounded-[12px] border border-[color:var(--hairline)] bg-white/60 px-4 py-3">
+                      <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-[#5865F2]/10">
+                        {discord.avatarUrl ? (
+                          <Image src={discord.avatarUrl} alt="" width={36} height={36} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center">
+                            <svg width="16" height="16" viewBox="0 0 127.14 96.36" aria-hidden>
+                              <path fill="#5865F2" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-ink">{discord.username}</p>
+                        <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-ok">Connecté</p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={disconnectDiscord}
+                        disabled={discordUnlinking}
+                      >
+                        {discordUnlinking ? (
+                          <Loader2 size={13} className="animate-spin" />
+                        ) : (
+                          <Unlink size={13} />
+                        )}
+                        Déconnecter
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button type="button" variant="secondary" onClick={connectDiscord}>
+                      <svg width="14" height="14" viewBox="0 0 127.14 96.36" aria-hidden>
+                        <path fill="#5865F2" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z" />
+                      </svg>
+                      Connecter Discord
+                    </Button>
+                  )}
+                  <StatusMessage status={discordStatus} />
                 </div>
                 <div>
                   <Label htmlFor="settings-bio">Bio</Label>
@@ -410,6 +611,176 @@ export default function SettingsClient({
         {activeTab === "security" && (
           <div className="flex flex-col gap-10 pt-9">
             <section>
+              <h2 className="pv-display text-lg text-ink">Changer d&apos;adresse e-mail</h2>
+              <p className="mt-2 max-w-lg text-sm leading-relaxed text-steel">
+                {mfaEnabled
+                  ? "Confirmez avec un code A2F. Un lien de confirmation sera envoyé à la nouvelle adresse."
+                  : "Confirmez avec votre mot de passe actuel. Un lien de confirmation sera envoyé à la nouvelle adresse."}
+              </p>
+              <div className="mt-7 grid gap-5 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="new-email">Nouvelle adresse e-mail</Label>
+                  <Input
+                    id="new-email"
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    placeholder="nouvelle@adresse.com"
+                  />
+                </div>
+                {mfaEnabled ? (
+                  <div>
+                    <Label htmlFor="email-mfa-code">Code A2F</Label>
+                    <Input
+                      id="email-mfa-code"
+                      inputMode="numeric"
+                      value={emailCode}
+                      onChange={(e) => setEmailCode(e.target.value)}
+                      placeholder="123456"
+                      maxLength={6}
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <Label htmlFor="email-password">Mot de passe actuel</Label>
+                    <Input
+                      id="email-password"
+                      type="password"
+                      value={emailPassword}
+                      onChange={(e) => setEmailPassword(e.target.value)}
+                      placeholder="••••••••"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <StatusMessage status={emailStatus} />
+              <div className="mt-6 flex justify-end">
+                <Button
+                  onClick={changeEmail}
+                  disabled={
+                    emailSaving ||
+                    !newEmail ||
+                    (mfaEnabled ? emailCode.length < 6 : !emailPassword)
+                  }
+                >
+                  {emailSaving ? (
+                    <><Loader2 size={13} className="animate-spin" />Envoi…</>
+                  ) : (
+                    "Changer l'adresse e-mail"
+                  )}
+                </Button>
+              </div>
+            </section>
+
+            <section className="border-t border-[color:var(--hairline)] pt-9">
+              <h2 className="pv-display text-lg text-ink">Authentification à deux facteurs</h2>
+              <p className="mt-2 max-w-lg text-sm leading-relaxed text-steel">
+                Ajoutez un code temporaire (application d&apos;authentification) en plus de votre
+                mot de passe.
+              </p>
+
+              {mfaEnabled ? (
+                <div className="mt-6">
+                  <div className="flex items-center gap-3 rounded-[12px] border border-ok/30 bg-ok/[0.06] px-4 py-3">
+                    <ShieldCheck size={18} className="shrink-0 text-ok" />
+                    <p className="text-sm font-medium text-ink">A2F activée sur ce compte</p>
+                  </div>
+                  <div className="mt-5 grid max-w-sm gap-3">
+                    <div>
+                      <Label htmlFor="mfa-disable-code">Code A2F pour désactiver</Label>
+                      <Input
+                        id="mfa-disable-code"
+                        inputMode="numeric"
+                        value={mfaDisableCode}
+                        onChange={(e) => setMfaDisableCode(e.target.value)}
+                        placeholder="123456"
+                        maxLength={6}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="border-err/30 text-err"
+                      onClick={disableMfa}
+                      disabled={mfaSaving || mfaDisableCode.length < 6}
+                    >
+                      {mfaSaving ? (
+                        <><Loader2 size={13} className="animate-spin" />Désactivation…</>
+                      ) : (
+                        <><ShieldOff size={13} />Désactiver l&apos;A2F</>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              ) : mfaEnrolling ? (
+                <div className="mt-6 flex flex-col gap-5 rounded-[12px] border border-[color:var(--hairline)] bg-white/60 p-5 sm:flex-row sm:items-start">
+                  {mfaQrCode && (
+                    <div className="h-[176px] w-[176px] shrink-0 overflow-hidden rounded-lg border border-[color:var(--hairline)] bg-white p-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={mfaQrCode.startsWith('<') ? `data:image/svg+xml;utf8,${encodeURIComponent(mfaQrCode)}` : mfaQrCode}
+                        alt="QR code A2F"
+                        width={160}
+                        height={160}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-ink">
+                      Scannez ce QR code avec votre application d&apos;authentification (Google
+                      Authenticator, Authy…), ou saisissez la clé manuellement :
+                    </p>
+                    {mfaSecret && (
+                      <p className="mt-2 select-all break-all rounded-md bg-[rgba(43,36,80,0.05)] px-3 py-2 font-mono text-[11px] tracking-[0.05em] text-ink">
+                        {mfaSecret}
+                      </p>
+                    )}
+                    <div className="mt-4 max-w-[200px]">
+                      <Label htmlFor="mfa-verify-code">Code de vérification</Label>
+                      <Input
+                        id="mfa-verify-code"
+                        inputMode="numeric"
+                        value={mfaVerifyCode}
+                        onChange={(e) => setMfaVerifyCode(e.target.value)}
+                        placeholder="123456"
+                        maxLength={6}
+                      />
+                    </div>
+                    <div className="mt-4 flex gap-3">
+                      <Button
+                        type="button"
+                        onClick={confirmMfaEnroll}
+                        disabled={mfaSaving || mfaVerifyCode.length < 6}
+                      >
+                        {mfaSaving ? (
+                          <><Loader2 size={13} className="animate-spin" />Vérification…</>
+                        ) : (
+                          'Confirmer'
+                        )}
+                      </Button>
+                      <Button type="button" variant="secondary" onClick={cancelMfaEnroll} disabled={mfaSaving}>
+                        Annuler
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-6">
+                  <Button type="button" variant="secondary" onClick={startMfaEnroll} disabled={mfaSaving}>
+                    {mfaSaving ? (
+                      <><Loader2 size={13} className="animate-spin" />Préparation…</>
+                    ) : (
+                      <><ShieldCheck size={13} />Activer l&apos;A2F</>
+                    )}
+                  </Button>
+                </div>
+              )}
+              <StatusMessage status={mfaStatus} />
+            </section>
+
+            <section className="border-t border-[color:var(--hairline)] pt-9">
               <h2 className="pv-display text-lg text-ink">Changer le mot de passe</h2>
               <p className="mt-2 max-w-lg text-sm leading-relaxed text-steel">
                 Six caractères minimum. La modification prend effet immédiatement.

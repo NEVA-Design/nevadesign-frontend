@@ -10,6 +10,7 @@ import {
   Palette,
   ScanSearch,
   Settings,
+  ShieldCheck,
   UserRound,
   Wand2,
   X,
@@ -30,6 +31,7 @@ interface UserProfile {
   credits: number;
   maxCredits: number;
   plan: string;
+  isAdmin?: boolean;
 }
 
 /*
@@ -70,6 +72,14 @@ const navGroups = [
 export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
+
+  const groups = user.isAdmin
+    ? navGroups.map((group) =>
+        group.label === "Compte"
+          ? { ...group, items: [...group.items, { href: "/admin", icon: ShieldCheck, label: "Admin" }] }
+          : group
+      )
+    : navGroups;
 
   const isActive = (href: string) =>
     href === "/dashboard" ? pathname === href : pathname.startsWith(href);
@@ -146,7 +156,7 @@ export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?
 
       {/* Navigation — scrollbar fine et transparente : rien ne raye le verre */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 [scrollbar-color:rgba(43,36,80,0.14)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-0 [&::-webkit-scrollbar-thumb]:bg-[rgba(43,36,80,0.14)] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-[5px]">
-        {navGroups.map((group) => (
+        {groups.map((group) => (
           <div key={group.label} className="mb-5">
             <div className="mb-2 px-2">
               <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">

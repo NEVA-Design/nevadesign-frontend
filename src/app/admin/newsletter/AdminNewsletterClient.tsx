@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Input, Label, Textarea } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import { useToasts, ToastViewport } from "@/components/ui/toast";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { StatTile } from "@/components/admin/StatTile";
 import { backendFetch } from "@/lib/api/backend-client";
@@ -64,6 +65,7 @@ export function AdminNewsletterClient({
   const [confirmation, setConfirmation] = useState("");
   const [loading, setLoading] = useState<SendMode | "refresh" | null>(null);
   const { toasts, push } = useToasts();
+  const confirm = useConfirm();
 
   const audienceCount = countForAudience(stats, audience);
   const canBroadcast = stats.resendConfigured && subject.trim() && message.trim() && confirmation === "UPGRADE";
@@ -88,7 +90,14 @@ export function AdminNewsletterClient({
   }
 
   async function send(mode: SendMode) {
-    if (mode === "broadcast" && !confirm(`Envoyer cette newsletter à ${audienceCount} utilisateur(s) ?`)) return;
+    if (mode === "broadcast") {
+      const ok = await confirm({
+        title: "Envoyer la newsletter",
+        description: `Envoyer cette newsletter à ${audienceCount} utilisateur(s) ?`,
+        confirmLabel: "Envoyer",
+      });
+      if (!ok) return;
+    }
 
     setLoading(mode);
     try {

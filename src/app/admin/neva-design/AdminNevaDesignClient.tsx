@@ -20,6 +20,7 @@ import { FormMessage, Input, Label, Select, Textarea } from "@/components/ui/fie
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { useToasts, ToastViewport } from "@/components/ui/toast";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { PageHeader } from "@/components/admin/PageHeader";
 import {
   PORTFOLIO_CATEGORIES,
@@ -86,6 +87,7 @@ export function AdminNevaDesignClient({
   const [uploadingImage, setUploadingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const { toasts, push } = useToasts();
+  const confirm = useConfirm();
   const editing = items.find((item) => item.id === editingId) ?? null;
 
   function updateForm<K extends keyof FormState>(key: K, value: FormState[K]) {
@@ -192,7 +194,13 @@ export function AdminNevaDesignClient({
       push("Ajoutez la migration Supabase avant de supprimer", "error");
       return;
     }
-    if (!confirm(`Supprimer « ${item.title} » ?`)) return;
+    const ok = await confirm({
+      title: "Supprimer l'élément",
+      description: `Supprimer « ${item.title} » ?`,
+      confirmLabel: "Supprimer",
+      tone: "danger",
+    });
+    if (!ok) return;
 
     setLoading(true);
     try {

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { DEFAULT_MAINTENANCE, isMaintenanceActive, type MaintenanceMode } from '@/lib/maintenance'
-import { backendGetJson } from '@/lib/api/backend-server'
+import { backendFetchServer } from '@/lib/api/backend-server'
 import { BrandMark } from '@/components/prisme/Brand'
 import SatinSphere from '@/components/givre/SatinSphere'
 import { Button } from '@/components/ui/button'
@@ -16,9 +16,20 @@ export const metadata: Metadata = {
   },
 }
 
-async function getMaintenance() {
-  const data = await backendGetJson<{ maintenance: MaintenanceMode }>('/maintenance')
-  return data?.maintenance ?? DEFAULT_MAINTENANCE
+/* On atterrit ici pour deux raisons distinctes : la maintenance a été
+   activée depuis l'admin (backendDown=false, message éditable en base),
+   ou le backend est injoignable (proxy.ts a fait basculer la nav app —
+   voir src/proxy.ts). Le second cas ne doit jamais afficher "De retour
+   en ligne" : ce n'est pas la fin d'une maintenance, c'est une panne. */
+async function getMaintenance(): Promise<{ maintenance: MaintenanceMode; backendDown: boolean }> {
+  try {
+    const res = await backendFetchServer('/maintenance')
+    if (!res.ok) return { maintenance: DEFAULT_MAINTENANCE, backendDown: true }
+    const body = await res.json()
+    return { maintenance: body?.maintenance ?? DEFAULT_MAINTENANCE, backendDown: false }
+  } catch {
+    return { maintenance: DEFAULT_MAINTENANCE, backendDown: true }
+  }
 }
 
 /*
@@ -29,8 +40,14 @@ async function getMaintenance() {
  * se pose nu au centre de la scène.
  */
 export default async function MaintenancePage() {
-  const maintenance = await getMaintenance()
-  const active = isMaintenanceActive(maintenance)
+  const { maintenance, backendDown } = await getMaintenance()
+  const active = backendDown || isMaintenanceActive(maintenance)
+  const title = backendDown ? 'Service indisponible' : maintenance.title
+  const message = backendDown
+    ? 'Nous rencontrons un problème technique. Le service revient très vite — réessaie dans quelques instants.'
+    : maintenance.message
+  const eyebrow = backendDown ? 'Panne technique' : active ? 'Interlude technique' : 'De retour en ligne'
+  const statusLabel = backendDown ? 'Reconnexion en cours · Réessaie dans un instant' : 'Intervention en cours · Retour très vite'
 
   return (
     <main className="pv-scene relative flex min-h-[100svh] flex-col text-ink">
@@ -70,7 +87,7 @@ export default async function MaintenancePage() {
           className="pv-fade-up mt-9 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist"
           style={{ animationDelay: '0.15s' }}
         >
-          {active ? 'Interlude technique' : 'De retour en ligne'}
+          {eyebrow}
         </p>
 
         <h1
@@ -78,7 +95,7 @@ export default async function MaintenancePage() {
           style={{ animationDelay: '0.25s' }}
         >
           {active ? (
-            maintenance.title
+            title
           ) : (
             <>
               Maintenance <span className="font-medium text-ink">terminée.</span>
@@ -91,7 +108,7 @@ export default async function MaintenancePage() {
           style={{ animationDelay: '0.38s' }}
         >
           {active
-            ? maintenance.message
+            ? message
             : 'Le site est de nouveau disponible. Vous pouvez revenir sur Neva Design.'}
         </p>
 
@@ -110,7 +127,7 @@ export default async function MaintenancePage() {
               <span className="pv-breathe absolute -inset-1 rounded-full bg-info/40 blur-[3px]" />
               <span className="relative h-2 w-2 rounded-full bg-info" />
             </span>
-            Intervention en cours · Retour très vite
+            {statusLabel}
           </p>
         ) : (
           <div className="pv-fade-up mt-9" style={{ animationDelay: '0.62s' }}>

@@ -211,9 +211,10 @@ export default function DevPreviewClient({ screen }: { screen: string }) {
             email="lea@nevadesign.fr"
             initialDisplayName="Léa Moreau"
             initialAvatarUrl={null}
-            initialDiscordHandle="@lea"
+            initialDiscord={{ username: "lea.moreau", avatarUrl: null }}
             initialBio="Directrice artistique du serveur Horizon RP."
             initialNotificationPrefs={{ sound: true, browser: false }}
+            initialMfaEnabled={false}
           />
         </DashboardShell>
       );

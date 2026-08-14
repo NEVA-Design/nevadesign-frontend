@@ -15,6 +15,7 @@ interface UserProfile {
   maxCredits: number
   plan: string
   creditReviewStatus?: string | null
+  isAdmin?: boolean
 }
 
 /*

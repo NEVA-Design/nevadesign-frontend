@@ -19,6 +19,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { ModuleHeader } from "@/components/dashboard/ModuleHeader";
 import { readApiResponse } from "@/lib/api/client";
 import { backendFetch } from "@/lib/api/backend-client";
+import { usePrompt } from "@/components/ui/confirm-dialog";
 
 /*
  * Character — le bureau des identités : la table d'examen du dossier à
@@ -60,6 +61,7 @@ const ASSETS: AssetOption[] = [
 ];
 
 export default function CharacterPageClient() {
+  const prompt = usePrompt();
   const inputRef = useRef<HTMLInputElement>(null);
   const [sourceImage, setSourceImage] = useState<SourceImage | null>(null);
   const [assetType, setAssetType] = useState<CharacterAssetType>("character_poster");
@@ -179,7 +181,12 @@ export default function CharacterPageClient() {
   };
 
   const renameMemory = async (character: SavedCharacter) => {
-    const name = window.prompt("Nouveau nom du personnage", character.name)?.trim();
+    const name = await prompt({
+      title: "Renommer le personnage",
+      label: "Nouveau nom",
+      defaultValue: character.name,
+      placeholder: "Nom du personnage",
+    });
     if (!name) return;
     const res = await backendFetch(`/characters/${character.id}`, {
       method: "PATCH",

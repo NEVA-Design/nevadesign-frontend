@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { geist, geistMono, outfit } from "./fonts";
 import LanguageProvider from "@/components/LanguageProvider";
+import { ConfirmDialogProvider } from "@/components/ui/confirm-dialog";
 import { defaultSeo, siteName, siteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -75,7 +76,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="bg-void text-white min-h-screen antialiased">
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          <ConfirmDialogProvider>{children}</ConfirmDialogProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

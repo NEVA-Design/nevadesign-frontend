@@ -45,14 +45,11 @@ export async function readApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const payload = parsed as ApiErrorPayload | null;
     const error = payload?.error;
-    const code =
+    const code = typeof error === "object" ? error?.code : payload?.code;
+    const message =
       typeof error === "string"
         ? error
-        : error?.code ?? payload?.code;
-    const message =
-      typeof error === "object" && error?.message
-        ? error.message
-        : payload?.message;
+        : error?.message ?? payload?.message;
 
     throw new Error(message ?? messageFor(code, response.status, text));
   }
@@ -64,11 +61,9 @@ export async function readApiResponse<T>(response: Response): Promise<T> {
   const payload = parsed as { success?: boolean; data?: T; error?: ApiErrorPayload["error"] };
   if (payload.success === false) {
     const error = payload.error;
-    throw new Error(
-      typeof error === "object" && error?.message
-        ? error.message
-        : messageFor(typeof error === "string" ? error : error?.code, response.status, text)
-    );
+    const message = typeof error === "string" ? error : error?.message;
+    const code = typeof error === "object" ? error?.code : undefined;
+    throw new Error(message ?? messageFor(code, response.status, text));
   }
 
   return (payload.success === true && "data" in payload ? payload.data : parsed) as T;

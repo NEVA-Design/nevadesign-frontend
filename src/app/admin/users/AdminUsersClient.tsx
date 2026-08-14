@@ -21,6 +21,7 @@ import { LoadingBlock } from "@/components/ui/spinner";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Table, TableHeader, TableRow } from "@/components/ui/table";
 import { useToasts, ToastViewport } from "@/components/ui/toast";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { PageHeader, HeaderMeta } from "@/components/admin/PageHeader";
 import { backendFetch } from "@/lib/api/backend-client";
 
@@ -85,6 +86,7 @@ function UserModal({
   const [addAmount, setAddAmount] = useState("");
   const [setAmount, setSetAmount] = useState("");
 
+  const confirm = useConfirm();
   const clearMessages = () => { setError(null); setSuccess(null); };
 
   async function callAdmin(path: string, body: Record<string, unknown>) {
@@ -151,7 +153,13 @@ function UserModal({
   }
 
   async function handleRemoveSub() {
-    if (!confirm(`Résilier l'abonnement de ${user.email} et revenir au plan Free ?`)) return;
+    const ok = await confirm({
+      title: "Résilier l'abonnement",
+      description: `Résilier l'abonnement de ${user.email} et revenir au plan Free ?`,
+      confirmLabel: "Résilier",
+      tone: "danger",
+    });
+    if (!ok) return;
     const data = await callAdmin(`/admin/users/${user.id}/plan`, {
       plan: "free",
       resetCredits: false,

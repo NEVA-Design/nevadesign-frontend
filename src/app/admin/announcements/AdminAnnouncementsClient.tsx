@@ -8,6 +8,7 @@ import { Input, Label, Textarea } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { useToasts, ToastViewport } from "@/components/ui/toast";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { PageHeader, HeaderMeta } from "@/components/admin/PageHeader";
 import {
   ACCENT_STYLES,
@@ -98,6 +99,7 @@ export function AdminAnnouncementsClient({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { toasts, push } = useToasts();
+  const confirm = useConfirm();
 
   const editing = items.find((item) => item.id === editingId) ?? null;
 
@@ -154,7 +156,13 @@ export function AdminAnnouncementsClient({
   }
 
   async function deleteAnnouncement(item: SiteAnnouncement) {
-    if (!confirm(`Supprimer « ${item.title} » ?`)) return;
+    const ok = await confirm({
+      title: "Supprimer l'affichage",
+      description: `Supprimer « ${item.title} » ?`,
+      confirmLabel: "Supprimer",
+      tone: "danger",
+    });
+    if (!ok) return;
     setLoading(true);
     try {
       const res = await backendFetch(`/admin/announcements/${item.id}`, { method: "DELETE" });
