@@ -57,7 +57,7 @@ const BRIEFS: Brief[] = [
   {
     key: "b3",
     module: 0,
-    render: { src: "/postergrandfivem2.png", ratio: "aspect-[3/4]" },
+    render: { src: "/postergrandfivem2.webp", ratio: "aspect-[3/4]" },
     swatches: ["#12081F", "#7C6AFF", "#B14BF4", "#E6E9F2", "#4CC9F0"],
   },
 ];

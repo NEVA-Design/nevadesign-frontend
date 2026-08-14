@@ -59,15 +59,15 @@ const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
    nom de fichier brut. Table éditoriale (nommée d'après l'œuvre) ;
    titleFromFilename ne sert que de filet aux fichiers inconnus. */
 const PIECE_TITLES: Record<string, string> = {
-  "EFINAL.png": "E Final — emblème esport",
-  "krlogo.png": "KR — monogramme chrome",
-  "logo.png": "EV — wordmark esport",
-  "logobg.png": "S Dragon — emblème doré",
-  "logotbnnn.png": "TBN — écusson New York",
-  "ocen.png": "Ocen — emblème floral",
-  "vulcainlogo.png": "Vulcain — V ailé",
-  "worldlogo.png": "World — anneau cinétique",
-  "Xlogo.png": "X — monogramme chrome",
+  "EFINAL.webp": "E Final — emblème esport",
+  "krlogo.webp": "KR — monogramme chrome",
+  "logo.webp": "EV — wordmark esport",
+  "logobg.webp": "S Dragon — emblème doré",
+  "logotbnnn.webp": "TBN — écusson New York",
+  "ocen.webp": "Ocen — emblème floral",
+  "vulcainlogo.webp": "Vulcain — V ailé",
+  "worldlogo.webp": "World — anneau cinétique",
+  "Xlogo.webp": "X — monogramme chrome",
 };
 
 function titleFromFilename(filename: string) {

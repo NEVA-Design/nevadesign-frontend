@@ -141,7 +141,7 @@ function EnhanceScene() {
     <div className="flex h-full min-h-[250px] flex-col gap-3 p-6">
       <div className="relative grid flex-1 grid-cols-[1fr_1.15fr] gap-3">
         <figure className="pv-media">
-          <Image src="/jetski.jpg" alt="" fill sizes="(max-width: 1024px) 40vw, 16vw" className="object-cover" />
+          <Image src="/jetski.webp" alt="" fill sizes="(max-width: 1024px) 40vw, 16vw" className="object-cover" />
           <span
             aria-hidden
             className="absolute left-[40%] top-[16%] z-[1] h-[42%] w-[26%] rounded-md border border-[rgba(164,139,232,0.85)] shadow-[0_0_16px_rgba(164,139,232,0.45)]"
@@ -152,7 +152,7 @@ function EnhanceScene() {
         </figure>
         <figure className="pv-media border-[rgba(164,139,232,0.35)]">
           <Image
-            src="/jetski.jpg"
+            src="/jetski.webp"
             alt=""
             fill
             sizes="100vw"
@@ -230,7 +230,7 @@ function CharacterScene() {
         <div className="flex gap-4 p-4">
           <div className="relative h-[84px] w-[68px] shrink-0 overflow-hidden rounded-md bg-abyss">
             <Image
-              src="/poser.png"
+              src="/poser.webp"
               alt=""
               fill
               sizes="140px"
@@ -280,7 +280,7 @@ function AuditScene() {
     <div className="grid h-full gap-6 p-6 md:grid-cols-[1.1fr_auto_1.2fr] md:items-center">
       <figure className="pv-media relative h-[120px] md:h-[136px]">
         <Image
-          src="/bglanding.png"
+          src="/bglanding.webp"
           alt=""
           fill
           sizes="(max-width: 768px) 90vw, 30vw"

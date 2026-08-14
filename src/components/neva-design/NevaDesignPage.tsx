@@ -33,17 +33,17 @@ const DISCORD_URL = "https://discord.gg/nevadesign";
 
 /* Images de secours pour les items sans image_path (rotation). */
 const previewAssets = [
-  "/Prime_-_preview_serveur_pack_15.png",
-  "/Prime_-_preview_serveur_pack_4.png",
-  "/Prime_-_preview_serveur_pack_7.png",
-  "/Prime_-_preview_serveur_pack_8.png",
-  "/Prime_-_preview_serveur_pack_9.png",
-  "/postergrandfivem.png",
-  "/postergrandfivem2.png",
-  "/posterlarya.png",
-  "/affiche1.png",
-  "/affiche2.png",
-  "/affiche3.png",
+  "/Prime_-_preview_serveur_pack_15.webp",
+  "/Prime_-_preview_serveur_pack_4.webp",
+  "/Prime_-_preview_serveur_pack_7.webp",
+  "/Prime_-_preview_serveur_pack_8.webp",
+  "/Prime_-_preview_serveur_pack_9.webp",
+  "/postergrandfivem.webp",
+  "/postergrandfivem2.webp",
+  "/posterlarya.webp",
+  "/affiche1.webp",
+  "/affiche2.webp",
+  "/affiche3.webp",
 ];
 
 const NAV_ANCHORS = [
@@ -58,28 +58,28 @@ const SERVICES = [
     title: "Branding",
     description:
       "Logo, palette, direction artistique et système visuel complet pour votre serveur.",
-    image: "/affiche3.png",
+    image: "/affiche3.webp",
     span: "lg:col-span-5",
   },
   {
     title: "Affiches & posters",
     description:
       "Visuels marketing, annonces Discord et images de lancement qui donnent envie de rejoindre.",
-    image: "/postergrandfivem2.png",
+    image: "/postergrandfivem2.webp",
     span: "lg:col-span-7",
   },
   {
     title: "Packs GFX",
     description:
       "Templates, previews, overlays et assets prêts à l'emploi pour votre équipe.",
-    image: "/Prime_-_preview_serveur_pack_7.png",
+    image: "/Prime_-_preview_serveur_pack_7.webp",
     span: "lg:col-span-7",
   },
   {
     title: "Landing pages",
     description:
       "Pages courtes, sombres et précises pour poser votre image avant le lancement.",
-    image: "/ordi.png",
+    image: "/ordi.webp",
     span: "lg:col-span-5",
   },
 ];

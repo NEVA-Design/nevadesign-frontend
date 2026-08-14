@@ -162,7 +162,7 @@ export default function GivreEnhance() {
             >
               {/* Après — la finition studio */}
               <Image
-                src="/plage.png"
+                src="/plage.webp"
                 alt={t(
                   "enhance.alt",
                   "Rendu plage Los Santos retravaillé par le module Enhance"
@@ -180,7 +180,7 @@ export default function GivreEnhance() {
                 style={{ clipPath: "inset(0 50% 0 0)" }}
               >
                 <Image
-                  src="/plage.png"
+                  src="/plage.webp"
                   alt=""
                   fill
                   sizes="(max-width: 1200px) 100vw, 1112px"

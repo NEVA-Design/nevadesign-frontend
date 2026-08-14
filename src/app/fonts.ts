@@ -21,8 +21,11 @@ export const geist = Geist({
   variable: "--font-geist-sans",
 });
 
+/* budget run 3 : 2 preloads max — la mono n'habille que badges et
+   étiquettes, elle peut arriver en swap sans préchargement */
 export const geistMono = Geist_Mono({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-geist-mono",
+  preload: false,
 });

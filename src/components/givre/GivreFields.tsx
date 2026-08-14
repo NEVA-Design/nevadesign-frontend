@@ -264,7 +264,7 @@ export default function GivreFields() {
             <RevealMedia>
               <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
                 <Image
-                  src="/posterlarya.png"
+                  src="/posterlarya.webp"
                   alt="Campagne Larya serveur GTA RP"
                   fill
                   sizes="(max-width: 1024px) 92vw, 55vw"

@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [62, 75, 90],
+    /* les dérivés optimisés sont recalculés à chaque déploiement au
+       pire — 31 jours de cache navigateur/CDN */
+    minimumCacheTTL: 2678400,
     remotePatterns: [
       {
         protocol: "https",
@@ -15,6 +18,23 @@ const nextConfig: NextConfig = {
         hostname: "**.supabase.co",
       },
     ],
+  },
+  async headers() {
+    return [
+      {
+        /* assets de public/ : pas de hash dans le nom → un jour de
+           cache + une semaine servie périmée pendant revalidation
+           (les remplacements d'assets restent visibles sous 24 h) */
+        source:
+          "/:path*.(webp|avif|png|jpg|jpeg|gif|svg|ico|woff2)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=604800",
+          },
+        ],
+      },
+    ];
   },
 };
 

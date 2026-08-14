@@ -13,23 +13,23 @@ type Piece = { src: string; alt: string; ratio: string };
 const ROW_A: Piece[] = [
   { src: "/showcase/thumb-gtarp.webp", alt: "Miniature YouTube GTA RP", ratio: "aspect-[16/9]" },
   { src: "/showcase/logo-kova.webp", alt: "Logo Kova, banque mobile", ratio: "aspect-[4/3]" },
-  { src: "/posterlarya.png", alt: "Campagne serveur GTA RP", ratio: "aspect-[3/4]" },
+  { src: "/posterlarya.webp", alt: "Campagne serveur GTA RP", ratio: "aspect-[3/4]" },
   { src: "/showcase/charte-meridien.webp", alt: "Charte graphique Méridien", ratio: "aspect-[16/10]" },
   { src: "/showcase/thumb-esport.webp", alt: "Miniature YouTube esport", ratio: "aspect-[16/9]" },
-  { src: "/Prime_-_preview_serveur_pack_8.png", alt: "Pack graphique complet", ratio: "aspect-[4/3]" },
+  { src: "/Prime_-_preview_serveur_pack_8.webp", alt: "Pack graphique complet", ratio: "aspect-[4/3]" },
   { src: "/showcase/logo-volt.webp", alt: "Logo Volt Esports", ratio: "aspect-[4/3]" },
   { src: "/showcase/thumb-invest.webp", alt: "Miniature YouTube finance", ratio: "aspect-[16/9]" },
 ];
 
 const ROW_B: Piece[] = [
-  { src: "/postergrandfivem2.png", alt: "Affiche grand format FiveM", ratio: "aspect-[3/4]" },
+  { src: "/postergrandfivem2.webp", alt: "Affiche grand format FiveM", ratio: "aspect-[3/4]" },
   { src: "/showcase/thumb-secret.webp", alt: "Miniature YouTube tutoriel", ratio: "aspect-[16/9]" },
   { src: "/showcase/charte-kova.webp", alt: "Charte graphique Kova", ratio: "aspect-[16/10]" },
   { src: "/showcase/logo-meridien.webp", alt: "Logo Méridien café", ratio: "aspect-[4/3]" },
-  { src: "/affiche3.png", alt: "Identité visuelle serveur", ratio: "aspect-[3/4]" },
+  { src: "/affiche3.webp", alt: "Identité visuelle serveur", ratio: "aspect-[3/4]" },
   { src: "/showcase/thumb-pc.webp", alt: "Miniature YouTube test PC", ratio: "aspect-[16/9]" },
-  { src: "/Prime_-_preview_serveur_pack_4.png", alt: "Pack graphique serveur", ratio: "aspect-[4/3]" },
-  { src: "/vice.png", alt: "Visuel ambiance Vice", ratio: "aspect-[16/10]" },
+  { src: "/Prime_-_preview_serveur_pack_4.webp", alt: "Pack graphique serveur", ratio: "aspect-[4/3]" },
+  { src: "/vice.webp", alt: "Visuel ambiance Vice", ratio: "aspect-[16/10]" },
 ];
 
 function Row({

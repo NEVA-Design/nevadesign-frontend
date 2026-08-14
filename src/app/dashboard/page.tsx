@@ -49,9 +49,9 @@ const quickActions = [
 ];
 
 const libraryItems = [
-  { title: "Affiche cartel Vice City", type: "Campagne", image: "/vice.png", metric: "9:16" },
-  { title: "Pack serveur Prime", type: "Ressource", image: "/Prime_-_preview_serveur_pack_15.png", metric: "Pack" },
-  { title: "Lancement beach club", type: "Lifestyle", image: "/plage.png", metric: "4K" },
+  { title: "Affiche cartel Vice City", type: "Campagne", image: "/vice.webp", metric: "9:16" },
+  { title: "Pack serveur Prime", type: "Ressource", image: "/Prime_-_preview_serveur_pack_15.webp", metric: "Pack" },
+  { title: "Lancement beach club", type: "Lifestyle", image: "/plage.webp", metric: "4K" },
 ];
 
 const TYPE_LABELS: Record<string, string> = {
