@@ -103,21 +103,40 @@ export default function PrismLoader() {
       marks.fonts = 1;
     }
 
+    /* run 3, LOT 6 : « load » ne suffit pas — l'image peut être
+       chargée mais pas DÉCODÉE au moment de la levée (une frame
+       floue/blanche possible). decode() garantit des pixels prêts ;
+       error/absence libèrent la marque (jamais d'otage). */
     const posterImg = document.querySelector<HTMLImageElement>(
       "#top picture img"
     );
-    if (!posterImg || (posterImg.complete && posterImg.naturalWidth > 0)) {
+    if (!posterImg) {
       marks.poster = 1;
     } else {
-      const onPoster = () => {
-        marks.poster = 1;
+      const markDecoded = () => {
+        posterImg
+          .decode()
+          .catch(() => {
+            /* décodage refusé (source retirée…) : on libère */
+          })
+          .finally(() => {
+            marks.poster = 1;
+          });
       };
-      posterImg.addEventListener("load", onPoster, { once: true });
-      posterImg.addEventListener("error", onPoster, { once: true });
-      cleanups.push(() => {
-        posterImg.removeEventListener("load", onPoster);
-        posterImg.removeEventListener("error", onPoster);
-      });
+      if (posterImg.complete && posterImg.naturalWidth > 0) {
+        markDecoded();
+      } else {
+        const onPoster = () => markDecoded();
+        const onError = () => {
+          marks.poster = 1;
+        };
+        posterImg.addEventListener("load", onPoster, { once: true });
+        posterImg.addEventListener("error", onError, { once: true });
+        cleanups.push(() => {
+          posterImg.removeEventListener("load", onPoster);
+          posterImg.removeEventListener("error", onError);
+        });
+      }
     }
 
     const onScene = (e: Event) => {

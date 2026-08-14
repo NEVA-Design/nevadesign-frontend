@@ -1744,3 +1744,26 @@ html {
 html[data-prism-seen="1"] .pv-overture-core {
   display: none;
 }
+
+/* ═══ Tier LOW — la scène en poster (run 3, LOT 4) ═══════════
+   Zéro WebGL : le poster HQ porte le hero, une micro-parallaxe
+   scroll-driven 100 % CSS le garde vivant (compositor only, aucun
+   JS). Le scale absorbe le translateY : jamais de bord nu. À
+   scroll 0 la transformation est nulle en Y — l'état de repos
+   reste identique au cadrage validé. Sans support
+   animation-timeline, le poster est simplement immobile. */
+@supports (animation-timeline: scroll()) {
+  .pv-hero-parallax img {
+    animation: pv-hero-drift linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 100vh;
+  }
+  @keyframes pv-hero-drift {
+    from {
+      transform: translateY(0) scale(1.045);
+    }
+    to {
+      transform: translateY(4.5%) scale(1.045);
+    }
+  }
+}

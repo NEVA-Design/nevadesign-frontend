@@ -29,6 +29,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { ContactShadows, Environment, Lightformer } from "@react-three/drei";
+import { currentSceneTier, type SceneTier } from "./scene-tier";
+
+/* Tier au chargement du module (run 3, LOT 4) : GivreHero détecte
+   AVANT d'importer ce chunk — ici on lit le verdict. « low »
+   n'existe pas dans ce fichier (le chunk n'est jamais importé).
+   IS_MID dimensionne ce qui se fige à la peinture (textures ÷2,
+   grain 1 octave, jamais d'upscale wide) ; la descente high → mid
+   EN DIRECT passe par les props (DPR, dispersion, passes). */
+const IS_MID = currentSceneTier() === "mid";
 
 /* ── Petits outils de peinture ─────────────────────────────────── */
 
@@ -177,7 +186,9 @@ const VIEW = (() => {
   const vw = ssr ? 1440 : window.innerWidth;
   const vh = ssr ? 900 : window.innerHeight;
   const aspect = vw / Math.max(1, vh);
-  const wide = vw >= 1680;
+  /* MID : jamais le pipeline wide (upscale 6144/8192 ≈ 75-101 Mo
+     GPU) — textures legacy ÷2, voir WALL_TEX_W plus bas */
+  const wide = vw >= 1680 && !IS_MID;
   /* écartement des satellites : nul jusqu'à 16:10, plein à 2,35:1
      — ET seulement aux paliers grands écrans */
   const spread = wide ? clamp01((aspect - 1.6) / 0.75) : 0;
@@ -236,14 +247,20 @@ const VIEW = (() => {
   /* plafond 6144 : 1,5 × est atteint jusqu'à 3440 (le 34″ du
      brief) ; un 4K NATIF sans scaling tombe à 1,3 × — compromis
      mémoire GPU (75 Mo vs 101 Mo) documenté au rapport */
-  const wallOutW = wide ? Math.min(6144, maxTex, Math.max(2048, idealW)) : 2048;
+  const wallOutW = wide
+    ? Math.min(6144, maxTex, Math.max(2048, idealW))
+    : IS_MID
+      ? 1024
+      : 2048;
   const wallOutH = Math.round((wallOutW * 11) / WALL_W);
   /* le sol : rasance oblige, la perspective le suréchantillonne
      verticalement — 0,72 × la densité du mur suffit à ses détails
      (reflets/ombres floues par nature), le grain reste natif */
   const floorOutW = wide
     ? Math.min(8192, maxTex, Math.max(1536, Math.round(wallOutW * 0.72)))
-    : 1536;
+    : IS_MID
+      ? 768
+      : 1536;
   const floorOutH = Math.min(4608, Math.round((floorOutW * floorD) / WALL_W));
   return {
     wide, spread, aspect, vw, vh, frustum, gridStep, haloScale,
@@ -256,10 +273,12 @@ const VIEW = (() => {
 const WALL_Z = VIEW.wallZ;
 const FLOOR_D = VIEW.floorD;
 
-const WALL_TEX_W = 2048;
-const WALL_TEX_H = Math.round((WALL_TEX_W * 11) / WALL_W); // 1024
-const FLOOR_TEX_W = 1536;
-const FLOOR_TEX_H = Math.round((FLOOR_TEX_W * FLOOR_D) / WALL_W); // legacy ≈ 1222
+/* MID : peinture directement à la résolution finale ÷2 — moitié de
+   long tasks au boot, quart de mémoire GPU */
+const WALL_TEX_W = IS_MID ? 1024 : 2048;
+const WALL_TEX_H = Math.round((WALL_TEX_W * 11) / WALL_W); // 1024 (512 mid)
+const FLOOR_TEX_W = IS_MID ? 768 : 1536;
+const FLOOR_TEX_H = Math.round((FLOOR_TEX_W * FLOOR_D) / WALL_W); // legacy ≈ 1222 (611 mid)
 
 /* La sculpture vit autour de x = SCULPT_X, posée au sol. Les
    positions des satellites sont partagées avec le peintre du sol
@@ -690,10 +709,12 @@ function paintCanvasInto(
       const col = color(u, v);
       /* grain de film — deux octaves déterministes (hash2) : le
          fin tue le banding, le grossier tue le « digital plat ».
-         (En mode wide, le grain est reposé NATIF après upscale.) */
+         (En mode wide, le grain est reposé NATIF après upscale ;
+         en MID une seule octave — la fine, celle qui tue le
+         banding — divise le coût de hash par deux.) */
       const dith = withGrain
         ? (hash2(u * 1400, v * 1400) - 0.5) * 0.016 +
-          (hash2(u * 340 + 7.3, v * 340 + 2.1) - 0.5) * 0.009
+          (IS_MID ? 0 : (hash2(u * 340 + 7.3, v * 340 + 2.1) - 0.5) * 0.009)
         : 0;
       const i = (py * w + px) * 4;
       data[i] = Math.round(clamp01(col[0] + dith) * 255);
@@ -1282,7 +1303,7 @@ function DawnRoom() {
    aligné sur les taches de fenêtre du mur, dont l'opacité ondule
    très lentement. Transparent : il vit à l'écran seulement, le
    décor réfracté reste stable. */
-function DawnBreath() {
+function DawnBreath({ mid }: { mid: boolean }) {
   const matRef = useRef<THREE.MeshBasicMaterial>(null);
 
   const texture = useMemo(() => {
@@ -1318,11 +1339,13 @@ function DawnBreath() {
   useFrame((state) => {
     if (matRef.current) {
       /* période ≈ 30 s, sans jamais s'éteindre ni saturer — et la
-         respiration s'éveille avec l'assemblage (fenêtre 1→4 s) */
+         respiration s'éveille avec l'assemblage (fenêtre 1→4 s).
+         MID : la nappe se fige à sa valeur moyenne une fois posée
+         (« statiques ou off ») */
       const t = state.clock.elapsedTime;
+      const breathe = mid ? 0 : 0.042 * Math.sin(t * 0.21);
       matRef.current.opacity =
-        (0.042 + 0.042 * Math.sin(t * 0.21)) *
-        easeOutCubic(progress(t, 1.0, 3.0));
+        (0.042 + breathe) * easeOutCubic(progress(t, 1.0, 3.0));
     }
   });
 
@@ -1348,7 +1371,7 @@ function DawnBreath() {
    Trois arcs très dilués au pied du monogramme, en dérive f(t)
    absolue ultra lente (offset de texture + opacité sinusoïdale).
    Gain ≤ 0,05 : une vibration de matière, pas un effet. */
-function FloorCaustics() {
+function FloorCaustics({ mid }: { mid: boolean }) {
   const matRef = useRef<THREE.MeshBasicMaterial>(null);
 
   const texture = useMemo(() => {
@@ -1387,11 +1410,13 @@ function FloorCaustics() {
     const t = state.clock.elapsedTime;
     if (matRef.current) {
       /* opacité : jamais nulle, jamais > 0,05 d'apport perçu ;
-         s'éveille avec l'assemblage (fenêtre 1,2 → 3,6 s) */
+         s'éveille avec l'assemblage (fenêtre 1,2 → 3,6 s).
+         MID : caustiques STATIQUES — opacité moyenne, zéro dérive */
+      const shimmer = mid ? 0 : 0.016 * Math.sin((t * Math.PI * 2) / 38);
       matRef.current.opacity =
-        (0.032 + 0.016 * Math.sin((t * Math.PI * 2) / 38)) *
-        easeOutCubic(progress(t, 1.2, 2.4));
+        (0.032 + shimmer) * easeOutCubic(progress(t, 1.2, 2.4));
     }
+    if (mid) return;
     /* la nappe dérive en f(t) absolu — offset de texture, pas de
        transform de mesh : le pattern glisse dans son cadre */
     texture.offset.x = 0.012 * Math.sin((t * Math.PI * 2) / 71);
@@ -1662,7 +1687,7 @@ function useMonogramGeometry() {
 
 const MONO_REST_Y = FLOOR_Y + LOGO_H / 2 + LOGO_BEVEL + 0.005;
 
-function Monogram() {
+function Monogram({ mid }: { mid: boolean }) {
   const geometry = useMonogramGeometry();
   const mesh = useRef<THREE.Mesh>(null);
 
@@ -1670,13 +1695,18 @@ function Monogram() {
      très léger dépassement (settle), pendant le fondu d'entrée du
      canvas. Vie : oscillation lente (±15°, période 80 s — un logo
      vu de dos se lit en miroir : jamais de tour complet) et la
-     dispersion qui glisse doucement dans ses teintes. */
+     dispersion qui glisse doucement dans ses teintes.
+     MID : dispersion 0 — le chunk natif de transmission passe de
+     3 passes (une par canal RGB) à 1 : c'est LA simplification
+     « render target réfraction ÷2 » de notre pipeline (le RT natif
+     n'est pas lu, le coût vit dans le fragment shader). */
   useFrame((state) => {
     const t = state.clock.elapsedTime;
     if (!mesh.current) return;
     const rise = settle(progress(t, 0.15, 1.9));
     mesh.current.position.y = MONO_REST_Y - (1 - rise) * 0.85;
     mesh.current.rotation.y = -0.3 + 0.26 * Math.sin((t * Math.PI * 2) / 80);
+    if (mid) return;
     const mat = mesh.current.material as THREE.MeshPhysicalMaterial;
     if (mat && "dispersion" in mat) {
       mat.dispersion = 0.55 + 0.12 * Math.sin((t * Math.PI * 2) / 45);
@@ -1693,7 +1723,7 @@ function Monogram() {
       <Glass
         thickness={1.45}
         ior={1.52}
-        dispersion={0.55}
+        dispersion={mid ? 0 : 0.55}
         roughness={0.015}
         attenuationDistance={2.4}
         attenuationColor="#f2eefb"
@@ -1708,7 +1738,7 @@ function Monogram() {
    place), puis vie au ralenti : précession de l'anneau, dérive
    verticale à peine perceptible de la sphère et de la bille. Le
    groupe entier glisse doucement au scroll (SCROLL.p). */
-function Sculpture() {
+function Sculpture({ mid }: { mid: boolean }) {
   const root = useRef<THREE.Group>(null);
   const sphere = useRef<THREE.Mesh>(null);
   const bead = useRef<THREE.Mesh>(null);
@@ -1749,11 +1779,11 @@ function Sculpture() {
 
   return (
     <group ref={root}>
-      <Monogram />
+      <Monogram mid={mid} />
 
       {/* L'anneau — posé devant l'épaule gauche du monogramme,
           presque couché : sa tranche épaisse plie l'horizon dans
-          son anneau */}
+          son anneau. MID : dispersion coupée (1 passe). */}
       <mesh
         ref={ring}
         position={[RING_X, FLOOR_Y + 0.61, RING_Z]}
@@ -1763,7 +1793,7 @@ function Sculpture() {
         <Glass
           thickness={0.3}
           ior={1.5}
-          dispersion={0.22}
+          dispersion={mid ? 0 : 0.22}
           roughness={0.02}
           attenuationDistance={1.4}
           attenuationColor="#eae5f6"
@@ -1780,7 +1810,7 @@ function Sculpture() {
         <Glass
           thickness={0.8}
           ior={1.45}
-          dispersion={0.08}
+          dispersion={mid ? 0 : 0.08}
           roughness={0.17}
           attenuationDistance={2.8}
           attenuationColor="#eee9f8"
@@ -1793,7 +1823,12 @@ function Sculpture() {
           de la scène */}
       <mesh ref={bead} position={[BEAD_X, FLOOR_Y + 3.28, -0.7]}>
         <sphereGeometry args={[0.14, 48, 48]} />
-        <Glass thickness={0.28} roughness={0.02} dispersion={0.15} bend={0.45} />
+        <Glass
+          thickness={0.28}
+          roughness={0.02}
+          dispersion={mid ? 0 : 0.15}
+          bend={0.45}
+        />
       </mesh>
     </group>
   );
@@ -1899,14 +1934,29 @@ function SceneLights() {
 /* (Les cadrages POSES vivent en tête de module : le layout de
    scène VIEW en dépend pour caler le frustum du chargement.) */
 
+/* La taille du viewport, tenue par listener resize : la relire sur
+   window à CHAQUE frame (run 2) forçait une lecture layout par
+   frame — un rAF n'a pas à interroger le DOM. */
+const VIEWPORT = {
+  w: typeof window === "undefined" ? 1440 : window.innerWidth,
+  h: typeof window === "undefined" ? 900 : window.innerHeight,
+};
+
 function CameraRig() {
   const appliedFov = useRef(-1);
 
+  useEffect(() => {
+    const read = () => {
+      VIEWPORT.w = window.innerWidth;
+      VIEWPORT.h = window.innerHeight;
+    };
+    read();
+    window.addEventListener("resize", read);
+    return () => window.removeEventListener("resize", read);
+  }, []);
+
   useFrame((state) => {
-    const pose = poseFor(
-      window.innerWidth,
-      window.innerWidth / Math.max(1, window.innerHeight)
-    );
+    const pose = poseFor(VIEWPORT.w, VIEWPORT.w / Math.max(1, VIEWPORT.h));
     const cam = state.camera as THREE.PerspectiveCamera;
     if (appliedFov.current !== pose.fov) {
       appliedFov.current = pose.fov;
@@ -1932,12 +1982,17 @@ function CameraRig() {
 function AccentReveal() {
   const mat = useRef<THREE.MeshBasicMaterial>(null);
   const texture = useMemo(() => getAccentCoverTexture(), []);
+  /* le fondu est joué UNE fois (t ∈ [2,2 ; 4,6]) — au-delà, le
+     cache est éteint pour toujours : plus rien à écrire par frame */
+  const done = useRef(false);
 
   useFrame((state) => {
+    if (done.current) return;
+    const p = progress(state.clock.elapsedTime, 2.2, 2.4);
     if (mat.current) {
-      mat.current.opacity =
-        1 - easeOutCubic(progress(state.clock.elapsedTime, 2.2, 2.4));
+      mat.current.opacity = 1 - easeOutCubic(p);
     }
+    if (p >= 1) done.current = true;
   });
 
   return (
@@ -1962,16 +2017,72 @@ function AccentReveal() {
   );
 }
 
+/* ── Garde-fps (LOT 4) — la descente de tier en direct ──────────
+   Fenêtre glissante de 3 s, armée 5 s après le boot (l'assemblage
+   et la compile ne comptent pas) : sous 30 fps médians, descente
+   d'un tier — high → mid (DPR 1,5, dispersion coupée, ombres
+   figées, appliqués à chaud) ou mid → low (le canvas se démonte,
+   le poster reprend). Loggée et mémorisée par scene-tier. */
+function FpsGuard({
+  tier,
+  onDemote,
+}: {
+  tier: "high" | "mid";
+  onDemote?: (to: SceneTier, fps: number) => void;
+}) {
+  const frames = useRef<number[]>([]);
+  const armedAt = useRef(0);
+  const fired = useRef(false);
+
+  useEffect(() => {
+    /* nouveau tier → nouvelle fenêtre de mesure */
+    frames.current = [];
+    armedAt.current = 0;
+    fired.current = false;
+  }, [tier]);
+
+  useFrame((state) => {
+    if (fired.current || !onDemote) return;
+    if (state.clock.elapsedTime < 5) return;
+    const now = performance.now();
+    const last = frames.current[frames.current.length - 1];
+    /* un trou (> 500 ms) n'est pas un fps bas : c'est la boucle qui
+       était coupée (onglet caché, hors viewport) — on ré-arme */
+    if (last !== undefined && now - last > 500) {
+      frames.current = [];
+      armedAt.current = now;
+    }
+    if (!armedAt.current) armedAt.current = now;
+    frames.current.push(now);
+    while (frames.current.length && now - frames.current[0] > 3000) {
+      frames.current.shift();
+    }
+    if (now - armedAt.current < 3000) return;
+    const fps = Math.round(frames.current.length / 3);
+    if (fps < 30) {
+      fired.current = true;
+      onDemote(tier === "high" ? "mid" : "low", fps);
+    }
+  });
+
+  return null;
+}
+
 /* ── Le canvas — visibilité, DPR, crossfade ──────────────────── */
 export default function GlassSculpture({
   className,
   onReady,
+  tier = IS_MID ? "mid" : "high",
+  onDemote,
 }: {
   className?: string;
   onReady?: () => void;
+  tier?: "high" | "mid";
+  onDemote?: (to: SceneTier, fps: number) => void;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(true);
+  const [pageVisible, setPageVisible] = useState(true);
   const [ready, setReady] = useState(false);
   /* les textures se peignent AVANT le montage du Canvas, en
      tranches asynchrones : zéro long task (8,7 s de gel mesurés à
@@ -2004,6 +2115,16 @@ export default function GlassSculpture({
     return () => io.disconnect();
   }, []);
 
+  /* onglet caché → boucle coupée (run 3) : rAF est déjà throttlé
+     par le navigateur, mais « throttlé » n'est pas « arrêté » —
+     frameloop="never" l'est */
+  useEffect(() => {
+    const read = () => setPageVisible(!document.hidden);
+    read();
+    document.addEventListener("visibilitychange", read);
+    return () => document.removeEventListener("visibilitychange", read);
+  }, []);
+
   /* la dérive de scroll — listener passif, valeur lue par frame */
   useEffect(() => {
     const read = () => {
@@ -2031,11 +2152,11 @@ export default function GlassSculpture({
       {texReady ? (
       <Canvas
         /* run 2 : plafond 2 (un 4K en scaling 200 % rend natif) —
-           jamais au-delà, budget GIVRE §4 */
-        dpr={[1, 2]}
+           jamais au-delà, budget GIVRE §4. MID (run 3) : 1,5. */
+        dpr={tier === "mid" ? [1, 1.5] : [1, 2]}
         flat
         fallback={null}
-        frameloop={booted && inView ? "always" : "never"}
+        frameloop={booted && inView && pageVisible ? "always" : "never"}
         camera={{ position: [0.22, 0.58, 11.6], fov: 31 }}
         gl={{
           antialias: true,
@@ -2085,12 +2206,17 @@ export default function GlassSculpture({
       >
         <CameraRig />
         <DawnRoom />
-        <DawnBreath />
-        <FloorCaustics />
+        <DawnBreath mid={tier === "mid"} />
+        <FloorCaustics mid={tier === "mid"} />
         <AccentReveal />
         <SceneLights />
-        <Sculpture />
+        <Sculpture mid={tier === "mid"} />
+        <FpsGuard tier={tier} onDemote={onDemote} />
+        {/* MID : l'ombre de contact est rendue UNE frame puis figée
+            (la scène est quasi statique — le monogramme oscille de
+            ±15° sur 80 s) au lieu d'une passe depth 512² par frame */}
         <ContactShadows
+          frames={tier === "mid" ? 1 : Infinity}
           position={[SCULPT_X, FLOOR_Y + 0.01, 0.35]}
           scale={8.5}
           far={3}

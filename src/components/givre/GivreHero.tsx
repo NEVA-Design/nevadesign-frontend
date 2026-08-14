@@ -11,11 +11,12 @@
 
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ArrowRight } from "lucide-react";
 import { useTranslations } from "@/components/LanguageProvider";
+import { demoteSceneTier, detectSceneTier, type SceneTier } from "./scene-tier";
 
 const GlassSculpture = dynamic(() => import("./GlassSculpture"), {
   ssr: false,
@@ -37,6 +38,47 @@ function fieldLabel(kicker: string) {
 export default function GivreHero() {
   const { t } = useTranslations();
   const scope = useRef<HTMLElement>(null);
+  /* run 3 : le tier décide si le chunk three (262 Ko gzip) part —
+     et il ne part qu'APRÈS le first paint (deux rAF : la frame du
+     poster est composée avant que le réseau ne s'occupe de la 3D) */
+  const [tier, setTier] = useState<SceneTier | null>(null);
+  /* bfcache (run 3, LOT 6) : un retour back/forward restaure un
+     état GELÉ — contexte WebGL potentiellement perdu, canvas
+     figé. pageshow persisted remonte la scène (textures en cache
+     module : re-boot court, le poster couvre le crossfade). */
+  const [sceneEpoch, setSceneEpoch] = useState(0);
+
+  useEffect(() => {
+    const onShow = (e: PageTransitionEvent) => {
+      if (e.persisted) setSceneEpoch((k) => k + 1);
+    };
+    window.addEventListener("pageshow", onShow);
+    return () => window.removeEventListener("pageshow", onShow);
+  }, []);
+
+  useEffect(() => {
+    let raf = 0;
+    raf = requestAnimationFrame(() => {
+      raf = requestAnimationFrame(() => {
+        const next = detectSceneTier().tier;
+        setTier(next);
+        /* en low, la scène n'émettra jamais : le loader reçoit sa
+           part tout de suite (le poster HQ EST la scène) */
+        if (next === "low") {
+          try {
+            window.dispatchEvent(
+              new CustomEvent("neva:progress", {
+                detail: { phase: "scene", p: 1 },
+              })
+            );
+          } catch {
+            /* silencieux */
+          }
+        }
+      });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   useGSAP(
     () => {
@@ -112,33 +154,67 @@ export default function GivreHero() {
           Les media queries suivent EXACTEMENT les frontières des
           poses caméra (GlassSculpture.POSES) : le fondu poster →
           canvas reste un raccord, jamais un saut. */}
-      <picture>
+      <picture className={tier === "low" ? "pv-hero-parallax" : undefined}>
+        {/* Tier LOW (run 3) : la scène EST ce poster — versions AVIF
+            haute qualité dédiées (≤ 120 Ko), micro-parallaxe CSS au
+            scroll, zéro WebGL. Les autres tiers gardent les WebP
+            légers : simple fond de crossfade. */}
+        {/* Run 3, LOT 6 — chaque source porte ses densités : sans
+            descripteur x, un 1440 CSS à DPR 1,25-2 (scaling Windows,
+            Retina) recevait un poster 1440w étiré — LE fond flou du
+            F5 pendant toute la phase poster. Le 4K (min-3560)
+            recevait même un 1920w (×2) : corrigé par le 3840. */}
+        {tier === "low" ? (
+          <>
+            <source
+              media="(min-width: 2880px) and (min-aspect-ratio: 2/1)"
+              srcSet="/scene/low/hero-poster-3440.avif"
+              type="image/avif"
+            />
+            <source
+              media="(min-width: 1920px)"
+              srcSet="/scene/low/hero-poster-1920.avif 1x, /scene/low/hero-poster-3840.avif 2x"
+              type="image/avif"
+            />
+            <source
+              media="(min-width: 1024px)"
+              srcSet="/scene/low/hero-poster-1440.avif 1x, /scene/low/hero-poster-2880.avif 2x"
+              type="image/avif"
+            />
+            <source
+              media="(max-width: 1023px)"
+              srcSet="/scene/low/hero-poster-390.avif 2x, /scene/low/hero-poster-1170.avif 3x"
+              type="image/avif"
+            />
+          </>
+        ) : null}
         <source
           media="(min-width: 2880px) and (min-aspect-ratio: 2/1)"
           srcSet="/scene/hero-poster-3440.webp"
         />
         <source
           media="(min-width: 3560px)"
-          srcSet="/scene/hero-poster-1920.webp"
+          srcSet="/scene/hero-poster-3840.webp"
         />
         <source
           media="(min-width: 2200px)"
-          srcSet="/scene/hero-poster-2560.webp"
+          srcSet="/scene/hero-poster-2560.webp 1x, /scene/hero-poster-3840.webp 2x"
         />
         <source
           media="(min-width: 1920px)"
-          srcSet="/scene/hero-poster-1920.webp"
+          srcSet="/scene/hero-poster-1920.webp 1x, /scene/hero-poster-3840.webp 2x"
         />
         <source
           media="(min-width: 1680px)"
-          srcSet="/scene/hero-poster-1680.webp"
+          srcSet="/scene/hero-poster-1680.webp 1x, /scene/hero-poster-3360.webp 2x"
         />
         <source
           media="(max-width: 1023px)"
-          srcSet="/scene/hero-poster-390.webp"
+          srcSet="/scene/hero-poster-390.webp 2x, /scene/hero-poster-1170.webp 3x"
         />
         <img
           src="/scene/hero-poster.webp"
+          srcSet="/scene/hero-poster.webp 1x, /scene/hero-poster-2880.webp 2x"
           alt=""
           aria-hidden
           fetchPriority="high"
@@ -147,8 +223,20 @@ export default function GivreHero() {
       </picture>
 
       {/* La sculpture — rendu 3D temps réel plein cadre, en fondu
-          par-dessus son poster */}
-      <GlassSculpture className="absolute inset-0" />
+          par-dessus son poster. Montée après le first paint (deux
+          rAF), jamais en tier low : le chunk three n'est alors
+          jamais téléchargé. */}
+      {tier === "high" || tier === "mid" ? (
+        <GlassSculpture
+          key={`scene-${sceneEpoch}`}
+          className="absolute inset-0"
+          tier={tier}
+          onDemote={(to, fps) => {
+            demoteSceneTier(to, fps);
+            setTier(to);
+          }}
+        />
+      ) : null}
 
       {/* Aucun cadre au-dessus de la scène : le canvas est nu, seule
           la vraie interface (texte, boutons, rails) se pose dessus. */}
