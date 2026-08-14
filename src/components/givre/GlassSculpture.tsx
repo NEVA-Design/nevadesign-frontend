@@ -97,30 +97,193 @@ const SCROLL = { p: 0 };
    la sculpture, ses ombres peintes et ses reflets ne bougent
    jamais du monde. */
 const FLOOR_Y = -1.72;
-const WALL_Z = -6.5;
 const WALL_X0 = -11;
 const WALL_W = 22;
 const WALL_TOP = FLOOR_Y + 11; // 9.28
-const FLOOR_D = 17.5; // z ∈ [WALL_Z, WALL_Z + 17.5]
+/* WALL_Z et FLOOR_D dérivent du layout (VIEW, plus bas) : le
+   cyclorama RECULE aux grands paliers — legacy : -6.5 / 17.5. */
+
+/* ── Cadrages — la même scène, dix compositions ────────────────
+   La sculpture ne bouge jamais : chaque palier est un mouvement de
+   caméra (position, focale, visée). Déclaré ICI (avant le layout
+   de scène : il lit la pose du chargement pour caler le frustum).
+   ≥ 1680 (grands écrans, run 2) : la caméra se rapproche — le
+   monogramme tient 55-62 % de la hauteur du viewport, mesuré au
+   pixel sur capture ; le frustum reste DANS le décor peint à tous
+   les aspects (vérifié : 17,8 u visibles sur 22 à 3440×1440).
+   ≤ 1679 : cadrages du run 1, au pixel (home 1440/390 validée). */
+type Pose = {
+  pos: [number, number, number];
+  fov: number;
+  look: [number, number, number];
+  /* aspect minimal requis (21:9 réels) — sinon on passe à la
+     pose suivante : une fenêtre 2900×2000 n'est PAS un 21:9 */
+  minAspect?: number;
+};
+
+const POSES: { min: number; pose: Pose }[] = [
+  /* 21:9 réel (34″ client, et tout ultra-wide ≥ 2880) : sculpture
+     au centre-droit, satellites très écartés (layout), annotations
+     dans les tiers latéraux — AVANT l'entrée 4K : un 3840×1600
+     est un 21:9, pas un 4K */
+  { min: 2880, pose: { pos: [0.3, 0.97, 7.4], fov: 29, look: [0.85, 0.09, 0], minAspect: 2 } },
+  /* 3840×2160 (4K 16:9) : même resserrage que 1920, l'espace px
+     est composé par les satellites et la typo fluide */
+  { min: 3560, pose: { pos: [0.5, 0.97, 7.35], fov: 29, look: [0.8, 0.09, 0] } },
+  /* ≥ 2200 : la composition « grand écran » du brief s'applique */
+  { min: 2200, pose: { pos: [0.42, 0.97, 7.35], fov: 29, look: [0.83, 0.09, 0] } },
+  { min: 1920, pose: { pos: [0.5, 0.97, 7.35], fov: 29, look: [0.8, 0.09, 0] } },
+  /* palier de transition : entre la home validée (39 %) et la
+     cible grands écrans (58 %) — ~48 % à 1680-1919 */
+  { min: 1680, pose: { pos: [0.4, 1.0, 8.9], fov: 29, look: [0.85, 0.25, 0] } },
+  { min: 1360, pose: { pos: [0.22, 1.0, 10.9], fov: 31, look: [0.85, 0.44, 0] } },
+  { min: 1152, pose: { pos: [0.18, 0.98, 10.6], fov: 32, look: [0.83, 0.42, 0] } },
+  { min: 1024, pose: { pos: [0.3, 0.96, 10.9], fov: 33, look: [0.62, 0.4, 0] } },
+  /* < lg : le monogramme est cadré ENTIER dans la fenêtre entre le
+     titre et les CTA — jamais tronqué (viser bas descend la
+     sculpture à l'écran, la garde au sol visible autour) */
+  { min: 600, pose: { pos: [1.0, 0.95, 12.6], fov: 36, look: [1.0, 0.52, 0] } },
+  /* aligné sur le monogramme (MONO_X = 1.4) : la pièce reste
+     centrée et ENTIÈRE dans le cadre à toutes les largeurs */
+  { min: 390, pose: { pos: [1.35, 0.9, 13.2], fov: 40, look: [1.35, 0.45, 0] } },
+  /* très petits écrans (360×780) : le bloc texte mange plus de
+     hauteur — la caméra recule et vise haut pour poser la
+     sculpture plus bas, sous le sous-texte, entière */
+  { min: 0, pose: { pos: [1.35, 1.0, 15.0], fov: 40, look: [1.35, 2.5, 0] } },
+];
+
+function poseFor(w: number, aspect: number): Pose {
+  for (const { min, pose } of POSES) {
+    if (w < min) continue;
+    if (pose.minAspect && aspect < pose.minAspect) continue;
+    return pose;
+  }
+  return POSES[POSES.length - 1].pose;
+}
+
+/* ── Le layout de scène — figé au chargement (run 2) ────────────
+   Comme l'opacité du filigrane (ghInk) : la peinture et la mise en
+   place suivent le device au moment du paint. Legacy (< 1680) :
+   géométrie et textures du run 1, identiques au pixel. Wide :
+   satellites écartés selon l'aspect, annotations recalées dans le
+   frustum réel, textures denses — les champs 2048 sont upscalés
+   puis grille/annotations/filigrane/grain sont redessinés NATIFS
+   à la résolution cible (≥ 1,5 × la résolution affichée sur la
+   part visible du mur ; re-peindre 20 Mpx par pixel coûterait
+   ~18 s — l'upscale ne concerne que les dégradés basse fréquence,
+   toutes les hautes fréquences sont natives). */
+const VIEW = (() => {
+  const ssr = typeof window === "undefined";
+  const vw = ssr ? 1440 : window.innerWidth;
+  const vh = ssr ? 900 : window.innerHeight;
+  const aspect = vw / Math.max(1, vh);
+  const wide = vw >= 1680;
+  /* écartement des satellites : nul jusqu'à 16:10, plein à 2,35:1
+     — ET seulement aux paliers grands écrans */
+  const spread = wide ? clamp01((aspect - 1.6) / 0.75) : 0;
+  const pose = poseFor(vw, aspect);
+  const tanHalf = Math.tan((pose.fov * Math.PI) / 360);
+  /* Le cyclorama RECULE aux grands paliers : la caméra proche de
+     la sculpture (55-62 % vh) zoomerait sinon dans le mur peint —
+     filigrane écrasant, halo débordant, atelier illisible (mesuré
+     v1 : 61 % du mur seulement). Le recul est calé sur le BORD
+     DROIT du mur : le frustum s'arrête à wx ≈ 10,3 (+0,7 de garde
+     pour l'erreur d'approximation plane, mesurée 0,55 u) — soit
+     ~17,6-18 u du dessin utile visibles à TOUS les aspects, zéro
+     lecture du clamp de texture. Legacy : -6,5 exact. */
+  const kDir = (pose.look[0] - pose.pos[0]) / (pose.pos[2] - pose.look[2] || 1);
+  const wallZ = wide
+    ? Math.max(
+        -15,
+        Math.min(
+          -6.5,
+          -((10.15 - pose.pos[0]) / (kDir + tanHalf * aspect) - pose.pos[2])
+        )
+      )
+    : -6.5;
+  const floorD = 11 - wallZ; /* le sol court du mur à z = +11, comme au run 1 (17,5) */
+  /* frustum au mur (approximation plane : visée prolongée) */
+  const dWall = pose.pos[2] - wallZ;
+  const halfH = dWall * tanHalf;
+  const halfW = halfH * aspect;
+  const dir = pose.look[0] - pose.pos[0];
+  const cx = pose.pos[0] + (dir / (pose.pos[2] - pose.look[2] || 1)) * dWall;
+  const frustum = { left: cx - halfW, right: cx + halfW, width: 2 * halfW };
+  /* pas de la grille éditoriale : ~120 px apparents à l'écran,
+     borné [0.55, 1.1] — legacy reste 1.1 exactement */
+  const pxPerU = vw / frustum.width;
+  const gridStep = wide
+    ? Math.min(1.1, Math.max(0.55, +(120 / pxPerU).toFixed(3)))
+    : 1.1;
+  /* le halo aurore suit le frustum (« élargi proportionnellement »,
+     cibles ΔE/chroma inchangées : mêmes couleurs, plus grand) */
+  const haloScale = wide ? Math.min(1.45, Math.max(1, frustum.width / 14.98)) : 1;
+  /* résolution des textures : 1,5 × la résolution affichée sur la
+     part visible du mur, plafonnée par le GPU (lu sur un contexte
+     jetable) et bornée à 8192 */
+  let maxTex = 8192;
+  if (!ssr && wide) {
+    try {
+      const c = document.createElement("canvas");
+      const gl = c.getContext("webgl2") || c.getContext("webgl");
+      if (gl) maxTex = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
+    } catch {
+      /* garde le plafond par défaut */
+    }
+  }
+  const visible = Math.min(WALL_W, frustum.width);
+  const idealW = Math.ceil((1.5 * vw * WALL_W) / visible / 64) * 64;
+  /* plafond 6144 : 1,5 × est atteint jusqu'à 3440 (le 34″ du
+     brief) ; un 4K NATIF sans scaling tombe à 1,3 × — compromis
+     mémoire GPU (75 Mo vs 101 Mo) documenté au rapport */
+  const wallOutW = wide ? Math.min(6144, maxTex, Math.max(2048, idealW)) : 2048;
+  const wallOutH = Math.round((wallOutW * 11) / WALL_W);
+  /* le sol : rasance oblige, la perspective le suréchantillonne
+     verticalement — 0,72 × la densité du mur suffit à ses détails
+     (reflets/ombres floues par nature), le grain reste natif */
+  const floorOutW = wide
+    ? Math.min(8192, maxTex, Math.max(1536, Math.round(wallOutW * 0.72)))
+    : 1536;
+  const floorOutH = Math.min(4608, Math.round((floorOutW * floorD) / WALL_W));
+  return {
+    wide, spread, aspect, vw, vh, frustum, gridStep, haloScale,
+    wallZ, floorD, wallOutW, wallOutH, floorOutW, floorOutH,
+  };
+})();
+
+/* Le monde dérive du layout — tout le fichier (peinture, GLSL,
+   géométrie, reflets) lit ces deux constantes : une seule vérité. */
+const WALL_Z = VIEW.wallZ;
+const FLOOR_D = VIEW.floorD;
 
 const WALL_TEX_W = 2048;
 const WALL_TEX_H = Math.round((WALL_TEX_W * 11) / WALL_W); // 1024
 const FLOOR_TEX_W = 1536;
-const FLOOR_TEX_H = Math.round((FLOOR_TEX_W * FLOOR_D) / WALL_W); // ≈ 1222
+const FLOOR_TEX_H = Math.round((FLOOR_TEX_W * FLOOR_D) / WALL_W); // legacy ≈ 1222
 
 /* La sculpture vit autour de x = SCULPT_X, posée au sol. Les
    positions des satellites sont partagées avec le peintre du sol
-   (ombres, reflets) : une seule vérité. */
+   (ombres, reflets) : une seule vérité. En 21:9 elles s'écartent
+   (VIEW.spread) — l'espace gagné est composé, pas laissé mort. */
 const SCULPT_X = 1.25;
 const MONO_X = SCULPT_X + 0.15;
 /* L'anneau reste dans l'orbite du monogramme : plus près qu'en
    v27 — il ne doit JAMAIS mordre la colonne de texte à gauche
-   (zone de sécurité UI). */
-const RING_X = SCULPT_X - 0.92;
-const RING_Z = 0.5;
-const SPHERE_X = SCULPT_X - 0.52;
+   (zone de sécurité UI ; à 21:9 le texte vit vers wx −7…−4, le
+   tore écarté reste à wx ≥ −0.6). */
+/* écartement modéré (× 0,55) : à × 0,85 le tore trop à gauche ne
+   réfractait plus que le sol nu et virait au lait (le piège
+   documenté du tube fin) — il garde ici le monogramme et ses
+   ombres dans son champ réfracté */
+const RING_X = SCULPT_X - 0.92 - VIEW.spread * 0.55;
+/* aux paliers wide, le tore RECULE (z 0,5 → −0,5…−0,7) : la
+   caméra rapprochée le rendait énorme et coupé par le bord bas
+   (mesuré v4 : il mordait la pilule tarifaire à 1920) — reculé,
+   il se glisse derrière l'épaule gauche du monogramme, entier */
+const RING_Z = 0.5 - (VIEW.wide ? 0.9 : 0) - VIEW.spread * 0.25;
+const SPHERE_X = SCULPT_X - 0.52 - VIEW.spread * 0.6;
 const SPHERE_Z = -0.5;
-const BEAD_X = SCULPT_X + 1.55;
+const BEAD_X = SCULPT_X + 1.55 + VIEW.spread * 1.15;
 /* Mur virtuel derrière la caméra : le fallback des rayons
    réfractés qui repartent vers l'avant (tore incliné, chanfreins).
    Sans lui, ils sortiraient du monde et liraient un bord de
@@ -231,8 +394,24 @@ const cycOcc = (dist: number) =>
    chroma ≥ 0,035 vs mur nu ; retour au nu à 1,6 × le rayon.
    Rayon d'ensemble ≈ 38 % de la largeur viewport (~4,6 unités
    monde à 1440). Le dither du grain (paintCanvas) tue le banding. */
-const LOBE_LILAC = { cx: MONO_X - 1.7, cy: 2.85, rx: 3.2, ry: 2.3 };
-const LOBE_PEACH = { cx: MONO_X + 1.75, cy: 0.7, rx: 2.55, ry: 2.1 };
+/* Les lobes s'échelonnent avec le frustum (VIEW.haloScale) autour
+   du pivot (MONO_X, 1.6) : mêmes couleurs et mêmes cœurs (ΔE et
+   chroma inchangés), rayon d'ensemble ~38 % de la largeur
+   viewport à tous les paliers. Legacy (HS = 1) : valeurs du
+   run 1 au centième. */
+const HS = VIEW.haloScale;
+const LOBE_LILAC = {
+  cx: MONO_X - 1.7 * HS,
+  cy: 1.6 + 1.25 * HS,
+  rx: 3.2 * HS,
+  ry: 2.3 * HS,
+};
+const LOBE_PEACH = {
+  cx: MONO_X + 1.75 * HS,
+  cy: 1.6 - 0.9 * HS,
+  rx: 2.55 * HS,
+  ry: 2.1 * HS,
+};
 const PEACH: readonly number[] = [0.98, 0.762, 0.598];
 const LILAC: readonly number[] = [0.755, 0.702, 0.918];
 
@@ -482,36 +661,144 @@ function floorColor(wx: number, wz: number): [number, number, number] {
 
 /* ── Peinture des textures (une seule fois, cache module) ────── */
 
-function paintCanvas(
+/* La peinture par pixel, découpable : sans `yieldFn` elle est
+   strictement synchrone (mêmes pixels, même ordre — le filet de
+   sécurité des getters) ; avec, elle rend la main au navigateur
+   toutes les ~96 lignes — le main thread respire (le gel mesuré
+   à 3440 était un long task de 8,7 s), le loader anime et reçoit
+   la vraie progression. */
+type YieldFn = (() => Promise<void>) | null;
+
+function paintCanvasInto(
   w: number,
   h: number,
-  color: (u: number, v: number) => [number, number, number]
-): HTMLCanvasElement {
+  color: (u: number, v: number) => [number, number, number],
+  withGrain: boolean,
+  yieldFn: YieldFn,
+  onRow?: (row: number) => void
+): HTMLCanvasElement | Promise<HTMLCanvasElement> {
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext("2d")!;
   const img = ctx.createImageData(w, h);
   const data = img.data;
-  for (let py = 0; py < h; py++) {
+  const paintRow = (py: number) => {
     const v = 1 - py / (h - 1); /* v=1 en haut du canvas */
     for (let px = 0; px < w; px++) {
       const u = px / (w - 1);
       const col = color(u, v);
       /* grain de film — deux octaves déterministes (hash2) : le
-         fin tue le banding, le grossier tue le « digital plat » */
-      const dith =
-        (hash2(u * 1400, v * 1400) - 0.5) * 0.016 +
-        (hash2(u * 340 + 7.3, v * 340 + 2.1) - 0.5) * 0.009;
+         fin tue le banding, le grossier tue le « digital plat ».
+         (En mode wide, le grain est reposé NATIF après upscale.) */
+      const dith = withGrain
+        ? (hash2(u * 1400, v * 1400) - 0.5) * 0.016 +
+          (hash2(u * 340 + 7.3, v * 340 + 2.1) - 0.5) * 0.009
+        : 0;
       const i = (py * w + px) * 4;
       data[i] = Math.round(clamp01(col[0] + dith) * 255);
       data[i + 1] = Math.round(clamp01(col[1] + dith) * 255);
       data[i + 2] = Math.round(clamp01(col[2] + dith) * 255);
       data[i + 3] = 255;
     }
+  };
+  if (!yieldFn) {
+    for (let py = 0; py < h; py++) paintRow(py);
+    ctx.putImageData(img, 0, 0);
+    return canvas;
   }
-  ctx.putImageData(img, 0, 0);
-  return canvas;
+  return (async () => {
+    for (let py = 0; py < h; py++) {
+      paintRow(py);
+      if (py % 96 === 95) {
+        onRow?.(py);
+        await yieldFn();
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    return canvas;
+  })();
+}
+
+function paintCanvas(
+  w: number,
+  h: number,
+  color: (u: number, v: number) => [number, number, number],
+  withGrain = true
+): HTMLCanvasElement {
+  return paintCanvasInto(w, h, color, withGrain, null) as HTMLCanvasElement;
+}
+
+/* ── Grain natif pour textures upscalées (mode wide) ────────────
+   La même signature 2 octaves, précalculée en tuile 512² : le
+   hash par pixel sur 20 Mpx coûterait ~1,5 s ; un bruit répété ne
+   trahit jamais sa tuile. Mêmes amplitudes qu'en peinture (±0,016
+   et ±0,009), mêmes périodes en px de texture — la taille du
+   grain PERÇU reste celle du run 1 : il tue banding et plat. */
+const GRAIN_T = 512;
+let grainTile: Int8Array | null = null;
+function getGrainTile() {
+  if (!grainTile) {
+    grainTile = new Int8Array(GRAIN_T * GRAIN_T);
+    for (let y = 0; y < GRAIN_T; y++) {
+      for (let x = 0; x < GRAIN_T; x++) {
+        const d =
+          (hash2(x * 0.684, y * 1.368) - 0.5) * 0.016 +
+          (hash2(x * 0.166 + 7.3, y * 0.332 + 2.1) - 0.5) * 0.009;
+        grainTile[y * GRAIN_T + x] = Math.max(
+          -127,
+          Math.min(127, Math.round(d * 255))
+        );
+      }
+    }
+  }
+  return grainTile;
+}
+function addFilmGrain(canvas: HTMLCanvasElement): void;
+function addFilmGrain(canvas: HTMLCanvasElement, yieldFn: YieldFn): Promise<void> | void;
+function addFilmGrain(canvas: HTMLCanvasElement, yieldFn: YieldFn = null) {
+  const ctx = canvas.getContext("2d")!;
+  const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = img.data;
+  const tile = getGrainTile();
+  const W = canvas.width;
+  const H = canvas.height;
+  const grainRow = (py: number) => {
+    const trow = (py % GRAIN_T) * GRAIN_T;
+    let i = py * W * 4;
+    for (let px = 0; px < W; px++, i += 4) {
+      const d = tile[trow + (px % GRAIN_T)];
+      data[i] = Math.max(0, Math.min(255, data[i] + d));
+      data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + d));
+      data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + d));
+    }
+  };
+  if (!yieldFn) {
+    for (let py = 0; py < H; py++) grainRow(py);
+    ctx.putImageData(img, 0, 0);
+    return;
+  }
+  return (async () => {
+    for (let py = 0; py < H; py++) {
+      grainRow(py);
+      if (py % 512 === 511) await yieldFn();
+    }
+    ctx.putImageData(img, 0, 0);
+  })();
+}
+
+/* Upscale bicubique navigateur — ne concerne QUE les champs basse
+   fréquence (halo, rais, congé, ombres) : un dégradé interpolé est
+   indiscernable d'un dégradé repeint. */
+function upscaleCanvas(src: HTMLCanvasElement, w: number, h: number) {
+  const out = document.createElement("canvas");
+  out.width = w;
+  out.height = h;
+  const ctx = out.getContext("2d")!;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(src, 0, 0, w, h);
+  return out;
 }
 
 /* ── La couche atelier — le graphisme du plan de travail ────────
@@ -533,11 +820,15 @@ function drawAtelierLayer(canvas: HTMLCanvasElement) {
   const ink = (a: number) => `rgba(${INK_R},${INK_G},${INK_B},${a})`;
 
   /* 1 — la grille éditoriale : colonnes et lignes de base à peine
-     visibles, qui meurent avant le congé */
+     visibles, qui meurent avant le congé. Le pas suit le palier
+     (VIEW.gridStep : ~120 px apparents ; legacy = 1,1 u exact) —
+     les verticales meurent toujours à la lame d'aube (wx 4,4). */
   const gridBottom = FLOOR_Y + 0.55;
+  const step = VIEW.gridStep;
   ctx.lineWidth = Math.max(1.5, unit * 0.012);
-  for (let i = -4; i <= 13; i++) {
-    const wx = -9.9 + i * 1.1;
+  const iMax = Math.round(14.3 / step);
+  for (let i = -4; i <= iMax; i++) {
+    const wx = -9.9 + i * step;
     const major = ((i % 4) + 4) % 4 === 0;
     ctx.strokeStyle = ink(major ? 0.034 : 0.021);
     ctx.beginPath();
@@ -545,8 +836,10 @@ function drawAtelierLayer(canvas: HTMLCanvasElement) {
     ctx.lineTo(X(wx), Y(gridBottom));
     ctx.stroke();
   }
-  for (let j = 0; j <= 13; j++) {
-    const wy = gridBottom + j * 0.55;
+  const stepY = step / 2;
+  const jMax = Math.round(7.15 / stepY);
+  for (let j = 0; j <= jMax; j++) {
+    const wy = gridBottom + j * stepY;
     ctx.strokeStyle = ink(j % 4 === 0 ? 0.03 : 0.019);
     ctx.beginPath();
     ctx.moveTo(X(-10.6), Y(wy));
@@ -608,32 +901,59 @@ function drawAtelierLayer(canvas: HTMLCanvasElement) {
     ctx.lineTo(px, py + c);
     ctx.stroke();
   }
-  /* cote horizontale au-dessus de la zone */
+  /* cote horizontale au-dessus de la zone — legacy uniquement :
+     aux paliers wide le frustum recadré la posait dans la navbar
+     (mesurée sur « PACKS » à 1920) ; les annotations latérales
+     assurent la voix technique */
   const dimY = Y(by1 + 0.42);
-  ctx.strokeStyle = ink(0.12);
-  ctx.beginPath();
-  ctx.moveTo(X(bx0), dimY);
-  ctx.lineTo(X(bx1), dimY);
-  ctx.moveTo(X(bx0), dimY - unit * 0.05);
-  ctx.lineTo(X(bx0), dimY + unit * 0.05);
-  ctx.moveTo(X(bx1), dimY - unit * 0.05);
-  ctx.lineTo(X(bx1), dimY + unit * 0.05);
-  ctx.stroke();
+  if (!VIEW.wide) {
+    ctx.strokeStyle = ink(0.12);
+    ctx.beginPath();
+    ctx.moveTo(X(bx0), dimY);
+    ctx.lineTo(X(bx1), dimY);
+    ctx.moveTo(X(bx0), dimY - unit * 0.05);
+    ctx.lineTo(X(bx0), dimY + unit * 0.05);
+    ctx.moveTo(X(bx1), dimY - unit * 0.05);
+    ctx.lineTo(X(bx1), dimY + unit * 0.05);
+    ctx.stroke();
+  }
   /* annotations mono — lisibilité de décor assumée (ink 0,42 ≈
      contraste 2,4:1, cible ≥ 2,2:1) et positions hors de TOUTE
      colonne de texte : le folio vit haut-gauche (wx −8…−6,
      wy 6…7,5), le bloc titre à gauche (wy 1,5…5), TERRAINS à
      droite (wx 5,5…8, wy 2…3,5) — les annotations occupent le
-     haut-centre et le haut-droit, jamais ces zones. */
+     haut-centre et le haut-droit, jamais ces zones.
+     Aux grands paliers (frustum recadré : le haut du mur sort du
+     champ), elles se recalent dans les TIERS LATÉRAUX du frustum
+     réel — mêmes textes, hauteur ~91 % du champ visible. */
   ctx.fillStyle = ink(0.42);
   ctx.font = `${Math.round(unit * 0.13)}px Consolas, monospace`;
-  ctx.textAlign = "center";
-  ctx.fillText("2260", X((bx0 + bx1) / 2), dimY - unit * 0.07);
-  ctx.textAlign = "left";
-  ctx.fillText("ΛV — EXTRUSION 0.40", X(6.3), Y(7.0));
-  ctx.fillText("R 0.05", X(6.3), Y(6.76));
-  ctx.fillText("BASELINE 0.55", X(-6.85), Y(6.88));
-  ctx.fillText("NV—27", X(-6.85), Y(7.12));
+  if (!VIEW.wide) {
+    ctx.textAlign = "center";
+    ctx.fillText("2260", X((bx0 + bx1) / 2), dimY - unit * 0.07);
+    ctx.textAlign = "left";
+    ctx.fillText("ΛV — EXTRUSION 0.40", X(6.3), Y(7.0));
+    ctx.fillText("R 0.05", X(6.3), Y(6.76));
+    ctx.fillText("BASELINE 0.55", X(-6.85), Y(6.88));
+    ctx.fillText("NV—27", X(-6.85), Y(7.12));
+  } else {
+    ctx.textAlign = "left";
+    const fr = VIEW.frustum;
+    /* le frustum vertical au mur pour la pose du chargement */
+    const pose = poseFor(VIEW.vw, VIEW.aspect);
+    const dWall = pose.pos[2] - WALL_Z;
+    const halfH = dWall * Math.tan((pose.fov * Math.PI) / 360);
+    const cy = pose.pos[1] + ((pose.look[1] - pose.pos[1]) / (pose.pos[2] - pose.look[2] || 1)) * dWall;
+    const topY = cy + halfH;
+    const wxR = fr.right - 0.16 * fr.width;
+    /* la colonne gauche démarre à ~180 px écran : toujours à
+       droite du logo navbar, quel que soit le palier */
+    const wxL = Math.max(WALL_X0 + 0.6, fr.left + (180 / VIEW.vw) * fr.width);
+    ctx.fillText("ΛV — EXTRUSION 0.40", X(wxR), Y(topY - 0.09 * 2 * halfH));
+    ctx.fillText("R 0.05", X(wxR), Y(topY - 0.09 * 2 * halfH - 0.26));
+    ctx.fillText("BASELINE 0.55", X(wxL), Y(topY - 0.07 * 2 * halfH));
+    ctx.fillText("NV—27", X(wxL), Y(topY - 0.07 * 2 * halfH - 0.26));
+  }
 }
 
 function makeTexture(canvas: HTMLCanvasElement, anisotropy: number) {
@@ -655,8 +975,10 @@ const ACC_Y0 = FLOOR_Y;
 const ACC_Y1 = ACCENT_TOP + 1.5;
 
 /* La lame, en passe additive sur le canvas fini (espace sRGB,
-   comme toute la peinture) */
-function addAccentToCanvas(canvas: HTMLCanvasElement) {
+   comme toute la peinture) — découpable comme la peinture */
+function addAccentToCanvas(canvas: HTMLCanvasElement): void;
+function addAccentToCanvas(canvas: HTMLCanvasElement, yieldFn: YieldFn): Promise<void> | void;
+function addAccentToCanvas(canvas: HTMLCanvasElement, yieldFn: YieldFn = null) {
   const W = canvas.width;
   const H = canvas.height;
   const px0 = Math.floor(((ACC_X0 - WALL_X0) / WALL_W) * W);
@@ -667,7 +989,7 @@ function addAccentToCanvas(canvas: HTMLCanvasElement) {
   const img = ctx.getImageData(px0, py0, px1 - px0, py1 - py0);
   const data = img.data;
   const rw = px1 - px0;
-  for (let py = py0; py < py1; py++) {
+  const accentRow = (py: number) => {
     const wy = FLOOR_Y + (1 - py / (H - 1)) * (WALL_TOP - FLOOR_Y);
     for (let px = px0; px < px1; px++) {
       const wx = WALL_X0 + (px / (W - 1)) * WALL_W;
@@ -678,35 +1000,87 @@ function addAccentToCanvas(canvas: HTMLCanvasElement) {
       data[i + 1] = Math.min(252, data[i + 1] + Math.round(g * 255));
       data[i + 2] = Math.min(252, data[i + 2] + Math.round(b * 255));
     }
+  };
+  if (!yieldFn) {
+    for (let py = py0; py < py1; py++) accentRow(py);
+    ctx.putImageData(img, px0, py0);
+    return;
   }
-  ctx.putImageData(img, px0, py0);
+  return (async () => {
+    for (let py = py0; py < py1; py++) {
+      accentRow(py);
+      if ((py - py0) % 256 === 255) await yieldFn();
+    }
+    ctx.putImageData(img, px0, py0);
+  })();
 }
 
 /* Le mur de base (SANS lame) — peint une seule fois, sert deux
    maîtres : la texture finale (base + lame) et le cache d'allumage
    (copie exacte de la région, lame éteinte). */
+/* Construction du mur de base — MÊME séquence en sync (filet des
+   getters) et en async découpé (prepareSceneTextures) : une seule
+   écriture, zéro divergence de pixels. */
 let wallBaseCanvas: HTMLCanvasElement | null = null;
-function getWallBaseCanvas() {
-  if (!wallBaseCanvas) {
-    wallBaseCanvas = paintCanvas(WALL_TEX_W, WALL_TEX_H, (u, v) =>
-      /* v=1 ↔ haut du mur */
-      wallColor(WALL_X0 + u * WALL_W, FLOOR_Y + v * (WALL_TOP - FLOOR_Y))
+const wallField = (u: number, v: number) =>
+  /* v=1 ↔ haut du mur */
+  wallColor(WALL_X0 + u * WALL_W, FLOOR_Y + v * (WALL_TOP - FLOOR_Y));
+
+async function buildWallBaseAsync(yieldFn: YieldFn, onStep: (p: number) => void) {
+  if (wallBaseCanvas) return wallBaseCanvas;
+  if (!VIEW.wide) {
+    const c = await paintCanvasInto(WALL_TEX_W, WALL_TEX_H, wallField, true, yieldFn, (row) =>
+      onStep((row / WALL_TEX_H) * 0.9)
     );
-    drawAtelierLayer(wallBaseCanvas);
+    drawAtelierLayer(c);
+    onStep(1);
+    wallBaseCanvas = c;
+  } else {
+    const fields = await paintCanvasInto(WALL_TEX_W, WALL_TEX_H, wallField, false, yieldFn, (row) =>
+      onStep((row / WALL_TEX_H) * 0.5)
+    );
+    const up = upscaleCanvas(fields, VIEW.wallOutW, VIEW.wallOutH);
+    onStep(0.55);
+    await addFilmGrain(up, yieldFn);
+    onStep(0.9);
+    drawAtelierLayer(up);
+    onStep(1);
+    wallBaseCanvas = up;
   }
   return wallBaseCanvas;
 }
 
+function getWallBaseCanvas() {
+  if (!wallBaseCanvas) {
+    if (!VIEW.wide) {
+      /* legacy : le pipeline du run 1, identique au pixel */
+      wallBaseCanvas = paintCanvas(WALL_TEX_W, WALL_TEX_H, wallField);
+      drawAtelierLayer(wallBaseCanvas);
+    } else {
+      /* wide : champs 2048 → upscale → grain natif → vectoriel
+         natif (grille, filigrane, annotations à pleine densité) */
+      const fields = paintCanvas(WALL_TEX_W, WALL_TEX_H, wallField, false);
+      wallBaseCanvas = upscaleCanvas(fields, VIEW.wallOutW, VIEW.wallOutH);
+      addFilmGrain(wallBaseCanvas);
+      drawAtelierLayer(wallBaseCanvas);
+    }
+  }
+  return wallBaseCanvas;
+}
+
+let wallFinalCanvas: HTMLCanvasElement | null = null;
 let wallTexture: THREE.CanvasTexture | null = null;
 function getWallTexture() {
   if (!wallTexture) {
-    const base = getWallBaseCanvas();
-    const canvas = document.createElement("canvas");
-    canvas.width = base.width;
-    canvas.height = base.height;
-    canvas.getContext("2d")!.drawImage(base, 0, 0);
-    addAccentToCanvas(canvas);
-    wallTexture = makeTexture(canvas, 4);
+    if (!wallFinalCanvas) {
+      const base = getWallBaseCanvas();
+      wallFinalCanvas = document.createElement("canvas");
+      wallFinalCanvas.width = base.width;
+      wallFinalCanvas.height = base.height;
+      wallFinalCanvas.getContext("2d")!.drawImage(base, 0, 0);
+      addAccentToCanvas(wallFinalCanvas);
+    }
+    wallTexture = makeTexture(wallFinalCanvas, 4);
   }
   return wallTexture;
 }
@@ -752,7 +1126,8 @@ function drawMonogramReflection(canvas: HTMLCanvasElement) {
   grad.addColorStop(0.45, "rgba(52,44,96,0.07)");
   grad.addColorStop(1, "rgba(43,36,80,0)");
   ctx.save();
-  ctx.filter = "blur(5px)";
+  /* le blur suit la densité de la texture (5 px @ 1536) */
+  ctx.filter = `blur(${((5 * W) / 1536).toFixed(1)}px)`;
   ctx.fillStyle = grad;
   ctx.beginPath();
   for (const poly of LOGO_POLYS) {
@@ -788,18 +1163,95 @@ function buildWallBottomRow() {
   wallBottomRow = row;
 }
 
+let floorFinalCanvas: HTMLCanvasElement | null = null;
 let floorTexture: THREE.CanvasTexture | null = null;
+const floorField = (u: number, v: number) =>
+  /* v=1 ↔ fond du sol (contre le mur, z = WALL_Z) */
+  floorColor(WALL_X0 + u * WALL_W, WALL_Z + (1 - v) * FLOOR_D);
+
+async function buildFloorAsync(yieldFn: YieldFn, onStep: (p: number) => void) {
+  if (floorFinalCanvas) return floorFinalCanvas;
+  buildWallBottomRow();
+  if (!VIEW.wide) {
+    const c = await paintCanvasInto(FLOOR_TEX_W, FLOOR_TEX_H, floorField, true, yieldFn, (row) =>
+      onStep((row / FLOOR_TEX_H) * 0.92)
+    );
+    drawMonogramReflection(c);
+    onStep(1);
+    floorFinalCanvas = c;
+  } else {
+    const fields = await paintCanvasInto(FLOOR_TEX_W, FLOOR_TEX_H, floorField, false, yieldFn, (row) =>
+      onStep((row / FLOOR_TEX_H) * 0.55)
+    );
+    const up = upscaleCanvas(fields, VIEW.floorOutW, VIEW.floorOutH);
+    onStep(0.6);
+    await addFilmGrain(up, yieldFn);
+    onStep(0.95);
+    drawMonogramReflection(up);
+    onStep(1);
+    floorFinalCanvas = up;
+  }
+  return floorFinalCanvas;
+}
+
 function getFloorTexture() {
   if (!floorTexture) {
-    buildWallBottomRow();
-    const canvas = paintCanvas(FLOOR_TEX_W, FLOOR_TEX_H, (u, v) =>
-      /* v=1 ↔ fond du sol (contre le mur, z = WALL_Z) */
-      floorColor(WALL_X0 + u * WALL_W, WALL_Z + (1 - v) * FLOOR_D)
-    );
-    drawMonogramReflection(canvas);
-    floorTexture = makeTexture(canvas, 8);
+    if (!floorFinalCanvas) {
+      buildWallBottomRow();
+      if (!VIEW.wide) {
+        floorFinalCanvas = paintCanvas(FLOOR_TEX_W, FLOOR_TEX_H, floorField);
+        drawMonogramReflection(floorFinalCanvas);
+      } else {
+        const fields = paintCanvas(FLOOR_TEX_W, FLOOR_TEX_H, floorField, false);
+        floorFinalCanvas = upscaleCanvas(fields, VIEW.floorOutW, VIEW.floorOutH);
+        addFilmGrain(floorFinalCanvas);
+        drawMonogramReflection(floorFinalCanvas);
+      }
+    }
+    floorTexture = makeTexture(floorFinalCanvas, 8);
   }
   return floorTexture;
+}
+
+/* ── Préparation asynchrone des textures — la scène sans gel ────
+   Peint tout AVANT le montage du Canvas, en tranches qui rendent
+   la main (~10-20 ms de travail par macro-tâche) : le poster et
+   le loader restent vivants, et chaque étape émet sa progression
+   RÉELLE (window « neva:progress », consommée par l'ouverture).
+   Idempotent ; strictement les mêmes pixels que le chemin sync. */
+let scenePrepPromise: Promise<void> | null = null;
+export function prepareSceneTextures(
+  onProgress?: (p: number) => void
+): Promise<void> {
+  if (scenePrepPromise) return scenePrepPromise;
+  const yieldFn: YieldFn = () => new Promise((r) => setTimeout(r, 0));
+  /* pondération : mur (peinture+grain) ~55 %, lame 8 %, sol 37 % */
+  const emit = (p: number) => {
+    onProgress?.(p);
+    try {
+      window.dispatchEvent(
+        new CustomEvent("neva:progress", { detail: { phase: "scene", p } })
+      );
+    } catch {
+      /* environnement sans CustomEvent : silencieux */
+    }
+  };
+  scenePrepPromise = (async () => {
+    await buildWallBaseAsync(yieldFn, (p) => emit(p * 0.5));
+    const base = wallBaseCanvas!;
+    if (!wallFinalCanvas) {
+      const c = document.createElement("canvas");
+      c.width = base.width;
+      c.height = base.height;
+      c.getContext("2d")!.drawImage(base, 0, 0);
+      await addAccentToCanvas(c, yieldFn);
+      wallFinalCanvas = c;
+    }
+    emit(0.58);
+    await buildFloorAsync(yieldFn, (p) => emit(0.58 + p * 0.4));
+    emit(1);
+  })();
+  return scenePrepPromise;
 }
 
 /* ── Le décor que l'œil voit — deux plans réels ────────────────
@@ -1010,16 +1462,16 @@ const GLSL_SAMPLER = `
 		if ( tFloor < tWall && tFloor < tBack ) {
 			vec3 p = ro + rd * tFloor;
 			vec2 uv = vec2( ( p.x - ${fmt(WALL_X0)} ) / ${fmt(WALL_W)}, 1.0 - ( p.z - ${fmt(WALL_Z)} ) / ${fmt(FLOOR_D)} );
-			s = textureBicubic( uFloorMap, clamp( uv, 0.002, 0.998 ), ${fmt(Math.log2(FLOOR_TEX_W))} * rr );
+			s = textureBicubic( uFloorMap, clamp( uv, 0.002, 0.998 ), ${fmt(Math.log2(VIEW.floorOutW))} * rr );
 		} else if ( tBack < tWall ) {
 			/* mur virtuel derrière la caméra — même matière, en miroir */
 			vec3 p = ro + rd * tBack;
 			vec2 uv = vec2( 1.0 - ( p.x - ${fmt(WALL_X0)} ) / ${fmt(WALL_W)}, ( p.y - ${fmt(FLOOR_Y)} ) / ${fmt(WALL_TOP - FLOOR_Y)} );
-			s = textureBicubic( uWallMap, clamp( uv, 0.002, 0.998 ), ${fmt(Math.log2(WALL_TEX_W))} * ( rr + 0.06 ) );
+			s = textureBicubic( uWallMap, clamp( uv, 0.002, 0.998 ), ${fmt(Math.log2(VIEW.wallOutW))} * ( rr + 0.06 ) );
 		} else {
 			vec3 p = ro + rd * min( tWall, 44.0 );
 			vec2 uv = vec2( ( p.x - ${fmt(WALL_X0)} ) / ${fmt(WALL_W)}, ( p.y - ${fmt(FLOOR_Y)} ) / ${fmt(WALL_TOP - FLOOR_Y)} );
-			s = textureBicubic( uWallMap, clamp( uv, 0.002, 0.998 ), ${fmt(Math.log2(WALL_TEX_W))} * rr );
+			s = textureBicubic( uWallMap, clamp( uv, 0.002, 0.998 ), ${fmt(Math.log2(VIEW.wallOutW))} * rr );
 		}
 		/* le cristal concentre : gain de contraste sur le décor
 		   traversé, pivot calé sur l'ivoire du cyc (~0.88) — les
@@ -1444,45 +1896,17 @@ function SceneLights() {
   );
 }
 
-/* ── Cadrages — la même scène, six compositions ────────────────
-   La sculpture ne bouge jamais : chaque breakpoint est un
-   mouvement de caméra (position, focale, visée). ≥ 1024 : la
-   sculpture vit à droite du texte ; en dessous : elle revient au
-   centre, sous le texte. */
-type Pose = {
-  pos: [number, number, number];
-  fov: number;
-  look: [number, number, number];
-};
-
-const POSES: { min: number; pose: Pose }[] = [
-  { min: 1680, pose: { pos: [0.3, 1.02, 11.6], fov: 29, look: [0.9, 0.46, 0] } },
-  { min: 1360, pose: { pos: [0.22, 1.0, 10.9], fov: 31, look: [0.85, 0.44, 0] } },
-  { min: 1152, pose: { pos: [0.18, 0.98, 10.6], fov: 32, look: [0.83, 0.42, 0] } },
-  { min: 1024, pose: { pos: [0.3, 0.96, 10.9], fov: 33, look: [0.62, 0.4, 0] } },
-  /* < lg : le monogramme est cadré ENTIER dans la fenêtre entre le
-     titre et les CTA — jamais tronqué (viser bas descend la
-     sculpture à l'écran, la garde au sol visible autour) */
-  { min: 600, pose: { pos: [1.0, 0.95, 12.6], fov: 36, look: [1.0, 0.52, 0] } },
-  /* aligné sur le monogramme (MONO_X = 1.4) : la pièce reste
-     centrée et ENTIÈRE dans le cadre à toutes les largeurs */
-  { min: 390, pose: { pos: [1.35, 0.9, 13.2], fov: 40, look: [1.35, 0.45, 0] } },
-  /* très petits écrans (360×780) : le bloc texte mange plus de
-     hauteur — la caméra recule et vise haut pour poser la
-     sculpture plus bas, sous le sous-texte, entière */
-  { min: 0, pose: { pos: [1.35, 1.0, 15.0], fov: 40, look: [1.35, 2.5, 0] } },
-];
-
-function poseForWidth(w: number): Pose {
-  for (const { min, pose } of POSES) if (w >= min) return pose;
-  return POSES[POSES.length - 1].pose;
-}
+/* (Les cadrages POSES vivent en tête de module : le layout de
+   scène VIEW en dépend pour caler le frustum du chargement.) */
 
 function CameraRig() {
   const appliedFov = useRef(-1);
 
   useFrame((state) => {
-    const pose = poseForWidth(window.innerWidth);
+    const pose = poseFor(
+      window.innerWidth,
+      window.innerWidth / Math.max(1, window.innerHeight)
+    );
     const cam = state.camera as THREE.PerspectiveCamera;
     if (appliedFov.current !== pose.fov) {
       appliedFov.current = pose.fov;
@@ -1549,6 +1973,21 @@ export default function GlassSculpture({
   const host = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(true);
   const [ready, setReady] = useState(false);
+  /* les textures se peignent AVANT le montage du Canvas, en
+     tranches asynchrones : zéro long task (8,7 s de gel mesurés à
+     3440 en un seul bloc), le poster reste vivant, le loader lit
+     la progression réelle */
+  const [texReady, setTexReady] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    prepareSceneTextures().then(() => {
+      if (alive) setTexReady(true);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   useEffect(() => {
     const el = host.current;
@@ -1585,8 +2024,11 @@ export default function GlassSculpture({
           fallback (rien) et le poster baké de GivreHero — la même
           scène, en image — reste visible dessous. Jamais d'autre
           design. */}
+      {texReady ? (
       <Canvas
-        dpr={[1, 1.5]}
+        /* run 2 : plafond 2 (un 4K en scaling 200 % rend natif) —
+           jamais au-delà, budget GIVRE §4 */
+        dpr={[1, 2]}
         flat
         fallback={null}
         frameloop={inView ? "always" : "never"}
@@ -1607,6 +2049,7 @@ export default function GlassSculpture({
           onReady?.();
           if (process.env.NODE_ENV === "development") {
             (window as unknown as { __sculpt?: unknown }).__sculpt = state;
+            (window as unknown as { __sculptView?: unknown }).__sculptView = VIEW;
           }
         }}
         style={{ pointerEvents: "none" }}
@@ -1628,6 +2071,7 @@ export default function GlassSculpture({
           resolution={512}
         />
       </Canvas>
+      ) : null}
     </div>
   );
 }

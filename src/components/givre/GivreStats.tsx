@@ -27,7 +27,7 @@ export default function GivreStats() {
       <div aria-hidden className="pv-scene-bg pv-scene-bg--dawn-calm" />
       <div aria-hidden className="pv-caustics" />
 
-      <div className="relative mx-auto max-w-[1140px] px-5 py-16 sm:px-8 lg:py-20">
+      <div className="relative mx-auto pv-container px-5 py-16 sm:px-8 lg:py-20">
         {/* Pagination discrète, label en regard — la ligne d'en-tête */}
         <RevealBlock>
           <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">

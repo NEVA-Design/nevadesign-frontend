@@ -326,7 +326,7 @@ export default function GivreModules() {
     <section id="modules" className="pv-scene">
       <div aria-hidden className="pv-scene-bg pv-scene-bg--glacier" />
       <div aria-hidden className="pv-caustics" />
-      <div className="relative mx-auto max-w-[1140px] px-5 py-20 sm:px-8 lg:py-24">
+      <div className="relative mx-auto pv-container px-5 py-20 sm:px-8 lg:py-24">
         {/* En-tête latéral droit — le miroir du hero : la pagination
             et le titre se rangent contre le filet droit du cadre */}
         <div className="flex flex-col items-end text-right">
@@ -340,7 +340,7 @@ export default function GivreModules() {
             </p>
           </RevealBlock>
           <RevealMask className="mt-4">
-            <h2 className="max-w-[720px] font-display text-[clamp(2rem,4.4vw,3.3rem)] font-light leading-[1.12] tracking-[-0.015em] text-slate">
+            <h2 className="max-w-[720px] font-display pv-t-mid font-light leading-[1.12] tracking-[-0.015em] text-slate">
               {t("bento.title", "Six modules. Une seule direction artistique.")}
             </h2>
           </RevealMask>

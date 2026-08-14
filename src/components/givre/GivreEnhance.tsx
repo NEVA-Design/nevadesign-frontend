@@ -113,7 +113,7 @@ export default function GivreEnhance() {
       <div aria-hidden className="pv-scene-bg--dawn-calm absolute inset-0" />
       <div aria-hidden className="pv-caustics" />
 
-      <div className="relative z-10 mx-auto w-full max-w-[1140px] px-5 sm:px-8">
+      <div className="relative z-10 mx-auto w-full pv-container px-5 sm:px-8">
         {/* En-tête éditorial centré — la symétrie est l'identité
             de cette section, à rebours des deux voisines */}
         <div className="mx-auto max-w-[640px] text-center">
@@ -129,7 +129,7 @@ export default function GivreEnhance() {
             </p>
           </RevealBlock>
           <RevealMask className="mt-4">
-            <h2 className="font-display text-[clamp(2rem,4.6vw,3.4rem)] leading-[1.1] tracking-[-0.015em]">
+            <h2 className="font-display pv-section-title leading-[1.1] tracking-[-0.015em]">
               <span className="block font-light text-slate">{titleLead}</span>
               {titleAccent ? (
                 <span className="block font-medium text-ink">

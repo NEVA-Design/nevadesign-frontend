@@ -116,7 +116,7 @@ export default function GivreFooter() {
           }}
         />
 
-        <div className="relative z-10 mx-auto flex min-h-[76vh] max-w-[1140px] flex-col items-center justify-center px-6 py-28 text-center sm:px-8 lg:py-36">
+        <div className="relative z-10 mx-auto flex min-h-[76vh] pv-container flex-col items-center justify-center px-6 py-28 text-center sm:px-8 lg:py-36">
           <RevealBlock>
             <p className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
               {t(
@@ -127,7 +127,7 @@ export default function GivreFooter() {
           </RevealBlock>
 
           <RevealMask className="mt-7">
-            <h2 className="mx-auto max-w-[900px] font-display text-[clamp(2.4rem,5.6vw,4.6rem)] font-light leading-[1.08] tracking-[-0.015em] text-slate">
+            <h2 className="mx-auto max-w-[900px] font-display pv-t-colophon font-light leading-[1.08] tracking-[-0.015em] text-slate">
               {t("footer.cta.title.a", "Publiez quelque chose dont votre communauté")}{" "}
               <span className="font-medium text-ink">
                 {t("footer.cta.title.beam", "sera fière.")}
@@ -177,7 +177,7 @@ export default function GivreFooter() {
           <path d="M575 0 L755.1 0 L1013 618 L1266.6 0 L1438.1 0 L1015.2 990 Z" />
           <path d="M893.4 0 L1134.1 0 L1013.7 292 Z" />
         </svg>
-        <div className="relative mx-auto max-w-[1140px] px-5 sm:px-8">
+        <div className="relative mx-auto pv-container px-5 sm:px-8">
           <div className="grid gap-12 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-16">
             <div>
               <Image
@@ -221,7 +221,7 @@ export default function GivreFooter() {
 
         {/* Rangée basse — copyright, heure du studio, réseaux */}
         <div className="relative border-t border-[rgba(43,36,80,0.07)]">
-          <div className="mx-auto flex max-w-[1140px] flex-col items-start justify-between gap-4 px-5 py-7 sm:flex-row sm:items-center sm:px-8">
+          <div className="mx-auto flex pv-container flex-col items-start justify-between gap-4 px-5 py-7 sm:flex-row sm:items-center sm:px-8">
             <p className="font-mono text-[11px] tracking-[0.1em] text-mist">
               © {year} Neva Design · {t("footer.rights", "Tous droits réservés.")}
             </p>

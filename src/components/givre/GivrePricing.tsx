@@ -28,7 +28,7 @@ export default function GivrePricing() {
       <div aria-hidden className="pv-caustics" />
       <div aria-hidden className="pv-windowlight opacity-60" />
 
-      <div className="relative mx-auto max-w-[1140px] px-5 py-20 sm:px-8 lg:py-24">
+      <div className="relative mx-auto pv-container px-5 py-20 sm:px-8 lg:py-24">
         {/* En-tête centré — pagination, label, titre, sous-titre */}
         <div className="text-center">
           <RevealBlock>
@@ -41,7 +41,7 @@ export default function GivrePricing() {
             </p>
           </RevealBlock>
           <RevealMask className="mt-4">
-            <h2 className="pv-display mx-auto max-w-[720px] text-[clamp(2rem,4.6vw,3.4rem)]">
+            <h2 className="pv-display mx-auto max-w-[720px] pv-section-title">
               {t("pricing.title.a", "Moins cher qu'un logo.")}{" "}
               <span className="pv-display-strong">
                 {t("pricing.title.beam", "Pour toute une identité.")}
@@ -60,7 +60,7 @@ export default function GivrePricing() {
 
         {/* LE panneau — quatre plans en rangées, filets encre entre eux */}
         <RevealBlock delay={0.15} className="mt-12">
-          <div className="pv-glass relative mx-auto max-w-[940px] rounded-[22px] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_2px_6px_rgba(96,84,140,0.1),0_16px_40px_rgba(96,84,140,0.13)] sm:px-5 sm:py-4">
+          <div className="pv-glass relative mx-auto max-w-[clamp(940px,45vw,1180px)] rounded-[22px] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_2px_6px_rgba(96,84,140,0.1),0_16px_40px_rgba(96,84,140,0.13)] sm:px-5 sm:py-4">
             {PLAN_ORDER.map((planId, index) => {
               const plan = PLANS[planId];
               const featured = planId === FEATURED_PLAN;

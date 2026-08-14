@@ -35,7 +35,7 @@ export default function GivreCreations() {
           }}
         >
           <div>
-            <h2 className="font-display text-[clamp(28px,3.6vw,44px)] font-light leading-[1.1] tracking-[-0.015em] text-slate">
+            <h2 className="font-display pv-t-creations font-light leading-[1.1] tracking-[-0.015em] text-slate">
               {t("wall.title.a", "Les créations sortent")}{" "}
               <span className="font-medium text-ink">
                 {t("wall.title.b", "d'ici.")}

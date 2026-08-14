@@ -230,7 +230,7 @@ export default function NevaDesignPage({
               <GlassLens size={130} floatY={-10} floatDur={9} groundShadow={false} />
             </div>
 
-            <div className="relative mx-auto flex w-full max-w-[1200px] flex-1 flex-col items-center justify-center px-5 text-center sm:px-8">
+            <div className="relative mx-auto flex w-full pv-container--wide flex-1 flex-col items-center justify-center px-5 text-center sm:px-8">
               <RevealBlock className="mb-8">
                 <span className="inline-flex min-h-[32px] items-center gap-2.5 rounded-full border border-[color:var(--hairline-glass)] bg-[rgba(255,255,255,0.6)] px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(43,36,80,0.05),0_10px_24px_rgba(43,36,80,0.06)]">
                   <span className="pv-breathe h-[5px] w-[5px] rounded-full bg-periwinkle" />
@@ -240,7 +240,7 @@ export default function NevaDesignPage({
                 </span>
               </RevealBlock>
               <RevealBlock delay={0.1}>
-                <h1 className="pv-display text-[clamp(3.4rem,12vw,10rem)] leading-[0.98]">
+                <h1 className="pv-display pv-t-showcase-hero leading-[0.98]">
                   Neva <span className="pv-display-strong">Design</span>
                 </h1>
               </RevealBlock>
@@ -331,7 +331,7 @@ export default function NevaDesignPage({
           <section id="portfolio" className="pv-scene">
             <div aria-hidden className="pv-scene-bg pv-scene-bg--dawn-calm" />
             <div aria-hidden className="pv-caustics" />
-            <div className="relative mx-auto max-w-[1200px] px-5 pb-28 pt-28 sm:px-8 lg:pb-36 lg:pt-32">
+            <div className="relative mx-auto pv-container--wide px-5 pb-28 pt-28 sm:px-8 lg:pb-36 lg:pt-32">
               <div className="flex flex-wrap items-end justify-between gap-10">
                 <RevealBlock>
                   <div className="pv-page-num [&>b]:text-[52px]">
@@ -341,7 +341,7 @@ export default function NevaDesignPage({
                   <p className="mt-6 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
                     Portfolio sélectionné
                   </p>
-                  <h2 className="mt-4 font-display text-[clamp(2rem,4.6vw,3.4rem)] font-light leading-[1.08] tracking-[-0.015em] text-slate">
+                  <h2 className="mt-4 font-display pv-section-title font-light leading-[1.08] tracking-[-0.015em] text-slate">
                     Chaque serveur,{" "}
                     <span className="font-medium text-ink">une signature.</span>
                   </h2>
@@ -421,13 +421,13 @@ export default function NevaDesignPage({
         <section id="services" className="pv-scene">
           <div aria-hidden className="pv-scene-bg pv-scene-bg--glacier" />
           <div aria-hidden className="pv-caustics" />
-          <div className="relative mx-auto max-w-[1200px] px-5 pb-28 pt-28 sm:px-8 lg:pb-32 lg:pt-32">
+          <div className="relative mx-auto pv-container--wide px-5 pb-28 pt-28 sm:px-8 lg:pb-32 lg:pt-32">
             <div className="flex flex-wrap items-end justify-between gap-10">
               <RevealBlock>
                 <p className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
                   Services
                 </p>
-                <h2 className="mt-4 font-display text-[clamp(2rem,4.6vw,3.4rem)] font-light leading-[1.08] tracking-[-0.015em] text-slate">
+                <h2 className="mt-4 font-display pv-section-title font-light leading-[1.08] tracking-[-0.015em] text-slate">
                   Quatre métiers,{" "}
                   <span className="font-medium text-ink">une exigence.</span>
                 </h2>
@@ -507,7 +507,7 @@ export default function NevaDesignPage({
           <div aria-hidden className="pv-caustics" />
           <hr className="pv-rule--beam relative" />
 
-          <div className="relative mx-auto max-w-[1200px] px-5 py-32 text-center sm:px-8 lg:py-44">
+          <div className="relative mx-auto pv-container--wide px-5 py-32 text-center sm:px-8 lg:py-44">
             <RevealBlock>
               <div className="flex justify-center">
                 <div className="pv-page-num [&>b]:text-[52px]">
@@ -518,7 +518,7 @@ export default function NevaDesignPage({
               <p className="mt-6 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
                 Contact
               </p>
-              <h2 className="mx-auto mt-5 max-w-4xl font-display text-[clamp(2.2rem,5.6vw,4.6rem)] font-light leading-[1.08] tracking-[-0.015em] text-slate">
+              <h2 className="mx-auto mt-5 max-w-4xl font-display pv-t-showcase-cta font-light leading-[1.08] tracking-[-0.015em] text-slate">
                 Votre image mérite{" "}
                 <span className="font-medium text-ink">un studio.</span>
               </h2>
@@ -544,7 +544,7 @@ export default function NevaDesignPage({
 
           {/* Bas de page — un filet blanc sur la scène */}
           <div className="relative border-t border-[rgba(255,255,255,0.55)]">
-            <div className="mx-auto flex max-w-[1200px] flex-col items-start justify-between gap-4 px-5 py-7 sm:flex-row sm:items-center sm:px-8">
+            <div className="mx-auto flex pv-container--wide flex-col items-start justify-between gap-4 px-5 py-7 sm:flex-row sm:items-center sm:px-8">
               <Brand size={18} tone="ink" />
               <p className="font-mono text-[11px] tracking-[0.1em] text-mist">
                 © {new Date().getFullYear()} Neva Design · Tous droits réservés.

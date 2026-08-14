@@ -88,7 +88,7 @@ export default function GivrePacks() {
         }
       />
 
-      <div className="relative mx-auto max-w-[1140px] px-5 py-20 sm:px-8 lg:py-24">
+      <div className="relative mx-auto pv-container px-5 py-20 sm:px-8 lg:py-24">
         {/* En-tête latéral gauche — pagination, label, titre */}
         <RevealBlock>
           <div className="max-w-[700px]">
@@ -99,7 +99,7 @@ export default function GivrePacks() {
             <p className="mt-6 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
               {t("resources.label", "Packs du studio")}
             </p>
-            <h2 className="pv-display mt-4 text-[clamp(2rem,4.6vw,3.4rem)]">
+            <h2 className="pv-display mt-4 pv-section-title">
               {t("resources.title.a", "Les outils du studio,")}{" "}
               <span className="pv-display-strong">
                 {t("resources.title.beam", "dans vos mains.")}

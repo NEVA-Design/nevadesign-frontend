@@ -36,7 +36,7 @@ function FieldRow({
           <p className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
             {kicker}
           </p>
-          <h3 className="mt-4 font-display text-[clamp(26px,2.4vw,30px)] font-normal leading-[1.15] tracking-[-0.012em] text-ink">
+          <h3 className="mt-4 font-display pv-t-field-card font-normal leading-[1.15] tracking-[-0.012em] text-ink">
             {title}
           </h3>
           <p className="mt-3 max-w-[420px] text-[14.5px] leading-[1.7] text-slate">
@@ -121,7 +121,7 @@ export default function GivreFields() {
       <div aria-hidden className="pv-scene-bg pv-scene-bg--dawn-calm" />
       <div aria-hidden className="pv-caustics" />
 
-      <div className="relative mx-auto max-w-[1140px] px-5 pb-24 pt-24 sm:px-8 sm:pb-32 sm:pt-28">
+      <div className="relative mx-auto pv-container px-5 pb-24 pt-24 sm:px-8 sm:pb-32 sm:pt-28">
         {/* En-tête paginé — tout à gauche, l'UI chuchote */}
         <header className="max-w-[760px]">
           <RevealBlock>
@@ -136,7 +136,7 @@ export default function GivreFields() {
             </p>
           </RevealBlock>
           <RevealMask delay={0.12} className="mt-4">
-            <h2 className="font-display text-[clamp(34px,4.5vw,54px)] font-light leading-[1.08] tracking-[-0.015em] text-slate">
+            <h2 className="font-display pv-t-fields font-light leading-[1.08] tracking-[-0.015em] text-slate">
               {titleHead}
               {titleTail ? (
                 <span className="font-medium text-ink">{titleTail}</span>

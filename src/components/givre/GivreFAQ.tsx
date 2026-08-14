@@ -65,7 +65,7 @@ export default function GivreFAQ() {
       {/* Scène dawn diluée, sans caustiques : la respiration avant
           la finale */}
       <div aria-hidden className="pv-scene-bg pv-scene-bg--dawn-calm" />
-      <div className="relative mx-auto grid max-w-[1140px] gap-14 px-5 py-24 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20 lg:py-28">
+      <div className="relative mx-auto grid pv-container gap-14 px-5 py-24 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20 lg:py-28">
         {/* Colonne sticky — folio, titre et appel */}
         <RevealBlock>
           <div className="lg:sticky lg:top-28">
@@ -76,7 +76,7 @@ export default function GivreFAQ() {
             <p className="mt-7 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
               {t("faq.label", "Questions")}
             </p>
-            <h2 className="mt-5 font-display text-[clamp(2rem,4.4vw,3.3rem)] font-light leading-[1.12] tracking-[-0.015em] text-slate">
+            <h2 className="mt-5 font-display pv-t-mid font-light leading-[1.12] tracking-[-0.015em] text-slate">
               {t("faq.title.a", "Tout ce qu'on nous demande")}{" "}
               <span className="font-medium text-ink">
                 {t("faq.title.beam", "avant de se lancer.")}

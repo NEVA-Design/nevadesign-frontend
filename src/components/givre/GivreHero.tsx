@@ -97,8 +97,31 @@ export default function GivreHero() {
     >
       {/* Poster baké de la même scène (par cadrage) — visible pendant
           le chargement du canvas, et seul fallback si WebGL est
-          indisponible. Jamais une autre version du design. */}
+          indisponible. Jamais une autre version du design.
+          Les media queries suivent EXACTEMENT les frontières des
+          poses caméra (GlassSculpture.POSES) : le fondu poster →
+          canvas reste un raccord, jamais un saut. */}
       <picture>
+        <source
+          media="(min-width: 2880px) and (min-aspect-ratio: 2/1)"
+          srcSet="/scene/hero-poster-3440.webp"
+        />
+        <source
+          media="(min-width: 3560px)"
+          srcSet="/scene/hero-poster-1920.webp"
+        />
+        <source
+          media="(min-width: 2200px)"
+          srcSet="/scene/hero-poster-2560.webp"
+        />
+        <source
+          media="(min-width: 1920px)"
+          srcSet="/scene/hero-poster-1920.webp"
+        />
+        <source
+          media="(min-width: 1680px)"
+          srcSet="/scene/hero-poster-1680.webp"
+        />
         <source
           media="(max-width: 1023px)"
           srcSet="/scene/hero-poster-390.webp"
@@ -138,7 +161,9 @@ export default function GivreHero() {
         }}
       >
         <div className="w-full lg:pl-[108px] lg:pr-[40px]">
-          <div className="max-w-[560px]">
+          {/* ≥ 1680 : la mesure s'élargit à 640 px (brief §4 :
+              ≤ 640 px, ≤ 65 ch) — l'eyebrow tient sur sa ligne */}
+          <div className="max-w-[560px] min-[1680px]:max-w-[640px]">
             {/* Pagination — 8 moments réels sur la page */}
             <div className="gh-num pv-page-num">
               <b>01</b>
@@ -156,7 +181,7 @@ export default function GivreHero() {
             {/* Titre — Outfit léger, l'accent est un contraste de
                 graisse. L'identité vit dans la scène (le monogramme
                 de cristal) : aucun ornement dans la ligne. */}
-            <h1 className="mt-4 font-display text-[clamp(36px,10.5vw,48px)] leading-[1.06] tracking-[-0.015em] sm:text-[clamp(40px,6.2vw,84px)] lg:mt-5">
+            <h1 className="mt-4 font-display gh-title leading-[1.06] tracking-[-0.015em] lg:mt-5">
               <span className="gh-line block overflow-hidden">
                 <span className="block font-light text-slate">
                   {t("hero.line1", "Des visuels")}

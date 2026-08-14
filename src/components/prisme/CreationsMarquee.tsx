@@ -41,19 +41,28 @@ function Row({
   duration: number;
   reverse?: boolean;
 }) {
-  const strip = (ariaHidden: boolean) => (
-    <div aria-hidden={ariaHidden} className="flex shrink-0 items-center gap-6 pr-6">
+  /* Trois copies de la strip (run 2) : une strip ≈ 2 240 px ne
+     couvrait pas un viewport 3440 — la boucle montrait un trou.
+     Le keyframe translate d'exactement UNE strip (−33,333 %) :
+     vitesse inchangée au pixel. ≥ 2200 px : les tirages gagnent
+     en présence (176 → 204 px). */
+  const strip = (copy: number) => (
+    <div
+      aria-hidden={copy > 0}
+      key={copy}
+      className="flex shrink-0 items-center gap-6 pr-6"
+    >
       {pieces.map((piece, i) => (
         <figure
-          key={`${piece.src}-${ariaHidden ? "b" : "a"}`}
+          key={`${piece.src}-${copy}`}
           className={`pv-print group h-[150px] shrink-0 sm:h-[176px] ${piece.ratio}`}
         >
           <Image
             src={piece.src}
-            alt={ariaHidden ? "" : piece.alt}
+            alt={copy > 0 ? "" : piece.alt}
             fill
-            sizes="320px"
-            loading={i < 6 && !ariaHidden ? "eager" : "lazy"}
+            sizes="(min-width: 2200px) 380px, 320px"
+            loading={i < 6 && copy === 0 ? "eager" : "lazy"}
             className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
           />
         </figure>
@@ -66,8 +75,9 @@ function Row({
       className={`pv-marquee py-4 ${reverse ? "pv-marquee--reverse" : ""}`}
       style={{ "--marquee-duration": `${duration}s` } as React.CSSProperties}
     >
-      {strip(false)}
-      {strip(true)}
+      {strip(0)}
+      {strip(1)}
+      {strip(2)}
     </div>
   );
 }

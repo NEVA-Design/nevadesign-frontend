@@ -73,7 +73,10 @@ export default function GivreStudio() {
         className="relative z-10 pr-[calc(var(--frame-inset)_+_24px)] lg:pr-0"
         style={{ paddingLeft: "calc(var(--frame-inset) + 24px)" }}
       >
-        <div className="lg:grid lg:grid-cols-[300px_1px_minmax(0,1fr)] lg:gap-x-10">
+        {/* ≥ 1680 : le plateau se borne (la maquette s'étirait sur
+            ~3 000 px à 3440, l'intérieur se vidait) et se centre —
+            gouttières fluides autour */}
+        <div className="lg:grid lg:grid-cols-[300px_1px_minmax(0,1fr)] lg:gap-x-10 min-[1680px]:mx-auto min-[1680px]:max-w-[1720px]">
           {/* Rail éditorial — l'UI chuchote à gauche */}
           <div className="lg:pt-2">
             <RevealBlock>
