@@ -98,6 +98,20 @@ const settle = (p: number) => {
    pour tous, et nulle à scroll 0 (preuves). */
 const SCROLL = { p: 0 };
 
+/* Le temps de scène (run 3, LOT 6). Au F5 d'une session vue, l'UI
+   naît posée (tl.progress(1)) mais la sculpture rejouait son
+   assemblage (~3 s de pièces en transit) en fondu PAR-DESSUS un
+   poster déjà posé : dédoublement mesuré (forensique v2, blocs
+   sculpture à ratio 0,24-0,49). Même remède que l'UI : la
+   cérémonie n'est due qu'une fois par session — un offset absolu
+   avance f(t) au-delà des settles (assemblage fini, oscillations
+   en phase avec le poster, déterminisme intact). Posé par le host
+   au montage : les remontages (nav interne, bfcache) d'une session
+   vue naissent posés aussi. */
+let CLOCK_OFFSET = 0;
+const SETTLED_AT = 6.5; /* > fin du dernier settle (satellites 3,15 s) */
+const sceneTime = (t: number) => t + CLOCK_OFFSET;
+
 /* ── Le monde (unités monde, identique à tous les cadrages) ─────
    Un vrai décor : le mur est un plan vertical à z = WALL_Z, le sol
    un plan horizontal à y = FLOOR_Y — leur jonction EST la ligne
@@ -1342,7 +1356,7 @@ function DawnBreath({ mid }: { mid: boolean }) {
          respiration s'éveille avec l'assemblage (fenêtre 1→4 s).
          MID : la nappe se fige à sa valeur moyenne une fois posée
          (« statiques ou off ») */
-      const t = state.clock.elapsedTime;
+      const t = sceneTime(state.clock.elapsedTime);
       const breathe = mid ? 0 : 0.042 * Math.sin(t * 0.21);
       matRef.current.opacity =
         (0.042 + breathe) * easeOutCubic(progress(t, 1.0, 3.0));
@@ -1407,7 +1421,7 @@ function FloorCaustics({ mid }: { mid: boolean }) {
   useEffect(() => () => texture.dispose(), [texture]);
 
   useFrame((state) => {
-    const t = state.clock.elapsedTime;
+    const t = sceneTime(state.clock.elapsedTime);
     if (matRef.current) {
       /* opacité : jamais nulle, jamais > 0,05 d'apport perçu ;
          s'éveille avec l'assemblage (fenêtre 1,2 → 3,6 s).
@@ -1701,7 +1715,7 @@ function Monogram({ mid }: { mid: boolean }) {
      « render target réfraction ÷2 » de notre pipeline (le RT natif
      n'est pas lu, le coût vit dans le fragment shader). */
   useFrame((state) => {
-    const t = state.clock.elapsedTime;
+    const t = sceneTime(state.clock.elapsedTime);
     if (!mesh.current) return;
     const rise = settle(progress(t, 0.15, 1.9));
     mesh.current.position.y = MONO_REST_Y - (1 - rise) * 0.85;
@@ -1745,7 +1759,7 @@ function Sculpture({ mid }: { mid: boolean }) {
   const ring = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
-    const t = state.clock.elapsedTime;
+    const t = sceneTime(state.clock.elapsedTime);
     if (root.current) {
       root.current.position.y = -SCROLL.p * 0.55;
     }
@@ -1988,7 +2002,7 @@ function AccentReveal() {
 
   useFrame((state) => {
     if (done.current) return;
-    const p = progress(state.clock.elapsedTime, 2.2, 2.4);
+    const p = progress(sceneTime(state.clock.elapsedTime), 2.2, 2.4);
     if (mat.current) {
       mat.current.opacity = 1 - easeOutCubic(p);
     }
@@ -2084,6 +2098,17 @@ export default function GlassSculpture({
   const [inView, setInView] = useState(true);
   const [pageVisible, setPageVisible] = useState(true);
   const [ready, setReady] = useState(false);
+  /* session vue : scène posée (CLOCK_OFFSET) ET fondu court — le
+     crossfade de 1,4 s est la cérémonie de la première ouverture ;
+     au F5 il ne fait qu'étirer la fenêtre où deux images du même
+     contenu se superposent */
+  const seenSession = useMemo(() => {
+    try {
+      return typeof window !== "undefined" && !!window.sessionStorage.getItem("prism-overture");
+    } catch {
+      return false;
+    }
+  }, []);
   /* les textures se peignent AVANT le montage du Canvas, en
      tranches asynchrones : zéro long task (8,7 s de gel mesurés à
      3440 en un seul bloc), le poster reste vivant, le loader lit
@@ -2095,6 +2120,15 @@ export default function GlassSculpture({
   const [booted, setBooted] = useState(false);
 
   useEffect(() => {
+    /* session déjà vue → la scène naît posée (voir CLOCK_OFFSET) ;
+       première ouverture → assemblage complet, offset nul */
+    try {
+      CLOCK_OFFSET = window.sessionStorage.getItem("prism-overture")
+        ? SETTLED_AT
+        : 0;
+    } catch {
+      CLOCK_OFFSET = 0;
+    }
     let alive = true;
     prepareSceneTextures().then(() => {
       if (alive) setTexReady(true);
@@ -2141,7 +2175,7 @@ export default function GlassSculpture({
       className={className}
       style={{
         opacity: ready ? 1 : 0,
-        transition: "opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1)",
+        transition: `opacity ${seenSession ? "0.6s" : "1.4s"} cubic-bezier(0.16, 1, 0.3, 1)`,
       }}
       aria-hidden
     >
