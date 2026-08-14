@@ -743,11 +743,18 @@ function paintCanvasInto(
     return canvas;
   }
   return (async () => {
+    /* run 3 : découpage PAR TEMPS (8 ms de travail réel par
+       tranche) — un pas fixe en lignes redevient une long task dès
+       que le CPU est throttlé (mesuré : 24 lignes ≈ 120 ms à ×4).
+       Ici la tranche s'adapte à la machine : jamais > ~10 ms de
+       blocage, quel que soit le matériel. */
+    let sliceStart = performance.now();
     for (let py = 0; py < h; py++) {
       paintRow(py);
-      if (py % 96 === 95) {
+      if (performance.now() - sliceStart > 8) {
         onRow?.(py);
         await yieldFn();
+        sliceStart = performance.now();
       }
     }
     ctx.putImageData(img, 0, 0);
@@ -814,9 +821,14 @@ function addFilmGrain(canvas: HTMLCanvasElement, yieldFn: YieldFn = null) {
     return;
   }
   return (async () => {
+    /* run 3 : découpage par temps (8 ms), comme paintCanvasInto */
+    let sliceStart = performance.now();
     for (let py = 0; py < H; py++) {
       grainRow(py);
-      if (py % 512 === 511) await yieldFn();
+      if (performance.now() - sliceStart > 8) {
+        await yieldFn();
+        sliceStart = performance.now();
+      }
     }
     ctx.putImageData(img, 0, 0);
   })();
@@ -1042,9 +1054,13 @@ function addAccentToCanvas(canvas: HTMLCanvasElement, yieldFn: YieldFn = null) {
     return;
   }
   return (async () => {
+    let sliceStart = performance.now();
     for (let py = py0; py < py1; py++) {
       accentRow(py);
-      if ((py - py0) % 256 === 255) await yieldFn();
+      if (performance.now() - sliceStart > 8) {
+        await yieldFn();
+        sliceStart = performance.now();
+      }
     }
     ctx.putImageData(img, px0, py0);
   })();

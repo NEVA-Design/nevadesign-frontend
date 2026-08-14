@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import PrismShell from "@/components/prisme/Shell";
 import GivreNavbar from "@/components/givre/GivreNavbar";
 import PrismLoader from "@/components/prisme/PrismLoader";
@@ -174,18 +175,48 @@ export default function Home() {
         <GivreNavbar />
         <SectionRail />
         <LocaleKeyed>
+          {/* Hydratation SÉLECTIVE (run 3, LOT 7) : sans frontières,
+              react-dom hydrate les 12 sections en un bloc — 17 s de
+              script mesurées à CPU ×4 (Lighthouse bootup-time), le
+              « très lourd » du premier chargement. Une boundary par
+              section sous le pli découpe ce bloc en tâches courtes
+              interruptibles et priorisées par interaction ; le HTML
+              serveur reste affiché tel quel pendant ce temps —
+              fallback jamais montré, zéro changement visuel. */}
           <GivreHero />
-          <GivreStudio />
-          <GivreCreations />
-          <GivreEnhance />
-          <GivreType />
-          <GivreFields />
-          <GivreModules />
-          <GivreStats />
-          <GivrePricing />
-          <GivrePacks />
-          <GivreFAQ />
-          <GivreFooter />
+          <Suspense>
+            <GivreStudio />
+          </Suspense>
+          <Suspense>
+            <GivreCreations />
+          </Suspense>
+          <Suspense>
+            <GivreEnhance />
+          </Suspense>
+          <Suspense>
+            <GivreType />
+          </Suspense>
+          <Suspense>
+            <GivreFields />
+          </Suspense>
+          <Suspense>
+            <GivreModules />
+          </Suspense>
+          <Suspense>
+            <GivreStats />
+          </Suspense>
+          <Suspense>
+            <GivrePricing />
+          </Suspense>
+          <Suspense>
+            <GivrePacks />
+          </Suspense>
+          <Suspense>
+            <GivreFAQ />
+          </Suspense>
+          <Suspense>
+            <GivreFooter />
+          </Suspense>
         </LocaleKeyed>
       </main>
     </PrismShell>
