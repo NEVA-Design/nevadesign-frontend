@@ -85,6 +85,17 @@ export default function GivreHero() {
           { opacity: 1, duration: 0.9, stagger: 0.1 },
           1.05
         );
+
+      /* F5 d'une session connue (data-prism-seen posé avant le
+         paint) : le micro-rideau fond sur une page DÉJÀ composée —
+         la cérémonie d'entrée n'est due qu'une fois par session,
+         on la pose à son état final ; les animations permanentes
+         (oscillation, marquee, breath) vivent, elles. */
+      if (
+        document.documentElement.getAttribute("data-prism-seen") === "1"
+      ) {
+        tl.progress(1);
+      }
     },
     { scope }
   );

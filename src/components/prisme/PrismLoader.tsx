@@ -23,15 +23,28 @@ declare global {
  * À cache chaud tout est prêt ≤ 1,8 s ; sur réseau lent le
  * compteur reflète la réalité — jamais une fausse barre. Sortie
  * par fondu de cache (l'ivoire du veil = l'ivoire de la page).
- * Une fois par session ; jamais aux navigations internes.
+ * Le grand loader joue une fois par session. Les F5 et arrivées
+ * directes suivants reçoivent le MICRO-RIDEAU (LOT 2 §2) : le
+ * même ivoire (halo + grain, sans monogramme ni compteur — un
+ * script inline le masque avant le premier paint) tenu jusqu'aux
+ * mêmes conditions « net », puis fondu 320 ms — c'est lui qui tue
+ * le « F5 flou ». Les navigations internes n'ont aucun rideau.
  * Purement décoratif : aucun état React, DOM piloté en temps
  * absolu f(t) — aucune branche reduced-motion (preuve 0 diff).
  */
 const DRAW_MS = 620; /* le trait se dessine */
 const FILL_MS = 560; /* le verre monte, la lame balaie */
 const EXIT_MS = 450; /* fondu du cache */
+const MICRO_EXIT_MS = 320; /* fondu du micro-rideau (250-400 exigés) */
 const MIN_SHOW_MS = DRAW_MS + FILL_MS; /* jamais de sortie avant l'extrusion */
 const SWEEP_PERIOD_MS = 2400; /* en attente réelle, la lame repasse */
+
+/* Vrai jusqu'au premier montage du module : distingue le chargement
+   de document (F5, arrivée directe — le micro-rideau s'applique) de
+   la navigation interne (remontage de la home : la préparation de
+   scène, singleton résolu, ne ré-émettrait pas sa progression — le
+   rideau attendrait son filet pour rien). */
+let documentBoot = true;
 
 /* le grain de l'atelier — le MÊME motif 2 octaves que les fonds
    de scène (.pv-scene::after), fréquence 0,8, 256 px */
@@ -40,6 +53,7 @@ const GRAIN_URI =
 
 export default function PrismLoader() {
   const veilRef = useRef<HTMLDivElement>(null);
+  const coreRef = useRef<HTMLDivElement>(null);
   const strokeRef = useRef<SVGGElement>(null);
   const fillRef = useRef<SVGGElement>(null);
   const sheenRef = useRef<SVGRectElement>(null);
@@ -50,8 +64,18 @@ export default function PrismLoader() {
     const veil = veilRef.current;
     if (!veil) return;
 
-    const seen = window.sessionStorage.getItem("prism-overture");
-    if (seen) {
+    const isDocumentLoad = documentBoot;
+    documentBoot = false;
+
+    let seen = false;
+    try {
+      seen = window.sessionStorage.getItem("prism-overture") !== null;
+    } catch {
+      /* stockage indisponible : on rejoue l'ouverture complète */
+    }
+
+    if (seen && !isDocumentLoad) {
+      /* navigation interne : la page est déjà là, aucun rideau */
       window.__prismLoaded = true;
       veil.style.display = "none";
       return;
@@ -117,6 +141,37 @@ export default function PrismLoader() {
       marks.fonts * 0.25 +
       marks.poster * 0.25 +
       Math.min(marks.scene / 0.22, 1) * 0.3;
+
+    /* ── micro-rideau (LOT 2 §2) — F5 et arrivées directes ──────
+       Pas de chorégraphie : l'ivoire (halo + grain) tient jusqu'aux
+       MÊMES conditions « net » que l'ouverture, puis fond. Derrière
+       lui, le poster net (≤ 60 Ko) couvre l'arrivée du canvas. */
+    if (seen) {
+      /* ceinture — le script inline de la page masque déjà la pièce
+         centrale avant le premier paint */
+      if (coreRef.current) coreRef.current.style.display = "none";
+      let microRaf = 0;
+      let microLeave = 0;
+      const wait = () => {
+        if (realProgress() < 1) {
+          microRaf = requestAnimationFrame(wait);
+          return;
+        }
+        window.__prismLoaded = true;
+        veil.style.transition = `opacity ${MICRO_EXIT_MS}ms cubic-bezier(0.65,0,0.35,1)`;
+        veil.style.opacity = "0";
+        veil.style.pointerEvents = "none";
+        microLeave = window.setTimeout(() => {
+          veil.style.display = "none";
+        }, MICRO_EXIT_MS + 60);
+      };
+      microRaf = requestAnimationFrame(wait);
+      return () => {
+        cancelAnimationFrame(microRaf);
+        window.clearTimeout(microLeave);
+        cleanups.forEach((fn) => fn());
+      };
+    }
 
     /* ── la chorégraphie f(t) + le compteur réel ──────────────── */
     const t0 = performance.now();
@@ -210,7 +265,10 @@ export default function PrismLoader() {
           mixBlendMode: "multiply",
         }}
       />
-      <div className="relative flex w-[240px] flex-col items-center gap-7">
+      <div
+        ref={coreRef}
+        className="pv-overture-core relative flex w-[240px] flex-col items-center gap-7"
+      >
         <svg viewBox="0 0 1441 1120" className="w-[120px]">
           <defs>
             <linearGradient id="pvGlassFill" x1="0" y1="0" x2="1" y2="1">

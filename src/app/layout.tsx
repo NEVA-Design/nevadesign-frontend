@@ -69,6 +69,10 @@ export default function RootLayout({
       lang="fr"
       className={`${geist.variable} ${geistMono.variable} ${outfit.variable} dark`}
       style={{ colorScheme: "dark" }}
+      /* data-prism-seen est posé sur <html> par un script inline
+         AVANT l'hydratation (anti-flash du micro-rideau) — même
+         pattern qu'un attribut de thème, mismatch d'attribut voulu */
+      suppressHydrationWarning
     >
       <body className="bg-void text-white min-h-screen antialiased">
         <LanguageProvider>{children}</LanguageProvider>

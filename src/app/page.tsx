@@ -81,6 +81,16 @@ export default function Home() {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/* Anti-flash du F5 : exécuté au parse, AVANT le rideau dans
+            le flux — si la session a déjà vu l'ouverture, l'attribut
+            masque monogramme et compteur dès le premier paint (le
+            micro-rideau ne montre que l'ivoire). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{if(sessionStorage.getItem("prism-overture"))document.documentElement.setAttribute("data-prism-seen","1")}catch(e){}',
+          }}
+        />
         <PrismLoader />
         <GivreNavbar />
         <SectionRail />

@@ -1734,3 +1734,13 @@ html {
    Les animations font partie de l'identité du studio : elles
    restent actives même quand le système déclare
    prefers-reduced-motion (optimisations Windows comprises). */
+
+/* ═══ Ouverture — anti-flash du F5 ═══════════════════════════
+   Le rideau vit dans le HTML initial (jamais d'écran blanc). Si
+   la session a déjà vu l'ouverture, un script inline de la home
+   pose cet attribut AVANT le premier paint : le monogramme et le
+   compteur du grand loader n'apparaissent jamais — le
+   micro-rideau n'est que l'ivoire de l'atelier. */
+html[data-prism-seen="1"] .pv-overture-core {
+  display: none;
+}
