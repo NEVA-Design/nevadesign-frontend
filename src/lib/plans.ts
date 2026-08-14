@@ -1,7 +1,7 @@
 // Client-safe monetization constants.
 // The database column is still named `credits`, but the product language is "creations".
 // Grille run 2 (14/08/2026) — décision business client :
-// Découverte 3 créations à l'inscription (one-shot), Creator 24 €/12,
+// Découverte 3 créations à l’inscription (one-shot), Creator 24 €/12,
 // Studio 59 €/25, Agence 129 €/45 ; recharges 10/30/100 à 2,90 €/création.
 
 export const PLANS = {

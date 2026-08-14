@@ -42,7 +42,7 @@ export default function GivrePricing() {
           </RevealBlock>
           <RevealMask className="mt-4">
             <h2 className="pv-display mx-auto max-w-[720px] pv-section-title">
-              {t("pricing.title.a", "Moins cher qu'un logo.")}{" "}
+              {t("pricing.title.a", "Moins cher qu’un logo.")}{" "}
               <span className="pv-display-strong">
                 {t("pricing.title.beam", "Pour toute une identité.")}
               </span>
@@ -52,7 +52,7 @@ export default function GivrePricing() {
             <p className="mx-auto mt-5 max-w-[500px] text-[15px] leading-[1.7] text-slate">
               {t(
                 "pricing.subtitle",
-                "Commencez avec 3 créations offertes à l'inscription. Passez en formule quand vos publications s'enchaînent — sans engagement."
+                "Commencez avec 3 créations offertes à l’inscription. Passez en formule quand vos publications s’enchaînent — sans engagement."
               )}
             </p>
           </RevealBlock>
@@ -103,7 +103,7 @@ export default function GivrePricing() {
                       <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[color:var(--num-color)]">
                         {plan.credits.toLocaleString("fr-FR")}{" "}
                         {planId === "free"
-                          ? t("pricing.creationsOnce", "créations à l'inscription")
+                          ? t("pricing.creationsOnce", "créations à l’inscription")
                           : t("pricing.creations", "créations / mois")}
                       </p>
                     </div>

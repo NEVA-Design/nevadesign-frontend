@@ -54,7 +54,7 @@ export default function GivrePacks() {
           data.error ??
             t(
               "resources.error.checkout",
-              "Le paiement n'a pas pu démarrer. Réessayez dans un instant."
+              "Le paiement n’a pas pu démarrer. Réessayez dans un instant."
             )
         );
         return;
@@ -210,7 +210,7 @@ export default function GivrePacks() {
                 {t("resources.tools.title", "Ressources du studio")}
               </h3>
               <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-mist">
-                {t("resources.tools.tagline", "Les outils Photoshop de l'atelier")}
+                {t("resources.tools.tagline", "Les outils Photoshop de l’atelier")}
               </p>
             </div>
             <div className="mt-5 flex flex-col">

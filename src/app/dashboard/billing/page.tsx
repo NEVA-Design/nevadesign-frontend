@@ -122,7 +122,7 @@ function BillingContent() {
                   {!isFree ? <span className="pv-meta">/ mois</span> : null}
                 </p>
                 <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[color:var(--num-color)]">
-                  {plan.credits.toLocaleString("fr-FR")} créations{isFree ? " à l'inscription" : " / mois"}
+                  {plan.credits.toLocaleString("fr-FR")} créations{isFree ? " à l’inscription" : " / mois"}
                 </p>
 
                 <ul className="mt-5 flex flex-col gap-2 border-t border-[color:var(--hairline)] pt-5">
@@ -169,7 +169,7 @@ function BillingContent() {
         Report des créations non utilisées : 1 mois
       </p>
 
-      {/* ── Recharges de créations (2,90 € l'unité) ─────────────── */}
+      {/* ── Recharges de créations (2,90 € l’unité) ─────────────── */}
       <section className="relative mt-14">
         <div className="mb-5 flex items-baseline justify-between gap-4">
           <h2 className="pv-display text-xl text-ink">Recharges de créations</h2>
