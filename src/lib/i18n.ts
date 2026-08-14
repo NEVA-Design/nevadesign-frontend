@@ -304,6 +304,14 @@ export const TRANSLATIONS_FR: Record<string, string> = {
   "footer.link.terms": "Conditions d’utilisation",
   "footer.link.cookies": "Cookies",
   "footer.rights": "Tous droits réservés.",
+
+  "footer.solutions": "Solutions",
+  "footer.link.fivemDesigner": "Graphiste FiveM",
+  "footer.link.fivemLogo": "Logo FiveM",
+  "footer.link.fivemPack": "Pack graphique FiveM",
+  "footer.link.thumbnail": "Miniature YouTube",
+  "footer.link.logoMaker": "Générateur de logo",
+  "footer.link.flyer": "Flyer en ligne",
 };
 
 export const SUPPORTED_LANGUAGES: Array<{ code: Locale; label: string }> = LOCALES.map((code) => ({

@@ -16,6 +16,81 @@ import GivreFooter from "@/components/givre/GivreFooter";
 import SectionRail from "@/components/givre/SectionRail";
 import LocaleKeyed from "@/components/prisme/LocaleKeyed";
 import { defaultSeo, siteName, siteUrl } from "@/lib/seo";
+import { PLANS, TOPUPS } from "@/lib/plans";
+import { CREATION_PACKS } from "@/lib/resources";
+import { TRANSLATIONS_FR } from "@/lib/i18n";
+
+/* JSON-LD Product — abonnements et packs depuis la source de vérité
+   des prix (run 3, LOT 5) : jamais de montant en dur ici. */
+const planNodes = Object.values(PLANS)
+  .filter((p) => p.price > 0)
+  .map((p) => ({
+    "@type": "Product",
+    "@id": `${siteUrl}/#plan-${p.id}`,
+    name: `Abonnement ${p.name}`,
+    description: p.description,
+    brand: { "@id": `${siteUrl}/#organization` },
+    offers: {
+      "@type": "Offer",
+      price: String(p.price),
+      priceCurrency: "EUR",
+      availability: "https://schema.org/InStock",
+      url: `${siteUrl}/#pricing`,
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: String(p.price),
+        priceCurrency: "EUR",
+        billingDuration: "P1M",
+      },
+    },
+  }));
+
+const packNodes = Object.values(CREATION_PACKS).map((p) => ({
+  "@type": "Product",
+  "@id": `${siteUrl}/#${p.id}`,
+  name: p.name,
+  description: p.description,
+  brand: { "@id": `${siteUrl}/#organization` },
+  offers: {
+    "@type": "Offer",
+    price: String(p.price),
+    priceCurrency: "EUR",
+    availability: "https://schema.org/InStock",
+    url: `${siteUrl}/#packs`,
+  },
+}));
+
+const topupNode = {
+  "@type": "Product",
+  "@id": `${siteUrl}/#topups`,
+  name: "Recharges de créations",
+  description:
+    "Des créations supplémentaires à 2,90 € l’unité, par packs de 10, 30 ou 100 — sans changer d’abonnement.",
+  brand: { "@id": `${siteUrl}/#organization` },
+  offers: TOPUPS.map((t) => ({
+    "@type": "Offer",
+    name: `${t.credits} créations`,
+    price: String(t.price),
+    priceCurrency: "EUR",
+    availability: "https://schema.org/InStock",
+    url: `${siteUrl}/#pricing`,
+  })),
+};
+
+/* FAQPage — les 6 questions réelles de la section FAQ (mêmes clés
+   i18n que le composant : jamais deux vérités). */
+const faqNode = {
+  "@type": "FAQPage",
+  "@id": `${siteUrl}/#faq`,
+  mainEntity: [1, 2, 3, 4, 5, 6].map((i) => ({
+    "@type": "Question",
+    name: TRANSLATIONS_FR[`faq.q${i}`],
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: TRANSLATIONS_FR[`faq.a${i}`],
+    },
+  })),
+};
 
 export default function Home() {
   const jsonLd = {
@@ -49,7 +124,7 @@ export default function Home() {
         applicationCategory: "DesignApplication",
         operatingSystem: "Web",
         url: siteUrl,
-        image: `${siteUrl}/brand/og.png`,
+        image: `${siteUrl}/brand/og.jpg`,
         description: defaultSeo.description,
         keywords: defaultSeo.keywords.join(", "),
         brand: {
@@ -67,6 +142,10 @@ export default function Home() {
             "Youtubeurs et créateurs de contenu, entrepreneurs et marques, équipes esport, serveurs GTA RP et communautés gaming",
         },
       },
+      ...planNodes,
+      ...packNodes,
+      topupNode,
+      faqNode,
     ],
   };
 

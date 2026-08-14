@@ -1,4 +1,9 @@
-export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://neva-ai.com").replace(/\/$/, "");
+/* Le domaine de la marque (run 3) : tous les canaux publics vivent
+   sur nevadesign.fr (mails nevapro@nevadesign.fr, discord.gg/
+   nevadesign, x.com/nevadesign) — l'ancien défaut neva-ai.com
+   faisait pointer canonical/OG/sitemap/JSON-LD vers un domaine
+   tiers. NEXT_PUBLIC_SITE_URL reste la vérité au déploiement. */
+export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://nevadesign.fr").replace(/\/$/, "");
 
 export const siteName = "Neva Design";
 

@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { verifyAdmin } from "@/lib/admin";
 import {
   isPortfolioCategory,
@@ -94,5 +95,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "Erreur creation" }, { status: 500 });
   }
 
+  /* la vitrine est en ISR (run 3) : une mutation la régénère */
+  revalidatePath("/neva-design");
   return Response.json({ item: data }, { status: 201 });
 }

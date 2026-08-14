@@ -1,9 +1,20 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { DEFAULT_MAINTENANCE, isMaintenanceActive, type MaintenanceMode } from '@/lib/maintenance'
 import { createServiceClient } from '@/lib/supabase/server'
 import { BrandMark } from '@/components/prisme/Brand'
 import SatinSphere from '@/components/givre/SatinSphere'
 import { Button } from '@/components/ui/button'
+
+/* Cible du 307 de maintenance : ne doit jamais s'indexer à la
+   place des vraies pages (run 3, LOT 5). */
+export const metadata: Metadata = {
+  title: 'Maintenance en cours',
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 async function getMaintenance() {
   try {

@@ -289,6 +289,14 @@ const EN: Record<string, string> = {
   "footer.link.terms": "Terms of use",
   "footer.link.cookies": "Cookies",
   "footer.rights": "All rights reserved.",
+
+  "footer.solutions": "Solutions",
+  "footer.link.fivemDesigner": "FiveM graphic designer",
+  "footer.link.fivemLogo": "FiveM logo maker",
+  "footer.link.fivemPack": "FiveM graphics pack",
+  "footer.link.thumbnail": "YouTube thumbnail maker",
+  "footer.link.logoMaker": "Logo maker",
+  "footer.link.flyer": "Online flyer maker",
 };
 
 export default EN;

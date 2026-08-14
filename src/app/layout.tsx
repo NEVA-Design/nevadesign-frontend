@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     siteName,
     images: [
       {
-        url: "/brand/og.png",
+        url: "/brand/og.jpg",
         width: 1200,
         height: 630,
         alt: "Neva Design — studio créatif IA : miniatures, logos, identités, gaming",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: defaultSeo.title,
     description: defaultSeo.description,
-    images: ["/brand/og.png"],
+    images: ["/brand/og.jpg"],
   },
 };
 

@@ -44,6 +44,19 @@ export default function GivreFooter() {
       ],
     },
     {
+      /* Solutions (run 3, LOT 5) : les landings par intention de
+         recherche — leur seule porte d'entrée dans la navigation */
+      title: t("footer.solutions", "Solutions"),
+      links: [
+        { label: t("footer.link.fivemDesigner", "Graphiste FiveM"), href: "/graphiste-fivem" },
+        { label: t("footer.link.fivemLogo", "Logo FiveM"), href: "/logo-fivem" },
+        { label: t("footer.link.fivemPack", "Pack graphique FiveM"), href: "/pack-graphique-fivem" },
+        { label: t("footer.link.thumbnail", "Miniature YouTube"), href: "/miniature-youtube" },
+        { label: t("footer.link.logoMaker", "Générateur de logo"), href: "/generateur-de-logo" },
+        { label: t("footer.link.flyer", "Flyer en ligne"), href: "/flyer-en-ligne" },
+      ],
+    },
+    {
       title: t("footer.legal", "Légal"),
       links: [
         { label: t("footer.link.privacy", "Confidentialité"), href: "/privacy" },
@@ -178,7 +191,7 @@ export default function GivreFooter() {
           <path d="M893.4 0 L1134.1 0 L1013.7 292 Z" />
         </svg>
         <div className="relative mx-auto pv-container px-5 sm:px-8">
-          <div className="grid gap-12 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-16">
+          <div className="grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr] lg:gap-14">
             <div>
               <Image
                 src="/brand/logo-noir.png"

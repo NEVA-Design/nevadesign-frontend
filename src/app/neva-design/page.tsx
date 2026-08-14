@@ -10,7 +10,12 @@ const title = "Neva Design - Studio graphique premium pour serveurs FiveM";
 const description =
   "Neva Design crée logos, branding, affiches, bannières, landing pages, visuels Discord et packs GFX premium pour les serveurs FiveM ambitieux.";
 
-export const dynamic = "force-dynamic";
+/* ISR (run 3) : la vitrine était force-dynamic — readdir + Supabase
+   à CHAQUE visite, TTFB ~200 ms et page exclue du prerender. Le
+   portfolio bouge rarement : servie statique, re-générée au plus
+   toutes les heures, et revalidatePath("/neva-design") est appelé
+   par les mutations admin du portfolio. */
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title,
@@ -36,7 +41,7 @@ export const metadata: Metadata = {
     siteName: "Neva Design",
     images: [
       {
-        url: "/brand/og.png",
+        url: "/brand/og.jpg",
         width: 1200,
         height: 630,
         alt: "Neva Design - studio graphique premium FiveM",
@@ -49,7 +54,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title,
     description,
-    images: ["/brand/og.png"],
+    images: ["/brand/og.jpg"],
   },
 };
 
@@ -198,7 +203,7 @@ export default function Page() {
     "@type": "ProfessionalService",
     name: "Neva Design",
     url: `${siteUrl}/neva-design`,
-    image: `${siteUrl}/brand/og.png`,
+    image: `${siteUrl}/brand/og.jpg`,
     description,
     areaServed: "France",
     serviceType: [

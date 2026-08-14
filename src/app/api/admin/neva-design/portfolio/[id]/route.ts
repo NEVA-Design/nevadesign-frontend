@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { verifyAdmin } from "@/lib/admin";
 import {
   isPortfolioCategory,
@@ -77,6 +78,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return Response.json({ error: "Erreur mise a jour" }, { status: 500 });
   }
 
+  /* la vitrine est en ISR (run 3) : une mutation la régénère */
+  revalidatePath("/neva-design");
   return Response.json({ item: data });
 }
 
@@ -93,5 +96,6 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     return Response.json({ error: "Erreur suppression" }, { status: 500 });
   }
 
+  revalidatePath("/neva-design");
   return Response.json({ ok: true });
 }
