@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useRef } from "react";
 import type { Layer } from "@/lib/projects-shared";
 import { fontFamilyFor } from "./editorFonts";
 
@@ -63,6 +63,11 @@ type LayerCanvasProps = {
   selectedId?: string | null;
   onSelect?: (layerId: string | null) => void;
   onPointerDownLayer?: (event: React.PointerEvent, layer: Layer) => void;
+  // édition de texte inline (double-clic) : le div devient éditable en place
+  editingId?: string | null;
+  onTextInput?: (layerId: string, text: string) => void;
+  onEditEnd?: () => void;
+  onDoubleClickLayer?: (layer: Layer) => void;
   className?: string;
   children?: React.ReactNode;
 };
@@ -78,8 +83,87 @@ export function logoUrlForVariant(
   return logoUrls.color || layer.url;
 }
 
+// Le contenu DOM d'un contentEditable ne doit JAMAIS être re-rendu par
+// React pendant la frappe (le curseur sauterait au début) : on fige le
+// texte initial au début de l'édition et on laisse le DOM vivre.
+function TextLayerView({
+  layer,
+  editing,
+  outline,
+  draggable,
+  onPointerDown,
+  onDoubleClick,
+  onTextInput,
+  onEditEnd,
+}: {
+  layer: Layer;
+  editing: boolean;
+  outline?: React.CSSProperties;
+  draggable: boolean;
+  onPointerDown: (e: React.PointerEvent) => void;
+  onDoubleClick: () => void;
+  onTextInput: (text: string) => void;
+  onEditEnd: () => void;
+}) {
+  const nodeRef = useRef<HTMLDivElement>(null);
+  const frozenTextRef = useRef<string>(layer.text ?? "");
+
+  useEffect(() => {
+    if (editing) {
+      frozenTextRef.current = layer.text ?? "";
+      // focus + curseur en fin de texte
+      const node = nodeRef.current;
+      if (node) {
+        node.focus();
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        range.collapse(false);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editing]);
+
+  return (
+    <div
+      ref={nodeRef}
+      data-layer-id={layer.id}
+      contentEditable={editing}
+      suppressContentEditableWarning
+      spellCheck={false}
+      style={{
+        ...textLayerStyle(layer),
+        ...outline,
+        cursor: editing ? "text" : draggable ? "grab" : undefined,
+        ...(editing
+          ? { outline: "1.5px dashed rgba(164,139,232,0.95)", outlineOffset: "3px", userSelect: "text" }
+          : {}),
+      }}
+      onPointerDown={(e) => {
+        if (editing) {
+          e.stopPropagation();
+          return;
+        }
+        onPointerDown(e);
+      }}
+      onDoubleClick={onDoubleClick}
+      onInput={(e) => onTextInput((e.target as HTMLElement).textContent ?? "")}
+      onBlur={onEditEnd}
+      onKeyDown={(e) => {
+        if (!editing) return;
+        e.stopPropagation();
+        if (e.key === "Escape") (e.target as HTMLElement).blur();
+      }}
+    >
+      {editing ? frozenTextRef.current : layer.text ?? ""}
+    </div>
+  );
+}
+
 const LayerCanvas = forwardRef<HTMLDivElement, LayerCanvasProps>(function LayerCanvas(
-  { width, height, layers, logoUrls, selectedId, onSelect, onPointerDownLayer, className, children },
+  { width, height, layers, logoUrls, selectedId, onSelect, onPointerDownLayer, editingId, onTextInput, onEditEnd, onDoubleClickLayer, className, children },
   ref
 ) {
   return (
@@ -106,17 +190,20 @@ const LayerCanvas = forwardRef<HTMLDivElement, LayerCanvasProps>(function LayerC
 
         if (layer.type === "text") {
           return (
-            <div
+            <TextLayerView
               key={layer.id}
-              data-layer-id={layer.id}
-              style={{ ...textLayerStyle(layer), ...outline, cursor: onPointerDownLayer ? "grab" : undefined }}
+              layer={layer}
+              editing={editingId === layer.id}
+              outline={outline}
+              draggable={Boolean(onPointerDownLayer)}
               onPointerDown={(e) => {
                 onSelect?.(layer.id);
                 onPointerDownLayer?.(e, layer);
               }}
-            >
-              {layer.text ?? ""}
-            </div>
+              onDoubleClick={() => onDoubleClickLayer?.(layer)}
+              onTextInput={(text) => onTextInput?.(layer.id, text)}
+              onEditEnd={() => onEditEnd?.()}
+            />
           );
         }
 
