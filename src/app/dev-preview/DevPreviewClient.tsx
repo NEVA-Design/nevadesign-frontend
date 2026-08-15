@@ -13,6 +13,7 @@ import BrandPage from "@/app/dashboard/brand/page";
 import CodePage from "@/app/dashboard/code/page";
 import LandingModulePage from "@/app/dashboard/landing/page";
 import PromptPage from "@/app/dashboard/prompt/page";
+import LogoWizard from "@/app/dashboard/projects/[id]/create/logo/LogoWizard";
 import { AdminsClient } from "@/app/admin/admins/AdminsClient";
 import { AdminAnnouncementsClient } from "@/app/admin/announcements/AdminAnnouncementsClient";
 import { AdminNewsletterClient } from "@/app/admin/newsletter/AdminNewsletterClient";
@@ -136,8 +137,48 @@ const mockPacks = [
   },
 ];
 
+// ── Placeholders CSS/SVG de l'étape B (run 5.4) — captures SANS génération ──
+// Des SVG dessinés à la main (lettre + dégradés), jamais une image générée.
+function svgDataUri(svg: string): string {
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+const previewLogoSvg = (fill: string) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#118AB2"/><stop offset="1" stop-color="#06D6A0"/></linearGradient></defs><text x="50%" y="58%" text-anchor="middle" font-family="Arial Black, Arial" font-size="300" font-weight="900" fill="${fill}">AB</text></svg>`;
+
+const previewFondSvg = (a: string, b: string) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><defs><linearGradient id="f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="512" height="512" fill="url(%23f)"/><g stroke="white" stroke-width="3" fill="none" opacity="0.3"><circle cx="60" cy="80" r="10"/><circle cx="440" cy="120" r="8"/><path d="M80 420 q 14 -18 28 0"/><path d="M400 400 q 14 -18 28 0"/><circle cx="250" cy="60" r="6"/></g><text x="50%" y="58%" text-anchor="middle" font-family="Arial Black, Arial" font-size="220" font-weight="900" fill="white">AB</text></svg>`;
+
+const DEV_ETAPE_B_MASTER = {
+  url: svgDataUri(previewLogoSvg("url(%23g)")),
+  whiteUrl: svgDataUri(previewLogoSvg("#FFFFFF")),
+  blackUrl: svgDataUri(previewLogoSvg("#111111")),
+};
+
+const DEV_ETAPE_B_FONDS = [
+  { fondUrl: "dev-fond-1", previewUrl: svgDataUri(previewFondSvg("#118AB2", "#06D6A0")), choix: "signature" as const },
+  { fondUrl: "dev-fond-2", previewUrl: svgDataUri(previewFondSvg("#0B3C5D", "#1D2440")), choix: "signature" as const },
+];
+
 export default function DevPreviewClient({ screen }: { screen: string }) {
   switch (screen) {
+    // Run 5.4 : les écrans de l'étape B du wizard logo, sans aucune génération
+    case "wizard-logo-etape-b":
+      return (
+        <WizardScene>
+          <LogoWizard projectId="preview" projectName="Azure Bay" devInitial={{ master: DEV_ETAPE_B_MASTER, etapeB: "choix" }} />
+        </WizardScene>
+      );
+    case "wizard-logo-etape-b-fonds":
+      return (
+        <WizardScene>
+          <LogoWizard
+            projectId="preview"
+            projectName="Azure Bay"
+            devInitial={{ master: DEV_ETAPE_B_MASTER, etapeB: "fonds", fonds: DEV_ETAPE_B_FONDS }}
+          />
+        </WizardScene>
+      );
     case "design":
       return (
         <DashboardShell user={mockUser}>
@@ -280,6 +321,17 @@ export default function DevPreviewClient({ screen }: { screen: string }) {
         </div>
       );
   }
+}
+
+/* L'atelier wizard en aperçu — fond clair calme, comme le layout dashboard. */
+function WizardScene({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="pv-light pv-atelier relative flex min-h-screen flex-col bg-paper text-ink">
+      <style>{`html{color-scheme:light}`}</style>
+      <div aria-hidden className="pv-scene-bg--dawn-calm pointer-events-none fixed inset-0" />
+      <div className="relative flex flex-1 flex-col">{children}</div>
+    </div>
+  );
 }
 
 /* La régie en aperçu — la même aube diluée que le châssis admin,

@@ -71,6 +71,13 @@ import { cn } from "@/lib/utils";
 type Props = {
   projectId: string;
   projectName: string;
+  // dev-preview UNIQUEMENT (captures sans génération) : état initial injecté —
+  // jamais fourni par les pages produit.
+  devInitial?: {
+    master: { url: string; whiteUrl: string; blackUrl: string };
+    etapeB?: "choix" | "fonds" | "final";
+    fonds?: LogoFondProposition[];
+  };
 };
 
 const STEPS = [
@@ -136,7 +143,7 @@ const FOND_CHOIX = [
 
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
-export default function LogoWizard({ projectId, projectName }: Props) {
+export default function LogoWizard({ projectId, projectName, devInitial }: Props) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
@@ -170,13 +177,15 @@ export default function LogoWizard({ projectId, projectName }: Props) {
   const [chosen, setChosen] = useState<string | null>(null);
   const [retouchesUsed, setRetouchesUsed] = useState(0);
   const [finalizing, setFinalizing] = useState(false);
-  const [master, setMaster] = useState<{ url: string; whiteUrl: string; blackUrl: string } | null>(null);
+  const [master, setMaster] = useState<{ url: string; whiteUrl: string; blackUrl: string } | null>(
+    devInitial?.master ?? null
+  );
   const [error, setError] = useState<string | null>(null);
 
   // ── Étape B : le fond, après validation du master ────────────────────────
-  const [etapeB, setEtapeB] = useState<"choix" | "fonds" | "final">("choix");
+  const [etapeB, setEtapeB] = useState<"choix" | "fonds" | "final">(devInitial?.etapeB ?? "choix");
   const [fondsGenerating, setFondsGenerating] = useState<LogoFondChoix | null>(null);
-  const [fonds, setFonds] = useState<LogoFondProposition[]>([]);
+  const [fonds, setFonds] = useState<LogoFondProposition[]>(devInitial?.fonds ?? []);
   const [fondChosen, setFondChosen] = useState<string | null>(null);
   const [fondApplying, setFondApplying] = useState(false);
   const [logoScene, setLogoScene] = useState<LogoScene | null>(null);
