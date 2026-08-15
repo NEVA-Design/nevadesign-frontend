@@ -60,7 +60,7 @@ const ASSETS: AssetOption[] = [
   { id: "studio_portrait", label: "Portrait studio", description: "Portrait RP soigné", icon: ScanFace },
 ];
 
-export default function CharacterPageClient() {
+export default function CharacterPageClient({ initialCharacters }: { initialCharacters?: SavedCharacter[] } = {}) {
   const prompt = usePrompt();
   const inputRef = useRef<HTMLInputElement>(null);
   const [sourceImage, setSourceImage] = useState<SourceImage | null>(null);
@@ -73,16 +73,18 @@ export default function CharacterPageClient() {
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [savedCharacters, setSavedCharacters] = useState<SavedCharacter[]>([]);
+  const [savedCharacters, setSavedCharacters] = useState<SavedCharacter[]>(initialCharacters ?? []);
   const [selectedMemory, setSelectedMemory] = useState<SavedCharacter | null>(null);
   const [showBetterResultGuide, setShowBetterResultGuide] = useState(false);
   const activeStep = result ? 2 : sourceImage ? 1 : 0;
 
   useEffect(() => {
+    if (initialCharacters) return;
     backendFetch("/characters")
       .then((res) => readApiResponse<{ characters: SavedCharacter[] }>(res))
       .then((data) => setSavedCharacters(data.characters ?? []))
       .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFile = (file: File | null) => {

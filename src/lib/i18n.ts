@@ -37,7 +37,7 @@ export const TRANSLATIONS_FR: Record<string, string> = {
     "Miniatures YouTube, logos, identités de marque, assets gaming. Décrivez ce que vous voulez — le studio IA compose des rendus prêts à publier, jusqu’en 8K.",
   "hero.cta.primary": "Créer mon premier visuel",
   "hero.cta.secondary": "Voir les créations",
-  "hero.proof": "3 créations offertes · Sans carte bancaire",
+  "hero.proof": "Sans carte bancaire",
   "hero.marquee": "Produites par le studio — publiées par 2 400+ créateurs",
 
   "demo.label": "Design Studio — en direct",
@@ -176,7 +176,7 @@ export const TRANSLATIONS_FR: Record<string, string> = {
   "pricing.title.a": "Moins cher qu’un logo.",
   "pricing.title.beam": "Pour toute une identité.",
   "pricing.subtitle":
-    "Commencez avec 3 créations offertes à l’inscription. Passez en formule quand vos publications s’enchaînent — sans engagement.",
+    "Passez en formule dès que vous êtes prêt à créer — sans engagement.",
   "pricing.note":
     "Sans engagement · Annulation en deux clics · Recharges de créations depuis votre espace",
   "pricing.rules.retouches": "5 retouches incluses par création — au-delà, 1 création",
@@ -188,8 +188,7 @@ export const TRANSLATIONS_FR: Record<string, string> = {
   "pricing.cta.free": "Commencer gratuitement",
   "pricing.cta.paid": "Choisir",
   "pricing.plan.free.name": "Découverte",
-  "pricing.plan.free.description": "Pour tester le studio, sans carte bancaire.",
-  "pricing.plan.free.f1": "3 créations à l’inscription",
+  "pricing.plan.free.description": "Pour découvrir le studio, sans carte bancaire.",
   "pricing.plan.free.f2": "Prévisualisations filigranées",
   "pricing.plan.free.f3": "Historique limité",
   "pricing.plan.free.f4": "Usage non commercial",
@@ -267,7 +266,7 @@ export const TRANSLATIONS_FR: Record<string, string> = {
     "Un studio créatif complet piloté par IA : vous décrivez une intention, il compose miniatures YouTube, logos, chartes graphiques et visuels gaming prêts à publier — avec une vraie direction artistique, pas une génération au hasard.",
   "faq.q2": "Que vaut vraiment le plan gratuit ?",
   "faq.a2":
-    "3 créations offertes à l’inscription pour tester le flux complet, brief compris. Les rendus sortent en prévisualisation filigranée ; les formules débloquent les exports HD, l’usage commercial et la priorité de génération",
+    "Le plan Découverte permet d'explorer le flux complet, brief compris, sans créditer de créations. Les formules débloquent les exports HD, l’usage commercial et la priorité de génération",
   "faq.q3": "Puis-je vendre ce que je crée ?",
   "faq.a3":
     "Oui. Dès le premier plan payant, chaque création vous appartient commercialement : chaîne, boutique, réseaux, serveur, livrables clients.",
@@ -287,7 +286,7 @@ export const TRANSLATIONS_FR: Record<string, string> = {
   "footer.cta.subtitle": "Décrivez votre univers. Le premier visuel est prêt dans la minute.",
   "footer.cta.primary": "Commencer gratuitement",
   "footer.cta.secondary": "Parler au studio",
-  "footer.cta.note": "3 créations offertes · Aucune carte demandée",
+  "footer.cta.note": "Aucune carte demandée",
   "footer.baseline":
     "Le studio créatif IA — miniatures, logos, identités, gaming. La direction artistique en plus.",
   "footer.product": "Produit",

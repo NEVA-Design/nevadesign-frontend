@@ -7,7 +7,7 @@ import { PLANS } from "@/lib/plans";
 import { RevealBlock, RevealMask } from "@/components/prisme/Motion";
 import { cn } from "@/lib/utils";
 
-const PLAN_ORDER = ["free", "creator", "studio", "pro"] as const;
+const PLAN_ORDER = ["creator", "studio", "pro"] as const;
 const FEATURED_PLAN = "creator";
 
 /*
@@ -52,7 +52,7 @@ export default function GivrePricing() {
             <p className="mx-auto mt-5 max-w-[500px] text-[15px] leading-[1.7] text-slate">
               {t(
                 "pricing.subtitle",
-                "Commencez avec 3 créations offertes à l’inscription. Passez en formule quand vos publications s’enchaînent — sans engagement."
+                "Passez en formule dès que vous êtes prêt à créer — sans engagement."
               )}
             </p>
           </RevealBlock>
@@ -102,9 +102,7 @@ export default function GivrePricing() {
                       </p>
                       <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[color:var(--num-color)]">
                         {plan.credits.toLocaleString("fr-FR")}{" "}
-                        {planId === "free"
-                          ? t("pricing.creationsOnce", "créations à l’inscription")
-                          : t("pricing.creations", "créations / mois")}
+                        {t("pricing.creations", "créations / mois")}
                       </p>
                     </div>
 
@@ -139,7 +137,7 @@ export default function GivrePricing() {
                           {plan.price}
                         </span>
                         <span className="font-mono text-[11px] tracking-[0.08em] text-mist">
-                          €{planId === "free" ? "" : <>&nbsp;{t("pricing.perMonth", "/ mois")}</>}
+                          €&nbsp;{t("pricing.perMonth", "/ mois")}
                         </span>
                       </p>
                       <Link
@@ -149,12 +147,10 @@ export default function GivrePricing() {
                           !featured && "pv-btn--ghost"
                         )}
                       >
-                        {planId === "free"
-                          ? t("pricing.cta.free", "Commencer gratuitement")
-                          : `${t("pricing.cta.paid", "Choisir")} ${t(
-                              `pricing.plan.${planId}.name`,
-                              plan.name
-                            )}`}
+                        {`${t("pricing.cta.paid", "Choisir")} ${t(
+                          `pricing.plan.${planId}.name`,
+                          plan.name
+                        )}`}
                       </Link>
                     </div>
                   </article>

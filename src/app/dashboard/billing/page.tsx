@@ -122,7 +122,9 @@ function BillingContent() {
                   {!isFree ? <span className="pv-meta">/ mois</span> : null}
                 </p>
                 <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[color:var(--num-color)]">
-                  {plan.credits.toLocaleString("fr-FR")} créations{isFree ? " à l’inscription" : " / mois"}
+                  {isFree
+                    ? "Aperçu, sans créations incluses"
+                    : `${plan.credits.toLocaleString("fr-FR")} créations / mois`}
                 </p>
 
                 <ul className="mt-5 flex flex-col gap-2 border-t border-[color:var(--hairline)] pt-5">
@@ -137,7 +139,7 @@ function BillingContent() {
                 <div className="mt-auto pt-6">
                   {isFree ? (
                     <p className="flex h-10 items-center justify-center rounded-lg border border-dashed border-[color:var(--hairline-strong)] font-mono text-[10px] uppercase tracking-[0.14em] text-dusk">
-                      Inclus à l&apos;inscription
+                      Plan actuel
                     </p>
                   ) : (
                     <Button

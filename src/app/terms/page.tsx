@@ -23,7 +23,7 @@ export default function TermsPage() {
         {
           heading: "Comptes et créations",
           paragraphs: [
-            "L'inscription offre 3 créations, sans carte bancaire. Les abonnements (Creator 24 €/mois, Studio 59 €/mois, Agence 129 €/mois) renouvellent chaque mois un volume de créations ; des recharges à 2,90 € la création sont disponibles à tout moment.",
+            "L'inscription est gratuite et sans carte bancaire, mais ne crédite aucune création. Les abonnements (Creator 24 €/mois, Studio 59 €/mois, Agence 129 €/mois) renouvellent chaque mois un volume de créations ; des recharges à 2,90 € la création sont disponibles à tout moment.",
           ],
           list: [
             "Chaque création inclut 5 retouches ; au-delà, une nouvelle création est décomptée.",

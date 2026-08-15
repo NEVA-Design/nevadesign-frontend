@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { backendGetJson } from '@/lib/api/backend-server'
+import { getMe } from '@/lib/api/backend-server'
 import SettingsClient from './SettingsClient'
 
 type DiscordIdentity = { username: string; avatarUrl: string | null }
@@ -15,7 +15,7 @@ type MeResponse = {
 }
 
 export default async function SettingsPage() {
-  const me = await backendGetJson<MeResponse>('/me')
+  const me = await getMe<MeResponse>()
   if (!me) redirect('/login')
 
   return (

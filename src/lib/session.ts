@@ -11,7 +11,11 @@ const DEFAULT_ACCESS_TTL = 3600; // seconds — Supabase's default access token 
 const REFRESH_TTL = 60 * 60 * 24 * 30; // 30 days
 
 function setCookie(name: string, value: string, maxAgeSeconds: number) {
-  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAgeSeconds}; SameSite=Lax`;
+  // Secure is dropped on plain http:// (e.g. localhost dev) since browsers
+  // refuse to store/send Secure cookies without TLS — everywhere else
+  // (production, always https) it's on.
+  const secure = location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAgeSeconds}; SameSite=Lax${secure}`;
 }
 
 function getCookie(name: string): string | null {

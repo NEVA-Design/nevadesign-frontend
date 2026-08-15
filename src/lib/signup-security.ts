@@ -2,7 +2,7 @@
 // nevadesign-backend (src/lib/signup-security.ts). This file just keeps the
 // shared shape for the admin UI (security alerts table).
 
-export const FREE_SIGNUP_CREDITS = 3
+export const FREE_SIGNUP_CREDITS = 0
 
 export type SignupSecurityStatus =
   | 'allowed'

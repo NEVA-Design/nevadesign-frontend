@@ -290,7 +290,9 @@ function showBrowserNotification() {
 
 // ─── Composant ────────────────────────────────────────────────────────────────
 
-export function DesignPageClient({ userPlan }: { userPlan: string }) {
+type SavedChar = { id: string; name: string; image_preview?: string | null; role?: string | null; server?: string | null; style?: string | null };
+
+export function DesignPageClient({ userPlan, initialCharacters }: { userPlan: string; initialCharacters?: SavedChar[] }) {
   // État principal
   const [prompt, setPrompt] = useState("");
   const [selectedAspectRatio, setSelectedAspectRatio] = useState("16:9");
@@ -312,8 +314,7 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
   const [isDraggingReference, setIsDraggingReference] = useState(false);
 
   // Personnages mémorisés
-  type SavedChar = { id: string; name: string; image_preview?: string | null; role?: string | null; server?: string | null; style?: string | null };
-  const [savedCharacters, setSavedCharacters] = useState<SavedChar[]>([]);
+  const [savedCharacters, setSavedCharacters] = useState<SavedChar[]>(initialCharacters ?? []);
   const [selectedCharacter, setSelectedCharacter] = useState<{ id: string; name: string; description: string } | null>(null);
   const [showCharPicker, setShowCharPicker] = useState(false);
   const [saveCharName, setSaveCharName] = useState("");
@@ -378,12 +379,14 @@ export function DesignPageClient({ userPlan }: { userPlan: string }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  // Chargement des personnages mémorisés au montage
+  // Chargement des personnages mémorisés au montage (skippé si déjà fournis par le serveur)
   useEffect(() => {
+    if (initialCharacters) return;
     backendFetch("/characters")
       .then(r => readApiResponse<{ characters: SavedChar[] }>(r))
       .then(d => { if (d.characters) setSavedCharacters(d.characters); })
       .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const saveCharacter = async () => {

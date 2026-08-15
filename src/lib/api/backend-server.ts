@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { cache } from "react";
 
 // Server-side counterpart of backend-client.ts — for server components and
 // route handlers, which read the session from the request's cookies
@@ -30,3 +31,14 @@ export async function backendGetJson<T>(path: string): Promise<T | null> {
     return null;
   }
 }
+
+/**
+ * Cached /me lookup — dedupes the backend call within a single request.
+ * Several server components (dashboard layout + several dashboard pages)
+ * independently need the current user, which previously meant the backend
+ * saw two /me calls per page load. React's cache() memoizes per-request,
+ * so all callers share one fetch — identical data, no HTTP caching involved.
+ */
+export const getMe = cache(async <T>(): Promise<T | null> => {
+  return backendGetJson<T>("/me");
+});

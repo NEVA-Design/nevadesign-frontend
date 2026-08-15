@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { backendGetJson } from '@/lib/api/backend-server'
+import { getMe } from '@/lib/api/backend-server'
 import DashboardShell from "@/components/dashboard/DashboardShell"
 
 // Depends on the request's session cookie — never prerender statically.
@@ -23,7 +23,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const me = await backendGetJson<MeResponse>('/me')
+  const me = await getMe<MeResponse>()
   if (!me) redirect('/login')
 
   const meta = me.user_metadata ?? {}

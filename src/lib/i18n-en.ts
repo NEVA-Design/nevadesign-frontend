@@ -23,7 +23,7 @@ const EN: Record<string, string> = {
     "YouTube thumbnails, logos, brand identities, gaming assets. Describe what you want — the AI studio composes renders ready to publish, up to 8K.",
   "hero.cta.primary": "Create my first visual",
   "hero.cta.secondary": "See the work",
-  "hero.proof": "3 free creations · No credit card",
+  "hero.proof": "No credit card",
   "hero.marquee": "Produced by the studio — published by 2,400+ creators",
 
   "demo.label": "Design Studio — live",
@@ -162,7 +162,7 @@ const EN: Record<string, string> = {
   "pricing.title.a": "Cheaper than a logo.",
   "pricing.title.beam": "For a whole identity.",
   "pricing.subtitle":
-    "Start with 3 free creations when you sign up. Move to a plan when your publishing pace grows — no commitment.",
+    "Move to a plan when you're ready to create — no commitment.",
   "pricing.note":
     "No commitment · Cancel in two clicks · Creation top-ups from your workspace",
   "pricing.rules.retouches": "5 retouches included per creation — beyond that, 1 creation",
@@ -174,8 +174,7 @@ const EN: Record<string, string> = {
   "pricing.cta.free": "Start for free",
   "pricing.cta.paid": "Choose",
   "pricing.plan.free.name": "Discovery",
-  "pricing.plan.free.description": "To try the studio, no credit card required.",
-  "pricing.plan.free.f1": "3 creations at sign-up",
+  "pricing.plan.free.description": "To discover the studio, no credit card required.",
   "pricing.plan.free.f2": "Watermarked previews",
   "pricing.plan.free.f3": "Limited history",
   "pricing.plan.free.f4": "Non-commercial use",
@@ -252,7 +251,7 @@ const EN: Record<string, string> = {
     "A full AI-driven creative studio: you describe an intent, it composes YouTube thumbnails, logos, brand guidelines and gaming visuals ready to publish — with real art direction, not random generation.",
   "faq.q2": "How good is the free plan, really?",
   "faq.a2":
-    "3 free creations at sign-up to try the full flow, brief included. Renders come out as watermarked previews; paid plans unlock HD exports, commercial use and generation priority",
+    "The Discovery plan lets you explore the full flow, brief included, with no creations credited. Paid plans unlock HD exports, commercial use and generation priority",
   "faq.q3": "Can I sell what I create?",
   "faq.a3":
     "Yes. From the first paid plan, every creation is commercially yours: channel, store, socials, server, client deliverables.",
@@ -272,7 +271,7 @@ const EN: Record<string, string> = {
   "footer.cta.subtitle": "Describe your universe. The first visual is ready within a minute.",
   "footer.cta.primary": "Start for free",
   "footer.cta.secondary": "Talk to the studio",
-  "footer.cta.note": "3 free creations · No card required",
+  "footer.cta.note": "No card required",
   "footer.baseline":
     "The AI creative studio — thumbnails, logos, identities, gaming. Art direction included.",
   "footer.product": "Product",
