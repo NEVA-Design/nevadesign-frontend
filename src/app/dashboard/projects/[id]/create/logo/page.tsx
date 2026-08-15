@@ -26,11 +26,5 @@ export default async function LogoWizardPage({ params }: { params: Promise<{ id:
     redirect(`/dashboard/projects/${id}`);
   }
 
-  return (
-    <LogoWizard
-      projectId={detail!.project.id}
-      projectName={detail!.project.name}
-      ambianceChips={detail!.project.ambiance?.chips ?? []}
-    />
-  );
+  return <LogoWizard projectId={detail!.project.id} projectName={detail!.project.name} />;
 }

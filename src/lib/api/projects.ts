@@ -6,10 +6,23 @@ import { backendFetch } from "@/lib/api/backend-client";
 // /projects du backend. Le projet porte la DA complète d'un serveur ;
 // tout asset créé dedans en hérite.
 
+// Réponses du wizard v2 (run 5.2) — l'utilisateur parle de son serveur,
+// le moteur traduit via le mapping backend. Jamais de « chrome »/« graffiti ».
+export type StyleAnswers = {
+  universe: "rp_urbain" | "cartel" | "luxe" | "ete_plage" | "sombre_hardcore" | "chill";
+  // 0 = élégant/calme, 100 = agressif/percutant
+  energie: number;
+  // 0 = classique, 100 = moderne
+  modernite: number;
+  // hex #RRGGBB ou "surprise"
+  couleur: string;
+};
+
 export type ProjectAmbiance = {
   universe: string;
   chips: string[];
   references: string[];
+  styleAnswers?: StyleAnswers;
 };
 
 export type LogoMaster = {

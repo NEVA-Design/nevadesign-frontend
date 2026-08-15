@@ -1,62 +1,56 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, ImagePlus, Loader2, X } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Building2,
+  Check,
+  Crown,
+  Gem,
+  ImagePlus,
+  Loader2,
+  Skull,
+  Smile,
+  Sparkles,
+  Sun,
+  X,
+} from "lucide-react";
 import { backendFetch } from "@/lib/api/backend-client";
-import { createProject } from "@/lib/api/projects";
+import { createProject, type StyleAnswers } from "@/lib/api/projects";
 import { cn } from "@/lib/utils";
 
 /*
- * Wizard de création de projet — une question par écran, cartes
- * illustrées, barre de progression fine, retour toujours possible.
- * Trois écrans : nom du serveur → secteur → ambiance. Aucun champ
- * « prompt » : l'univers se décrit en une phrase, trois exemples
- * cliquables amorcent la plume.
+ * Wizard de création de projet v2 (run 5.2) — une question par écran,
+ * réponses en chips illustrées de PICTOS DESSINÉS (jamais une image
+ * générée par IA), deux curseurs, une couleur, ≤ 60 s au total.
+ * L'utilisateur parle de son serveur ; le mapping backend traduit en
+ * direction artistique — il ne voit jamais « chrome » ou « graffiti ».
  */
 
-const SECTORS = [
-  {
-    id: "fivem",
-    label: "FiveM",
-    detail: "Serveurs GTA RP — logos, bannières, loading screens",
-    image: "/postergrandfivem.webp",
-    active: true,
-  },
-  {
-    id: "youtube",
-    label: "YouTube",
-    detail: "Miniatures et habillage de chaîne",
-    image: "/ordi.webp",
-    active: false,
-  },
-  {
-    id: "marques",
-    label: "Marques",
-    detail: "Identités et campagnes produit",
-    image: "/poser.webp",
-    active: false,
-  },
-  {
-    id: "evenementiel",
-    label: "Événementiel",
-    detail: "Affiches et communication d'événements",
-    image: "/affiche2.webp",
-    active: false,
-  },
-] as const;
-
-const AMBIANCE_CHIPS = ["Luxe", "Street", "Cartel", "Été", "Sombre", "Néon", "Rétro", "Militaire"];
-
-const UNIVERSE_EXAMPLES = [
-  "Serveur whitelist exigeant, ambiance cartel et nuits chaudes de Los Santos",
-  "RP français sérieux, économie réaliste, esthétique premium sombre",
-  "Freeroam estival — jetski, plage de Vespucci et couleurs saturées",
+const UNIVERSES: Array<{
+  id: StyleAnswers["universe"];
+  label: string;
+  detail: string;
+  icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
+  tint: string;
+}> = [
+  { id: "rp_urbain", label: "RP urbain", detail: "La ville, la rue, le quotidien de Los Santos", icon: Building2, tint: "#22D3EE" },
+  { id: "cartel", label: "Cartel", detail: "Pouvoir, territoires, nuits sous tension", icon: Crown, tint: "#E63946" },
+  { id: "luxe", label: "Luxe", detail: "Villas, montres, très haut standing", icon: Gem, tint: "#C9A227" },
+  { id: "ete_plage", label: "Été / plage", detail: "Vespucci, jetski, couleurs qui claquent", icon: Sun, tint: "#FF6B4A" },
+  { id: "sombre_hardcore", label: "Sombre / hardcore", detail: "RP dur, ambiance lourde, zéro pitié", icon: Skull, tint: "#94A3B8" },
+  { id: "chill", label: "Chill communautaire", detail: "Détente, entre potes, bonne humeur", icon: Smile, tint: "#8B5CF6" },
 ];
 
-const STEPS = ["Nom", "Secteur", "Ambiance"] as const;
+const COLOR_SWATCHES = [
+  "#E63946", "#FF6B4A", "#FFD166", "#06D6A0",
+  "#118AB2", "#22D3EE", "#8B5CF6", "#C9A227",
+];
+
+const STEPS = ["Nom", "Univers", "Énergie", "Époque", "Couleur", "Références"] as const;
 
 export default function NewProjectWizard() {
   const router = useRouter();
@@ -64,9 +58,14 @@ export default function NewProjectWizard() {
   const [direction, setDirection] = useState(1);
 
   const [name, setName] = useState("");
-  const [sector, setSector] = useState<string>("fivem");
-  const [universe, setUniverse] = useState("");
-  const [chips, setChips] = useState<string[]>([]);
+  const [universe, setUniverse] = useState<StyleAnswers["universe"] | null>(null);
+  // 0 = élégant, 100 = agressif — départ au centre, l'utilisateur tranche
+  const [energie, setEnergie] = useState(50);
+  const [energieTouched, setEnergieTouched] = useState(false);
+  // 0 = classique, 100 = moderne
+  const [modernite, setModernite] = useState(50);
+  const [moderniteTouched, setModerniteTouched] = useState(false);
+  const [couleur, setCouleur] = useState<string | null>(null);
   const [references, setReferences] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -74,22 +73,17 @@ export default function NewProjectWizard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const canContinue =
-    step === 0 ? name.trim().length >= 2 : step === 1 ? sector === "fivem" : universe.trim().length >= 8;
+    step === 0 ? name.trim().length >= 2
+    : step === 1 ? universe !== null
+    : step === 2 ? energieTouched
+    : step === 3 ? moderniteTouched
+    : step === 4 ? couleur !== null
+    : true;
 
   function go(delta: number) {
     setError(null);
     setDirection(delta);
     setStep((s) => Math.max(0, Math.min(STEPS.length - 1, s + delta)));
-  }
-
-  function toggleChip(chip: string) {
-    setChips((current) =>
-      current.includes(chip)
-        ? current.filter((c) => c !== chip)
-        : current.length >= 3
-          ? current
-          : [...current, chip]
-    );
   }
 
   async function handleReferenceUpload(file: File) {
@@ -119,14 +113,19 @@ export default function NewProjectWizard() {
   }
 
   async function handleSubmit() {
-    if (submitting) return;
+    if (submitting || !universe || !couleur) return;
     setSubmitting(true);
     setError(null);
     try {
       const project = await createProject({
         name: name.trim(),
-        sector,
-        ambiance: { universe: universe.trim(), chips, references },
+        sector: "fivem",
+        ambiance: {
+          universe: "",
+          chips: [],
+          references,
+          styleAnswers: { universe, energie, modernite, couleur },
+        },
         palette: [],
       });
       router.push(`/dashboard/projects/${project.id}`);
@@ -141,7 +140,7 @@ export default function NewProjectWizard() {
       {/* Barre de progression */}
       <div className="mb-10">
         <div className="flex items-baseline justify-between">
-          <p className="pv-label text-[color:var(--num-color)]">Nouveau projet</p>
+          <p className="pv-label text-[color:var(--num-color)]">Nouveau projet — moteur FiveM</p>
           <p className="font-mono text-[11px] tracking-[0.12em] text-dusk">
             {step + 1} / {STEPS.length} — {STEPS[step]}
           </p>
@@ -168,10 +167,10 @@ export default function NewProjectWizard() {
           {step === 0 ? (
             <section>
               <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
-                Comment s&apos;appelle votre serveur&nbsp;?
+                Comment s&apos;appelle ton serveur&nbsp;?
               </h1>
               <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
-                Ce nom signera chaque création du projet — il reste modifiable.
+                Ce nom sera dessiné dans chaque visuel — lettre par lettre, sans faute.
               </p>
               <input
                 autoFocus
@@ -191,59 +190,42 @@ export default function NewProjectWizard() {
           {step === 1 ? (
             <section>
               <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
-                Quel univers créez-vous&nbsp;?
+                Ton serveur, c&apos;est quel univers&nbsp;?
               </h1>
               <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
-                Chaque secteur a son moteur entraîné. FiveM ouvre le bal — les autres arrivent.
+                Une réponse suffit — le moteur en déduit toute la direction artistique.
               </p>
-              <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                {SECTORS.map((item) => {
-                  const selected = sector === item.id;
+              <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {UNIVERSES.map((item) => {
+                  const selected = universe === item.id;
+                  const Icon = item.icon;
                   return (
                     <button
                       key={item.id}
                       type="button"
-                      disabled={!item.active}
-                      onClick={() => item.active && setSector(item.id)}
+                      onClick={() => setUniverse(item.id)}
                       className={cn(
-                        "group relative overflow-hidden rounded-2xl border text-left transition-all duration-300",
-                        item.active
-                          ? selected
-                            ? "border-[rgba(164,139,232,0.65)] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_18px_44px_rgba(96,84,140,0.22)]"
-                            : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
-                          : "cursor-not-allowed border-[color:var(--hairline)]"
+                        "group flex items-start gap-3.5 rounded-2xl border p-4 text-left transition-all duration-300",
+                        selected
+                          ? "border-[rgba(164,139,232,0.65)] bg-white/70 shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_14px_36px_rgba(96,84,140,0.18)]"
+                          : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
                       )}
                     >
-                      <div className="relative h-[120px] overflow-hidden">
-                        <Image
-                          src={item.image}
-                          alt=""
-                          fill
-                          sizes="(max-width: 640px) 100vw, 420px"
-                          className={cn(
-                            "object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
-                            item.active ? "group-hover:scale-[1.05]" : "opacity-40 saturate-[0.3]"
-                          )}
-                        />
-                        {!item.active ? (
-                          <span className="absolute right-3 top-3 rounded-full border border-[color:var(--hairline-strong)] bg-white/80 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.14em] text-steel backdrop-blur-sm">
-                            Bientôt
-                          </span>
-                        ) : null}
-                        {selected ? (
-                          <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-white shadow-[0_2px_8px_rgba(43,36,80,0.4)]">
-                            <Check size={13} strokeWidth={2.4} />
-                          </span>
-                        ) : null}
-                      </div>
-                      <div className={cn("px-5 py-4", item.active ? "bg-white/70" : "bg-white/40")}>
-                        <span className={cn("block text-[15px] font-medium", item.active ? "text-ink" : "text-mist")}>
-                          {item.label}
+                      {/* Picto dessiné — jamais une image générée */}
+                      <span
+                        aria-hidden
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-black/5"
+                        style={{ background: `${item.tint}1A`, color: item.tint }}
+                      >
+                        <Icon size={20} strokeWidth={1.8} />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-center justify-between gap-2">
+                          <span className="text-[14.5px] font-medium text-ink">{item.label}</span>
+                          {selected ? <Check size={15} className="shrink-0 text-[color:var(--num-color)]" /> : null}
                         </span>
-                        <span className={cn("mt-1 block text-xs leading-relaxed", item.active ? "text-steel" : "text-mist")}>
-                          {item.detail}
-                        </span>
-                      </div>
+                        <span className="mt-1 block text-[11.5px] leading-relaxed text-steel">{item.detail}</span>
+                      </span>
                     </button>
                   );
                 })}
@@ -254,98 +236,172 @@ export default function NewProjectWizard() {
           {step === 2 ? (
             <section>
               <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
-                Décrivez l&apos;ambiance en une phrase.
+                L&apos;énergie&nbsp;?
               </h1>
               <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
-                C&apos;est la boussole du moteur : chaque visuel du projet la respectera.
+                Glisse le curseur là où ton serveur se reconnaît.
               </p>
-
-              <textarea
-                autoFocus
-                value={universe}
-                onChange={(e) => setUniverse(e.target.value)}
-                placeholder="Serveur RP exigeant, ambiance cartel, nuits chaudes de Los Santos…"
-                maxLength={240}
-                rows={3}
-                className="pv-glass mt-7 w-full resize-none rounded-2xl border border-[color:var(--hairline-strong)] px-6 py-5 text-[17px] leading-relaxed text-ink outline-none transition-shadow placeholder:text-mist focus:shadow-[0_0_0_2px_rgba(164,139,232,0.35)]"
-              />
-              <div className="mt-3 flex flex-wrap gap-2">
-                {UNIVERSE_EXAMPLES.map((example) => (
-                  <button
-                    key={example}
-                    type="button"
-                    onClick={() => setUniverse(example)}
-                    className="rounded-full border border-[color:var(--hairline-strong)] px-3.5 py-1.5 text-left text-[11px] leading-snug text-steel transition-colors hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
-                  >
-                    {example}
-                  </button>
-                ))}
-              </div>
-
-              <div className="mt-8">
-                <p className="pv-label">Ambiance — 3 maximum</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {AMBIANCE_CHIPS.map((chip) => {
-                    const selected = chips.includes(chip);
-                    return (
-                      <button
-                        key={chip}
-                        type="button"
-                        onClick={() => toggleChip(chip)}
-                        className={cn(
-                          "rounded-full border px-4 py-2 text-[13px] font-medium transition-all duration-200",
-                          selected
-                            ? "border-transparent bg-ink text-white shadow-[0_2px_10px_rgba(43,36,80,0.3)]"
-                            : "border-[color:var(--hairline-strong)] text-steel hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
-                        )}
-                      >
-                        {chip}
-                      </button>
-                    );
-                  })}
+              <div className="pv-glass mt-10 rounded-2xl border border-[color:var(--hairline-strong)] px-6 py-8">
+                <div className="flex items-baseline justify-between">
+                  <span className={cn("text-[15px] font-medium transition-colors", energie < 50 ? "text-ink" : "text-mist")}>Élégant</span>
+                  <span className={cn("text-[15px] font-medium transition-colors", energie >= 50 ? "text-ink" : "text-mist")}>Agressif</span>
                 </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={5}
+                  value={energie}
+                  onChange={(e) => {
+                    setEnergie(Number(e.target.value));
+                    setEnergieTouched(true);
+                  }}
+                  className="mt-4 w-full accent-[#7C6BD4]"
+                  aria-label="Curseur énergie, d'élégant à agressif"
+                />
+                <p className="mt-4 text-center font-mono text-[11px] tracking-[0.08em] text-dusk">
+                  {!energieTouched
+                    ? "Touche le curseur — même pour le laisser au centre"
+                    : energie < 25 ? "Feutré, précis, sûr de lui"
+                    : energie < 50 ? "Élégant, avec du caractère"
+                    : energie < 75 ? "Percutant, ça avance"
+                    : "Frontal, ça ne demande pas la permission"}
+                </p>
               </div>
+            </section>
+          ) : null}
 
-              <div className="mt-8">
-                <p className="pv-label">Références visuelles — facultatif</p>
-                <div className="mt-3 flex flex-wrap items-center gap-3">
-                  {references.map((url) => (
-                    <span key={url} className="relative h-16 w-16 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)]">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={url} alt="" className="h-full w-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => setReferences((c) => c.filter((r) => r !== url))}
-                        className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-ink/80 text-white"
-                        aria-label="Retirer la référence"
-                      >
-                        <X size={11} />
-                      </button>
-                    </span>
-                  ))}
-                  {references.length < 3 ? (
+          {step === 3 ? (
+            <section>
+              <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
+                Plutôt&nbsp;?
+              </h1>
+              <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
+                L&apos;époque de ta direction artistique.
+              </p>
+              <div className="pv-glass mt-10 rounded-2xl border border-[color:var(--hairline-strong)] px-6 py-8">
+                <div className="flex items-baseline justify-between">
+                  <span className={cn("text-[15px] font-medium transition-colors", modernite < 50 ? "text-ink" : "text-mist")}>Classique</span>
+                  <span className={cn("text-[15px] font-medium transition-colors", modernite >= 50 ? "text-ink" : "text-mist")}>Moderne</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={5}
+                  value={modernite}
+                  onChange={(e) => {
+                    setModernite(Number(e.target.value));
+                    setModerniteTouched(true);
+                  }}
+                  className="mt-4 w-full accent-[#7C6BD4]"
+                  aria-label="Curseur époque, de classique à moderne"
+                />
+                <p className="mt-4 text-center font-mono text-[11px] tracking-[0.08em] text-dusk">
+                  {!moderniteTouched
+                    ? "Touche le curseur — même pour le laisser au centre"
+                    : modernite < 25 ? "Héritage, matière, patine"
+                    : modernite < 50 ? "Classique bien coupé"
+                    : modernite < 75 ? "Actuel, net, affûté"
+                    : "Résolument moderne"}
+                </p>
+              </div>
+            </section>
+          ) : null}
+
+          {step === 4 ? (
+            <section>
+              <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
+                Une couleur qui doit dominer&nbsp;?
+              </h1>
+              <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
+                Elle guidera l&apos;étalonnage de chaque visuel du projet.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                {COLOR_SWATCHES.map((hex) => {
+                  const selected = couleur === hex;
+                  return (
+                    <button
+                      key={hex}
+                      type="button"
+                      onClick={() => setCouleur(hex)}
+                      aria-label={`Couleur ${hex}`}
+                      className={cn(
+                        "relative h-14 w-14 rounded-full border-2 transition-all duration-200",
+                        selected ? "scale-110 border-ink shadow-[0_6px_18px_rgba(43,36,80,0.3)]" : "border-black/10 hover:scale-105"
+                      )}
+                      style={{ background: hex }}
+                    >
+                      {selected ? (
+                        <span className="absolute inset-0 flex items-center justify-center text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
+                          <Check size={18} strokeWidth={2.6} />
+                        </span>
+                      ) : null}
+                    </button>
+                  );
+                })}
+                <button
+                  type="button"
+                  onClick={() => setCouleur("surprise")}
+                  className={cn(
+                    "flex h-14 items-center gap-2 rounded-full border-2 px-5 text-[13px] font-medium transition-all duration-200",
+                    couleur === "surprise"
+                      ? "scale-105 border-ink bg-white text-ink shadow-[0_6px_18px_rgba(43,36,80,0.25)]"
+                      : "border-[color:var(--hairline-strong)] text-steel hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
+                  )}
+                >
+                  <Sparkles size={15} className="text-[color:var(--num-color)]" />
+                  Surprends-moi
+                </button>
+              </div>
+            </section>
+          ) : null}
+
+          {step === 5 ? (
+            <section>
+              <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
+                Des références à nous montrer&nbsp;? <span className="text-mist">(facultatif)</span>
+              </h1>
+              <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
+                Un logo que tu aimes, une bannière qui t&apos;inspire — le moteur s&apos;en imprègne.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                {references.map((url) => (
+                  <span key={url} className="relative h-20 w-20 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt="" className="h-full w-full object-cover" />
                     <button
                       type="button"
-                      disabled={uploading}
-                      onClick={() => fileInputRef.current?.click()}
-                      className="flex h-16 w-16 items-center justify-center rounded-xl border border-dashed border-[color:var(--hairline-strong)] text-dusk transition-colors hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
-                      aria-label="Ajouter une référence"
+                      onClick={() => setReferences((c) => c.filter((r) => r !== url))}
+                      className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-ink/80 text-white"
+                      aria-label="Retirer la référence"
                     >
-                      {uploading ? <Loader2 size={16} className="animate-spin" /> : <ImagePlus size={16} />}
+                      <X size={11} />
                     </button>
-                  ) : null}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) void handleReferenceUpload(file);
-                      e.target.value = "";
-                    }}
-                  />
-                </div>
+                  </span>
+                ))}
+                {references.length < 3 ? (
+                  <button
+                    type="button"
+                    disabled={uploading}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex h-20 w-20 items-center justify-center rounded-xl border border-dashed border-[color:var(--hairline-strong)] text-dusk transition-colors hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
+                    aria-label="Ajouter une référence"
+                  >
+                    {uploading ? <Loader2 size={16} className="animate-spin" /> : <ImagePlus size={16} />}
+                  </button>
+                ) : null}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void handleReferenceUpload(file);
+                    e.target.value = "";
+                  }}
+                />
               </div>
             </section>
           ) : null}

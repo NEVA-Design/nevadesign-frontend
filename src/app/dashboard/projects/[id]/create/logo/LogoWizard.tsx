@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import Image from "next/image";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -10,66 +9,45 @@ import { finalizeLogoMaster, generateLogoProposals, type LogoWizardAnswers } fro
 import { cn } from "@/lib/utils";
 
 /*
- * Étape 1 obligatoire — le logo, la base de tout.
- * Trois questions en cartes illustrées (type, style, palette), puis
- * 3 propositions en 1K, choix, master 4K détouré côté serveur et
- * déclinaisons blanc/noir dérivées localement. Zéro prompt visible.
+ * Étape 1 obligatoire — le logo, la base de tout. Version 5.2 :
+ * UNE question (« Ton logo idéal ? »), illustrée typographiquement en CSS
+ * — plus aucun écran de style, plus aucune vignette générée par IA. Le
+ * style et la palette viennent du mapping du projet (univers, énergie,
+ * époque, couleur). Puis 3 propositions en 1K passées à l'OCR gate,
+ * choix, master 4K détouré côté serveur. Zéro prompt visible.
  */
 
 type Props = {
   projectId: string;
   projectName: string;
-  ambianceChips: string[];
 };
 
-const STEPS = ["Type", "Style", "Palette", "Propositions"] as const;
+const STEPS = ["Ton logo idéal", "Propositions"] as const;
 
 const TYPES = [
   {
     id: "lettre" as const,
-    label: "Lettre unique",
+    label: "Une lettre",
     detail: "Un monogramme fort, lisible en petit",
   },
   {
     id: "nom" as const,
-    label: "Nom complet",
+    label: "Le nom entier",
     detail: "Le nom du serveur en lettrage dessiné",
   },
   {
     id: "embleme" as const,
-    label: "Emblème",
+    label: "Un emblème",
     detail: "Un symbole pur, sans aucune lettre",
   },
 ];
 
-const STYLES = [
-  { id: "chrome" as const, label: "Chrome", detail: "Métal poli, biseaux, reflets" },
-  { id: "graffiti" as const, label: "Graffiti", detail: "Urbain, contours épais, énergie" },
-  { id: "luxe" as const, label: "Luxe", detail: "Fin, doré, espacé, élégant" },
-  { id: "neon" as const, label: "Néon", detail: "Tubes lumineux sur fond sombre" },
-  { id: "cartoon" as const, label: "Cartoon", detail: "Mascotte 3D, épais, vif" },
-  { id: "minimal" as const, label: "Minimal", detail: "Vectoriel plat, géométrique" },
-];
-
-const PALETTES: Array<{ id: string; label: string; colors: string[]; boost: string[] }> = [
-  { id: "or-encre", label: "Or & encre", colors: ["#C9A227", "#0A0A0A", "#F5F0E8"], boost: ["Luxe", "Sombre"] },
-  { id: "cartel", label: "Cartel", colors: ["#E63946", "#D4A017", "#0F0F0F"], boost: ["Cartel", "Street"] },
-  { id: "neon-nuit", label: "Néon nuit", colors: ["#8B5CF6", "#22D3EE", "#0B0B10"], boost: ["Néon", "Sombre"] },
-  { id: "ete-vespucci", label: "Été Vespucci", colors: ["#FF6B4A", "#FFD166", "#118AB2"], boost: ["Été", "Rétro"] },
-  { id: "acier", label: "Acier", colors: ["#94A3B8", "#1E293B", "#E2E8F0"], boost: ["Militaire", "Minimal"] },
-];
-
-const HEX = /^#[0-9a-fA-F]{6}$/;
-
-export default function LogoWizard({ projectId, projectName, ambianceChips }: Props) {
+export default function LogoWizard({ projectId, projectName }: Props) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
 
   const [type, setType] = useState<LogoWizardAnswers["type"] | null>(null);
-  const [style, setStyle] = useState<LogoWizardAnswers["style"] | null>(null);
-  const [paletteId, setPaletteId] = useState<string | null>(null);
-  const [customColors, setCustomColors] = useState(["#C9A227", "#0A0A0A", "#F5F0E8"]);
 
   const [generating, setGenerating] = useState(false);
   const [assetId, setAssetId] = useState<string | undefined>();
@@ -80,47 +58,24 @@ export default function LogoWizard({ projectId, projectName, ambianceChips }: Pr
   const [master, setMaster] = useState<{ url: string; whiteUrl: string; blackUrl: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Palettes remontées selon les chips d'ambiance du projet
-  const sortedPalettes = useMemo(() => {
-    return [...PALETTES].sort((a, b) => {
-      const scoreA = a.boost.filter((c) => ambianceChips.includes(c)).length;
-      const scoreB = b.boost.filter((c) => ambianceChips.includes(c)).length;
-      return scoreB - scoreA;
-    });
-  }, [ambianceChips]);
-
-  const palette = useMemo(() => {
-    if (paletteId === "custom") return customColors.filter((c) => HEX.test(c));
-    return PALETTES.find((p) => p.id === paletteId)?.colors ?? [];
-  }, [paletteId, customColors]);
-
-  const canContinue =
-    step === 0 ? type !== null : step === 1 ? style !== null : step === 2 ? palette.length >= 2 : false;
-
-  function go(delta: number) {
-    setError(null);
-    setDirection(delta);
-    setStep((s) => Math.max(0, Math.min(STEPS.length - 1, s + delta)));
-  }
-
   async function launchProposals(again = false) {
-    if (!type || !style || generating) return;
+    if (!type || generating) return;
     setGenerating(true);
     setError(null);
     setChosen(null);
+    if (step !== 1) {
+      setDirection(1);
+      setStep(1);
+    }
     try {
       const result = await generateLogoProposals({
         projectId,
         assetId: again ? assetId : undefined,
-        answers: { type, style, palette },
+        answers: { type },
       });
       setAssetId(result.assetId);
       setProposals(result.proposals);
       setRetouchesUsed(result.retouchesUsed);
-      if (step !== 3) {
-        setDirection(1);
-        setStep(3);
-      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -228,8 +183,12 @@ export default function LogoWizard({ projectId, projectName, ambianceChips }: Pr
           {step === 0 ? (
             <section>
               <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
-                Quelle forme pour le logo&nbsp;?
+                Ton logo idéal&nbsp;?
               </h1>
+              <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
+                Le style, les matières et les couleurs viennent de ton projet — ici on choisit
+                juste la forme.
+              </p>
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
                 {TYPES.map((item) => {
                   const selected = type === item.id;
@@ -245,7 +204,7 @@ export default function LogoWizard({ projectId, projectName, ambianceChips }: Pr
                           : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
                       )}
                     >
-                      {/* Illustration typographique réelle — jamais de liste sèche */}
+                      {/* Illustration typographique réelle (CSS) — jamais une génération */}
                       <div className="relative flex h-[120px] items-center justify-center bg-[#14111F]">
                         {item.id === "lettre" ? (
                           <span className="pv-display text-[64px] leading-none text-white">
@@ -281,134 +240,12 @@ export default function LogoWizard({ projectId, projectName, ambianceChips }: Pr
           {step === 1 ? (
             <section>
               <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
-                Quel style le définit&nbsp;?
-              </h1>
-              <p className="mt-3 text-sm text-steel">Vignettes générées par le moteur entraîné — le vôtre suivra ce langage.</p>
-              <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
-                {STYLES.map((item) => {
-                  const selected = style === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setStyle(item.id)}
-                      className={cn(
-                        "group overflow-hidden rounded-2xl border text-left transition-all duration-300",
-                        selected
-                          ? "border-[rgba(164,139,232,0.65)] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_18px_44px_rgba(96,84,140,0.22)]"
-                          : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
-                      )}
-                    >
-                      <div className="relative aspect-square overflow-hidden bg-white">
-                        <Image
-                          src={`/wizard/logo-style-${item.id}.webp`}
-                          alt=""
-                          fill
-                          sizes="(max-width: 640px) 45vw, 260px"
-                          className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
-                        />
-                        {selected ? (
-                          <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-white shadow-[0_2px_8px_rgba(43,36,80,0.4)]">
-                            <Check size={13} strokeWidth={2.6} />
-                          </span>
-                        ) : null}
-                      </div>
-                      <div className="bg-white/70 px-4 py-3">
-                        <span className="block text-[14px] font-medium text-ink">{item.label}</span>
-                        <span className="mt-0.5 block text-[11px] leading-relaxed text-steel">{item.detail}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-          ) : null}
-
-          {step === 2 ? (
-            <section>
-              <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
-                Ses couleurs&nbsp;?
-              </h1>
-              <p className="mt-3 text-sm text-steel">
-                Cette palette devient celle du projet — chaque visuel s&apos;y étalonnera.
-              </p>
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {sortedPalettes.map((item) => {
-                  const selected = paletteId === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setPaletteId(item.id)}
-                      className={cn(
-                        "flex items-center gap-4 rounded-2xl border p-4 text-left transition-all duration-300",
-                        selected
-                          ? "border-[rgba(164,139,232,0.65)] bg-white/70 shadow-[0_0_0_1px_rgba(164,139,232,0.4)]"
-                          : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
-                      )}
-                    >
-                      <span className="flex h-12 w-24 overflow-hidden rounded-lg border border-black/10">
-                        {item.colors.map((color) => (
-                          <span key={color} className="h-full flex-1" style={{ background: color }} />
-                        ))}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-[14px] font-medium text-ink">{item.label}</span>
-                        <span className="mt-0.5 block font-mono text-[10px] tracking-[0.06em] text-dusk">
-                          {item.colors.join("  ")}
-                        </span>
-                      </span>
-                      {selected ? <Check size={16} className="shrink-0 text-[color:var(--num-color)]" /> : null}
-                    </button>
-                  );
-                })}
-
-                {/* Palette personnalisée */}
-                <button
-                  type="button"
-                  onClick={() => setPaletteId("custom")}
-                  className={cn(
-                    "flex items-center gap-4 rounded-2xl border p-4 text-left transition-all duration-300",
-                    paletteId === "custom"
-                      ? "border-[rgba(164,139,232,0.65)] bg-white/70 shadow-[0_0_0_1px_rgba(164,139,232,0.4)]"
-                      : "border-dashed border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
-                  )}
-                >
-                  <span className="flex h-12 w-24 items-center justify-center gap-1.5 rounded-lg border border-dashed border-[color:var(--hairline-strong)]">
-                    {customColors.map((color, i) => (
-                      <label key={i} className="relative h-7 w-7 cursor-pointer overflow-hidden rounded-full border border-black/10" style={{ background: color }}>
-                        <input
-                          type="color"
-                          value={color}
-                          onChange={(e) => {
-                            const next = [...customColors];
-                            next[i] = e.target.value.toUpperCase();
-                            setCustomColors(next);
-                            setPaletteId("custom");
-                          }}
-                          className="absolute inset-0 cursor-pointer opacity-0"
-                        />
-                      </label>
-                    ))}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-[14px] font-medium text-ink">Personnalisée</span>
-                    <span className="mt-0.5 block text-[11px] text-steel">Touchez les pastilles pour choisir</span>
-                  </span>
-                  {paletteId === "custom" ? <Check size={16} className="shrink-0 text-[color:var(--num-color)]" /> : null}
-                </button>
-              </div>
-            </section>
-          ) : null}
-
-          {step === 3 ? (
-            <section>
-              <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
-                {generating ? "Le moteur dessine…" : "Choisissez votre logo."}
+                {generating ? "Le moteur dessine…" : "Choisis ton logo."}
               </h1>
               {!generating && proposals.length ? (
                 <p className="mt-3 text-sm text-steel">
-                  Trois interprétations du même brief. Celle que vous validez devient le master 4K du projet.
+                  Trois interprétations du même brief, orthographe vérifiée. Celle que tu valides
+                  devient le master 4K du projet.
                 </p>
               ) : null}
 
@@ -499,8 +336,10 @@ export default function LogoWizard({ projectId, projectName, ambianceChips }: Pr
           type="button"
           onClick={() => {
             if (step === 0) router.push(`/dashboard/projects/${projectId}`);
-            else if (step === 3 && !generating) go(-1);
-            else if (step < 3) go(-1);
+            else if (!generating) {
+              setDirection(-1);
+              setStep(0);
+            }
           }}
           className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm text-steel transition-colors hover:bg-ink/[0.04] hover:text-ink"
         >
@@ -508,35 +347,21 @@ export default function LogoWizard({ projectId, projectName, ambianceChips }: Pr
           {step === 0 ? "Le projet" : "Retour"}
         </button>
 
-        {step < 2 ? (
+        {step === 0 ? (
           <button
             type="button"
-            disabled={!canContinue}
-            onClick={() => go(1)}
-            className={cn(
-              "inline-flex h-11 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium transition-all",
-              canContinue
-                ? "bg-ink text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] hover:bg-[#35305E]"
-                : "cursor-not-allowed bg-ink/10 text-mist"
-            )}
-          >
-            Continuer
-            <ArrowRight size={15} />
-          </button>
-        ) : step === 2 ? (
-          <button
-            type="button"
-            disabled={!canContinue || generating}
+            disabled={!type || generating}
             onClick={() => launchProposals(false)}
             className={cn(
               "inline-flex h-11 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium transition-all",
-              canContinue && !generating
+              type && !generating
                 ? "bg-ink text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] hover:bg-[#35305E]"
                 : "cursor-not-allowed bg-ink/10 text-mist"
             )}
           >
             {generating ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
             Générer 3 propositions
+            <ArrowRight size={15} />
           </button>
         ) : null}
       </div>

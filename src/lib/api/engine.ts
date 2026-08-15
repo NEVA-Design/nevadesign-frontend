@@ -3,12 +3,12 @@
 import { backendFetch } from "@/lib/api/backend-client";
 import type { ProjectAsset } from "@/lib/api/projects";
 
-// Helpers du moteur de génération (run 5) — miroir des routes /engine.
+// Helpers du moteur de génération (run 5.2) — miroir des routes /engine.
 
+// v2 : le style se déduit du mapping projet — le wizard logo ne répond
+// qu'à « Ton logo idéal ? ».
 export type LogoWizardAnswers = {
   type: "lettre" | "nom" | "embleme";
-  style: "chrome" | "graffiti" | "luxe" | "neon" | "cartoon" | "minimal";
-  palette: string[];
 };
 
 export type SceneWizardAnswers = {
@@ -17,6 +17,10 @@ export type SceneWizardAnswers = {
   personnages?: string;
   moment?: string;
   props?: string;
+  // slogan optionnel généré sous le titre, épelé + OCR comme lui
+  baseline?: string;
+  // option pré-câblée : logo master intégré à la génération
+  logoInScene?: boolean;
 };
 
 export type SceneTemplateInfo = {
@@ -77,13 +81,28 @@ export async function generateScene(input: {
   return parseOrThrow(res);
 }
 
-export async function regenerateScene(input: {
+// Retouche par instruction courte (run 5.2) : « passe le titre en chrome »,
+// « scène de nuit »… = 1 retouche du compteur.
+export async function instructLayer(input: {
   projectId: string;
   assetId: string;
-  answers?: SceneWizardAnswers;
-  keepComposition?: boolean;
+  instruction: string;
 }): Promise<{ asset: ProjectAsset; retouchesUsed: number; includedRetouches: number; creditCharged: number; retried: boolean }> {
-  const res = await backendFetch("/engine/scene/regenerate", {
+  const res = await backendFetch("/engine/layer/instruct", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+  return parseOrThrow(res);
+}
+
+// Masque de gomme non destructive — stocké côté serveur, aucun débit.
+export async function saveLayerMask(input: {
+  projectId: string;
+  assetId: string;
+  layerId: string;
+  mask: string;
+}): Promise<{ maskUrl: string }> {
+  const res = await backendFetch("/engine/mask", {
     method: "POST",
     body: JSON.stringify(input),
   });
