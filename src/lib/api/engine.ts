@@ -3,12 +3,38 @@
 import { backendFetch } from "@/lib/api/backend-client";
 import type { ProjectAsset } from "@/lib/api/projects";
 
-// Helpers du moteur de génération (run 5.2) — miroir des routes /engine.
+// Helpers du moteur de génération (run 5.2 → 5.3) — miroir des routes /engine.
 
-// v2 : le style se déduit du mapping projet — le wizard logo ne répond
-// qu'à « Ton logo idéal ? ».
+// v3 (run 5.3) : le wizard pose ENFIN les bonnes questions — le sujet/thème,
+// les couleurs libres (picker + dégradé), l'ambiance du logo, le fond, les
+// interdits. Le brief part TEL QUEL au directeur artistique (étage 1).
+export type LogoCouleursChoix =
+  | { mode: "palette" }
+  | { mode: "unie"; couleur: string }
+  | { mode: "degrade"; couleurs: string[]; angle: number };
+
 export type LogoWizardAnswers = {
   type: "lettre" | "nom" | "embleme";
+  sujet: string;
+  ambiance: "ete" | "sombre" | "luxe" | "neon" | "retro" | "propre" | null;
+  couleurs: LogoCouleursChoix;
+  fond: "transparent" | "plein" | "degrade_motifs";
+  interdits: string;
+};
+
+export type LogoConcept = {
+  nom: string;
+  justification: string;
+  prompt: string;
+};
+
+export type LogoProposition = {
+  url: string;
+  concept: LogoConcept;
+  ocrRejects: number;
+  conceptOk: boolean;
+  defauts: string[];
+  regenere: boolean;
 };
 
 export type SceneWizardAnswers = {
@@ -48,7 +74,15 @@ export async function generateLogoProposals(input: {
   projectId: string;
   assetId?: string;
   answers: LogoWizardAnswers;
-}): Promise<{ assetId: string; proposals: string[]; retouchesUsed: number; includedRetouches: number; creditCharged: number }> {
+}): Promise<{
+  assetId: string;
+  propositions: LogoProposition[];
+  proposals: string[];
+  concepts: LogoConcept[];
+  retouchesUsed: number;
+  includedRetouches: number;
+  creditCharged: number;
+}> {
   const res = await backendFetch("/engine/logo/proposals", {
     method: "POST",
     body: JSON.stringify(input),
