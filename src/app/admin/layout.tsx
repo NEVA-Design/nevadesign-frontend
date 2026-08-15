@@ -23,6 +23,7 @@ const navItems = [
   { href: '/admin/users', label: 'Utilisateurs' },
   { href: '/admin/security-alerts', label: 'Sécurité' },
   { href: '/admin/neva-design', label: 'Portfolio' },
+  { href: '/admin/test-moteur', label: 'Test moteur' },
   { href: '/admin/announcements', label: 'Annonces' },
   { href: '/admin/newsletter', label: 'Newsletter' },
   { href: '/admin/maintenance', label: 'Maintenance' },
