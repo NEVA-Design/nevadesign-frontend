@@ -1,24 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle, ChevronDown, Loader2, Play, ShieldCheck, Sparkles } from "lucide-react";
+import { AlertTriangle, ChevronDown, Download, Loader2, Play, ShieldCheck, Sparkles } from "lucide-react";
 import { backendFetch } from "@/lib/api/backend-client";
 import { cn } from "@/lib/utils";
 
 /*
- * /admin/test-moteur (run 5.2 LOT 5 → run 5.3 LOT 4) — la checklist à cliquer.
- * Chaque cas montre son brief et ses prompts AVANT lancement (GET = compilation
- * pure, zéro appel API). Les cas logo v3 se jouent en deux temps : « Étage 1 »
- * écrit les 3 concepts du DA (affichés dépliables AVANT toute image), puis
- * « Étages 2+3 » les dessine et les relit. Coût par étage + compteurs de
- * session (rejets OCR, échecs de concept, coût cumulé). Rien n'est généré
+ * /admin/test-moteur (run 5.2 → 5.4) — la checklist à cliquer.
+ * Run 5.4 (LOT 6) : badge d'état ADN/exemplars/réfs en tête — cas GRISÉS avec
+ * le message « Entraînement requis » tant que train-fivem-v4 n'a pas tourné.
+ * Cas Fruitz FiveM-check : les gabarits maîtres complets se déplient AVANT
+ * génération, les scores du contrôle (relief, glow, verdict ADN, lisibilité
+ * 64 px) s'affichent après. Cas étape B : 3 fonds générés sans le logo,
+ * composition par calques, déclinaisons téléchargeables. Compteurs : rejets
+ * OCR, échecs concept, ÉCHECS ADN, coût cumulé. Rien n'est généré
  * automatiquement — chaque lancement est un clic de l'admin.
  */
 
 type Variant = {
   id: string;
   label: string;
-  pipeline: "v1" | "v2" | "instruct" | "logo_v3_concepts" | "logo_v3_generation";
+  pipeline: "v1" | "v2" | "instruct" | "logo_v3_concepts" | "logo_v3_generation" | "logo_fond_b";
   kind: "logo" | "hero";
   model: string;
   count: number;
@@ -36,14 +38,25 @@ type TestCase = {
   variants: Variant[];
 };
 
-type Concept = { nom: string; justification: string; prompt: string };
+type Concept = { nom: string; justification: string; citations: string[]; rendu: "relief" | "plat"; prompt: string };
 
 type Compteurs = {
   generations: number;
   ocrRejets: number;
   echecsConcept: number;
+  echecsAdn: number;
   regenerationsCiblees: number;
   coutCumuleEur: number;
+};
+
+type Entrainement = {
+  installed: boolean;
+  adnActif: boolean;
+  version: number | null;
+  exemplarsLogo: number;
+  referencesJointes: number;
+  fondsBibliotheque: number;
+  manques: string[];
 };
 
 type CoutParEtage = { daEur: number; generationEur: number; relectureEur: number; totalEur: number };
@@ -57,9 +70,15 @@ type RunResult = {
     concept: Concept;
     ocrRejects: number;
     conceptOk: boolean;
+    adnOk: boolean;
+    serveurLogo: boolean;
+    lisible64: boolean;
+    scores: { relief: number; glow: number };
     defauts: string[];
     regenere: boolean;
   }>;
+  fonds?: Array<{ fondDataUrl: string; previewDataUrl: string }>;
+  declinaisons?: { alphaDataUrl: string; carreDataUrl: string; banniereDataUrl: string };
   coutParEtage?: CoutParEtage;
   dureeMs: number;
   compteurs?: Compteurs;
@@ -69,6 +88,7 @@ const COMPTEUR_TILES: Array<{ id: keyof Compteurs; label: string }> = [
   { id: "generations", label: "Générations" },
   { id: "ocrRejets", label: "Rejets OCR" },
   { id: "echecsConcept", label: "Échecs concept" },
+  { id: "echecsAdn", label: "Échecs ADN" },
   { id: "regenerationsCiblees", label: "Régén. ciblées" },
   { id: "coutCumuleEur", label: "Coût cumulé €" },
 ];
@@ -76,6 +96,9 @@ const COMPTEUR_TILES: Array<{ id: keyof Compteurs; label: string }> = [
 export default function TestMoteur() {
   const [cases, setCases] = useState<TestCase[]>([]);
   const [compteurs, setCompteurs] = useState<Compteurs | null>(null);
+  const [entrainement, setEntrainement] = useState<Entrainement | null>(null);
+  const [bloque, setBloque] = useState(false);
+  const [messageBlocage, setMessageBlocage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [openPrompts, setOpenPrompts] = useState<Record<string, boolean>>({});
@@ -91,6 +114,9 @@ export default function TestMoteur() {
         if (!r.ok) throw new Error(json?.error ?? "Chargement impossible");
         setCases(json.cases ?? []);
         setCompteurs(json.compteurs ?? null);
+        setEntrainement(json.entrainement ?? null);
+        setBloque(Boolean(json.bloque));
+        setMessageBlocage(json.messageBlocage ?? null);
       })
       .catch((e) => setLoadError((e as Error).message))
       .finally(() => setLoading(false));
@@ -137,18 +163,42 @@ export default function TestMoteur() {
   return (
     <div className="flex flex-col gap-8">
       <header>
-        <p className="pv-label text-[color:var(--num-color)]">Run 5.3 — logos qui réfléchissent</p>
+        <p className="pv-label text-[color:var(--num-color)]">Run 5.4 — l&apos;ADN FiveM</p>
         <h1 className="pv-display mt-2 text-[clamp(1.6rem,3vw,2.3rem)] text-ink">Banc de test du moteur.</h1>
+
+        {/* LOT 0/6 : le badge d'état — le client ne teste plus jamais à l'aveugle */}
+        {entrainement ? (
+          <div
+            className={cn(
+              "mt-4 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 font-mono text-[11px] tracking-[0.04em]",
+              entrainement.installed
+                ? "border-[rgba(61,122,88,0.35)] bg-[rgba(61,122,88,0.07)] text-[#3D7A58]"
+                : "border-[rgba(220,80,80,0.35)] bg-[rgba(220,80,80,0.06)] text-[#B4443C]"
+            )}
+          >
+            {entrainement.installed ? <ShieldCheck size={13} /> : <AlertTriangle size={13} />}
+            ADN v4 : {entrainement.adnActif ? "actif" : "absent"} · exemplars : {entrainement.exemplarsLogo} · réfs
+            jointes au prochain appel : {entrainement.referencesJointes} · fonds : {entrainement.fondsBibliotheque}
+          </div>
+        ) : null}
+        {bloque ? (
+          <p className="mt-3 max-w-2xl rounded-xl border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-4 py-3 text-[13px] leading-relaxed text-[#B4443C]">
+            {messageBlocage ?? "Entraînement requis"} — les cas sont grisés :{" "}
+            {entrainement?.manques.join(" ; ")}.
+          </p>
+        ) : null}
+
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-steel">
-          Les cas logo se jouent en deux temps&nbsp;: l&apos;étage 1 écrit les 3 concepts du
-          directeur artistique (affichés AVANT toute image), les étages 2+3 les dessinent
-          en 2K et les relisent (OCR + concept). Chaque lancement est un clic — la
-          compilation ne coûte rien, le coût réel s&apos;affiche par étage.
+          Les cas logo se jouent en deux temps&nbsp;: l&apos;étage 1 écrit les 3 gabarits
+          maîtres du directeur artistique (dépliables AVANT toute image), les étages 2+3
+          les dessinent en 2K et les relisent (OCR + ADN + lisibilité 64 px). L&apos;étape B
+          génère les fonds SANS le logo et compose par calques. Chaque lancement est un
+          clic — la compilation ne coûte rien, le coût réel s&apos;affiche par étage.
         </p>
 
         {/* Les compteurs de session (LOT 4.4) */}
         {compteurs ? (
-          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-5">
+          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-6">
             {COMPTEUR_TILES.map((tile) => (
               <div key={tile.id} className="rounded-2xl border border-[color:var(--hairline-strong)] bg-white/60 px-4 py-3">
                 <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">{tile.label}</p>
@@ -199,15 +249,16 @@ export default function TestMoteur() {
                     </div>
                     <button
                       type="button"
-                      disabled={Boolean(running)}
+                      disabled={Boolean(running) || bloque}
                       onClick={() => run(testCase.id, variant.id)}
+                      title={bloque ? messageBlocage ?? "Entraînement requis" : undefined}
                       className={cn(
                         "inline-flex h-9 shrink-0 items-center gap-2 rounded-full px-4 text-[13px] font-medium transition-colors",
-                        !running ? "bg-ink text-white hover:bg-[#35305E]" : "cursor-not-allowed bg-ink/10 text-mist"
+                        !running && !bloque ? "bg-ink text-white hover:bg-[#35305E]" : "cursor-not-allowed bg-ink/10 text-mist"
                       )}
                     >
                       {isRunning ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />}
-                      {isRunning ? "En cours…" : "Lancer"}
+                      {isRunning ? "En cours…" : bloque ? "Grisé" : "Lancer"}
                     </button>
                   </div>
 
@@ -246,8 +297,20 @@ export default function TestMoteur() {
                               <div className="min-w-0">
                                 <p className="text-[13px] font-medium text-ink">
                                   Concept {i + 1} — {concept.nom}
+                                  <span className="ml-2 rounded-full bg-ink/[0.06] px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em] text-dusk">
+                                    {concept.rendu}
+                                  </span>
                                 </p>
                                 <p className="mt-0.5 text-[12px] leading-relaxed text-steel">{concept.justification}</p>
+                                {concept.citations?.length ? (
+                                  <ul className="mt-1 flex flex-col gap-0.5">
+                                    {concept.citations.map((c) => (
+                                      <li key={c} className="text-[11px] leading-relaxed text-dusk">
+                                        {c}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                ) : null}
                               </div>
                             </div>
                             <button
@@ -278,7 +341,25 @@ export default function TestMoteur() {
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={prop.dataUrl} alt={`Proposition ${i + 1} — ${prop.concept.nom}`} className="w-full object-contain" />
                             <figcaption className="bg-white/70 px-2 py-1.5">
-                              <p className="truncate text-[10.5px] font-medium text-ink">{prop.concept.nom}</p>
+                              <p className="truncate text-[10.5px] font-medium text-ink">
+                                {prop.concept.nom}
+                                <span className="ml-1.5 font-mono text-[8.5px] uppercase tracking-[0.06em] text-dusk">{prop.concept.rendu}</span>
+                              </p>
+                              {/* Les scores du contrôle (LOT 6.2) : relief, glow, ADN, 64 px */}
+                              <p className="mt-0.5 flex flex-wrap items-center gap-x-2 font-mono text-[9.5px] text-dusk">
+                                <span>relief {prop.scores?.relief ?? 0}/10</span>
+                                <span>glow {prop.scores?.glow ?? 0}/10</span>
+                                {prop.adnOk ? (
+                                  <span className="inline-flex items-center gap-0.5 text-[#3D7A58]">
+                                    <ShieldCheck size={10} /> ADN ok
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-0.5 text-[#B4443C]">
+                                    <AlertTriangle size={10} /> {prop.serveurLogo ? "échec ADN" : "icône d’appli"}
+                                  </span>
+                                )}
+                                <span className={prop.lisible64 ? "" : "text-[#B4443C]"}>{prop.lisible64 ? "64 px ok" : "64 px illisible"}</span>
+                              </p>
                               <p className="mt-0.5 flex flex-wrap items-center gap-x-2 font-mono text-[9.5px] text-dusk">
                                 {prop.ocrRejects > 0 ? `${prop.ocrRejects} rejet${prop.ocrRejects > 1 ? "s" : ""} OCR` : "OCR ok"}
                                 {prop.conceptOk ? (
@@ -296,6 +377,48 @@ export default function TestMoteur() {
                           </figure>
                         ))}
                       </div>
+                    </div>
+                  ) : null}
+
+                  {/* ── Résultat étape B : fonds + composition + déclinaisons ── */}
+                  {result?.fonds ? (
+                    <div className="mt-4">
+                      <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">
+                        Fonds générés SANS le logo → aperçus composés [fond][logo]
+                      </p>
+                      <div className="mt-2 grid grid-cols-3 gap-2">
+                        {result.fonds.map((f, i) => (
+                          <figure key={i} className="overflow-hidden rounded-lg border border-[color:var(--hairline)]">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={f.previewDataUrl} alt={`Fond ${i + 1} composé`} className="w-full object-contain" />
+                            <figcaption className="bg-white/70 px-2 py-1 font-mono text-[9.5px] text-dusk">
+                              fond #{i + 1} — composé
+                            </figcaption>
+                          </figure>
+                        ))}
+                      </div>
+                      {result.declinaisons ? (
+                        <div className="mt-3 flex flex-wrap items-center gap-3">
+                          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">
+                            Déclinaisons (fond #1) :
+                          </span>
+                          {[
+                            { label: "PNG alpha", url: result.declinaisons.alphaDataUrl, file: "logo-alpha.png" },
+                            { label: "Carré 1:1", url: result.declinaisons.carreDataUrl, file: "logo-carre.png" },
+                            { label: "Bannière 16:9", url: result.declinaisons.banniereDataUrl, file: "logo-banniere.png" },
+                          ].map((d) => (
+                            <a
+                              key={d.label}
+                              href={d.url}
+                              download={d.file}
+                              className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--hairline-strong)] px-3 py-1 text-[11px] text-ink transition-colors hover:border-[rgba(164,139,232,0.5)]"
+                            >
+                              <Download size={11} />
+                              {d.label}
+                            </a>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
                   ) : null}
 
