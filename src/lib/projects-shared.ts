@@ -29,7 +29,7 @@ export const CATEGORY_LABELS: Record<AssetCategory, string> = {
 export const CATEGORY_SPECS: Record<AssetCategory, { width: number; height: number; usage: string }> = {
   logo: { width: 4096, height: 4096, usage: "Master PNG alpha — décliné partout" },
   banniere_discord: { width: 1920, height: 1080, usage: "Bannière de serveur Discord" },
-  banniere_fivem: { width: 1920, height: 480, usage: "Bandeau liste des serveurs FiveM" },
+  banniere_fivem: { width: 3730, height: 216, usage: "Bandeau liste des serveurs FiveM" },
   banniere_f5: { width: 1920, height: 1080, usage: "Fond du menu F5 en jeu" },
   affiche: { width: 1080, height: 1350, usage: "Annonce, événement, règlement" },
   wallpaper: { width: 3840, height: 2160, usage: "Fond d'écran communauté" },
