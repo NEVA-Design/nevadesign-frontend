@@ -41,8 +41,12 @@ export const CATEGORY_SPECS: Record<AssetCategory, { width: number; height: numb
 // ── Modèle de calques (miroir du backend engine/layers.ts) ──────────────────
 // Transforms NORMALISÉS en fractions du canvas : le même calque se rend à
 // l'identique en aperçu éditeur et en export serveur haute résolution.
+//
+// Run 5.2 : le type "text" n'existe plus — le lettrage (titre, baseline)
+// est GÉNÉRÉ dans le calque héro par le moteur. Les blend modes ne sont
+// plus exposés dans l'éditeur (portés par les effets maison uniquement).
 
-export type LayerType = "scene" | "effect" | "logo" | "text" | "grain";
+export type LayerType = "scene" | "effect" | "logo" | "grain";
 export type BlendMode = "normal" | "screen" | "multiply" | "overlay";
 
 export type Layer = {
@@ -61,30 +65,19 @@ export type Layer = {
   aspect?: number;
   variant?: "color" | "white" | "black";
   effectId?: string;
-  text?: string;
-  font?: string;
-  weight?: number;
-  sizeRel?: number;
-  color?: string;
-  strokeColor?: string;
-  strokeWidth?: number;
-  shadow?: { x: number; y: number; blur: number; color: string } | null;
-  gradient?: { from: string; to: string; angle: number } | null;
-  letterSpacing?: number;
-  align?: "left" | "center" | "right";
-  uppercase?: boolean;
+  // gomme non destructive : masque alpha (blanc opaque = visible,
+  // transparent = effacé) — URL stockée côté serveur, ou dataURL locale
+  // le temps de l'édition (maskDataUrl prime à l'affichage)
+  maskUrl?: string;
+  maskDataUrl?: string;
 };
 
-export const TEXT_FONT_IDS = ["archivo-black", "bebas-neue", "anton", "oswald", "montserrat"] as const;
-export type TextFontId = (typeof TEXT_FONT_IDS)[number];
-
-export const TEXT_FONT_LABELS: Record<TextFontId, string> = {
-  "archivo-black": "Archivo Black",
-  "bebas-neue": "Bebas Neue",
-  anton: "Anton",
-  oswald: "Oswald",
-  montserrat: "Montserrat",
-};
+// Migration : les assets d'avant le run 5.2 peuvent contenir des calques
+// "text" en base — filtrés à l'entrée de l'éditeur et du viewer.
+export function stripLegacyTextLayers(layers: unknown): Layer[] {
+  if (!Array.isArray(layers)) return [];
+  return (layers as Array<{ type?: string }>).filter((l) => l && l.type !== "text") as Layer[];
+}
 
 // L'ordre d'affichage des catégories dans la page projet et le hub
 export const CATEGORY_ORDER: AssetCategory[] = [

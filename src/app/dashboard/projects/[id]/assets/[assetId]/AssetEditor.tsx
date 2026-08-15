@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   Check,
   Download,
+  Eraser,
   Eye,
   EyeOff,
   GripVertical,
@@ -17,18 +18,17 @@ import {
   RefreshCw,
   Sparkles,
   Trash2,
-  Type,
   Undo2,
+  Wand2,
   X,
 } from "lucide-react";
 import LayerCanvas from "@/components/editor/LayerCanvas";
 import { BACKEND_URL } from "@/lib/api/backend-client";
-import { exportAsset, regenerateScene } from "@/lib/api/engine";
+import { exportAsset, instructLayer, saveLayerMask } from "@/lib/api/engine";
 import { saveAsset } from "@/lib/api/projects";
 import {
   CATEGORY_LABELS,
-  TEXT_FONT_IDS,
-  TEXT_FONT_LABELS,
+  stripLegacyTextLayers,
   type AssetCategory,
   type BlendMode,
   type Layer,
@@ -37,11 +37,13 @@ import { backendFetch } from "@/lib/api/backend-client";
 import { cn } from "@/lib/utils";
 
 /*
- * L'éditeur par calques — le mini-Photoshop de l'atelier.
- * Compositing 100 % local (aucun aller-retour serveur pour bouger un
- * texte), poignées 44 px, réordonnancement par glisser, édition de texte
- * inline au double-clic, undo/redo 30 pas, autosave, régénération du
- * calque scène (5 retouches incluses), export serveur au clic.
+ * L'éditeur par calques v2 (run 5.2) — réduit à sa mission :
+ * afficher/masquer, supprimer, réordonner, opacité ; GOMME NON DESTRUCTIVE
+ * par masque de calque (taille 10-200 px, dureté 0-100, undo/redo 30 pas) ;
+ * replacer/scaler le logo ; RÉGÉNÉRER LE HÉRO PAR INSTRUCTION COURTE
+ * (« passe le titre en chrome ») = 1 retouche ; export à la résolution du
+ * plan (= 1 création). Le texte n'existe plus comme calque : le lettrage
+ * est généré dans le héro — le code d'édition de texte a été supprimé.
  */
 
 type ProjectInfo = {
@@ -66,34 +68,26 @@ type AssetInfo = {
 type EffectInfo = { id: string; label: string; blend: string; opacity: number; url: string };
 
 const HISTORY_LIMIT = 30;
-const BLENDS: BlendMode[] = ["normal", "screen", "multiply", "overlay"];
-const BLEND_LABELS: Record<BlendMode, string> = {
-  normal: "Normal",
-  screen: "Screen",
-  multiply: "Multiply",
-  overlay: "Overlay",
-};
+const MASK_LONG_EDGE = 1024;
 
 function makeId() {
   return `layer-${Math.random().toString(36).slice(2, 10)}`;
 }
 
 type Gesture = {
-  mode: "move" | "scale" | "rotate";
+  mode: "move" | "scale";
   layerId: string;
   startClientX: number;
   startClientY: number;
   origin: Layer;
   centerPx: { x: number; y: number };
   startDistance: number;
-  startAngle: number;
 };
 
 export default function AssetEditor({ project, initialAsset }: { project: ProjectInfo; initialAsset: AssetInfo }) {
-  const [layers, setLayers] = useState<Layer[]>(initialAsset.layers ?? []);
+  const [layers, setLayers] = useState<Layer[]>(stripLegacyTextLayers(initialAsset.layers ?? []));
   const [title, setTitle] = useState(initialAsset.title ?? CATEGORY_LABELS[initialAsset.category as AssetCategory] ?? "Création");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [retouchesUsed, setRetouchesUsed] = useState(initialAsset.retouches_used ?? 0);
 
   const [past, setPast] = useState<Layer[][]>([]);
@@ -105,10 +99,17 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
   const [effects, setEffects] = useState<EffectInfo[]>([]);
   const [effectsOpen, setEffectsOpen] = useState(false);
 
-  const [regenOpen, setRegenOpen] = useState(false);
-  const [regenBusy, setRegenBusy] = useState(false);
-  const [regenKeep, setRegenKeep] = useState(true);
-  const [regenNotes, setRegenNotes] = useState({ lieu: "", personnages: "", props: "" });
+  // gomme non destructive
+  const [eraserOn, setEraserOn] = useState(false);
+  const [brushSize, setBrushSize] = useState(60);
+  const [brushHardness, setBrushHardness] = useState(70);
+  const maskCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const maskThrottleRef = useRef(0);
+  const erasingRef = useRef(false);
+
+  const [instructOpen, setInstructOpen] = useState(false);
+  const [instructBusy, setInstructBusy] = useState(false);
+  const [instruction, setInstruction] = useState("");
 
   const [exportBusy, setExportBusy] = useState(false);
   const [exportResult, setExportResult] = useState<{ url: string; resolution: string; remaining: number } | null>(null);
@@ -136,6 +137,8 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
         return previous;
       });
       dirtyRef.current = true;
+      // le canvas de gomme doit repartir du masque restauré
+      maskCanvasRef.current = null;
       return p.slice(0, -1);
     });
   }, []);
@@ -149,18 +152,42 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
         return next;
       });
       dirtyRef.current = true;
+      maskCanvasRef.current = null;
       return f.slice(0, -1);
     });
   }, []);
 
   // ── Autosave (1,2 s après la dernière modification) ─────────────────────
+  // Les masques peints localement (maskDataUrl) sont d'abord stockés côté
+  // serveur (POST /engine/mask) puis remplacés par leur URL — la base ne
+  // porte jamais un dataURL.
   useEffect(() => {
     if (!dirtyRef.current) return;
     const timeout = setTimeout(async () => {
       dirtyRef.current = false;
       setSaving(true);
       try {
-        await saveAsset(project.id, initialAsset.id, { layers, title });
+        let toSave = layers;
+        const withLocalMask = layers.filter((l) => l.maskDataUrl);
+        if (withLocalMask.length) {
+          const uploads = await Promise.all(
+            withLocalMask.map(async (layer) => {
+              const { maskUrl } = await saveLayerMask({
+                projectId: project.id,
+                assetId: initialAsset.id,
+                layerId: layer.id,
+                mask: layer.maskDataUrl!,
+              });
+              return { layerId: layer.id, maskUrl };
+            })
+          );
+          toSave = layers.map((layer) => {
+            const upload = uploads.find((u) => u.layerId === layer.id);
+            return upload ? { ...layer, maskUrl: upload.maskUrl, maskDataUrl: undefined } : layer;
+          });
+          setLayers(toSave);
+        }
+        await saveAsset(project.id, initialAsset.id, { layers: toSave, title });
         setSavedAt(new Date());
       } catch {
         dirtyRef.current = true;
@@ -194,7 +221,6 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
   // ── Clavier ─────────────────────────────────────────────────────────────
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (editingId) return;
       const target = e.target as HTMLElement;
       if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) return;
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z" && !e.shiftKey) {
@@ -223,11 +249,11 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [editingId, selectedId, layers, undo, redo, mutateLayers, updateLayer]);
+  }, [selectedId, layers, undo, redo, mutateLayers, updateLayer]);
 
-  // ── Gestes canvas : déplacer / redimensionner / pivoter ─────────────────
+  // ── Gestes canvas : déplacer / redimensionner ───────────────────────────
   const beginGesture = useCallback((e: React.PointerEvent, layer: Layer, mode: Gesture["mode"]) => {
-    if (layer.locked) return;
+    if (layer.locked || eraserOn) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
@@ -242,12 +268,11 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
       origin: { ...layer },
       centerPx,
       startDistance: Math.max(8, Math.hypot(dx, dy)),
-      startAngle: (Math.atan2(dy, dx) * 180) / Math.PI,
     };
     pushHistory(layers);
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
     e.preventDefault();
-  }, [layers, pushHistory]);
+  }, [layers, pushHistory, eraserOn]);
 
   useEffect(() => {
     function onMove(e: PointerEvent) {
@@ -266,24 +291,15 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
               : l
           )
         );
-      } else if (gesture.mode === "scale") {
+      } else {
         const distance = Math.max(8, Math.hypot(e.clientX - gesture.centerPx.x, e.clientY - gesture.centerPx.y));
         const ratio = distance / gesture.startDistance;
         setLayers((current) =>
-          current.map((l) => {
-            if (l.id !== gesture.layerId) return l;
-            if (l.type === "text") {
-              return { ...l, sizeRel: Math.min(0.9, Math.max(0.015, (gesture.origin.sizeRel ?? 0.1) * ratio)) };
-            }
-            return { ...l, scale: Math.min(4, Math.max(0.02, gesture.origin.scale * ratio)) };
-          })
-        );
-      } else {
-        const angle = (Math.atan2(e.clientY - gesture.centerPx.y, e.clientX - gesture.centerPx.x) * 180) / Math.PI;
-        let rotation = gesture.origin.rotation + (angle - gesture.startAngle);
-        if (e.shiftKey) rotation = Math.round(rotation / 15) * 15;
-        setLayers((current) =>
-          current.map((l) => (l.id === gesture.layerId ? { ...l, rotation: Math.round(rotation * 10) / 10 } : l))
+          current.map((l) =>
+            l.id === gesture.layerId
+              ? { ...l, scale: Math.min(4, Math.max(0.02, gesture.origin.scale * ratio)) }
+              : l
+          )
         );
       }
       dirtyRef.current = true;
@@ -321,35 +337,107 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
     return () => cancelAnimationFrame(frame);
   }, [selectedId, layers]);
 
-  // ── Ajouts de calques ───────────────────────────────────────────────────
-  function addTextLayer() {
-    const layer: Layer = {
-      id: makeId(),
-      type: "text",
-      name: "Texte",
-      text: "NOUVEAU TEXTE",
-      font: "archivo-black",
-      weight: 900,
-      sizeRel: 0.08,
-      x: 0.5,
-      y: 0.3,
-      scale: 1,
-      rotation: 0,
-      opacity: 1,
-      blend: "normal",
-      color: "#FFFFFF",
-      strokeColor: "#000000",
-      strokeWidth: 0,
-      shadow: { x: 0, y: 3, blur: 14, color: "rgba(0,0,0,0.55)" },
-      gradient: null,
-      letterSpacing: 0.06,
-      align: "center",
-      uppercase: true,
-    };
-    mutateLayers((c) => [...c, layer], true);
-    setSelectedId(layer.id);
+  // ── Gomme non destructive (masque du calque héro) ───────────────────────
+  const ensureMaskCanvas = useCallback(async (): Promise<HTMLCanvasElement | null> => {
+    if (!sceneLayer) return null;
+    if (maskCanvasRef.current) return maskCanvasRef.current;
+
+    const aspect = sceneLayer.aspect ?? initialAsset.width / initialAsset.height;
+    const width = aspect >= 1 ? MASK_LONG_EDGE : Math.round(MASK_LONG_EDGE * aspect);
+    const height = aspect >= 1 ? Math.round(MASK_LONG_EDGE / aspect) : MASK_LONG_EDGE;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d")!;
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, width, height);
+
+    // repart du masque existant si le calque en porte déjà un
+    const existing = sceneLayer.maskDataUrl ?? sceneLayer.maskUrl;
+    if (existing) {
+      await new Promise<void>((resolveLoad) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          ctx.clearRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+          resolveLoad();
+        };
+        img.onerror = () => resolveLoad();
+        img.src = existing;
+      });
+    }
+
+    maskCanvasRef.current = canvas;
+    return canvas;
+  }, [sceneLayer, initialAsset.width, initialAsset.height]);
+
+  const eraseAt = useCallback((canvas: HTMLCanvasElement, clientX: number, clientY: number) => {
+    const display = canvasRef.current;
+    if (!display) return;
+    const rect = display.getBoundingClientRect();
+    const scaleFactor = canvas.width / rect.width;
+    const x = (clientX - rect.left) * scaleFactor;
+    const y = (clientY - rect.top) * scaleFactor;
+    const radius = (brushSize / 2) * scaleFactor;
+
+    const ctx = canvas.getContext("2d")!;
+    ctx.globalCompositeOperation = "destination-out";
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, Math.max(1, radius));
+    const hard = Math.max(0, Math.min(1, brushHardness / 100));
+    gradient.addColorStop(0, "rgba(0,0,0,1)");
+    gradient.addColorStop(Math.max(0.01, hard), "rgba(0,0,0,1)");
+    gradient.addColorStop(1, hard >= 0.999 ? "rgba(0,0,0,1)" : "rgba(0,0,0,0)");
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(x, y, Math.max(1, radius), 0, Math.PI * 2);
+    ctx.fill();
+  }, [brushSize, brushHardness]);
+
+  const commitMaskPreview = useCallback((canvas: HTMLCanvasElement, throttleMs: number) => {
+    const now = Date.now();
+    if (throttleMs > 0 && now - maskThrottleRef.current < throttleMs) return;
+    maskThrottleRef.current = now;
+    const dataUrl = canvas.toDataURL("image/png");
+    if (!sceneLayer) return;
+    setLayers((current) =>
+      current.map((l) => (l.id === sceneLayer.id ? { ...l, maskDataUrl: dataUrl } : l))
+    );
+  }, [sceneLayer]);
+
+  async function handleEraserPointerDown(e: React.PointerEvent) {
+    if (!eraserOn || !sceneLayer) return;
+    e.preventDefault();
+    const canvas = await ensureMaskCanvas();
+    if (!canvas) return;
+    pushHistory(layers);
+    erasingRef.current = true;
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    eraseAt(canvas, e.clientX, e.clientY);
+    commitMaskPreview(canvas, 0);
   }
 
+  function handleEraserPointerMove(e: React.PointerEvent) {
+    if (!erasingRef.current || !maskCanvasRef.current) return;
+    eraseAt(maskCanvasRef.current, e.clientX, e.clientY);
+    commitMaskPreview(maskCanvasRef.current, 80);
+  }
+
+  function handleEraserPointerUp() {
+    if (!erasingRef.current || !maskCanvasRef.current) return;
+    erasingRef.current = false;
+    commitMaskPreview(maskCanvasRef.current, 0);
+    dirtyRef.current = true;
+  }
+
+  function resetMask() {
+    if (!sceneLayer) return;
+    maskCanvasRef.current = null;
+    updateLayer(sceneLayer.id, { maskDataUrl: undefined, maskUrl: undefined }, true);
+  }
+
+  // ── Ajouts de calques ───────────────────────────────────────────────────
   function addLogoLayer() {
     if (!project.logo_master) return;
     const layer: Layer = {
@@ -390,31 +478,28 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
     setEffectsOpen(false);
   }
 
-  // ── Régénération du calque scène ────────────────────────────────────────
-  async function handleRegenerate() {
-    if (regenBusy) return;
-    setRegenBusy(true);
+  // ── Retouche par instruction courte ─────────────────────────────────────
+  async function handleInstruct() {
+    if (instructBusy || instruction.trim().length < 3) return;
+    setInstructBusy(true);
     setError(null);
     try {
-      const result = await regenerateScene({
+      const result = await instructLayer({
         projectId: project.id,
         assetId: initialAsset.id,
-        keepComposition: regenKeep,
-        answers: {
-          lieu: regenNotes.lieu.trim() || undefined,
-          personnages: regenNotes.personnages.trim() || undefined,
-          props: regenNotes.props.trim() || undefined,
-        },
+        instruction: instruction.trim(),
       });
-      setLayers(result.asset.layers as Layer[]);
+      setLayers(stripLegacyTextLayers(result.asset.layers as Layer[]));
       setRetouchesUsed(result.retouchesUsed);
       setPast([]);
       setFuture([]);
-      setRegenOpen(false);
+      maskCanvasRef.current = null;
+      setInstructOpen(false);
+      setInstruction("");
     } catch (e) {
       setError((e as Error).message);
     } finally {
-      setRegenBusy(false);
+      setInstructBusy(false);
     }
   }
 
@@ -434,7 +519,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
   }
 
   const layerIcon = (layer: Layer) =>
-    layer.type === "text" ? <Type size={13} /> : layer.type === "logo" ? <Sparkles size={13} /> : <ImageIcon size={13} />;
+    layer.type === "logo" ? <Sparkles size={13} /> : <ImageIcon size={13} />;
 
   // La liste des calques s'affiche du plus haut au plus bas
   const reversedLayers = useMemo(() => [...layers].reverse(), [layers]);
@@ -485,15 +570,30 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
           </button>
           <span aria-hidden className="mx-1 h-5 w-px bg-[color:var(--hairline-strong)]" />
           {sceneLayer ? (
-            <button
-              type="button"
-              onClick={() => setRegenOpen(true)}
-              className="inline-flex h-9 items-center gap-2 rounded-full border border-[color:var(--hairline-strong)] px-3.5 text-[13px] text-steel transition-colors hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
-            >
-              <RefreshCw size={13} />
-              <span className="hidden md:inline">Régénérer</span>
-              <span className="font-mono text-[10px] text-dusk">{retouchesUsed}/5</span>
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => setEraserOn((v) => !v)}
+                className={cn(
+                  "inline-flex h-9 items-center gap-2 rounded-full border px-3.5 text-[13px] transition-colors",
+                  eraserOn
+                    ? "border-[rgba(164,139,232,0.7)] bg-[rgba(164,139,232,0.12)] text-ink"
+                    : "border-[color:var(--hairline-strong)] text-steel hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
+                )}
+              >
+                <Eraser size={13} />
+                <span className="hidden md:inline">Gomme</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setInstructOpen(true)}
+                className="inline-flex h-9 items-center gap-2 rounded-full border border-[color:var(--hairline-strong)] px-3.5 text-[13px] text-steel transition-colors hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
+              >
+                <Wand2 size={13} />
+                <span className="hidden md:inline">Retoucher</span>
+                <span className="font-mono text-[10px] text-dusk">{retouchesUsed}/5</span>
+              </button>
+            </>
           ) : null}
           <button
             type="button"
@@ -506,6 +606,57 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
           </button>
         </div>
       </div>
+
+      {/* ── Barre gomme ── */}
+      <AnimatePresence>
+        {eraserOn ? (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden border-b border-[color:var(--hairline)] bg-[rgba(164,139,232,0.05)]"
+          >
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-2.5">
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-dusk">
+                Gomme — efface sur le héro, réversible
+              </span>
+              <label className="flex items-center gap-2.5 text-[12px] text-steel">
+                Taille
+                <input
+                  type="range"
+                  min={10}
+                  max={200}
+                  step={2}
+                  value={brushSize}
+                  onChange={(e) => setBrushSize(Number(e.target.value))}
+                  className="w-32 accent-[#7C6BD4]"
+                />
+                <span className="font-mono text-[10px] text-dusk">{brushSize} px</span>
+              </label>
+              <label className="flex items-center gap-2.5 text-[12px] text-steel">
+                Dureté
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={5}
+                  value={brushHardness}
+                  onChange={(e) => setBrushHardness(Number(e.target.value))}
+                  className="w-32 accent-[#7C6BD4]"
+                />
+                <span className="font-mono text-[10px] text-dusk">{brushHardness} %</span>
+              </label>
+              <button
+                type="button"
+                onClick={resetMask}
+                className="text-[12px] text-steel underline-offset-2 transition-colors hover:text-ink hover:underline"
+              >
+                Tout rétablir
+              </button>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       {error ? (
         <p className="border-b border-[rgba(220,80,80,0.25)] bg-[rgba(220,80,80,0.06)] px-5 py-2 text-[12.5px] text-[#B4443C]">
@@ -526,20 +677,23 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
               logoUrls={project.logo_master ? { color: project.logo_master.url, white: project.logo_master.whiteUrl, black: project.logo_master.blackUrl } : null}
               selectedId={selectedId}
               onSelect={(id) => {
-                setSelectedId(id);
-                if (editingId && editingId !== id) setEditingId(null);
+                if (!eraserOn) setSelectedId(id);
               }}
               onPointerDownLayer={(e, layer) => beginGesture(e, layer, "move")}
-              editingId={editingId}
-              onTextInput={(layerId, text) => updateLayer(layerId, { text })}
-              onEditEnd={() => setEditingId(null)}
-              onDoubleClickLayer={(layer) => {
-                if (layer.type === "text") setEditingId(layer.id);
-              }}
               className="rounded-xl border border-[color:var(--hairline-strong)] shadow-[0_24px_64px_rgba(43,36,80,0.25)]"
             >
+              {/* Surface de gomme — capte les traits quand le mode est actif */}
+              {eraserOn && sceneLayer ? (
+                <div
+                  style={{ position: "absolute", inset: 0, zIndex: 40, touchAction: "none", cursor: "crosshair" }}
+                  onPointerDown={handleEraserPointerDown}
+                  onPointerMove={handleEraserPointerMove}
+                  onPointerUp={handleEraserPointerUp}
+                  onPointerLeave={handleEraserPointerUp}
+                />
+              ) : null}
               {/* Poignées de sélection — 44 px de zone tactile */}
-              {selected && selectionBox && !editingId && !selected.locked ? (
+              {selected && selectionBox && !eraserOn && !selected.locked ? (
                 <>
                   {[
                     { corner: "nw", left: selectionBox.left, top: selectionBox.top },
@@ -555,19 +709,12 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                       <span className="h-3 w-3 rounded-full border-2 border-white bg-[#7C6BD4] shadow-[0_1px_4px_rgba(0,0,0,0.4)]" />
                     </div>
                   ))}
-                  <div
-                    style={{ position: "absolute", left: selectionBox.left + selectionBox.width / 2, top: selectionBox.top - 30, width: 44, height: 44, transform: "translate(-50%, -50%)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "grab", touchAction: "none", zIndex: 30 }}
-                    onPointerDown={(e) => beginGesture(e, selected, "rotate")}
-                  >
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full border border-white/70 bg-[#2B2450] text-white shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
-                      <RefreshCw size={10} />
-                    </span>
-                  </div>
                 </>
               ) : null}
             </LayerCanvas>
             <p className="mt-2 text-center font-mono text-[10px] tracking-[0.1em] text-dusk">
-              {initialAsset.width} × {initialAsset.height} px — double-clic sur un texte pour l&apos;éditer
+              {initialAsset.width} × {initialAsset.height} px
+              {eraserOn ? " — mode gomme : peins pour effacer, tout est réversible" : ""}
             </p>
           </div>
         </div>
@@ -579,14 +726,6 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
             <div className="mb-2 flex items-center justify-between">
               <span className="pv-label">Calques</span>
               <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={addTextLayer}
-                  className="flex h-7 items-center gap-1 rounded-full border border-[color:var(--hairline-strong)] px-2.5 font-mono text-[10px] uppercase tracking-[0.08em] text-steel transition-colors hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
-                >
-                  <Plus size={11} />
-                  Texte
-                </button>
                 <div className="relative">
                   <button
                     type="button"
@@ -690,11 +829,11 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
             </Reorder.Group>
           </div>
 
-          {/* Propriétés du calque sélectionné */}
+          {/* Propriétés du calque sélectionné — réduit à la mission */}
           <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
             {!selected ? (
               <p className="mt-4 text-center text-[12px] leading-relaxed text-mist">
-                Sélectionnez un calque sur le canvas
+                Sélectionne un calque sur le canvas
                 <br />
                 ou dans la liste.
               </p>
@@ -705,7 +844,6 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                   <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-dusk">{selected.type}</span>
                 </div>
 
-                {/* Opacité + blend — communs */}
                 <label className="block">
                   <span className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">
                     Opacité <span>{Math.round(selected.opacity * 100)} %</span>
@@ -721,236 +859,57 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                     className="mt-1.5 w-full accent-[#7C6BD4]"
                   />
                 </label>
-                <label className="block">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">Fusion</span>
-                  <div className="mt-1.5 grid grid-cols-4 gap-1">
-                    {BLENDS.map((blend) => (
-                      <button
-                        key={blend}
-                        type="button"
-                        onClick={() => updateLayer(selected.id, { blend }, true)}
-                        className={cn(
-                          "rounded-lg border px-1 py-1.5 text-[10px] transition-colors",
-                          selected.blend === blend
-                            ? "border-[rgba(164,139,232,0.6)] bg-white text-ink"
-                            : "border-[color:var(--hairline)] text-steel hover:text-ink"
-                        )}
-                      >
-                        {BLEND_LABELS[blend]}
-                      </button>
-                    ))}
-                  </div>
-                </label>
 
-                {/* Logo : déclinaison */}
+                {/* Logo : déclinaison + rappel replacer/scaler */}
                 {selected.type === "logo" ? (
-                  <label className="block">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">Déclinaison</span>
-                    <div className="mt-1.5 grid grid-cols-3 gap-1">
-                      {(["color", "white", "black"] as const).map((variant) => (
-                        <button
-                          key={variant}
-                          type="button"
-                          onClick={() => updateLayer(selected.id, { variant }, true)}
-                          className={cn(
-                            "rounded-lg border px-1 py-1.5 text-[10.5px] transition-colors",
-                            (selected.variant ?? "color") === variant
-                              ? "border-[rgba(164,139,232,0.6)] bg-white text-ink"
-                              : "border-[color:var(--hairline)] text-steel hover:text-ink"
-                          )}
-                        >
-                          {variant === "color" ? "Couleur" : variant === "white" ? "Blanc" : "Noir"}
-                        </button>
-                      ))}
-                    </div>
-                  </label>
-                ) : null}
-
-                {/* Texte */}
-                {selected.type === "text" ? (
                   <>
                     <label className="block">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">Texte</span>
-                      <textarea
-                        value={selected.text ?? ""}
-                        rows={2}
-                        onFocus={() => pushHistory(layers)}
-                        onChange={(e) => updateLayer(selected.id, { text: e.target.value })}
-                        className="mt-1.5 w-full resize-none rounded-lg border border-[color:var(--hairline-strong)] bg-white px-2.5 py-2 text-[13px] text-ink outline-none focus:shadow-[0_0_0_2px_rgba(164,139,232,0.3)]"
-                      />
-                    </label>
-                    <label className="block">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">Typographie</span>
-                      <select
-                        value={selected.font ?? "archivo-black"}
-                        onChange={(e) => updateLayer(selected.id, { font: e.target.value }, true)}
-                        className="mt-1.5 w-full rounded-lg border border-[color:var(--hairline-strong)] bg-white px-2.5 py-2 text-[13px] text-ink outline-none"
-                      >
-                        {TEXT_FONT_IDS.map((id) => (
-                          <option key={id} value={id}>
-                            {TEXT_FONT_LABELS[id]}
-                          </option>
+                      <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">Déclinaison</span>
+                      <div className="mt-1.5 grid grid-cols-3 gap-1">
+                        {(["color", "white", "black"] as const).map((variant) => (
+                          <button
+                            key={variant}
+                            type="button"
+                            onClick={() => updateLayer(selected.id, { variant }, true)}
+                            className={cn(
+                              "rounded-lg border px-1 py-1.5 text-[10.5px] transition-colors",
+                              (selected.variant ?? "color") === variant
+                                ? "border-[rgba(164,139,232,0.6)] bg-white text-ink"
+                                : "border-[color:var(--hairline)] text-steel hover:text-ink"
+                            )}
+                          >
+                            {variant === "color" ? "Couleur" : variant === "white" ? "Blanc" : "Noir"}
+                          </button>
                         ))}
-                      </select>
-                    </label>
-                    <label className="block">
-                      <span className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">
-                        Taille <span>{Math.round((selected.sizeRel ?? 0.1) * 100)} %</span>
-                      </span>
-                      <input
-                        type="range"
-                        min={0.02}
-                        max={0.6}
-                        step={0.005}
-                        value={selected.sizeRel ?? 0.1}
-                        onChange={(e) => updateLayer(selected.id, { sizeRel: Number(e.target.value) })}
-                        onPointerDown={() => pushHistory(layers)}
-                        className="mt-1.5 w-full accent-[#7C6BD4]"
-                      />
-                    </label>
-                    <label className="block">
-                      <span className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">
-                        Espacement <span>{(selected.letterSpacing ?? 0).toFixed(2)} em</span>
-                      </span>
-                      <input
-                        type="range"
-                        min={-0.05}
-                        max={0.6}
-                        step={0.01}
-                        value={selected.letterSpacing ?? 0}
-                        onChange={(e) => updateLayer(selected.id, { letterSpacing: Number(e.target.value) })}
-                        onPointerDown={() => pushHistory(layers)}
-                        className="mt-1.5 w-full accent-[#7C6BD4]"
-                      />
-                    </label>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <label className="block">
-                        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">Couleur</span>
-                        <input
-                          type="color"
-                          value={selected.gradient ? "#FFFFFF" : (selected.color ?? "#FFFFFF")}
-                          disabled={Boolean(selected.gradient)}
-                          onChange={(e) => updateLayer(selected.id, { color: e.target.value.toUpperCase() }, true)}
-                          className="mt-1.5 h-9 w-full cursor-pointer rounded-lg border border-[color:var(--hairline-strong)] bg-white"
-                        />
-                      </label>
-                      <label className="block">
-                        <span className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">
-                          Contour <span>{Math.round((selected.strokeWidth ?? 0) * 100)}</span>
-                        </span>
-                        <div className="mt-1.5 flex items-center gap-1.5">
-                          <input
-                            type="color"
-                            value={selected.strokeColor ?? "#000000"}
-                            onChange={(e) => updateLayer(selected.id, { strokeColor: e.target.value.toUpperCase() }, true)}
-                            className="h-9 w-10 cursor-pointer rounded-lg border border-[color:var(--hairline-strong)] bg-white"
-                          />
-                          <input
-                            type="range"
-                            min={0}
-                            max={0.08}
-                            step={0.005}
-                            value={selected.strokeWidth ?? 0}
-                            onChange={(e) => updateLayer(selected.id, { strokeWidth: Number(e.target.value) })}
-                            onPointerDown={() => pushHistory(layers)}
-                            className="w-full accent-[#7C6BD4]"
-                          />
-                        </div>
-                      </label>
-                    </div>
-
-                    {/* Ombre + dégradé */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          updateLayer(
-                            selected.id,
-                            { shadow: selected.shadow ? null : { x: 0, y: 3, blur: 14, color: "rgba(0,0,0,0.55)" } },
-                            true
-                          )
-                        }
-                        className={cn(
-                          "flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-[11.5px] transition-colors",
-                          selected.shadow
-                            ? "border-[rgba(164,139,232,0.6)] bg-white text-ink"
-                            : "border-[color:var(--hairline)] text-steel hover:text-ink"
-                        )}
-                      >
-                        {selected.shadow ? <Check size={12} /> : null}
-                        Ombre
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          updateLayer(
-                            selected.id,
-                            { gradient: selected.gradient ? null : { from: "#FFD166", to: "#E63946", angle: 180 } },
-                            true
-                          )
-                        }
-                        className={cn(
-                          "flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-[11.5px] transition-colors",
-                          selected.gradient
-                            ? "border-[rgba(164,139,232,0.6)] bg-white text-ink"
-                            : "border-[color:var(--hairline)] text-steel hover:text-ink"
-                        )}
-                      >
-                        {selected.gradient ? <Check size={12} /> : null}
-                        Dégradé
-                      </button>
-                    </div>
-                    {selected.gradient ? (
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="color"
-                          value={selected.gradient.from}
-                          onChange={(e) => updateLayer(selected.id, { gradient: { ...selected.gradient!, from: e.target.value.toUpperCase() } })}
-                          className="h-9 w-full cursor-pointer rounded-lg border border-[color:var(--hairline-strong)] bg-white"
-                        />
-                        <input
-                          type="color"
-                          value={selected.gradient.to}
-                          onChange={(e) => updateLayer(selected.id, { gradient: { ...selected.gradient!, to: e.target.value.toUpperCase() } })}
-                          className="h-9 w-full cursor-pointer rounded-lg border border-[color:var(--hairline-strong)] bg-white"
-                        />
                       </div>
-                    ) : null}
+                    </label>
+                    <p className="text-[11px] leading-relaxed text-mist">
+                      Glisse le logo pour le replacer, tire une poignée d&apos;angle pour le redimensionner.
+                    </p>
                   </>
                 ) : null}
 
-                {/* Rotation précise */}
-                <label className="block">
-                  <span className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">
-                    Rotation <span>{Math.round(selected.rotation)}°</span>
-                  </span>
-                  <input
-                    type="range"
-                    min={-180}
-                    max={180}
-                    step={1}
-                    value={selected.rotation}
-                    onChange={(e) => updateLayer(selected.id, { rotation: Number(e.target.value) })}
-                    onPointerDown={() => pushHistory(layers)}
-                    className="mt-1.5 w-full accent-[#7C6BD4]"
-                  />
-                </label>
+                {selected.type === "scene" ? (
+                  <p className="text-[11px] leading-relaxed text-mist">
+                    Le titre vit dans ce calque — pour le changer, utilise «&nbsp;Retoucher&nbsp;»
+                    («&nbsp;passe le titre en chrome&nbsp;», «&nbsp;scène de nuit&nbsp;»…).
+                  </p>
+                ) : null}
               </div>
             )}
           </div>
         </aside>
       </div>
 
-      {/* ── Modale régénération ── */}
+      {/* ── Modale retouche par instruction ── */}
       <AnimatePresence>
-        {regenOpen ? (
+        {instructOpen ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[90] flex items-center justify-center bg-[rgba(20,16,40,0.45)] p-4 backdrop-blur-sm"
-            onClick={() => !regenBusy && setRegenOpen(false)}
+            onClick={() => !instructBusy && setInstructOpen(false)}
           >
             <motion.div
               initial={{ opacity: 0, y: 18, scale: 0.98 }}
@@ -961,50 +920,28 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="pv-label text-[color:var(--num-color)]">Régénérer la scène</p>
+                  <p className="pv-label text-[color:var(--num-color)]">Retoucher le visuel</p>
                   <h2 className="pv-display mt-2 text-xl text-ink">Que change-t-on&nbsp;?</h2>
                 </div>
-                <button type="button" onClick={() => setRegenOpen(false)} className="rounded-lg p-1.5 text-mist hover:text-ink" aria-label="Fermer">
+                <button type="button" onClick={() => setInstructOpen(false)} className="rounded-lg p-1.5 text-mist hover:text-ink" aria-label="Fermer">
                   <X size={16} />
                 </button>
               </div>
 
-              <div className="mt-5 flex flex-col gap-3">
-                {[
-                  { key: "lieu" as const, label: "Lieu", placeholder: "Garder le même si vide" },
-                  { key: "personnages" as const, label: "Personnages", placeholder: "Garder les mêmes si vide" },
-                  { key: "props" as const, label: "Objets", placeholder: "Garder les mêmes si vide" },
-                ].map((field) => (
-                  <label key={field.key} className="block">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">{field.label}</span>
-                    <input
-                      value={regenNotes[field.key]}
-                      onChange={(e) => setRegenNotes((n) => ({ ...n, [field.key]: e.target.value }))}
-                      placeholder={field.placeholder}
-                      maxLength={200}
-                      className="mt-1.5 w-full rounded-lg border border-[color:var(--hairline-strong)] px-3 py-2 text-[13px] text-ink outline-none placeholder:text-mist focus:shadow-[0_0_0_2px_rgba(164,139,232,0.3)]"
-                    />
-                  </label>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => setRegenKeep((k) => !k)}
-                  className={cn(
-                    "flex items-center gap-2.5 rounded-xl border px-3.5 py-2.5 text-left text-[13px] transition-colors",
-                    regenKeep ? "border-[rgba(164,139,232,0.55)] bg-[rgba(164,139,232,0.06)] text-ink" : "border-[color:var(--hairline-strong)] text-steel"
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "flex h-5 w-5 items-center justify-center rounded-md border",
-                      regenKeep ? "border-transparent bg-ink text-white" : "border-[color:var(--hairline-strong)]"
-                    )}
-                  >
-                    {regenKeep ? <Check size={12} /> : null}
-                  </span>
-                  Garder la composition actuelle
-                </button>
-              </div>
+              <label className="mt-5 block">
+                <input
+                  autoFocus
+                  value={instruction}
+                  onChange={(e) => setInstruction(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") void handleInstruct(); }}
+                  placeholder="Passe le titre en chrome, scène de nuit, retire le personnage de gauche…"
+                  maxLength={240}
+                  className="w-full rounded-xl border border-[color:var(--hairline-strong)] px-4 py-3 text-[14px] text-ink outline-none placeholder:text-mist focus:shadow-[0_0_0_2px_rgba(164,139,232,0.3)]"
+                />
+              </label>
+              <p className="mt-2 text-[11.5px] leading-relaxed text-mist">
+                Le reste du visuel est conservé — composition, sujets, orthographe du titre vérifiée.
+              </p>
 
               <div className="mt-6 flex items-center justify-between">
                 <span className="font-mono text-[10.5px] tracking-[0.06em] text-dusk">
@@ -1012,12 +949,17 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                 </span>
                 <button
                   type="button"
-                  disabled={regenBusy}
-                  onClick={handleRegenerate}
-                  className="inline-flex h-10 items-center gap-2 rounded-full bg-ink px-5 text-[13px] font-medium text-white transition-colors hover:bg-[#35305E]"
+                  disabled={instructBusy || instruction.trim().length < 3}
+                  onClick={handleInstruct}
+                  className={cn(
+                    "inline-flex h-10 items-center gap-2 rounded-full px-5 text-[13px] font-medium transition-colors",
+                    !instructBusy && instruction.trim().length >= 3
+                      ? "bg-ink text-white hover:bg-[#35305E]"
+                      : "cursor-not-allowed bg-ink/10 text-mist"
+                  )}
                 >
-                  {regenBusy ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
-                  {regenBusy ? "Génération…" : "Régénérer"}
+                  {instructBusy ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+                  {instructBusy ? "Génération…" : "Appliquer"}
                 </button>
               </div>
             </motion.div>
