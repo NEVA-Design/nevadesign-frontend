@@ -38,6 +38,54 @@ export const CATEGORY_SPECS: Record<AssetCategory, { width: number; height: numb
   libre: { width: 1920, height: 1080, usage: "Format libre" },
 };
 
+// ── Modèle de calques (miroir du backend engine/layers.ts) ──────────────────
+// Transforms NORMALISÉS en fractions du canvas : le même calque se rend à
+// l'identique en aperçu éditeur et en export serveur haute résolution.
+
+export type LayerType = "scene" | "effect" | "logo" | "text" | "grain";
+export type BlendMode = "normal" | "screen" | "multiply" | "overlay";
+
+export type Layer = {
+  id: string;
+  type: LayerType;
+  name: string;
+  x: number;
+  y: number;
+  scale: number;
+  rotation: number;
+  opacity: number;
+  blend: BlendMode;
+  locked?: boolean;
+  hidden?: boolean;
+  url?: string;
+  aspect?: number;
+  variant?: "color" | "white" | "black";
+  effectId?: string;
+  text?: string;
+  font?: string;
+  weight?: number;
+  sizeRel?: number;
+  color?: string;
+  strokeColor?: string;
+  strokeWidth?: number;
+  shadow?: { x: number; y: number; blur: number; color: string } | null;
+  gradient?: { from: string; to: string; angle: number } | null;
+  letterSpacing?: number;
+  align?: "left" | "center" | "right";
+  uppercase?: boolean;
+};
+
+export const TEXT_FONT_IDS = ["archivo-black", "bebas-neue", "anton", "oswald", "montserrat"] as const;
+export type TextFontId = (typeof TEXT_FONT_IDS)[number];
+
+export const TEXT_FONT_LABELS: Record<TextFontId, string> = {
+  "archivo-black": "Archivo Black",
+  "bebas-neue": "Bebas Neue",
+  anton: "Anton",
+  oswald: "Oswald",
+  montserrat: "Montserrat",
+};
+
 // L'ordre d'affichage des catégories dans la page projet et le hub
 export const CATEGORY_ORDER: AssetCategory[] = [
   "logo",
