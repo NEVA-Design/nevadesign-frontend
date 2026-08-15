@@ -32,17 +32,41 @@ const STEPS = ["Scène", "Lumière", "Détails"] as const;
 // ── Glyphes de scène — SVG dessinés à la main, un par archétype ─────────────
 // Compositions schématiques (silhouettes, blocs, horizon) : on lit la
 // structure de la scène d'un coup d'œil, sans jamais montrer une génération.
-const GLYPH_TINTS: Record<string, { from: string; to: string; stroke: string }> = {
-  lifestyle: { from: "#2A1E3F", to: "#C96F3B", stroke: "#F5C97B" },
-  action: { from: "#0B0B14", to: "#3D1C55", stroke: "#C24B6E" },
-  vehicle: { from: "#141B3C", to: "#31498F", stroke: "#7FB4E0" },
-  portrait: { from: "#241F45", to: "#4C4370", stroke: "#C9B8F5" },
-  group: { from: "#1E4638", to: "#118AB2", stroke: "#9EE6C9" },
+// Trois gammes par archétype : la variation se choisit par hash de l'id du
+// template — deux cartes voisines du même type ne se ressemblent pas.
+const GLYPH_TINTS: Record<string, Array<{ from: string; to: string; stroke: string }>> = {
+  lifestyle: [
+    { from: "#2A1E3F", to: "#C96F3B", stroke: "#F5C97B" },
+    { from: "#14323C", to: "#1E6FB2", stroke: "#9EDCF2" },
+    { from: "#3C1E33", to: "#B2477A", stroke: "#F5B8D9" },
+  ],
+  action: [
+    { from: "#0B0B14", to: "#3D1C55", stroke: "#C24B6E" },
+    { from: "#140B0B", to: "#55261C", stroke: "#E08A4F" },
+  ],
+  vehicle: [
+    { from: "#141B3C", to: "#31498F", stroke: "#7FB4E0" },
+    { from: "#101018", to: "#4C4370", stroke: "#C9B8F5" },
+  ],
+  portrait: [
+    { from: "#241F45", to: "#4C4370", stroke: "#C9B8F5" },
+    { from: "#1E2C24", to: "#3D7A58", stroke: "#B8E6CB" },
+  ],
+  group: [{ from: "#1E4638", to: "#118AB2", stroke: "#9EE6C9" }],
 };
 
-function SceneGlyph({ sceneType, personnages }: { sceneType: string; personnages: number }) {
-  const tint = GLYPH_TINTS[sceneType] ?? GLYPH_TINTS.portrait!;
-  const gradientId = `glyph-${sceneType}`;
+function hashSeed(text: string): number {
+  let hash = 0;
+  for (const char of text) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return hash;
+}
+
+function SceneGlyph({ id, sceneType, personnages }: { id: string; sceneType: string; personnages: number }) {
+  const tints = GLYPH_TINTS[sceneType] ?? GLYPH_TINTS.portrait!;
+  const seed = hashSeed(id);
+  const tint = tints[seed % tints.length]!;
+  const sunX = 40 + (seed % 90);
+  const gradientId = `glyph-${id}`;
   return (
     <svg viewBox="0 0 160 90" role="img" aria-hidden className="h-full w-full">
       <defs>
@@ -91,9 +115,9 @@ function SceneGlyph({ sceneType, personnages }: { sceneType: string; personnages
           <path d="M98 70 q1 -18 10 -20 q9 2 10 20 z" />
         </g>
       ) : (
-        // lifestyle : silhouette posée + soleil bas
+        // lifestyle : silhouette posée + soleil bas (position seedée)
         <g fill={tint.stroke} fillOpacity="0.9">
-          <circle cx="122" cy="22" r="9" fillOpacity="0.6" />
+          <circle cx={sunX} cy="22" r="9" fillOpacity="0.6" />
           <circle cx="64" cy="34" r="7" />
           <path d="M50 66 q2 -18 14 -20 q12 2 14 20 l14 0 l0 4 l-46 0 z" />
         </g>
@@ -312,7 +336,7 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
                     >
                       {/* Glyphe dessiné (SVG) — plus aucune vignette générée par IA */}
                       <div className="relative aspect-video overflow-hidden">
-                        <SceneGlyph sceneType={template.scene_type} personnages={template.personnages} />
+                        <SceneGlyph id={template.id} sceneType={template.scene_type} personnages={template.personnages} />
                         {selected ? (
                           <span className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-white shadow-[0_2px_8px_rgba(43,36,80,0.4)]">
                             <Check size={13} strokeWidth={2.6} />

@@ -401,6 +401,9 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
     maskThrottleRef.current = now;
     const dataUrl = canvas.toDataURL("image/png");
     if (!sceneLayer) return;
+    // chaque commit de masque part à l'autosave — même un tap isolé plus
+    // rapide que le chargement initial du canvas de masque
+    dirtyRef.current = true;
     setLayers((current) =>
       current.map((l) => (l.id === sceneLayer.id ? { ...l, maskDataUrl: dataUrl } : l))
     );
