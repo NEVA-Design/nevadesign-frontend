@@ -1,9 +1,8 @@
 import {
   ArrowRight,
-  ArrowUpRight,
   ImageIcon,
   MessageSquare,
-  Palette,
+  Plus,
   ScanSearch,
   UserRound,
   Wand2,
@@ -31,44 +30,30 @@ type OverviewResponse = {
   recentActivity: Array<{ type: string; description: string; amount: number; created_at: string }>
 }
 
+type ProjectRow = {
+  id: string
+  name: string
+  sector: string
+  palette: string[]
+  logo_master: { url: string } | null
+  assetCount: number
+  lastActivity: string
+  updated_at: string
+}
+
 /*
- * Accueil de l'atelier — tuiles de verre pour les statistiques,
- * grille de lancement rapide, registre d'activité en mono et
- * bibliothèque de créations. La lumière spectrale guide l'œil.
+ * Vue Projets — l'accueil de l'atelier (run 5). Chaque projet porte la
+ * DA complète d'un serveur : logo master, palette, ambiance. Les tuiles
+ * de verre donnent l'état du compte, la grille donne les projets, le
+ * registre d'activité ferme le plan de travail.
  */
 
-const quickActions = [
-  {
-    label: "Créer un visuel",
-    href: "/dashboard/design",
-    icon: Palette,
-    detail: "Affiche, bannière, logo, campagne RP",
-  },
-  {
-    label: "Améliorer une image",
-    href: "/dashboard/enhance",
-    icon: Wand2,
-    detail: "Upscale et finition d'assets existants",
-  },
-  {
-    label: "Auditer un design",
-    href: "/dashboard/audit",
-    icon: ScanSearch,
-    detail: "Les points faibles avant le lancement",
-  },
-  {
-    label: "Dossier personnage",
-    href: "/dashboard/character",
-    icon: UserRound,
-    detail: "Identité et documents RP",
-  },
-];
-
-const libraryItems = [
-  { title: "Affiche cartel Vice City", type: "Campagne", image: "/vice.webp", metric: "9:16" },
-  { title: "Pack serveur Prime", type: "Ressource", image: "/Prime_-_preview_serveur_pack_15.webp", metric: "Pack" },
-  { title: "Lancement beach club", type: "Lifestyle", image: "/plage.webp", metric: "4K" },
-];
+const SECTOR_LABELS: Record<string, string> = {
+  fivem: "FiveM",
+  youtube: "YouTube",
+  marques: "Marques",
+  evenementiel: "Événementiel",
+};
 
 const TYPE_LABELS: Record<string, string> = {
   chat: "Creative Director",
@@ -77,9 +62,9 @@ const TYPE_LABELS: Record<string, string> = {
   image_audit: "Audit",
   image_audit_improved: "Audit",
   character_asset: "Character",
-  signup_bonus: "Créations offertes",
-  subscription: "Abonnement",
-  topup: "Recharge de créations",
+  project_creation: "Projet",
+  project_export: "Export projet",
+  project_retouch: "Retouche projet",
 };
 
 const TYPE_ICONS: Record<string, typeof ImageIcon> = {
@@ -110,9 +95,10 @@ function greeting() {
 }
 
 export default async function DashboardPage() {
-  const [me, overview] = await Promise.all([
+  const [me, overview, projectsRes] = await Promise.all([
     backendGetJson<MeResponse>("/me"),
     backendGetJson<OverviewResponse>("/dashboard/overview"),
+    backendGetJson<{ projects: ProjectRow[] }>("/projects"),
   ]);
 
   if (!me) redirect("/login");
@@ -126,12 +112,13 @@ export default async function DashboardPage() {
   const planInfo = PLANS[plan] ?? PLANS.free;
   const maxCredits = planInfo.credits;
 
-  const usageTypes = ["chat", "image_generation", "image_enhancement", "image_audit", "image_audit_improved", "character_asset"];
+  const usageTypes = ["chat", "image_generation", "image_enhancement", "image_audit", "image_audit_improved", "character_asset", "project_creation", "project_export", "project_retouch"];
 
   const todayCount = overview?.todayCount ?? 0;
   const monthCount = overview?.monthCount ?? 0;
   const announcements = overview?.announcements ?? [];
   const recentActivity = (overview?.recentActivity ?? []).filter((t) => usageTypes.includes(t.type));
+  const projects = projectsRes?.projects ?? [];
   const conversionHint =
     plan === "free" ? "Le plan supérieur retire les limites d'aperçu" : "Espace de production actif";
 
@@ -173,18 +160,19 @@ export default async function DashboardPage() {
       {/* Salutation */}
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="pv-label text-[color:var(--num-color)]">Atelier</p>
+          <p className="pv-label text-[color:var(--num-color)]">Projets</p>
           <h1 className="pv-display mt-4 text-[clamp(2.2rem,4.5vw,3.4rem)] text-ink">
             {greeting()}, <span className="pv-beam-underline font-medium text-ink">{firstName}.</span>
           </h1>
           <p className="mt-3 max-w-xl text-sm leading-relaxed text-steel">
-            Vos créations, vos crédits et votre pipeline visuel, réunis sur un seul plan de travail.
+            Chaque projet porte l&apos;identité complète d&apos;un serveur — logo master, palette,
+            ambiance. Toutes ses créations en héritent.
           </p>
         </div>
-        <Link href="/dashboard/design" className="shrink-0">
+        <Link href="/dashboard/projects/new" className="shrink-0">
           <span className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] transition-colors hover:bg-[#35305E]">
-            Création rapide
-            <ArrowRight size={15} />
+            <Plus size={15} />
+            Nouveau projet
           </span>
         </Link>
       </div>
@@ -211,124 +199,163 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      <div className="mt-12 grid gap-12 xl:grid-cols-12">
-        {/* Lancement rapide — grille de cartes */}
-        <section className="xl:col-span-5">
-          <div className="mb-5 flex items-baseline justify-between">
-            <h2 className="text-xl font-semibold tracking-[-0.01em] text-ink">File de production</h2>
-            <span className="pv-label--dim pv-label">Partir du résultat</span>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {quickActions.map((action) => (
-              <Link
-                key={action.href}
-                href={action.href}
-                className="pv-glass pv-edge pv-ignite group flex flex-col gap-3 rounded-xl p-5"
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--hairline)] bg-linen text-steel transition-colors duration-300 group-hover:border-[rgba(164,139,232,0.35)] group-hover:text-[color:var(--num-color)]">
-                  <action.icon size={16} strokeWidth={1.8} />
-                </span>
-                <span>
-                  <span className="flex items-center gap-1.5 text-[14px] font-medium text-ink">
-                    {action.label}
-                    <ArrowUpRight
-                      size={13}
-                      className="text-dusk transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink"
-                    />
+      {/* Projets */}
+      <section className="mt-12">
+        <div className="mb-5 flex items-baseline justify-between">
+          <h2 className="text-xl font-semibold tracking-[-0.01em] text-ink">
+            {projects.length > 0 ? `${projects.length} projet${projects.length > 1 ? "s" : ""}` : "Votre atelier"}
+          </h2>
+          <span className="pv-label--dim pv-label">Une DA par serveur</span>
+        </div>
+
+        {projects.length === 0 ? (
+          /* État vide composé — le texte à gauche, la preuve visuelle à droite */
+          <div className="pv-glass pv-edge relative overflow-hidden rounded-2xl">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -top-24 left-1/3 h-64 w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(164,139,232,0.16),transparent_70%)]"
+            />
+            <div className="relative grid items-center gap-10 p-8 sm:p-12 lg:grid-cols-2">
+              <div>
+                <p className="pv-label text-[color:var(--num-color)]">Premier projet</p>
+                <h3 className="pv-display mt-4 text-[clamp(1.6rem,2.6vw,2.2rem)] leading-tight text-ink">
+                  Créez votre premier projet.
+                </h3>
+                <p className="mt-4 max-w-md text-sm leading-relaxed text-steel">
+                  Un questionnaire illustré, un logo master généré puis détouré,
+                  et chaque bannière, affiche ou wallpaper qui suit garde exactement
+                  la même direction artistique.
+                </p>
+                <Link href="/dashboard/projects/new" className="mt-7 inline-block">
+                  <span className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] transition-colors hover:bg-[#35305E]">
+                    Créer un projet
+                    <ArrowRight size={15} />
                   </span>
-                  <span className="mt-1 block text-xs leading-relaxed text-steel">{action.detail}</span>
-                </span>
+                </Link>
+                <p className="mt-4 font-mono text-[10px] tracking-[0.1em] text-dusk">
+                  3 questions · logo d’abord · zéro prompt à écrire
+                </p>
+              </div>
+              {/* Éventail de créations — ce que le moteur produit */}
+              <div className="relative mx-auto hidden h-[260px] w-full max-w-[420px] lg:block" aria-hidden>
+                <div className="absolute left-0 top-8 h-[210px] w-[150px] -rotate-6 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] shadow-[0_18px_44px_rgba(96,84,140,0.22)]">
+                  <Image src="/affiche1.webp" alt="" fill sizes="150px" className="object-cover" />
+                </div>
+                <div className="absolute left-1/2 top-0 z-10 h-[240px] w-[170px] -translate-x-1/2 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] shadow-[0_24px_56px_rgba(96,84,140,0.3)]">
+                  <Image src="/postergrandfivem.webp" alt="" fill sizes="170px" className="object-cover" />
+                </div>
+                <div className="absolute right-0 top-10 h-[200px] w-[145px] rotate-6 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] shadow-[0_18px_44px_rgba(96,84,140,0.22)]">
+                  <Image src="/vice.webp" alt="" fill sizes="145px" className="object-cover" />
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {projects.map((project) => (
+              <Link
+                key={project.id}
+                href={`/dashboard/projects/${project.id}`}
+                className="pv-glass pv-edge pv-ignite group flex flex-col rounded-2xl p-5"
+              >
+                <div className="flex items-center gap-4">
+                  <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-ink">
+                    {project.logo_master?.url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={project.logo_master.url}
+                        alt=""
+                        className="h-full w-full object-contain p-1.5"
+                      />
+                    ) : (
+                      <span className="pv-display text-lg text-white">
+                        {project.name.slice(0, 2).toUpperCase()}
+                      </span>
+                    )}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-[15px] font-medium text-ink">{project.name}</span>
+                    <span className="mt-1 block font-mono text-[10px] uppercase tracking-[0.16em] text-[color:var(--num-color)]">
+                      {SECTOR_LABELS[project.sector] ?? project.sector}
+                    </span>
+                  </span>
+                </div>
+                <div className="mt-5 flex items-center justify-between border-t border-[color:var(--hairline)] pt-4">
+                  <span className="font-mono text-[11px] text-steel">
+                    {project.assetCount} création{project.assetCount > 1 ? "s" : ""}
+                  </span>
+                  <span className="font-mono text-[10px] text-dusk">{timeAgo(project.lastActivity)}</span>
+                </div>
+                {project.palette.length > 0 ? (
+                  <div className="mt-3 flex h-1.5 overflow-hidden rounded-full">
+                    {project.palette.slice(0, 6).map((color, i) => (
+                      <span key={`${color}-${i}`} className="h-full flex-1" style={{ background: color }} />
+                    ))}
+                  </div>
+                ) : null}
               </Link>
             ))}
-          </div>
-        </section>
 
-        {/* Activité */}
-        <section className="xl:col-span-7">
-          <div className="mb-5 flex items-baseline justify-between">
-            <h2 className="text-xl font-semibold tracking-[-0.01em] text-ink">Activité récente</h2>
-            <span className="pv-label--dim pv-label">Synchronisée en direct</span>
+            {/* Carte d'ajout — clôture la grille */}
+            <Link
+              href="/dashboard/projects/new"
+              className="group flex min-h-[150px] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-[color:var(--hairline-strong)] text-dusk transition-colors hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
+            >
+              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] transition-colors group-hover:border-[rgba(164,139,232,0.5)]">
+                <Plus size={16} />
+              </span>
+              <span className="text-[13px] font-medium">Nouveau projet</span>
+            </Link>
           </div>
-          {recentActivity.length === 0 ? (
-            <div className="relative overflow-hidden rounded-xl border border-dashed border-[color:var(--hairline-strong)] px-6 py-12 text-center">
-              <div
-                aria-hidden
-                className="pointer-events-none absolute left-1/2 top-0 h-32 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(164,139,232,0.12),transparent_70%)]"
-              />
-              <p className="text-lg font-semibold text-ink/85">Le registre est encore vierge.</p>
-              <p className="mt-3 font-mono text-xs tracking-[0.06em] text-dusk">
-                Lancez un design, un audit ou une conversation.
-              </p>
-            </div>
-          ) : (
-            <ul className="pv-glass pv-edge rounded-xl px-2">
-              {recentActivity.map((item, index) => {
-                const Icon = TYPE_ICONS[item.type] ?? ImageIcon;
-                return (
-                  <li
-                    key={`${item.created_at}-${index}`}
-                    className="flex items-center gap-4 border-b border-[color:var(--hairline)] px-3 py-3.5 last:border-b-0"
-                  >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[color:var(--hairline)] bg-ink/[0.04] text-steel">
-                      <Icon size={14} strokeWidth={1.8} />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <span className="text-[13px] text-ink">{TYPE_LABELS[item.type] ?? item.type}</span>
-                      <span className="ml-3 hidden truncate font-mono text-[10px] tracking-[0.04em] text-dusk sm:inline">
-                        {item.description}
-                      </span>
-                    </div>
-                    <span className="shrink-0 font-mono text-[11px] text-[color:var(--num-color)]">
-                      {Math.abs(item.amount)} cr
-                    </span>
-                    <span className="w-24 shrink-0 text-right font-mono text-[10px] text-dusk">
-                      {timeAgo(item.created_at)}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </section>
-      </div>
+        )}
+      </section>
 
-      {/* Bibliothèque */}
+      {/* Activité */}
       <section className="mt-14">
-        <div className="mb-6 flex items-baseline justify-between">
-          <h2 className="text-xl font-semibold tracking-[-0.01em] text-ink">Bibliothèque de création</h2>
-          <Link href="/neva-design#portfolio" className="pv-link inline-flex items-center gap-2 text-[13px]">
-            Ouvrir la galerie
-            <ArrowRight size={13} className="text-mist" />
-          </Link>
+        <div className="mb-5 flex items-baseline justify-between">
+          <h2 className="text-xl font-semibold tracking-[-0.01em] text-ink">Activité récente</h2>
+          <span className="pv-label--dim pv-label">Synchronisée en direct</span>
         </div>
-        <div className="grid gap-5 md:grid-cols-3">
-          {libraryItems.map((project) => (
-            <figure key={project.title} className="group">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-abyss transition-colors duration-500 group-hover:border-[#C9C9C0]">
-                <Image
-                  src={project.image}
-                  alt={project.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 30vw"
-                  className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
-                />
-                <span className="absolute right-3 top-3 z-10 rounded-full border border-[color:var(--hairline-strong)] bg-[rgba(28,23,55,0.6)] px-2 py-1 font-mono text-[9px] uppercase tracking-[0.14em] text-ink/80 backdrop-blur-sm">
-                  {project.metric}
-                </span>
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 rounded-xl shadow-[inset_0_0_0_1px_rgba(43,36,80,0.05)]"
-                />
-              </div>
-              <figcaption className="mt-3 flex items-baseline justify-between">
-                <span className="text-[13px] text-ink/80">{project.title}</span>
-                <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-dusk">
-                  {project.type}
-                </span>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
+        {recentActivity.length === 0 ? (
+          <div className="relative overflow-hidden rounded-xl border border-dashed border-[color:var(--hairline-strong)] px-6 py-12 text-center">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 top-0 h-32 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(164,139,232,0.12),transparent_70%)]"
+            />
+            <p className="text-lg font-semibold text-ink/85">Le registre est encore vierge.</p>
+            <p className="mt-3 font-mono text-xs tracking-[0.06em] text-dusk">
+              Créez un projet et lancez votre première génération.
+            </p>
+          </div>
+        ) : (
+          <ul className="pv-glass pv-edge rounded-xl px-2">
+            {recentActivity.map((item, index) => {
+              const Icon = TYPE_ICONS[item.type] ?? ImageIcon;
+              return (
+                <li
+                  key={`${item.created_at}-${index}`}
+                  className="flex items-center gap-4 border-b border-[color:var(--hairline)] px-3 py-3.5 last:border-b-0"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[color:var(--hairline)] bg-ink/[0.04] text-steel">
+                    <Icon size={14} strokeWidth={1.8} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-[13px] text-ink">{TYPE_LABELS[item.type] ?? item.type}</span>
+                    <span className="ml-3 hidden truncate font-mono text-[10px] tracking-[0.04em] text-dusk sm:inline">
+                      {item.description}
+                    </span>
+                  </div>
+                  <span className="shrink-0 font-mono text-[11px] text-[color:var(--num-color)]">
+                    {Math.abs(item.amount)} cr
+                  </span>
+                  <span className="w-24 shrink-0 text-right font-mono text-[10px] text-dusk">
+                    {timeAgo(item.created_at)}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </section>
     </div>
   );

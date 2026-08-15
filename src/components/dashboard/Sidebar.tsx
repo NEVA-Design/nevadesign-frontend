@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import {
   BookOpen,
   CreditCard,
-  Home,
+  Layers,
   LogOut,
   MessageSquare,
   Palette,
@@ -44,7 +44,7 @@ interface UserProfile {
 const navGroups = [
   {
     label: "Atelier",
-    items: [{ href: "/dashboard", icon: Home, label: "Vue d'ensemble" }],
+    items: [{ href: "/dashboard", icon: Layers, label: "Projets" }],
   },
   {
     label: "Création",
