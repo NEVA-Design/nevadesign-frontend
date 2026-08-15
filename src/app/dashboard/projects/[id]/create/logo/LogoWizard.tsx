@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  AlertTriangle,
   ArrowLeft,
   ArrowRight,
   Building2,
@@ -12,13 +13,18 @@ import {
   ChevronRight,
   Citrus,
   Crown,
+  Download,
   Flame,
   Gem,
   Loader2,
+  Moon,
+  Mountain,
+  Paintbrush,
   PawPrint,
   Pencil,
   Plus,
   RefreshCw,
+  ShieldCheck,
   Sparkles,
   Type,
   Waves,
@@ -26,27 +32,40 @@ import {
   Zap,
 } from "lucide-react";
 import {
+  applyLogoFond,
+  fetchTrainingStatus,
   finalizeLogoMaster,
+  generateLogoFonds,
   generateLogoProposals,
+  type LogoFondChoix,
+  type LogoFondProposition,
   type LogoProposition,
+  type LogoScene,
   type LogoWizardAnswers,
+  type TrainingStatus,
 } from "@/lib/api/engine";
 import { cn } from "@/lib/utils";
 
 /*
- * Wizard logo v3 (run 5.3, LOT 2) — les bonnes questions, une par écran,
+ * Wizard logo v4 (run 5.4, LOT 0/4/5) — les bonnes questions, une par écran,
  * illustrées en CSS pur (jamais une génération dans le wizard) :
- *   1. « Ton logo, il raconte quoi ? » — LE sujet/thème qui manquait
- *   2. La forme (lettre / nom / emblème) — conservée
- *   3. L'ambiance du logo (distincte de l'univers serveur)
- *   4. Les couleurs libres : palette projet, picker complet, ou constructeur
- *      de dégradé (2-3 couleurs + angle, aperçu live sur le nom du serveur)
- *   5. Le fond : transparent / plein / dégradé + motifs (façon ALYA)
- *   6. À éviter (optionnel)
- *   7. Récap éditable « On part sur ça ? » — le brief EXACT transmis au
- *      directeur artistique, chaque ligne cliquable pour revenir
- * Puis : 3 concepts pensés par le DA → 3 propositions dessinées par le pro,
- * chacune affichée avec son intention écrite.
+ *   ÉTAPE A — le logo seul :
+ *   1. « Ton logo, il raconte quoi ? » — le sujet/thème
+ *   2. La forme (lettre / nom / emblème)
+ *   3. L'ambiance du logo (pilote éclairage + matières via l'ADN)
+ *   4. Les couleurs libres (picker + dégradé, hex exacts)
+ *   5. À éviter (optionnel)
+ *   6. Récap éditable — le brief EXACT transmis au directeur artistique
+ *   → 3 gabarits maîtres pensés par le DA → 3 propositions 2K relues (OCR +
+ *     ADN), master PNG alpha 4K + déclinaisons blanc/noir.
+ *   ÉTAPE B — le fond, APRÈS validation : « On lui fait une scène ? » —
+ *   garder transparent / fond signature / atmosphérique / scène. Les fonds
+ *   se génèrent SANS le logo, la composition est par calques, chaque fond
+ *   coûte 1 retouche, les déclinaisons (alpha, carré 1:1, bannière 16:9)
+ *   tombent à la validation.
+ *   La question « fond » a DISPARU de l'étape A.
+ * LOT 0 : badge d'état ADN en tête — sans entraînement v4 installé, le wizard
+ * refuse et affiche « Entraînement requis ».
  */
 
 type Props = {
@@ -59,14 +78,13 @@ const STEPS = [
   "La forme",
   "L'ambiance",
   "Les couleurs",
-  "Le fond",
   "À éviter",
   "On part sur ça ?",
   "Propositions",
 ] as const;
 
-const RECAP_STEP = 6;
-const PROPOSALS_STEP = 7;
+const RECAP_STEP = 5;
+const PROPOSALS_STEP = 6;
 
 const SUJET_CHIPS = [
   { label: "fruit", icon: Citrus },
@@ -94,21 +112,25 @@ const AMBIANCES = [
   { id: "propre" as const, label: "Propre", swatch: "linear-gradient(135deg,#F3F1F8,#C9C4D8)" },
 ];
 
-const FONDS = [
+// Étape B — les choix de fond, APRÈS validation du master (run 5.4, LOT 4)
+const FOND_CHOIX = [
   {
-    id: "transparent" as const,
-    label: "Transparent",
-    detail: "PNG détouré — se pose partout",
+    id: "signature" as const,
+    label: "Fond signature",
+    detail: "Dégradé + motifs doodle dérivés de ton sujet, façon ALYA",
+    icon: Paintbrush,
   },
   {
-    id: "plein" as const,
-    label: "Fond plein",
-    detail: "Un aplat qui fait partie du logo",
+    id: "atmospherique" as const,
+    label: "Fond atmosphérique",
+    detail: "Sombre dramatique, particules, façon R doré",
+    icon: Moon,
   },
   {
-    id: "degrade_motifs" as const,
-    label: "Dégradé + motifs",
-    detail: "Fond dégradé et petits motifs de ton sujet",
+    id: "scene" as const,
+    label: "Fond scène",
+    detail: "L'ambiance de ton serveur en flou profond",
+    icon: Mountain,
   },
 ];
 
@@ -128,8 +150,18 @@ export default function LogoWizard({ projectId, projectName }: Props) {
   const [couleurUnie, setCouleurUnie] = useState("#7C6BD4");
   const [degradeCouleurs, setDegradeCouleurs] = useState<string[]>(["#FF6B4A", "#FFC4A3"]);
   const [degradeAngle, setDegradeAngle] = useState(45);
-  const [fond, setFond] = useState<LogoWizardAnswers["fond"]>("transparent");
   const [interdits, setInterdits] = useState("");
+
+  // ── LOT 0 : l'état d'entraînement — badge + blocage dur ──────────────────
+  const [training, setTraining] = useState<TrainingStatus | null>(null);
+  const [trainingLoaded, setTrainingLoaded] = useState(false);
+
+  useEffect(() => {
+    fetchTrainingStatus()
+      .then((r) => setTraining(r.training))
+      .catch(() => setTraining(null))
+      .finally(() => setTrainingLoaded(true));
+  }, []);
 
   // ── Génération ───────────────────────────────────────────────────────────
   const [generating, setGenerating] = useState(false);
@@ -140,6 +172,14 @@ export default function LogoWizard({ projectId, projectName }: Props) {
   const [finalizing, setFinalizing] = useState(false);
   const [master, setMaster] = useState<{ url: string; whiteUrl: string; blackUrl: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // ── Étape B : le fond, après validation du master ────────────────────────
+  const [etapeB, setEtapeB] = useState<"choix" | "fonds" | "final">("choix");
+  const [fondsGenerating, setFondsGenerating] = useState<LogoFondChoix | null>(null);
+  const [fonds, setFonds] = useState<LogoFondProposition[]>([]);
+  const [fondChosen, setFondChosen] = useState<string | null>(null);
+  const [fondApplying, setFondApplying] = useState(false);
+  const [logoScene, setLogoScene] = useState<LogoScene | null>(null);
 
   const degradeCss = useMemo(
     () => `linear-gradient(${degradeAngle}deg, ${degradeCouleurs.join(", ")})`,
@@ -158,10 +198,9 @@ export default function LogoWizard({ projectId, projectName }: Props) {
           : couleurMode === "degrade"
             ? { mode: "degrade", couleurs: degradeCouleurs, angle: degradeAngle }
             : { mode: "palette" },
-      fond,
       interdits: interdits.trim(),
     };
-  }, [type, lettrageSeul, sujet, ambiance, couleurMode, couleurUnie, degradeCouleurs, degradeAngle, fond, interdits]);
+  }, [type, lettrageSeul, sujet, ambiance, couleurMode, couleurUnie, degradeCouleurs, degradeAngle, interdits]);
 
   function goTo(next: number) {
     setDirection(next > step ? 1 : -1);
@@ -207,11 +246,55 @@ export default function LogoWizard({ projectId, projectName }: Props) {
     try {
       const result = await finalizeLogoMaster({ projectId, assetId, chosenUrl: chosen });
       setMaster(result.logoMaster);
+      setEtapeB("choix");
       router.refresh();
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setFinalizing(false);
+    }
+  }
+
+  // ── Étape B : générer des fonds (2 par salve, 1 retouche chacun) ─────────
+  async function launchFonds(choix: LogoFondChoix, again = false) {
+    if (!assetId || fondsGenerating) return;
+    setFondsGenerating(choix);
+    setError(null);
+    if (!again) {
+      setFonds([]);
+      setFondChosen(null);
+      setEtapeB("fonds");
+    }
+    try {
+      const result = await generateLogoFonds({
+        projectId,
+        assetId,
+        choix,
+        count: again ? 1 : 2,
+      });
+      setFonds((prev) => (again ? [...prev, ...result.fonds] : result.fonds));
+      setRetouchesUsed(result.retouchesUsed);
+    } catch (e) {
+      setError((e as Error).message);
+      if (!again) setEtapeB("choix");
+    } finally {
+      setFondsGenerating(null);
+    }
+  }
+
+  async function validateFond() {
+    if (!assetId || !fondChosen || fondApplying) return;
+    setFondApplying(true);
+    setError(null);
+    try {
+      const result = await applyLogoFond({ projectId, assetId, fondUrl: fondChosen });
+      setLogoScene(result.logoScene);
+      setEtapeB("final");
+      router.refresh();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setFondApplying(false);
     }
   }
 
@@ -226,55 +309,294 @@ export default function LogoWizard({ projectId, projectName }: Props) {
             ? degradeCouleurs.every((c) => HEX_RE.test(c))
             : true;
 
-  // ── Écran final : master en place ────────────────────────────────────────
+  // ── LOT 0 : le badge d'état — toujours visible, jamais de test à l'aveugle ─
+  const badge = trainingLoaded ? (
+    <div
+      className={cn(
+        "inline-flex items-center gap-2 rounded-full border px-4 py-1.5 font-mono text-[11px] tracking-[0.04em]",
+        training?.installed
+          ? "border-[rgba(61,122,88,0.35)] bg-[rgba(61,122,88,0.07)] text-[#3D7A58]"
+          : "border-[rgba(220,80,80,0.35)] bg-[rgba(220,80,80,0.06)] text-[#B4443C]"
+      )}
+    >
+      {training?.installed ? <ShieldCheck size={13} /> : <AlertTriangle size={13} />}
+      ADN v4 : {training?.adnActif ? "actif" : "absent"} · exemplars : {training?.exemplarsLogo ?? 0} · réfs
+      jointes au prochain appel : {training?.referencesJointes ?? 0}
+    </div>
+  ) : null;
+
+  // ── LOT 0 : sans entraînement v4 installé, le wizard REFUSE ──────────────
+  if (trainingLoaded && training && !training.installed && !master) {
+    return (
+      <div className="mx-auto flex w-full max-w-[860px] flex-1 flex-col px-4 py-8 sm:px-6 lg:py-12">
+        {badge}
+        <h1 className="pv-display mt-6 text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
+          Entraînement requis.
+        </h1>
+        <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
+          Le moteur logo ne génère plus rien sans l&apos;ADN FiveM mesuré sur le corpus.
+          Lance <code className="rounded bg-ink/[0.06] px-1.5 py-0.5 font-mono text-[12px]">bun run scripts/train-fivem-v4.ts</code>{" "}
+          côté backend, puis reviens ici.
+        </p>
+        <ul className="mt-6 flex flex-col gap-1.5 text-[13px] text-steel">
+          {training.manques.map((m) => (
+            <li key={m} className="flex items-center gap-2">
+              <AlertTriangle size={12} className="shrink-0 text-[#B4443C]" />
+              {m}
+            </li>
+          ))}
+        </ul>
+        <div className="mt-10">
+          <Link href={`/dashboard/projects/${projectId}`} className="pv-link text-[13px]">
+            Retour au projet
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // ── ÉTAPE B (run 5.4, LOT 4) : le master est là — « On lui fait une scène ? »
   if (master) {
     return (
       <div className="mx-auto flex w-full max-w-[860px] flex-1 flex-col px-4 py-8 sm:px-6 lg:py-12">
-        <p className="pv-label text-[color:var(--num-color)]">Logo master</p>
-        <h1 className="pv-display mt-3 text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
-          {projectName} a sa signature.
-        </h1>
-        <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
-          Master 4K + déclinaisons blanc et noir. Chaque création du projet
-          l&apos;intègre automatiquement — il se compose, il ne se régénère pas.
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="pv-label text-[color:var(--num-color)]">
+            {etapeB === "final" ? "Logo master" : "Étape 2 — la scène"}
+          </p>
+          {badge}
+        </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          {[
-            { label: "Master couleur", url: master.url, checker: true },
-            { label: "Déclinaison blanche", url: master.whiteUrl, dark: true },
-            { label: "Déclinaison noire", url: master.blackUrl },
-          ].map((item) => (
-            <figure key={item.label}>
-              <div
-                className={cn(
-                  "flex aspect-square items-center justify-center overflow-hidden rounded-2xl border border-[color:var(--hairline-strong)] p-6",
-                  item.dark ? "bg-[#191624]" : "bg-white",
-                  item.checker &&
-                    "bg-[conic-gradient(#EFECF4_90deg,#FFFFFF_90deg_180deg,#EFECF4_180deg_270deg,#FFFFFF_270deg)] bg-[length:22px_22px]"
-                )}
+        {etapeB === "choix" ? (
+          <>
+            <h1 className="pv-display mt-3 text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
+              Ton logo est prêt. On lui fait une scène&nbsp;?
+            </h1>
+            <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
+              Le fond se génère SANS le logo, puis se compose derrière lui — le logo
+              ne bouge jamais. Chaque fond généré consomme 1 retouche
+              ({retouchesUsed}/5 utilisées).
+            </p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setEtapeB("final")}
+                className="group overflow-hidden rounded-2xl border border-[color:var(--hairline-strong)] text-left transition-all duration-300 hover:border-[rgba(164,139,232,0.4)]"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.url} alt={item.label} className="max-h-full max-w-full object-contain" />
-              </div>
-              <figcaption className="mt-2 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-dusk">
-                {item.label}
-              </figcaption>
-            </figure>
-          ))}
-        </div>
+                <div className="flex h-[104px] items-center justify-center bg-[conic-gradient(#EFECF4_90deg,#FFFFFF_90deg_180deg,#EFECF4_180deg_270deg,#FFFFFF_270deg)] bg-[length:18px_18px]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={master.url} alt="Logo transparent" className="max-h-[84px] max-w-[84px] object-contain" />
+                </div>
+                <div className="bg-white/70 px-4 py-3">
+                  <span className="block text-[14px] font-medium text-ink">Garder transparent</span>
+                  <span className="mt-0.5 block text-xs leading-relaxed text-steel">
+                    Le PNG alpha se pose partout — aucun fond, aucun coût.
+                  </span>
+                </div>
+              </button>
+              {FOND_CHOIX.map((item) => {
+                const Icon = item.icon;
+                const loading = fondsGenerating === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    disabled={Boolean(fondsGenerating)}
+                    onClick={() => launchFonds(item.id)}
+                    className="group overflow-hidden rounded-2xl border border-[color:var(--hairline-strong)] text-left transition-all duration-300 hover:border-[rgba(164,139,232,0.4)] disabled:opacity-60"
+                  >
+                    <div
+                      className="relative flex h-[104px] items-center justify-center"
+                      style={{
+                        background:
+                          item.id === "signature"
+                            ? "linear-gradient(135deg,#7C6BD4,#C9B8F5)"
+                            : item.id === "atmospherique"
+                              ? "linear-gradient(135deg,#171226,#2B2438)"
+                              : "linear-gradient(135deg,#1E3A4C,#4C8A9E)",
+                      }}
+                    >
+                      {loading ? (
+                        <Loader2 size={22} className="animate-spin text-white" />
+                      ) : (
+                        <Icon size={26} className="text-white/85" />
+                      )}
+                    </div>
+                    <div className="bg-white/70 px-4 py-3">
+                      <span className="block text-[14px] font-medium text-ink">{item.label}</span>
+                      <span className="mt-0.5 block text-xs leading-relaxed text-steel">{item.detail}</span>
+                      <span className="mt-1 block font-mono text-[10px] text-dusk">2 propositions — 2 retouches</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        ) : null}
 
-        <div className="mt-10 flex flex-wrap items-center gap-4">
-          <Link href={`/dashboard/projects/${projectId}/create`}>
-            <span className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] transition-colors hover:bg-[#35305E]">
-              <Sparkles size={15} />
-              Lancer une création
-            </span>
-          </Link>
-          <Link href={`/dashboard/projects/${projectId}`} className="pv-link text-[13px]">
-            Voir le projet
-          </Link>
-        </div>
+        {etapeB === "fonds" ? (
+          <>
+            <h1 className="pv-display mt-3 text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
+              {fondsGenerating ? "Les fonds se dessinent…" : "Choisis la scène."}
+            </h1>
+            <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
+              Aperçus composés : ton logo posé sur chaque fond (ombre douce + glow de
+              contact). Le fond change, le logo ne bouge jamais.
+            </p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              {fonds.map((fond) => {
+                const selected = fondChosen === fond.fondUrl;
+                return (
+                  <button
+                    key={fond.fondUrl}
+                    type="button"
+                    onClick={() => setFondChosen(fond.fondUrl)}
+                    className={cn(
+                      "group relative block aspect-square w-full overflow-hidden rounded-2xl border transition-all duration-300",
+                      selected
+                        ? "border-[rgba(164,139,232,0.75)] shadow-[0_0_0_2px_rgba(164,139,232,0.45),0_18px_44px_rgba(96,84,140,0.25)]"
+                        : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.45)]"
+                    )}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={fond.previewUrl} alt="Fond proposé (aperçu composé)" className="h-full w-full object-cover" />
+                    {selected ? (
+                      <span className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-ink text-white shadow-[0_2px_10px_rgba(43,36,80,0.45)]">
+                        <Check size={14} strokeWidth={2.6} />
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
+              {fondsGenerating ? (
+                <div className="relative aspect-square overflow-hidden rounded-2xl border border-[color:var(--hairline)] bg-white/50">
+                  <div className="absolute inset-0 animate-pulse bg-[linear-gradient(120deg,transparent_30%,rgba(164,139,232,0.14)_50%,transparent_70%)]" />
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <Loader2 size={22} className="animate-spin text-mist" />
+                  </span>
+                </div>
+              ) : null}
+            </div>
+            {!fondsGenerating && fonds.length ? (
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => launchFonds(fonds[0]!.choix, true)}
+                    className="inline-flex h-10 items-center gap-2 rounded-full border border-[color:var(--hairline-strong)] px-4 text-[13px] text-steel transition-colors hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
+                  >
+                    <RefreshCw size={13} />
+                    Un autre fond
+                    <span className="font-mono text-[10px] text-dusk">— 1 retouche ({retouchesUsed}/5)</span>
+                  </button>
+                  <button type="button" onClick={() => setEtapeB("final")} className="pv-link text-[13px]">
+                    Garder transparent
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  disabled={!fondChosen || fondApplying}
+                  onClick={validateFond}
+                  className={cn(
+                    "inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium transition-all",
+                    fondChosen && !fondApplying
+                      ? "bg-ink text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] hover:bg-[#35305E]"
+                      : "cursor-not-allowed bg-ink/10 text-mist"
+                  )}
+                >
+                  {fondApplying ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
+                  {fondApplying ? "Déclinaisons…" : "Valider ce fond — déclinaisons"}
+                </button>
+              </div>
+            ) : null}
+          </>
+        ) : null}
+
+        {etapeB === "final" ? (
+          <>
+            <h1 className="pv-display mt-3 text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
+              {projectName} a sa signature.
+            </h1>
+            <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
+              Master PNG alpha 4K + déclinaisons blanc et noir
+              {logoScene ? ", et sa scène : carré avatar Discord + bannière 16:9" : ""}.
+              Chaque création du projet l&apos;intègre — il se compose, il ne se régénère pas.
+            </p>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              {[
+                { label: "Master couleur", url: master.url, checker: true },
+                { label: "Déclinaison blanche", url: master.whiteUrl, dark: true },
+                { label: "Déclinaison noire", url: master.blackUrl },
+              ].map((item) => (
+                <figure key={item.label}>
+                  <div
+                    className={cn(
+                      "flex aspect-square items-center justify-center overflow-hidden rounded-2xl border border-[color:var(--hairline-strong)] p-6",
+                      item.dark ? "bg-[#191624]" : "bg-white",
+                      item.checker &&
+                        "bg-[conic-gradient(#EFECF4_90deg,#FFFFFF_90deg_180deg,#EFECF4_180deg_270deg,#FFFFFF_270deg)] bg-[length:22px_22px]"
+                    )}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={item.url} alt={item.label} className="max-h-full max-w-full object-contain" />
+                  </div>
+                  <figcaption className="mt-2 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-dusk">
+                    {item.label}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+
+            {logoScene ? (
+              <div className="mt-6">
+                <p className="pv-label text-[color:var(--num-color)]">Déclinaisons avec fond</p>
+                <div className="mt-3 grid gap-4 sm:grid-cols-2">
+                  {[
+                    { label: "Carré 1:1 — avatar Discord", url: logoScene.carreUrl, square: true },
+                    { label: "Bannière-logo 16:9", url: logoScene.banniereUrl, square: false },
+                  ].map((item) => (
+                    <figure key={item.label}>
+                      <div className={cn("overflow-hidden rounded-2xl border border-[color:var(--hairline-strong)]", item.square ? "aspect-square" : "aspect-video")}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={item.url} alt={item.label} className="h-full w-full object-cover" />
+                      </div>
+                      <figcaption className="mt-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.14em] text-dusk">
+                        {item.label}
+                        <a href={item.url} download className="inline-flex items-center gap-1 text-ink hover:underline">
+                          <Download size={11} />
+                          PNG
+                        </a>
+                      </figcaption>
+                    </figure>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              <Link href={`/dashboard/projects/${projectId}/create`}>
+                <span className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] transition-colors hover:bg-[#35305E]">
+                  <Sparkles size={15} />
+                  Lancer une création
+                </span>
+              </Link>
+              {!logoScene ? (
+                <button type="button" onClick={() => setEtapeB("choix")} className="pv-link text-[13px]">
+                  Lui faire une scène
+                </button>
+              ) : null}
+              <Link href={`/dashboard/projects/${projectId}`} className="pv-link text-[13px]">
+                Voir le projet
+              </Link>
+            </div>
+          </>
+        ) : null}
+
+        {error ? (
+          <p className="mt-6 rounded-xl border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-4 py-3 text-[13px] text-[#B4443C]">
+            {error}
+          </p>
+        ) : null}
       </div>
     );
   }
@@ -310,11 +632,6 @@ export default function LogoWizard({ projectId, projectName }: Props) {
     },
     {
       step: 4,
-      label: "Le fond",
-      value: FONDS.find((f) => f.id === fond)?.label ?? "—",
-    },
-    {
-      step: 5,
       label: "À éviter",
       value: interdits.trim() || "Rien de précisé",
     },
@@ -322,10 +639,13 @@ export default function LogoWizard({ projectId, projectName }: Props) {
 
   return (
     <div className="mx-auto flex w-full max-w-[860px] flex-1 flex-col px-4 py-8 sm:px-6 lg:py-12">
-      {/* Progression */}
+      {/* Progression + badge d'état ADN (LOT 0) */}
       <div className="mb-10">
-        <div className="flex items-baseline justify-between">
-          <p className="pv-label text-[color:var(--num-color)]">Étape 1 — le logo</p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <p className="pv-label text-[color:var(--num-color)]">Étape 1 — le logo</p>
+            {badge}
+          </div>
           <p className="font-mono text-[11px] tracking-[0.12em] text-dusk">
             {step + 1} / {STEPS.length} — {STEPS[step]}
           </p>
@@ -655,91 +975,10 @@ export default function LogoWizard({ projectId, projectName }: Props) {
             </section>
           ) : null}
 
-          {/* ── 5. Le fond ──────────────────────────────────────────────── */}
+          {/* ── 5. À éviter ─────────────────────────────────────────────── */}
+          {/* La question « fond » a disparu de l'étape A (run 5.4, LOT 4) —
+              le fond se choisit à l'étape B, après validation du master. */}
           {step === 4 ? (
-            <section>
-              <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
-                Et derrière le logo&nbsp;?
-              </h1>
-              <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
-                Transparent pour tout habiller, ou un fond qui fait partie de la marque.
-              </p>
-              <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                {FONDS.map((item) => {
-                  const selected = fond === item.id;
-                  const dominante =
-                    couleurMode === "degrade" ? degradeCouleurs[0] : couleurMode === "unie" ? couleurUnie : "#7C6BD4";
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setFond(item.id)}
-                      className={cn(
-                        "group overflow-hidden rounded-2xl border text-left transition-all duration-300",
-                        selected
-                          ? "border-[rgba(164,139,232,0.65)] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_18px_44px_rgba(96,84,140,0.22)]"
-                          : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
-                      )}
-                    >
-                      {/* Trois vignettes 100 % CSS */}
-                      <div
-                        className={cn(
-                          "relative flex h-[104px] items-center justify-center",
-                          item.id === "transparent" &&
-                            "bg-[conic-gradient(#EFECF4_90deg,#FFFFFF_90deg_180deg,#EFECF4_180deg_270deg,#FFFFFF_270deg)] bg-[length:18px_18px]"
-                        )}
-                        style={
-                          item.id === "plein"
-                            ? { background: dominante }
-                            : item.id === "degrade_motifs"
-                              ? { background: couleurMode === "degrade" ? degradeCss : `linear-gradient(135deg, ${dominante}, #C9B8F5)` }
-                              : undefined
-                        }
-                      >
-                        {item.id === "degrade_motifs" ? (
-                          <span aria-hidden className="absolute inset-0 opacity-35">
-                            {["12%|18%", "78%|22%", "30%|70%", "62%|64%", "88%|78%", "8%|82%"].map((pos, i) => {
-                              const [left, top] = pos.split("|");
-                              return (
-                                <span
-                                  key={i}
-                                  className={cn(
-                                    "absolute block border-2 border-white",
-                                    i % 3 === 0 ? "h-3 w-3 rounded-full" : i % 3 === 1 ? "h-3 w-3 rotate-45" : "h-[3px] w-4 rounded-full"
-                                  )}
-                                  style={{ left, top }}
-                                />
-                              );
-                            })}
-                          </span>
-                        ) : null}
-                        <span
-                          className={cn(
-                            "pv-display relative text-[30px] leading-none",
-                            item.id === "transparent" ? "text-ink" : "text-white"
-                          )}
-                        >
-                          {projectName.trim()[0]?.toUpperCase() ?? "N"}
-                        </span>
-                        {selected ? (
-                          <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-white text-ink">
-                            <Check size={13} strokeWidth={2.6} />
-                          </span>
-                        ) : null}
-                      </div>
-                      <div className="bg-white/70 px-4 py-3">
-                        <span className="block text-[14px] font-medium text-ink">{item.label}</span>
-                        <span className="mt-0.5 block text-xs leading-relaxed text-steel">{item.detail}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-          ) : null}
-
-          {/* ── 6. À éviter ─────────────────────────────────────────────── */}
-          {step === 5 ? (
             <section>
               <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
                 Un truc à éviter&nbsp;?
@@ -856,9 +1095,24 @@ export default function LogoWizard({ projectId, projectName }: Props) {
                             </span>
                           ) : null}
                         </button>
-                        {/* L'intention écrite AVANT le dessin — la transparence v3 */}
-                        <p className="mt-2 px-1 text-[13px] font-medium text-ink">{prop.concept.nom}</p>
+                        {/* L'intention écrite AVANT le dessin — et ses citations
+                            du brief (run 5.4, LOT 5 : « "réponse" → effet ») */}
+                        <p className="mt-2 px-1 text-[13px] font-medium text-ink">
+                          {prop.concept.nom}
+                          <span className="ml-2 rounded-full bg-ink/[0.06] px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.08em] text-dusk">
+                            {prop.concept.rendu}
+                          </span>
+                        </p>
                         <p className="mt-0.5 px-1 text-xs leading-relaxed text-steel">{prop.concept.justification}</p>
+                        {prop.concept.citations?.length ? (
+                          <ul className="mt-1.5 flex flex-col gap-0.5 px-1">
+                            {prop.concept.citations.map((c) => (
+                              <li key={c} className="text-[11px] leading-relaxed text-dusk">
+                                {c}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
                       </div>
                     );
                   })}

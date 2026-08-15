@@ -3,11 +3,10 @@
 import { backendFetch } from "@/lib/api/backend-client";
 import type { ProjectAsset } from "@/lib/api/projects";
 
-// Helpers du moteur de génération (run 5.2 → 5.3) — miroir des routes /engine.
+// Helpers du moteur de génération (run 5.2 → 5.4) — miroir des routes /engine.
 
-// v3 (run 5.3) : le wizard pose ENFIN les bonnes questions — le sujet/thème,
-// les couleurs libres (picker + dégradé), l'ambiance du logo, le fond, les
-// interdits. Le brief part TEL QUEL au directeur artistique (étage 1).
+// v4 (run 5.4) : la question « fond » a DISPARU de l'étape logo — l'étape A
+// livre le logo seul (PNG alpha), le fond arrive à l'étape B (écran dédié).
 export type LogoCouleursChoix =
   | { mode: "palette" }
   | { mode: "unie"; couleur: string }
@@ -18,24 +17,93 @@ export type LogoWizardAnswers = {
   sujet: string;
   ambiance: "ete" | "sombre" | "luxe" | "neon" | "retro" | "propre" | null;
   couleurs: LogoCouleursChoix;
-  fond: "transparent" | "plein" | "degrade_motifs";
   interdits: string;
 };
 
 export type LogoConcept = {
   nom: string;
   justification: string;
+  // traçabilité (run 5.4, LOT 5) : « "réponse du brief" → effet »
+  citations: string[];
+  rendu: "relief" | "plat";
   prompt: string;
 };
+
+export type LogoScores = { relief: number; glow: number };
 
 export type LogoProposition = {
   url: string;
   concept: LogoConcept;
   ocrRejects: number;
   conceptOk: boolean;
+  // contrôle ADN (run 5.4, LOT 3)
+  adnOk: boolean;
+  serveurLogo: boolean;
+  lisible64: boolean;
+  scores: LogoScores;
   defauts: string[];
   regenere: boolean;
 };
+
+// ── État de l'entraînement (run 5.4, LOT 0) — le badge du wizard ─────────────
+export type TrainingStatus = {
+  installed: boolean;
+  adnActif: boolean;
+  version: number | null;
+  exemplarsLogo: number;
+  referencesJointes: number;
+  fondsBibliotheque: number;
+  imagesAnalysees: number;
+  imagesTotales: number;
+  manques: string[];
+};
+
+export async function fetchTrainingStatus(): Promise<{ training: TrainingStatus; message: string }> {
+  const res = await backendFetch("/engine/training-status");
+  return parseOrThrow(res);
+}
+
+// ── Étape B (run 5.4, LOT 4) : les fonds du logo ─────────────────────────────
+export type LogoFondChoix = "signature" | "atmospherique" | "scene";
+
+export type LogoFondProposition = {
+  fondUrl: string;
+  previewUrl: string;
+  choix: LogoFondChoix;
+};
+
+export type LogoScene = {
+  fondUrl: string;
+  carreUrl: string;
+  banniereUrl: string;
+  alphaUrl: string;
+};
+
+export async function generateLogoFonds(input: {
+  projectId: string;
+  assetId: string;
+  choix: LogoFondChoix;
+  ambianceScene?: string;
+  count?: number;
+}): Promise<{ fonds: LogoFondProposition[]; retouchesUsed: number; includedRetouches: number; creditCharged: number }> {
+  const res = await backendFetch("/engine/logo/fond/proposals", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+  return parseOrThrow(res);
+}
+
+export async function applyLogoFond(input: {
+  projectId: string;
+  assetId: string;
+  fondUrl: string;
+}): Promise<{ logoScene: LogoScene }> {
+  const res = await backendFetch("/engine/logo/fond/apply", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+  return parseOrThrow(res);
+}
 
 export type SceneWizardAnswers = {
   templateId?: string;
