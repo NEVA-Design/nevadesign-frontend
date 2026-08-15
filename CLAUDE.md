@@ -34,7 +34,16 @@ Produit et admin **sans base de données** via `/dev-preview?screen=<nom>` (mock
 - Dashboard : `design`, `chat`, `enhance`, `character`, `audit`, `downloads`, `settings`, `billing`, `brand`, `code`, `landing-module`, `prompt`
 - Admin : `admin-users`, `admin-admins`, `admin-announcements`, `admin-maintenance`, `admin-newsletter`, `admin-portfolio`, `admin-security`
 
-(L'accueil dashboard `/dashboard` et `/admin/overview` sont des Server Components à données réelles — non capturables tant que `.env.local` ne contient que des placeholders.)
+**Depuis le run 5, le vrai produit se capture en entier** : lancer le backend
+avec `DEV_LOCAL_MODE=1` (voir `nevadesign-backend/.env`), se connecter sur
+`/login` avec n'importe quels identifiants, et TOUTES les pages à données
+réelles fonctionnent (Supabase émulé sur `data/dev-store.json`). Écrans du
+moteur projets à couvrir : `projets-vue` et `projets-vide` (`/dashboard`),
+`projet-page` (`/dashboard/projects/[id]`), `projet-hub-creation`
+(`…/create`), `wizard-projet-*` (`/dashboard/projects/new`, 3 écrans),
+`wizard-logo-*` (`…/create/logo`, 4 écrans), `wizard-scene-*`
+(`…/create/banniere_discord`, 3 écrans), `editeur` (+ `editeur-selection`,
+`editeur-effets`, `editeur-export`) sur `…/assets/[assetId]`.
 
 ## Auto-critique
 
