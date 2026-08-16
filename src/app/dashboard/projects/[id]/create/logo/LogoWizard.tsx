@@ -47,15 +47,21 @@ import {
 import { cn } from "@/lib/utils";
 
 /*
- * Wizard logo v4 (run 5.4, LOT 0/4/5) — les bonnes questions, une par écran,
- * illustrées en CSS pur (jamais une génération dans le wizard) :
- *   ÉTAPE A — le logo seul :
- *   1. « Ton logo, il raconte quoi ? » — le sujet/thème
- *   2. La forme (lettre / nom / emblème)
- *   3. L'ambiance du logo (pilote éclairage + matières via l'ADN)
- *   4. Les couleurs libres (picker + dégradé, hex exacts)
- *   5. À éviter (optionnel)
- *   6. Récap éditable — le brief EXACT transmis au directeur artistique
+ * Wizard logo v4 (run 5.5) — chaque question JUSTIFIÉE par un axe mesuré du
+ * corpus (59 logos, manifest d'entraînement v4), une par écran, illustrées en
+ * CSS pur (jamais une génération dans le wizard) :
+ *   ÉTAPE A — le logo :
+ *   1. « Ton logo, il raconte quoi ? » — le sujet/thème (59 % du corpus
+ *      fusionne un emblème thématique au lettrage)
+ *   2. La forme (monogramme 49 % / nom entier 34 % / emblème pur 17 %)
+ *   3. La matière (NOUVELLE — l'axe le plus clivant : néon 27 %,
+ *      métal+chrome 18 %, verre 8 %, or = 3e couleur dominante du corpus)
+ *   4. L'ambiance (recentrée éclairage + sélection few-shot — tags corpus :
+ *      urbain 53 %, luxe 42 %, sombre 37 %, esport 27 %, retro 27 %, été 25 %.
+ *      « néon » est partie dans la matière, « propre » supprimée : aucun tag)
+ *   5. Les couleurs libres (picker + dégradé, hex exacts)
+ *   6. À éviter (optionnel)
+ *   7. Récap éditable — le brief EXACT transmis au directeur artistique
  *   → 3 gabarits maîtres pensés par le DA → 3 propositions 2K relues (OCR +
  *     ADN), master PNG alpha 4K + déclinaisons blanc/noir.
  *   ÉTAPE B — le fond, APRÈS validation : « On lui fait une scène ? » —
@@ -83,6 +89,7 @@ type Props = {
 const STEPS = [
   "Le sujet",
   "La forme",
+  "La matière",
   "L'ambiance",
   "Les couleurs",
   "À éviter",
@@ -90,8 +97,8 @@ const STEPS = [
   "Propositions",
 ] as const;
 
-const RECAP_STEP = 5;
-const PROPOSALS_STEP = 6;
+const RECAP_STEP = 6;
+const PROPOSALS_STEP = 7;
 
 const SUJET_CHIPS = [
   { label: "fruit", icon: Citrus },
@@ -110,13 +117,26 @@ const TYPES = [
   { id: "embleme" as const, label: "Un emblème", detail: "Un symbole pur, sans aucune lettre" },
 ];
 
+// v4 : moods = les tags mesurés du corpus (urbain 53 %, luxe 42 %, sombre
+// 37 %, esport 27 %, retro 27 %, été 25 %). « Néon » est devenue une MATIÈRE,
+// « propre » est supprimée (aucun tag corpus, redondante avec « À éviter »).
 const AMBIANCES = [
-  { id: "ete" as const, label: "Été", swatch: "linear-gradient(135deg,#FFD166,#FF6B4A)" },
-  { id: "sombre" as const, label: "Sombre", swatch: "linear-gradient(135deg,#2B2438,#0F0D16)" },
+  { id: "urbain" as const, label: "Urbain", swatch: "linear-gradient(135deg,#3A4254,#12151F)" },
   { id: "luxe" as const, label: "Luxe", swatch: "linear-gradient(135deg,#C9A227,#3D2B1F)" },
-  { id: "neon" as const, label: "Néon", swatch: "linear-gradient(135deg,#22D3EE,#8B5CF6)" },
+  { id: "sombre" as const, label: "Sombre", swatch: "linear-gradient(135deg,#2B2438,#0F0D16)" },
+  { id: "esport" as const, label: "Esport", swatch: "linear-gradient(135deg,#E23A50,#1B1E3C)" },
   { id: "retro" as const, label: "Rétro", swatch: "linear-gradient(135deg,#E8C9A0,#B4443C)" },
-  { id: "propre" as const, label: "Propre", swatch: "linear-gradient(135deg,#F3F1F8,#C9C4D8)" },
+  { id: "ete" as const, label: "Été", swatch: "linear-gradient(135deg,#FFD166,#FF6B4A)" },
+];
+
+// v4 : LA MATIÈRE — l'axe le plus clivant du corpus (néon 27 %, métal+chrome
+// 18 %, verre 8 %, or = 3e couleur dominante). Pilote la section 2 du gabarit.
+const MATIERES = [
+  { id: "neon" as const, label: "Néon", detail: "Tube lumineux, acrylique brillant", swatch: "linear-gradient(135deg,#22D3EE,#8B5CF6)" },
+  { id: "chrome" as const, label: "Chrome", detail: "Métal poli, reflets nets", swatch: "linear-gradient(135deg,#FFFFFF,#98A2B8 40%,#F2F5FA 55%,#5E6678)" },
+  { id: "or" as const, label: "Or", detail: "Doré poli, contraste laque noire", swatch: "linear-gradient(135deg,#F5D97B,#C9A227 55%,#7A5B14)" },
+  { id: "verre" as const, label: "Verre", detail: "Givré ou fumé, reflets contrôlés", swatch: "linear-gradient(135deg,rgba(200,225,255,0.9),rgba(120,150,200,0.55))" },
+  { id: "studio" as const, label: "Le studio choisit", detail: "Dérivée de ton ambiance", swatch: "linear-gradient(135deg,#C9B8F5,#7C6BD4)" },
 ];
 
 // Étape B — les choix de fond, APRÈS validation du master (run 5.4, LOT 4)
@@ -152,6 +172,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
   const [sujet, setSujet] = useState("");
   const [lettrageSeul, setLettrageSeul] = useState(false);
   const [type, setType] = useState<LogoWizardAnswers["type"] | null>(null);
+  const [matiere, setMatiere] = useState<LogoWizardAnswers["matiere"]>("studio");
   const [ambiance, setAmbiance] = useState<LogoWizardAnswers["ambiance"]>(null);
   const [couleurMode, setCouleurMode] = useState<"palette" | "unie" | "degrade">("palette");
   const [couleurUnie, setCouleurUnie] = useState("#7C6BD4");
@@ -201,6 +222,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
       type,
       sujet: lettrageSeul ? "" : sujet.trim(),
       ambiance,
+      matiere,
       couleurs:
         couleurMode === "unie"
           ? { mode: "unie", couleur: couleurUnie }
@@ -209,7 +231,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
             : { mode: "palette" },
       interdits: interdits.trim(),
     };
-  }, [type, lettrageSeul, sujet, ambiance, couleurMode, couleurUnie, degradeCouleurs, degradeAngle, interdits]);
+  }, [type, lettrageSeul, sujet, ambiance, matiere, couleurMode, couleurUnie, degradeCouleurs, degradeAngle, interdits]);
 
   function goTo(next: number) {
     setDirection(next > step ? 1 : -1);
@@ -312,9 +334,9 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
       ? lettrageSeul || sujet.trim().length > 0
       : step === 1
         ? Boolean(type)
-        : step === 3 && couleurMode === "unie"
+        : step === 4 && couleurMode === "unie"
           ? HEX_RE.test(couleurUnie)
-          : step === 3 && couleurMode === "degrade"
+          : step === 4 && couleurMode === "degrade"
             ? degradeCouleurs.every((c) => HEX_RE.test(c))
             : true;
 
@@ -624,11 +646,16 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
     },
     {
       step: 2,
+      label: "La matière",
+      value: MATIERES.find((m) => m.id === matiere)?.label ?? "Le studio choisit",
+    },
+    {
+      step: 3,
       label: "L'ambiance",
       value: AMBIANCES.find((a) => a.id === ambiance)?.label ?? "Libre",
     },
     {
-      step: 3,
+      step: 4,
       label: "Les couleurs",
       value:
         couleurMode === "unie"
@@ -640,7 +667,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
       gradient: couleurMode === "degrade" ? degradeCss : null,
     },
     {
-      step: 4,
+      step: 5,
       label: "À éviter",
       value: interdits.trim() || "Rien de précisé",
     },
@@ -797,15 +824,67 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
             </section>
           ) : null}
 
-          {/* ── 3. L'ambiance ───────────────────────────────────────────── */}
+          {/* ── 3. La matière (v4 — l'axe le plus clivant du corpus) ────── */}
           {step === 2 ? (
+            <section>
+              <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
+                Il est fait de quoi&nbsp;?
+              </h1>
+              <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
+                La matière du lettrage et de l&apos;emblème — c&apos;est elle qui sépare
+                un logo néon d&apos;un monogramme doré. Passe si tu hésites&nbsp;: le
+                studio choisira depuis ton ambiance.
+              </p>
+              <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
+                {MATIERES.map((item) => {
+                  const selected = matiere === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setMatiere(item.id)}
+                      className={cn(
+                        "group overflow-hidden rounded-2xl border text-left transition-all duration-300",
+                        selected
+                          ? "border-[rgba(164,139,232,0.65)] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_18px_44px_rgba(96,84,140,0.22)]"
+                          : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
+                      )}
+                    >
+                      {/* Échantillon de matière en CSS pur sur la 1re lettre — jamais une génération */}
+                      <div className="relative flex h-[72px] items-center justify-center bg-[#14111F]">
+                        <span
+                          className="pv-display bg-clip-text text-[44px] leading-none text-transparent"
+                          style={{ backgroundImage: item.swatch }}
+                        >
+                          {projectName.trim()[0]?.toUpperCase() ?? "N"}
+                        </span>
+                        {selected ? (
+                          <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-white text-ink">
+                            <Check size={13} strokeWidth={2.6} />
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="bg-white/70 px-4 py-3">
+                        <span className="block text-[14px] font-medium text-ink">{item.label}</span>
+                        <span className="mt-0.5 block text-xs leading-relaxed text-steel">{item.detail}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
+
+          {/* ── 4. L'ambiance (v4 — éclairage + sélection few-shot) ─────── */}
+          {step === 3 ? (
             <section>
               <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
                 L&apos;ambiance du logo&nbsp;?
               </h1>
               <p className="mt-3 max-w-lg text-sm leading-relaxed text-steel">
-                Indépendante de l&apos;univers du serveur — un logo d&apos;été sur un serveur
-                urbain, ça se fait. Optionnel&nbsp;: passe si tu hésites.
+                Elle pilote l&apos;éclairage du rendu et les références montrées au
+                directeur artistique. Indépendante de l&apos;univers du serveur.
+                Optionnel&nbsp;: passe si tu hésites.
               </p>
               <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
                 {AMBIANCES.map((item) => {
@@ -839,8 +918,8 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
             </section>
           ) : null}
 
-          {/* ── 4. Les couleurs ─────────────────────────────────────────── */}
-          {step === 3 ? (
+          {/* ── 5. Les couleurs ─────────────────────────────────────────── */}
+          {step === 4 ? (
             <section>
               <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
                 Tes couleurs, tes règles.
@@ -984,10 +1063,10 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
             </section>
           ) : null}
 
-          {/* ── 5. À éviter ─────────────────────────────────────────────── */}
+          {/* ── 6. À éviter ─────────────────────────────────────────────── */}
           {/* La question « fond » a disparu de l'étape A (run 5.4, LOT 4) —
               le fond se choisit à l'étape B, après validation du master. */}
-          {step === 4 ? (
+          {step === 5 ? (
             <section>
               <h1 className="pv-display text-[clamp(1.9rem,3.6vw,2.8rem)] leading-tight text-ink">
                 Un truc à éviter&nbsp;?

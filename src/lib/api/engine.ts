@@ -12,10 +12,15 @@ export type LogoCouleursChoix =
   | { mode: "unie"; couleur: string }
   | { mode: "degrade"; couleurs: string[]; angle: number };
 
+// Wizard v4 (run 5.5) : la MATIÈRE devient une question (l'axe le plus
+// clivant du corpus — neon 27 %, metal+chrome 18 %, glass 8 %, or) ; les
+// ambiances « neon »/« propre » quittent le wizard (neon = matière), et
+// « urbain » (53 % des tags corpus) + « esport » (27 %) arrivent.
 export type LogoWizardAnswers = {
   type: "lettre" | "nom" | "embleme";
   sujet: string;
-  ambiance: "ete" | "sombre" | "luxe" | "neon" | "retro" | "propre" | null;
+  ambiance: "ete" | "sombre" | "luxe" | "urbain" | "esport" | "retro" | null;
+  matiere: "neon" | "chrome" | "or" | "verre" | "studio";
   couleurs: LogoCouleursChoix;
   interdits: string;
 };
