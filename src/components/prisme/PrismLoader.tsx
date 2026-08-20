@@ -418,8 +418,15 @@ if(v.dataset.jsLive==='1'||v.style.display==='none')return;
 var r=performance.getEntriesByType('resource'),d=0;
 for(var i=0;i<r.length;i++)if(r[i].responseEnd>0)d++;
 var k=document.readyState==='loading'?0:1;
+/* part ressources + plancher asymptotique temporel : sur un long
+   telechargement, le ratio de ressources stagne (les gros chunks
+   restent en vol) et le compteur paraissait gele (critique QA R3)
+   — l'asymptote traduit la progression des octets, invisible par
+   entry, en gardant le plafond 60 (la part reseau). */
 var t=Math.min(60,(d/Math.max(4,r.length+2))*46+k*14);
-s=Math.min(Math.max(s,t),s+1.6);
+var a=60*(1-Math.exp(-performance.now()/5200));
+var g=Math.min(60,Math.max(t,a));
+s=Math.min(Math.max(s,g),s+1.2);
 c.textContent=('00'+Math.round(s)).slice(-3)+' \\u2014 100';
 requestAnimationFrame(f);}
 requestAnimationFrame(f);

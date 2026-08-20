@@ -549,7 +549,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
           maxLength={80}
         />
         <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-dusk">
-          {saving ? "Enregistrement…" : savedAt ? `Enregistré ${savedAt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}` : "—"}
+          {saving ? "Enregistrement…" : savedAt ? `Enregistré ${savedAt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}` : "Enregistrement auto"}
         </span>
 
         <div className="ml-auto flex items-center gap-1.5">

@@ -169,7 +169,12 @@ export default function GivreReviews() {
 
           {/* ── Le duo éditorial : pull-quote (60 %) + registre (40 %) ── */}
           <div
-            className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-14"
+            /* minmax(0,1fr) AUSSI en mobile (QA 20/08, R4) : sans lui,
+               la colonne grid refuse de descendre sous le min-content
+               des lignes truncate du registre → la section débordait
+               de 64 px à 390 (citation coupée en plein mot, 5ᵉ étoile
+               tronquée) */
+            className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-14"
             onMouseEnter={() => (hovered.current = true)}
             onMouseLeave={() => (hovered.current = false)}
           >

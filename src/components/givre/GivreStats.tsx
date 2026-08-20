@@ -87,7 +87,7 @@ export default function GivreStats() {
                 <div
                   key={hidden ? "b" : "a"}
                   aria-hidden={hidden}
-                  className="flex shrink-0 items-center gap-14 pr-14"
+                  className="flex shrink-0 items-center gap-10 pr-10 sm:gap-14 sm:pr-14"
                 >
                   {CLIENT_LOGOS.map((logo) => (
                     /* encombrement FIXE par logo (h-7 × w-20, logo

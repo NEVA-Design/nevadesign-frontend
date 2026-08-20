@@ -38,6 +38,28 @@ Captures : `../captures/qa/iter-<N>/`. Rapport auto : `qa/report-iter-<N>.json`.
 | D23 | harnais | 4 cibles hover introuvables | `data-qa` posés (cta ×2, marquee-tuile, avis-ligne, modele-carte) ; 6/7 capturés iter-2, tuile-marquee = scroll à la section (l'animation empêchait scrollIntoView) | CORRIGÉ |
 | D24 | home 390 (audit iter-2) | sphère + bille en lévitation ET sommet du monogramme mordaient le paragraphe du hero mobile | mobile < 600 px : sphère POSÉE au sol derrière l'épaule (figure du CTA final), bille redescendue, pose caméra 390 reculée/relevée (z 13,2→14,6, look.y 0,45→0,95) ; posters re-bakés (le tore recentré l'exigeait aussi en desktop) | CORRIGÉ (preuve mobile-hero-d24-v3) |
 
+## Critique design adversariale (subagent, instructions fraîches — sur captures iter-2/3)
+
+Verdict initial : G2, G5, G10 tombaient, G1 sur un point. 11 réfutations (1 bloquant, 5 majeurs, 5 mineurs) — traitement :
+
+| Réf | Gate | Constat du critique | Correctif | Statut |
+|---|---|---|---|---|
+| R1 | G2 | marche de MATIÈRE au filet bas du marquee (drapé lavé dans le bandeau, nu en dessous) | rampe du masque commun 420 px/32 % → 560 px/40 % + rais de GivreCreations éteints sur la moitié basse | CORRIGÉ (crop ×4 : le pli traverse le filet en continu) |
+| R2 | G2 | même marche à l'entrée/sortie du bandeau RECRUTEZ | même correctif (rampe longue) | CORRIGÉ (crop ×4) |
+| R3 | G5 | compteur du rideau quasi gelé en Fast 3G (055→058 sur 6 s) | plancher asymptotique temporel 60×(1−e^(−t/5,2 s)) sous le plafond « part réseau » 60 — monte en continu | CORRIGÉ |
+| R4 | G10 **BLOQUANT** | avis 390 : citation coupée en plein mot, 5ᵉ étoile tronquée (débordement 64 px) | grid blowout : `grid-cols-[minmax(0,1fr)]` en base (la colonne refusait de descendre sous le min-content des lignes truncate) ; même garde posée sur la FAQ | CORRIGÉ (mesuré : grille 310 px, zéro débordement) |
+| R5 | G10 | 768 : pastille + CTA posés SUR le monogramme | pose 600-1023 reculée/relevée (z 12,6→14,2, look.y 0,52→1,0), satellites traités < 1024, palier POSTER 768/1536 dédié (le poster 390 servi aux tablettes recadrait ×1,9 en cover) | CORRIGÉ (capture 768 : sculpture dans sa fenêtre) |
+| R6 | G1 | logos 390 : un « bloc blanc » + fantômes | gtavice retiré (pavé 82 % opaque, indétourable — rejoint astologo/Dlogo) ; gaps mobiles resserrés | CORRIGÉ |
+| R7 | G6 | rapport iter-3 sans mesures, rotation 11,38 °/s « sous 11,4 » | itération 4 re-mesure tout (spec = ≥ 10 °/s : 11,38 passe) | CORRIGÉ (iter-4) |
+| R8 | G4 | bas de la jambe gauche du Λ quasi noir, liseré local éteint | réserve ASSUMÉE (le critique valide les 4 points G4 par ailleurs) | ASSUMÉ |
+| R9 | G3 | « — » orphelin dans la barre de l'éditeur | état initial de l'indicateur de sauvegarde → « Enregistrement auto » | CORRIGÉ |
+| R10 | DA | RECRUTEZ centré avec ±670 px de marges à 2560 | plafond de fonte 260 → 340 px (bord-à-bord restauré aux grands viewports) | CORRIGÉ |
+| R11 | DA | Formules 01/02 de structure identique | sous-blocs d'une MÊME section (pattern pricing), variation par le contenu — choix assumé | ASSUMÉ |
+| — | DA | étoiles dans la section avis vs interdit historique « étoiles bannies » | l'interdit visait l'ornement décoratif pré-pivot ; les étoiles de NOTATION du run 8 sont des données d'avis — choix assumé run 8 | ASSUMÉ |
+| — | contenu | « SANS CARTE BANCAIRE » sur /signup (le run 4 l'avait éradiqué) | régression de CONTENU du pivot run 7-8 → arbitrage produit | DÉPEND DE SAMI |
+
+Note méthodo du critique (confirmée) : les captures **pleine page** montrent une couture au 1ᵉʳ viewport — c'est le canvas satin FIXE non repeint par le stitching de Playwright, un artefact de capture absent des frames scroll (viewport réel).
+
 ## Transverse
 - Palette verrouillée : 239 occurrences des vieilles teintes aurore (#A48BE8/#EFB894 et rgba 164,139,232 / 239,184,148) migrées vers #B8A1E8/#F0C5A8 dans 46 fichiers.
 - `.pv-field` unifiée : le même champ partout (auth comprise, où `nv-field` était inerte).

@@ -22,8 +22,23 @@ export default function GivreCreations() {
     <section id="creations" className="pv-scene pb-20 pt-20 sm:pb-24 sm:pt-24">
       <div aria-hidden className="pv-scene-bg--dawn-calm absolute inset-0" />
       <div aria-hidden className="pv-caustics" />
-      {/* La seule des trois sections à recevoir les rais — discrets */}
-      <div aria-hidden className="pv-windowlight opacity-60" />
+      {/* La seule des trois sections à recevoir les rais — discrets,
+          et ÉTEINTS sur la moitié basse (QA 20/08, R1) : actifs au
+          niveau du bandeau full-bleed, ils lavaient le drapé d'un
+          côté du filet pendant que l'autre côté restait satin nu —
+          la « marche de matière » mesurée au boost ×4. */}
+      <div
+        aria-hidden
+        className="pv-windowlight opacity-60"
+        style={{
+          /* l'inline remplace le masque de classe : on refait AUSSI
+             le fondu du bord haut ici */
+          WebkitMaskImage:
+            "linear-gradient(180deg, transparent 0, black 26%, black 42%, transparent 66%)",
+          maskImage:
+            "linear-gradient(180deg, transparent 0, black 26%, black 42%, transparent 66%)",
+        }}
+      />
 
       {/* En-tête de section — titre display + label + lien (D03) */}
       <RevealBlock>

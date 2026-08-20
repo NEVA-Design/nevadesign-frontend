@@ -236,6 +236,14 @@ export default function GivreHero() {
           srcSet="/scene/low/hero-poster-1440.avif 1x, /scene/low/hero-poster-2880.avif 2x"
           type="image/avif"
         />
+        {/* QA 20/08 (R5) : palier tablette dédié — servir le poster
+            390 (aspect portrait étroit) à 600-1023 le faisait
+            recadrer en cover (~×1,9) : sculpture sous les CTA. */}
+        <source
+          media="(min-width: 600px) and (max-width: 1023px)"
+          srcSet="/scene/low/hero-poster-768.avif 1x, /scene/low/hero-poster-1536.avif 2x"
+          type="image/avif"
+        />
         <source
           media="(max-width: 1023px)"
           srcSet="/scene/low/hero-poster-390.avif 2x, /scene/low/hero-poster-1170.avif 3x"
@@ -260,6 +268,10 @@ export default function GivreHero() {
         <source
           media="(min-width: 1680px)"
           srcSet="/scene/hero-poster-1680.webp 1x, /scene/hero-poster-3360.webp 2x"
+        />
+        <source
+          media="(min-width: 600px) and (max-width: 1023px)"
+          srcSet="/scene/hero-poster-768.webp 1x, /scene/hero-poster-1536.webp 2x"
         />
         <source
           media="(max-width: 1023px)"

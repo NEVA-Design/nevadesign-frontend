@@ -87,7 +87,10 @@ export default function GivreType() {
           data-word
           className="w-full whitespace-nowrap text-center font-display font-medium uppercase leading-[0.92] tracking-[-0.02em]"
           style={{
-            fontSize: `clamp(90px, ${vw}vw, 260px)`,
+            /* QA 20/08 (R10) : plafond relevé 260 → 340 px — à 2560
+               le mot flottait avec ~670 px de marge par côté, le
+               principe bord-à-bord ne tenait plus */
+            fontSize: `clamp(90px, ${vw}vw, 340px)`,
             /* Base encre sous la mosaïque : les lettres restent encrées
                sur la brume, les miniatures vivent par transparence. */
             backgroundImage:

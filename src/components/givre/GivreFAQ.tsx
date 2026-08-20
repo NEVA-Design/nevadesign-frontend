@@ -66,7 +66,7 @@ export default function GivreFAQ() {
       {/* Scène dawn diluée, sans caustiques : la respiration avant
           la finale */}
       <div aria-hidden className="pv-scene-bg pv-scene-bg--dawn-calm" />
-      <div className="relative mx-auto grid pv-container gap-14 px-5 py-24 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20 lg:py-28">
+      <div className="relative mx-auto grid pv-container grid-cols-[minmax(0,1fr)] gap-14 px-5 py-24 sm:px-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-20 lg:py-28">
         {/* Colonne sticky — folio, titre et appel */}
         <RevealBlock>
           <div className="lg:sticky lg:top-28">

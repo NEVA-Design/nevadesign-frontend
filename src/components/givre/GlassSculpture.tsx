@@ -171,9 +171,10 @@ const POSES: { min: number; pose: Pose }[] = [
   { min: 1152, pose: { pos: [0.18, 0.98, 10.6], fov: 32, look: [0.83, 0.42, 0] } },
   { min: 1024, pose: { pos: [0.3, 0.96, 10.9], fov: 33, look: [0.62, 0.4, 0] } },
   /* < lg : le monogramme est cadré ENTIER dans la fenêtre entre le
-     titre et les CTA — jamais tronqué (viser bas descend la
-     sculpture à l'écran, la garde au sol visible autour) */
-  { min: 600, pose: { pos: [1.0, 0.95, 12.6], fov: 36, look: [1.0, 0.52, 0] } },
+     titre et les CTA — jamais tronqué. QA 20/08 (R5) : à 768 la
+     sculpture montait sous la pastille et les CTA — recul + visée
+     relevée, même remède que la pose 390. */
+  { min: 600, pose: { pos: [1.0, 0.95, 14.2], fov: 36, look: [1.0, 1.0, 0] } },
   /* aligné sur le monogramme (MONO_X = 1.4) : la pièce reste
      centrée et ENTIÈRE dans le cadre à toutes les largeurs.
      QA 20/08 (D24) : recul + visée relevée — le sommet du mono
@@ -346,7 +347,7 @@ const BEAD_X = SCULPT_X + 1.55 + VIEW.spread * 1.15;
    et la bille redescend au niveau du sommet du mono : plus aucun
    objet sous une ligne de texte, la sculpture entière dans sa
    fenêtre. Desktop inchangé. */
-const SAT_MOBILE = VIEW.vw < 600;
+const SAT_MOBILE = VIEW.vw < 1024; /* toute la composition empilée (< lg) */
 const SPHERE_BASE_Y = SAT_MOBILE ? FLOOR_Y + 0.42 : FLOOR_Y + 2.52;
 const BEAD_BASE_Y = SAT_MOBILE ? FLOOR_Y + 1.95 : FLOOR_Y + 3.28;
 /* Mur virtuel derrière la caméra : le fallback des rayons
