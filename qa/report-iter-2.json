@@ -1,0 +1,14 @@
+{
+  "iter": "2",
+  "base": "http://localhost:3001",
+  "startedAt": "2026-08-20T20:26:10.254Z",
+  "media": {},
+  "fps": null,
+  "rotation": null,
+  "load": {
+    "framesCaptured": 37,
+    "dir": "load-frames/"
+  },
+  "errors": [],
+  "finishedAt": "2026-08-20T20:26:22.852Z"
+}

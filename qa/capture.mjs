@@ -32,6 +32,7 @@ const ASSET_ID = "5a396f65-d063-4e2d-b9b9-3ef3687b7dac"; // logo du projet
 const PUBLIC_PAGES = [
   { name: "home", url: "/" },
   { name: "home-en", url: "/", locale: "en" },
+  { name: "vitrine", url: "/neva-design" },
   { name: "login", url: "/login" },
   { name: "signup", url: "/signup" },
   { name: "forgot", url: "/forgot-password" },
@@ -319,7 +320,10 @@ async function runLoadSequence(browser) {
 async function runFps(browser) {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
   const page = await ctx.newPage();
-  await page.goto(BASE + "/", { waitUntil: "load", timeout: 60000 });
+  // scene-tier=high forcé : le détecteur classerait le headless (SwiftShader)
+  // en low et démonterait le canvas — fps headless à lire comme un plancher,
+  // la mesure G9 de référence se fait en --headed.
+  await page.goto(BASE + "/?scene-tier=high", { waitUntil: "load", timeout: 60000 });
   await page.waitForTimeout(6000); // laisser le loader finir + reveal
   const fps = await page.evaluate(() => new Promise(resolve => {
     const deltas = [];

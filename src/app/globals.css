@@ -1360,6 +1360,35 @@ html {
   animation-name: pv-marquee-reverse;
 }
 
+/* ═══ Ouverture pré-hydratation (QA 20/08) ═══════════════════
+   La chorégraphie du rideau (trait → extrusion) joue en CSS PUR
+   dès le premier paint : sur réseau lent, le monogramme se dessine
+   pendant le téléchargement des bundles au lieu d'attendre
+   l'hydratation (~8 s mesurées en Fast 3G, rideau mort). Mêmes
+   durées et même courbe (easeOutCubic) que la f(t) JS, qui coupe
+   ces animations en reprenant la main — continuité au pixel. */
+@keyframes pv-overture-draw {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes pv-overture-fill-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes pv-overture-shadow-in {
+  from { opacity: 0; }
+  to   { opacity: 0.16; }
+}
+.pv-overture-stroke {
+  animation: pv-overture-draw 620ms cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+.pv-overture-fill {
+  animation: pv-overture-fill-in 560ms cubic-bezier(0.33, 1, 0.68, 1) 620ms forwards;
+}
+.pv-overture-shadow {
+  animation: pv-overture-shadow-in 560ms cubic-bezier(0.33, 1, 0.68, 1) 620ms forwards;
+}
+
 @keyframes pv-fade-up {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }

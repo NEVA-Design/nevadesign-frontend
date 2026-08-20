@@ -81,6 +81,10 @@ export default function PrismLoader() {
       return;
     }
 
+    /* QA 20/08 : React prend la main — le script inline du compteur
+       (pré-hydratation) lit ce drapeau et s'arrête. */
+    veil.dataset.jsLive = "1";
+
     /* ── la vraie progression ─────────────────────────────────── */
     const marks = { dom: 0, fonts: 0, poster: 0, scene: 0, canvas: 0 };
     const cleanups: (() => void)[] = [];
@@ -205,13 +209,34 @@ export default function PrismLoader() {
       };
     }
 
-    /* ── la chorégraphie f(t) + le compteur réel ──────────────── */
-    const t0 = performance.now();
+    /* ── la chorégraphie f(t) + le compteur réel ────────────────
+       QA 20/08 : t0 = navigationStart (temps ABSOLU), plus l'instant
+       d'hydratation — en réseau lent, l'hydratation arrivait à ~8 s
+       et le rideau restait un écran mort (compteur à 000, monogramme
+       jamais dessiné) pendant tout le téléchargement. Le trait et
+       l'extrusion jouent désormais en CSS dès le premier paint
+       (.pv-overture-*, globals.css) ; le JS reprend ici la MÊME
+       f(t) absolue (continuité au pixel) et coupe les animations
+       CSS. Le compteur repart de la valeur affichée par le script
+       inline — il ne recule jamais. */
+    const t0 = 0;
     let raf = 0;
     let leaveTimer = 0;
-    let shown = 0; /* le compteur ne recule jamais */
+    let shown = Number(countRef.current?.textContent?.slice(0, 3)) || 0;
     let leaving = false;
     const easeOut = (p: number) => 1 - Math.pow(1 - p, 3);
+
+    for (const ref of [strokeRef, fillRef, sheenRef, shadowRef]) {
+      if (ref.current) (ref.current as SVGElement).style.animation = "none";
+    }
+
+    /* l'ouverture ne se lève plus AVANT le canvas (le poster figé
+       « zoomé/flou » perçu au calibrage) — même filet 4 s que le
+       micro-rideau : jamais l'utilisateur en otage. */
+    const ouvertureCanvasFallback = window.setTimeout(() => {
+      marks.canvas = 1;
+    }, 4000);
+    cleanups.push(() => window.clearTimeout(ouvertureCanvasFallback));
 
     const tick = (t: number) => {
       const el = t - t0;
@@ -247,7 +272,7 @@ export default function PrismLoader() {
         sheenRef.current.setAttribute("x", String(sx));
       }
 
-      const done = realProgress() >= 1 && el >= MIN_SHOW_MS;
+      const done = realProgress() >= 1 && el >= MIN_SHOW_MS && marks.canvas >= 1;
       if (!done) {
         raf = requestAnimationFrame(tick);
       } else if (!leaving) {
@@ -277,6 +302,7 @@ export default function PrismLoader() {
     <div
       ref={veilRef}
       aria-hidden
+      data-prism-veil
       className="fixed inset-0 z-[120] flex items-center justify-center bg-[#060606]"
     >
       {/* le halo de l'atelier respire déjà derrière le monogramme */}
@@ -315,9 +341,14 @@ export default function PrismLoader() {
               <path d="M893.4 0 L1134.1 0 L1013.7 292 Z" />
             </clipPath>
           </defs>
-          {/* l'ombre portée de l'extrusion — la pièce se pose */}
+          {/* l'ombre portée de l'extrusion — la pièce se pose.
+              Les classes pv-overture-* jouent la MÊME chorégraphie
+              en CSS pur dès le premier paint (QA 20/08) : sur
+              réseau lent le rideau vit avant l'hydratation ; le JS
+              coupe ces animations quand il reprend f(t). */}
           <ellipse
             ref={shadowRef}
+            className="pv-overture-shadow"
             cx="720"
             cy="1078"
             rx="560"
@@ -326,7 +357,7 @@ export default function PrismLoader() {
             style={{ opacity: 0, filter: "blur(14px)" }}
           />
           {/* le verre — monte dans le tracé, avec sa lame */}
-          <g ref={fillRef} style={{ opacity: 0 }}>
+          <g ref={fillRef} className="pv-overture-fill" style={{ opacity: 0 }}>
             <g clipPath="url(#pvMonoClip)">
               <rect width="1441" height="1000" fill="url(#pvGlassFill)" />
               <rect
@@ -343,6 +374,7 @@ export default function PrismLoader() {
           {/* le trait — se dessine en premier */}
           <g
             ref={strokeRef}
+            className="pv-overture-stroke"
             fill="none"
             stroke="#F2F2F0"
             strokeWidth="7"
@@ -358,10 +390,42 @@ export default function PrismLoader() {
         </svg>
         <span
           ref={countRef}
+          id="pv-ouverture-count"
+          /* le script inline ci-dessous écrit dans ce span AVANT
+             l'hydratation : sans ce drapeau, React régénère l'arbre
+             (mismatch SSR) et le rideau clignote */
+          suppressHydrationWarning
           className="font-mono text-[10px] tracking-[0.3em] text-mist"
         >
           000 — 100
         </span>
+        {/* Compteur pré-hydratation (QA 20/08) : exécuté au parse
+            HTML, il suit le VRAI téléchargement (resource timings +
+            DOM) et monte jusqu'à 60 % — la part « réseau » de la
+            pondération. React reprend depuis la valeur affichée
+            (data-js-live) ; les sessions vues (micro-rideau) ne
+            l'exécutent pas. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{
+if(document.documentElement.dataset.prismSeen)return;
+var v=document.currentScript&&document.currentScript.closest('[data-prism-veil]');
+var c=document.getElementById('pv-ouverture-count');
+if(!v||!c)return;
+var s=0;
+function f(){
+if(v.dataset.jsLive==='1'||v.style.display==='none')return;
+var r=performance.getEntriesByType('resource'),d=0;
+for(var i=0;i<r.length;i++)if(r[i].responseEnd>0)d++;
+var k=document.readyState==='loading'?0:1;
+var t=Math.min(60,(d/Math.max(4,r.length+2))*46+k*14);
+s=Math.min(Math.max(s,t),s+1.6);
+c.textContent=('00'+Math.round(s)).slice(-3)+' \\u2014 100';
+requestAnimationFrame(f);}
+requestAnimationFrame(f);
+}catch(e){}})();`,
+          }}
+        />
       </div>
     </div>
   );

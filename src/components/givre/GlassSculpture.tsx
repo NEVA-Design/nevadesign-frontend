@@ -321,7 +321,13 @@ const MONO_X = SCULPT_X + 0.15;
    réfractait plus que le sol nu et virait au lait (le piège
    documenté du tube fin) — il garde ici le monogramme et ses
    ombres dans son champ réfracté */
-const RING_X = SCULPT_X - 0.92 - VIEW.spread * 0.55;
+/* QA 20/08 (spec §3 composition) : à 1440 le bord gauche du tore
+   mordait la colonne de texte (mesuré ~40 px de chevauchement sur
+   capture) — recentré de 0,5 u sous l'épaule du monogramme, la
+   marge au texte passe à ~80 px. Vitesse de roulis du tore :
+   12 °/s (G6). */
+const RING_X = SCULPT_X - 0.42 - VIEW.spread * 0.55;
+const RING_SPIN = 0.21; /* rad/s ≈ 12 °/s */
 /* aux paliers wide, le tore RECULE (z 0,5 → −0,5…−0,7) : la
    caméra rapprochée le rendait énorme et coupé par le bord bas
    (mesuré v4 : il mordait la pilule tarifaire à 1920) — reculé,
@@ -2001,10 +2007,22 @@ function Monogram({ mid }: { mid: boolean }) {
     const t = sceneTime(state.clock.elapsedTime);
     if (!mesh.current) return;
     const rise = settle(progress(t, 0.15, 1.9));
+    /* QA 20/08 (spec §3 vitesses) : flottement 6-10 px → 0,055 u
+       (~8 px à 1440) période 5,2 s ; yaw ±19° période 9 s (vitesse
+       de pointe ~14 °/s, moyenne ~9 °/s — le mono ne tourne jamais
+       de dos) ; roulis discret 8 s. L'ancien réglage (14/32/21 s)
+       mesurait 4,3 °/s max : les escargots du diagnostic. */
     mesh.current.position.y =
-      MONO_REST_Y - (1 - rise) * 0.85 + 0.025 * Math.sin((t * Math.PI * 2) / 14);
-    mesh.current.rotation.y = -0.3 + 0.38 * Math.sin((t * Math.PI * 2) / 32);
-    mesh.current.rotation.z = 0.014 * Math.sin((t * Math.PI * 2) / 21);
+      MONO_REST_Y - (1 - rise) * 0.85 + 0.055 * Math.sin((t * Math.PI * 2) / 5.2);
+    mesh.current.rotation.y = -0.3 + 0.34 * Math.sin((t * Math.PI * 2) / 9);
+    mesh.current.rotation.z = 0.02 * Math.sin((t * Math.PI * 2) / 8);
+    if (typeof window !== "undefined") {
+      /* mesure QA (harnais §6) : rotations lues entre t et t+1 s */
+      (window as unknown as { __nevaQA?: object }).__nevaQA = {
+        rotationY: () => mesh.current?.rotation.y ?? 0,
+        ringSpinY: () => sceneTime(state.clock.elapsedTime) * RING_SPIN,
+      };
+    }
     if (mid) return;
     const mat = mesh.current.material as THREE.MeshPhysicalMaterial;
     if (mat && "dispersion" in mat) {
@@ -2026,11 +2044,16 @@ function Monogram({ mid }: { mid: boolean }) {
         /* dispersion 0,2-0,35 (brief P2.3) : arêtes irisées effet
            joaillerie — le 0,95 délavait tout en arc-en-ciel flou */
         dispersion={mid ? 0 : 0.32}
-        roughness={0.1}
-        attenuationDistance={1.6}
-        attenuationColor="#cfc2ee"
-        envMapIntensity={1.7}
-        iridescence={0.12}
+        /* QA 20/08 (G4) : le mono lisait graphite — moins
+           d'absorption sombre (attenuation 1,6 → 2,4, teinte plus
+           claire), reflets plus présents (env 1,7 → 2,2, roughness
+           0,08) et le film irisé un cran plus lisible : le verre
+           existe par ses liserés, plus par sa masse. */
+        roughness={0.08}
+        attenuationDistance={2.4}
+        attenuationColor="#d9cdf2"
+        envMapIntensity={2.2}
+        iridescence={0.16}
         clearcoat={1.0}
         clearcoatRoughness={0.05}
       />
@@ -2059,18 +2082,21 @@ function Sculpture({ mid }: { mid: boolean }) {
        latérale, l'anneau tangue davantage et tourne deux fois plus
        vite — toujours des fonctions absolues du temps, jamais
        nerveuses */
+    /* QA 20/08 (spec §3) : flottements portés à 6-10 px sur des
+       périodes 4-6 s — la scène VIT (l'ancien réglage 17-31 s
+       lisait figé) ; le tore tourne sur lui-même à 12 °/s. */
     if (sphere.current) {
       const arrive = easeOutCubic(progress(t, 0.85, 2.0));
       sphere.current.position.x =
-        SPHERE_X + (1 - arrive) * 0.35 + 0.06 * Math.sin((t * Math.PI * 2) / 31);
+        SPHERE_X + (1 - arrive) * 0.35 + 0.05 * Math.sin((t * Math.PI * 2) / 11);
       sphere.current.position.y =
-        FLOOR_Y + 2.52 + (1 - arrive) * 0.95 + 0.11 * Math.sin((t * Math.PI * 2) / 21);
+        FLOOR_Y + 2.52 + (1 - arrive) * 0.95 + 0.06 * Math.sin((t * Math.PI * 2) / 5.6);
     }
     if (bead.current) {
       const arrive = easeOutCubic(progress(t, 1.15, 2.0));
-      bead.current.position.x = BEAD_X + 0.05 * Math.sin((t * Math.PI * 2) / 26 + 1.2);
+      bead.current.position.x = BEAD_X + 0.05 * Math.sin((t * Math.PI * 2) / 12 + 1.2);
       bead.current.position.y =
-        FLOOR_Y + 3.28 + (1 - arrive) * 0.6 + 0.16 * Math.sin((t * Math.PI * 2) / 17);
+        FLOOR_Y + 3.28 + (1 - arrive) * 0.6 + 0.065 * Math.sin((t * Math.PI * 2) / 4.6);
     }
     /* précession : l'axe de l'anneau tangue pendant que le tore
        tourne sur lui-même — orientation ABSOLUE f(t), jamais
@@ -2078,14 +2104,15 @@ function Sculpture({ mid }: { mid: boolean }) {
     if (ring.current) {
       const arrive = easeOutCubic(progress(t, 0.55, 1.9));
       ring.current.position.x = RING_X - (1 - arrive) * 0.65;
-      ring.current.position.y = FLOOR_Y + 0.61 + (1 - arrive) * 0.28;
+      ring.current.position.y =
+        FLOOR_Y + 0.61 + (1 - arrive) * 0.28 + 0.045 * Math.sin((t * Math.PI * 2) / 4.8 + 0.7);
       ring.current.position.z = RING_Z + (1 - arrive) * 0.35;
       ring.current.rotation.set(
-        Math.PI / 2 - 1.32 + 0.11 * Math.sin((t * Math.PI * 2) / 33),
-        0.08 * Math.sin((t * Math.PI * 2) / 47),
+        Math.PI / 2 - 1.32 + 0.12 * Math.sin((t * Math.PI * 2) / 17),
+        0.09 * Math.sin((t * Math.PI * 2) / 23),
         0.3
       );
-      ring.current.rotateZ((t * 0.11) % (Math.PI * 2));
+      ring.current.rotateZ((t * RING_SPIN) % (Math.PI * 2));
     }
   });
 
@@ -2320,6 +2347,13 @@ const VIEWPORT = {
   h: typeof window === "undefined" ? 900 : window.innerHeight,
 };
 
+/* Parallax souris (QA 20/08, spec §3) — le canvas est
+   pointerEvents:none : le pointeur s'écoute sur window. Cible
+   normalisée [-1, 1], lissage exponentiel τ = 90 ms (lerp ~0,10
+   par frame à 60 fps, réponse complète < 400 ms). Nulle tant que
+   la souris n'a pas bougé : les captures restent déterministes. */
+const POINTER = { tx: 0, ty: 0, x: 0, y: 0 };
+
 function CameraRig() {
   const appliedFov = useRef(-1);
 
@@ -2330,10 +2364,18 @@ function CameraRig() {
     };
     read();
     window.addEventListener("resize", read);
-    return () => window.removeEventListener("resize", read);
+    const onMove = (e: PointerEvent) => {
+      POINTER.tx = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1;
+      POINTER.ty = (e.clientY / Math.max(1, window.innerHeight)) * 2 - 1;
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => {
+      window.removeEventListener("resize", read);
+      window.removeEventListener("pointermove", onMove);
+    };
   }, []);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const pose = poseFor(VIEWPORT.w, VIEWPORT.w / Math.max(1, VIEWPORT.h));
     const cam = state.camera as THREE.PerspectiveCamera;
     if (appliedFov.current !== pose.fov) {
@@ -2341,12 +2383,24 @@ function CameraRig() {
       cam.fov = pose.fov;
       cam.updateProjectionMatrix();
     }
+    /* lissage de la parallax — indépendant du fps */
+    const k = 1 - Math.exp(-Math.min(delta, 0.1) / 0.09);
+    POINTER.x += (POINTER.tx - POINTER.x) * k;
+    POINTER.y += (POINTER.ty - POINTER.y) * k;
     /* scrub de scroll : la caméra recule et s'élève à peine
        pendant que la première section arrive — fonction pure de
        scrollY, nulle en haut de page */
     const p = SCROLL.p;
-    cam.position.set(pose.pos[0], pose.pos[1] + p * 0.3, pose.pos[2] + p * 1.3);
-    cam.lookAt(pose.look[0], pose.look[1] + p * 0.12, pose.look[2]);
+    cam.position.set(
+      pose.pos[0] + POINTER.x * 0.14,
+      pose.pos[1] + p * 0.3 - POINTER.y * 0.08,
+      pose.pos[2] + p * 1.3
+    );
+    cam.lookAt(
+      pose.look[0] + POINTER.x * 0.05,
+      pose.look[1] + p * 0.12 - POINTER.y * 0.03,
+      pose.look[2]
+    );
   });
 
   return null;
@@ -2596,6 +2650,13 @@ export default function GlassSculpture({
               state.gl.initTexture(getFloorTexture());
               await next();
               await state.gl.compileAsync(state.scene, state.camera);
+              /* QA 20/08 (spec §3 chargement) : DEUX frames rendues
+                 canvas encore masqué (opacity 0) — shaders chauds,
+                 uploads faits : la première frame visible ne gèle
+                 jamais. */
+              state.gl.render(state.scene, state.camera);
+              await next();
+              state.gl.render(state.scene, state.camera);
             } catch {
               /* compile sync de secours à la première frame */
             }
