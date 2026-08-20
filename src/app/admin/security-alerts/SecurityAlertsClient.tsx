@@ -28,11 +28,11 @@ const STATUS_LABELS: Record<SignupSecurityStatus, string> = {
 
 /* États système désaturés : warn = à traiter, err = refusé, ok = accordé. */
 const STATUS_BADGES: Record<SignupSecurityStatus, string> = {
-  allowed: "border-[#C5DCD2] bg-[#EEF4F1] text-[#5E9B84]",
-  blocked: "border-[#EFC9C6] bg-[#FBEFEE] text-[#9E4A45]",
-  pending_review: "border-[#EAD9A8] bg-[#FBF6E9] text-[#8A6D1F]",
-  approved_by_admin: "border-[#C5DCD2] bg-[#EEF4F1] text-[#5E9B84]",
-  rejected_by_admin: "border-[#EFC9C6] bg-[#FBEFEE] text-[#9E4A45]",
+  allowed: "border-[rgba(111,191,159,0.40)] bg-[rgba(111,191,159,0.10)] text-[#6FBF9F]",
+  blocked: "border-[rgba(224,138,132,0.40)] bg-[rgba(224,138,132,0.10)] text-[#E08A84]",
+  pending_review: "border-[rgba(217,178,74,0.40)] bg-[rgba(217,178,74,0.10)] text-[#D9B24A]",
+  approved_by_admin: "border-[rgba(111,191,159,0.40)] bg-[rgba(111,191,159,0.10)] text-[#6FBF9F]",
+  rejected_by_admin: "border-[rgba(224,138,132,0.40)] bg-[rgba(224,138,132,0.10)] text-[#E08A84]",
 };
 
 const STATUS_ICON_COLORS: Record<SignupSecurityStatus, string> = {

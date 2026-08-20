@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 240" width="680" height="240">
+  <defs>
+    <linearGradient id="ngbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#12041F"/>
+      <stop offset="1" stop-color="#2B0A45"/>
+    </linearGradient>
+    <linearGradient id="ngneon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FF5ACD"/>
+      <stop offset="1" stop-color="#41E5FF"/>
+    </linearGradient>
+    <filter id="ngglow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="680" height="240" fill="url(#ngbg)"/>
+  <!-- grille rétro en perspective -->
+  <g stroke="#B03BD1" stroke-width="1.4" opacity="0.75">
+    <line x1="0" y1="154" x2="680" y2="154"/>
+    <line x1="0" y1="168" x2="680" y2="168"/>
+    <line x1="0" y1="186" x2="680" y2="186"/>
+    <line x1="0" y1="210" x2="680" y2="210"/>
+    <line x1="340" y1="150" x2="340" y2="240"/>
+    <line x1="340" y1="150" x2="260" y2="240"/>
+    <line x1="340" y1="150" x2="180" y2="240"/>
+    <line x1="340" y1="150" x2="60" y2="240"/>
+    <line x1="340" y1="150" x2="-80" y2="240"/>
+    <line x1="340" y1="150" x2="420" y2="240"/>
+    <line x1="340" y1="150" x2="500" y2="240"/>
+    <line x1="340" y1="150" x2="620" y2="240"/>
+    <line x1="340" y1="150" x2="760" y2="240"/>
+  </g>
+  <rect x="0" y="148" width="680" height="10" fill="#12041F" opacity="0.7"/>
+  <!-- horizon lumineux -->
+  <rect x="0" y="150" width="680" height="2.5" fill="url(#ngneon)" filter="url(#ngglow)"/>
+  <!-- soleil quadrillé -->
+  <circle cx="556" cy="94" r="42" fill="none" stroke="#FF5ACD" stroke-width="2" opacity="0.8"/>
+  <circle cx="556" cy="94" r="30" fill="none" stroke="#FF5ACD" stroke-width="1.4" opacity="0.5"/>
+  <!-- le nom, double néon -->
+  <text x="322" y="118" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="84" font-weight="800" letter-spacing="16" fill="none" stroke="url(#ngneon)" stroke-width="2.6" filter="url(#ngglow)">NEVA</text>
+  <text x="322" y="118" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="84" font-weight="800" letter-spacing="16" fill="#F7EAFF" opacity="0.92">NEVA</text>
+  <text x="322" y="144" text-anchor="middle" font-family="Consolas, 'Courier New', monospace" font-size="12" letter-spacing="10" fill="#41E5FF" opacity="0.85">NEON GRID SERVER</text>
+</svg>

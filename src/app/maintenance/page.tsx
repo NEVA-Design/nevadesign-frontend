@@ -74,13 +74,13 @@ export default async function MaintenancePage() {
       {/* Cadre éditorial — la page comme objet imprimé */}
       <div
         aria-hidden
-        className="pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.55)]"
+        className="pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.14)]"
         style={{ inset: 'var(--frame-inset)' }}
       />
 
       <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center px-6 py-24 text-center sm:px-8">
         <div className="pv-fade-up" style={{ animationDelay: '0.05s' }}>
-          <BrandMark size={36} tone="ink" />
+          <BrandMark size={36} tone="white" />
         </div>
 
         <p

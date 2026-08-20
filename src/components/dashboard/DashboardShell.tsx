@@ -1,5 +1,7 @@
 "use client";
 
+import "./dashboard-skin.css";
+
 import { useEffect, useMemo, useState } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { Menu } from "lucide-react";
@@ -74,8 +76,8 @@ export default function DashboardShell({
   }, [user.creditReviewStatus]);
 
   return (
-    <div className="pv-light pv-atelier relative flex min-h-screen bg-paper text-ink">
-      <style>{`html{color-scheme:light}`}</style>
+    <div className="pv-light pv-atelier relative flex min-h-screen text-ink">
+      <style>{`html{color-scheme:dark}`}</style>
       {/* La scène — aube diluée, fixe : le fond de travail du produit */}
       <div aria-hidden className="pv-scene-bg--dawn-calm pointer-events-none fixed inset-0" />
       {/* Caustiques très discrètes — la seule vie du fond */}
@@ -97,18 +99,22 @@ export default function DashboardShell({
       </div>
 
       <main className="relative z-10 flex min-h-screen w-full flex-1 flex-col overflow-x-hidden lg:ml-[288px]">
+        {/* L'atmosphère de la zone de travail — un seul champ de
+            lumière aurore, haut-droit. Le grain et la vignette sont
+            déjà montés site-wide par le layout racine. */}
+        <div aria-hidden className="pv-field-light pv-field-light--tr" />
         {/* Barre mobile — voile nav : filet bas encré, aucune ombre */}
-        <div className="sticky top-0 z-20 flex h-14 flex-shrink-0 items-center gap-3 border-b border-[rgba(43,36,80,0.06)] bg-[rgba(244,245,250,0.6)] px-4 backdrop-blur-xl lg:hidden">
+        <div className="sticky top-0 z-20 flex h-14 flex-shrink-0 items-center gap-3 border-b border-[rgba(255,255,255,0.06)] bg-[rgba(10,10,10,0.6)] px-4 backdrop-blur-xl lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
             className="cursor-pointer rounded-lg p-2 text-slate transition-colors duration-[var(--dur-base)] hover:bg-ink/5 hover:text-ink"
             aria-label="Ouvrir le menu"
             aria-expanded={sidebarOpen}
           >
-            <Menu size={18} />
+            <Menu size={16} strokeWidth={1.5} />
           </button>
           <span className="flex items-center gap-3">
-            <BrandMark size={16} tone="ink" />
+            <BrandMark size={16} tone="white" />
             <span className="text-sm font-medium tracking-[-0.01em] text-ink">
               Neva Design
             </span>
@@ -116,12 +122,12 @@ export default function DashboardShell({
         </div>
 
         {reviewMessage ? (
-          <div className="mx-4 mt-4 rounded-[12px] border border-[rgba(138,109,31,0.22)] bg-[rgba(251,246,233,0.78)] px-4 py-3 text-sm text-warn shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_10px_26px_rgba(96,84,140,0.07)] sm:mx-6 lg:mx-8">
+          <div className="relative z-10 mx-4 mt-4 rounded-[12px] border border-[rgba(138,109,31,0.22)] bg-[rgba(10,10,10,0.78)] px-4 py-3 text-sm text-warn shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_10px_26px_rgba(0,0,0,0.37)] sm:mx-6 lg:mx-8">
             {reviewMessage}
           </div>
         ) : null}
 
-        {children}
+        <div className="relative z-10 flex w-full flex-1 flex-col">{children}</div>
       </main>
     </div>
   );

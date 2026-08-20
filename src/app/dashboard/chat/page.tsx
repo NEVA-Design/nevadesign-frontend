@@ -545,7 +545,7 @@ export default function ChatPage() {
               onClick={() => setModelPickerOpen((v) => !v)}
               aria-expanded={modelPickerOpen}
               aria-haspopup="listbox"
-              className="flex min-h-[40px] items-center gap-2 rounded-lg border border-[color:var(--hairline-strong)] bg-white px-3 text-[13px] text-ink/80 transition-colors duration-300 hover:border-[rgba(164,139,232,0.35)] hover:text-ink"
+              className="flex min-h-[40px] items-center gap-2 rounded-lg border border-[color:var(--hairline-strong)] bg-white/5 px-3 text-[13px] text-ink/80 transition-colors duration-300 hover:border-[rgba(164,139,232,0.35)] hover:text-ink"
             >
               <span
                 className={`rounded-full border px-1.5 py-px font-mono text-[9px] font-medium uppercase tracking-[0.14em] ${
@@ -562,7 +562,7 @@ export default function ChatPage() {
             </button>
 
             {modelPickerOpen && (
-              <div className="pv-scale-in absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] bg-white shadow-[var(--shadow-float)]">
+              <div className="pv-scale-in absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] bg-abyss shadow-[var(--shadow-float)]">
                 <p className="pv-label border-b border-[color:var(--hairline)] px-4 py-2.5">
                   Modèle de direction
                 </p>
@@ -617,7 +617,7 @@ export default function ChatPage() {
       {/* ── Fil de messages éditorial ─────────────────────────── */}
       <div className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-6 sm:px-6">
         {/* filigrane ΛV — le vide de l'accueil est composé (D40) */}
-        <svg aria-hidden viewBox="0 0 1441 1000" className="pointer-events-none absolute left-1/2 top-1/2 w-[420px] -translate-x-1/2 -translate-y-1/2 fill-[rgba(43,36,80,0.03)]"><path d="M440.2 0 L864.6 1000 L694.6 1000 L441 379 L180.1 1000 L0 1000 Z" /><path d="M439.5 710 L559.2 1000 L320 1000 Z" /><path d="M575 0 L755.1 0 L1013 618 L1266.6 0 L1438.1 0 L1015.2 990 Z" /><path d="M893.4 0 L1134.1 0 L1013.7 292 Z" /></svg>
+        <svg aria-hidden viewBox="0 0 1441 1000" className="pointer-events-none absolute left-1/2 top-1/2 w-[420px] -translate-x-1/2 -translate-y-1/2 fill-[rgba(255,255,255,0.05)]"><path d="M440.2 0 L864.6 1000 L694.6 1000 L441 379 L180.1 1000 L0 1000 Z" /><path d="M439.5 710 L559.2 1000 L320 1000 Z" /><path d="M575 0 L755.1 0 L1013 618 L1266.6 0 L1438.1 0 L1015.2 990 Z" /><path d="M893.4 0 L1134.1 0 L1013.7 292 Z" /></svg>
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-7">
           {messages.map((msg, i) =>
             msg.role === "user" ? (
@@ -637,7 +637,7 @@ export default function ChatPage() {
                 )}
 
                 {msg.content && msg.content !== "📎" && (
-                  <div className="max-w-[85%] whitespace-pre-wrap rounded-xl rounded-br-[2px] border border-[color:var(--hairline)] bg-white px-4 py-3 text-sm leading-relaxed text-ink/90 shadow-[var(--shadow-print)]">
+                  <div className="max-w-[85%] whitespace-pre-wrap rounded-xl rounded-br-[2px] border border-[color:var(--hairline)] bg-white/5 px-4 py-3 text-sm leading-relaxed text-ink/90 shadow-[var(--shadow-print)]">
                     <MessageContent content={msg.content} variant="user" />
                   </div>
                 )}
@@ -828,7 +828,7 @@ export default function ChatPage() {
               onClick={() => handleSend()}
               disabled={(!input.trim() && pendingAttachments.length === 0) || isLoading}
               aria-label="Envoyer le message"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ink text-ink shadow-[0_1px_2px_rgba(43,36,80,0.14)] transition-colors duration-300 hover:bg-[#35305E] disabled:opacity-30"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ink text-[#060606] shadow-[0_1px_2px_rgba(0,0,0,0.44)] transition-colors duration-300 hover:bg-white disabled:opacity-30"
             >
               <Send size={13} />
             </button>

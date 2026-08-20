@@ -48,7 +48,7 @@ function FormatShape({ category }: { category: AssetCategory }) {
   return (
     <span className="flex h-[72px] w-[120px] items-center justify-center" aria-hidden>
       <span
-        className="rounded-[4px] border border-[rgba(164,139,232,0.55)] bg-[linear-gradient(135deg,rgba(164,139,232,0.16),rgba(124,107,212,0.06))] shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]"
+        className="rounded-[4px] border border-[rgba(164,139,232,0.55)] bg-[linear-gradient(135deg,rgba(164,139,232,0.16),rgba(124,107,212,0.06))] shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
         style={{ width: `${w}px`, height: `${Math.max(h, 8)}px` }}
       />
     </span>
@@ -100,7 +100,7 @@ export default async function CreateHubPage({ params }: { params: Promise<{ id: 
             <div
               className={
                 locked || logoDone
-                  ? "flex items-center gap-5 rounded-2xl border border-[color:var(--hairline)] bg-white/40 p-5"
+                  ? "flex items-center gap-5 rounded-2xl border border-[color:var(--hairline)] bg-white/5 p-5"
                   : "pv-glass pv-edge pv-ignite group flex items-center gap-5 rounded-2xl p-5 transition-all duration-300 hover:border-[rgba(164,139,232,0.5)]"
               }
             >
@@ -117,7 +117,7 @@ export default async function CreateHubPage({ params }: { params: Promise<{ id: 
                 </span>
               </div>
               {logoDone ? (
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[rgba(61,122,88,0.4)] text-[#3D7A58]">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[rgba(111,191,159,0.40)] text-[#6FBF9F]">
                   <Check size={14} />
                 </span>
               ) : locked ? (

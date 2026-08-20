@@ -82,7 +82,7 @@ export default function LoginPage() {
       {/* Cadre éditorial — la page comme objet imprimé */}
       <div
         aria-hidden
-        className="pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.55)]"
+        className="pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.14)]"
         style={{ inset: "var(--frame-inset)" }}
       />
 
@@ -118,7 +118,7 @@ export default function LoginPage() {
           {/* La carte porteuse — verre fort, arête allumée, ombre mauve */}
           <section className="pv-glass pv-glass--strong pv-edge pv-shadow-mauve pv-fade-up px-6 py-8 sm:px-9 sm:py-10">
             <Link href="/" aria-label="Neva Design — accueil" className="inline-flex">
-              <BrandMark size={24} tone="ink" />
+              <BrandMark size={24} tone="white" />
             </Link>
 
             <p className="mt-7 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">

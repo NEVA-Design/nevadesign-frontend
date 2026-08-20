@@ -372,7 +372,7 @@ export function AdminNevaDesignClient({
                     </div>
                   )}
                   {uploadingImage ? (
-                    <div className="absolute inset-0 z-10 flex items-center justify-center gap-2.5 bg-ink/70 text-xs text-ink backdrop-blur-sm">
+                    <div className="absolute inset-0 z-10 flex items-center justify-center gap-2.5 bg-ink/70 text-xs text-[#060606] backdrop-blur-sm">
                       <Spinner className="h-4 w-4" />
                       Téléversement…
                     </div>

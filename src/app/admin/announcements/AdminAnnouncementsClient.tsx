@@ -247,7 +247,7 @@ export function AdminAnnouncementsClient({
                     className={`flex min-h-10 items-center justify-center rounded-lg border px-2 py-2 text-xs transition-colors duration-300 ${
                       form.kind === kind
                         ? "border-[rgba(164,139,232,0.35)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
-                        : "border-[color:var(--hairline)] text-steel hover:border-[#C9C9C0] hover:text-ink"
+                        : "border-[color:var(--hairline)] text-steel hover:border-[rgba(255,255,255,0.14)] hover:text-ink"
                     }`}
                   >
                     {KIND_LABELS[kind]}

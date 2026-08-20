@@ -530,7 +530,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
   return (
     <div className="flex h-[calc(100dvh-0px)] min-h-0 flex-1 flex-col">
       {/* ── Barre supérieure ── */}
-      <div className="flex h-14 shrink-0 items-center gap-3 border-b border-[color:var(--hairline)] bg-white/55 px-3 backdrop-blur-sm sm:px-5">
+      <div className="flex h-14 shrink-0 items-center gap-3 border-b border-[color:var(--hairline)] bg-white/5 px-3 backdrop-blur-sm sm:px-5">
         <Link
           href={`/dashboard/projects/${project.id}`}
           className="inline-flex h-9 items-center gap-2 rounded-full px-3 text-[13px] text-steel transition-colors hover:bg-ink/[0.04] hover:text-ink"
@@ -577,24 +577,25 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
               <button
                 type="button"
                 onClick={() => setEraserOn((v) => !v)}
+                aria-pressed={eraserOn}
                 className={cn(
-                  "inline-flex h-9 items-center gap-2 rounded-full border px-3.5 text-[13px] transition-colors",
+                  "inline-flex h-9 items-center gap-2 rounded-[10px] border px-3.5 text-[13px] shadow-[inset_0_1px_0_rgba(255,255,255,0.10)] transition-colors",
                   eraserOn
-                    ? "border-[rgba(164,139,232,0.7)] bg-[rgba(164,139,232,0.12)] text-ink"
-                    : "border-[color:var(--hairline-strong)] text-steel hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
+                    ? "border-[rgba(184,161,232,0.7)] bg-[rgba(184,161,232,0.12)] text-ink"
+                    : "border-white/[0.12] bg-white/[0.04] text-slate hover:border-white/[0.24] hover:bg-white/[0.07] hover:text-ink"
                 )}
               >
-                <Eraser size={13} />
+                <Eraser size={13} strokeWidth={1.5} />
                 <span className="hidden md:inline">Gomme</span>
               </button>
               <button
                 type="button"
                 onClick={() => setInstructOpen(true)}
-                className="inline-flex h-9 items-center gap-2 rounded-full border border-[color:var(--hairline-strong)] px-3.5 text-[13px] text-steel transition-colors hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
+                className="inline-flex h-9 items-center gap-2 rounded-[10px] border border-white/[0.12] bg-white/[0.04] px-3.5 text-[13px] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.10)] transition-colors hover:border-white/[0.24] hover:bg-white/[0.07] hover:text-ink"
               >
-                <Wand2 size={13} />
+                <Wand2 size={13} strokeWidth={1.5} />
                 <span className="hidden md:inline">Retoucher</span>
-                <span className="font-mono text-[10px] text-dusk">{retouchesUsed}/5</span>
+                <span className="font-mono text-[10px] text-mist">{retouchesUsed}/5</span>
               </button>
             </>
           ) : null}
@@ -602,7 +603,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
             type="button"
             onClick={handleExport}
             disabled={exportBusy}
-            className="inline-flex h-9 items-center gap-2 rounded-full bg-ink px-4 text-[13px] font-medium text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_18px_rgba(164,139,232,0.25)] transition-colors hover:bg-[#35305E]"
+            className="pv-btn nv-btn-sm"
           >
             {exportBusy ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
             {exportBusy ? "Export…" : "Exporter"}
@@ -662,7 +663,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
       </AnimatePresence>
 
       {error ? (
-        <p className="border-b border-[rgba(220,80,80,0.25)] bg-[rgba(220,80,80,0.06)] px-5 py-2 text-[12.5px] text-[#B4443C]">
+        <p className="border-b border-[rgba(220,80,80,0.25)] bg-[rgba(220,80,80,0.06)] px-5 py-2 text-[12.5px] text-[#E08A84]">
           {error}
         </p>
       ) : null}
@@ -683,8 +684,13 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                 if (!eraserOn) setSelectedId(id);
               }}
               onPointerDownLayer={(e, layer) => beginGesture(e, layer, "move")}
-              className="rounded-xl border border-[color:var(--hairline-strong)] shadow-[0_24px_64px_rgba(43,36,80,0.25)]"
+              className="rounded-xl border border-[color:var(--hairline)] shadow-[0_24px_64px_rgba(0,0,0,0.55)]"
             >
+              {/* Canvas vide : le damier alpha annonce la transparence
+                  — une table lumineuse, pas un rectangle mort */}
+              {layers.every((l) => l.hidden) ? (
+                <div aria-hidden className="nv-checker pointer-events-none absolute inset-0" />
+              ) : null}
               {/* Surface de gomme — capte les traits quand le mode est actif */}
               {eraserOn && sceneLayer ? (
                 <div
@@ -723,7 +729,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
         </div>
 
         {/* ── Panneau latéral ── */}
-        <aside className="flex w-full shrink-0 flex-col border-t border-[color:var(--hairline)] bg-white/55 backdrop-blur-sm lg:w-[300px] lg:border-l lg:border-t-0">
+        <aside className="flex w-full shrink-0 flex-col border-t border-[color:var(--hairline)] bg-white/5 backdrop-blur-sm lg:w-[300px] lg:border-l lg:border-t-0">
           {/* Calques */}
           <div className="border-b border-[color:var(--hairline)] px-4 py-3">
             <div className="mb-2 flex items-center justify-between">
@@ -733,9 +739,9 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                   <button
                     type="button"
                     onClick={() => setEffectsOpen((o) => !o)}
-                    className="flex h-7 items-center gap-1 rounded-full border border-[color:var(--hairline-strong)] px-2.5 font-mono text-[10px] uppercase tracking-[0.08em] text-steel transition-colors hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
+                    className="flex h-7 items-center gap-1 rounded-[8px] border border-white/[0.12] bg-white/[0.04] px-2.5 font-mono text-[10px] uppercase tracking-[0.08em] text-slate transition-colors hover:border-white/[0.24] hover:bg-white/[0.07] hover:text-ink"
                   >
-                    <Plus size={11} />
+                    <Plus size={11} strokeWidth={1.5} />
                     Effet
                   </button>
                   <AnimatePresence>
@@ -744,7 +750,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                         initial={{ opacity: 0, y: -6 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -6 }}
-                        className="absolute right-0 top-9 z-50 w-52 rounded-xl border border-[color:var(--hairline-strong)] bg-white p-1.5 shadow-[0_18px_44px_rgba(43,36,80,0.18)]"
+                        className="absolute right-0 top-9 z-50 w-52 rounded-xl border border-[color:var(--hairline-strong)] bg-abyss p-1.5 shadow-[0_18px_44px_rgba(0,0,0,0.48)]"
                       >
                         {effects.map((effect) => (
                           <button
@@ -768,14 +774,53 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                   <button
                     type="button"
                     onClick={addLogoLayer}
-                    className="flex h-7 items-center gap-1 rounded-full border border-[color:var(--hairline-strong)] px-2.5 font-mono text-[10px] uppercase tracking-[0.08em] text-steel transition-colors hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
+                    className="flex h-7 items-center gap-1 rounded-[8px] border border-white/[0.12] bg-white/[0.04] px-2.5 font-mono text-[10px] uppercase tracking-[0.08em] text-slate transition-colors hover:border-white/[0.24] hover:bg-white/[0.07] hover:text-ink"
                   >
-                    <Plus size={11} />
+                    <Plus size={11} strokeWidth={1.5} />
                     Logo
                   </button>
                 ) : null}
               </div>
             </div>
+
+            {layers.length === 0 ? (
+              /* Panneau vide — une invitation, pas un trou */
+              <div className="flex flex-col items-center gap-3 rounded-[12px] border border-[color:var(--hairline)] px-4 py-6 text-center">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinejoin="round"
+                  className="text-mist"
+                  aria-hidden
+                >
+                  {/* deux losanges empilés — le pictogramme calques */}
+                  <path d="M12 3l8 4.5-8 4.5-8-4.5L12 3Z" />
+                  <path d="M4 12.5l8 4.5 8-4.5" />
+                </svg>
+                <p className="text-[13px] leading-relaxed text-mist">
+                  Le visuel se compose ici, calque par calque.
+                </p>
+                {project.logo_master ? (
+                  <button type="button" onClick={addLogoLayer} className="pv-btn pv-btn--ghost nv-btn-sm">
+                    <Plus size={13} strokeWidth={1.5} />
+                    Ajouter le logo
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setEffectsOpen(true)}
+                    className="pv-btn pv-btn--ghost nv-btn-sm"
+                  >
+                    <Plus size={13} strokeWidth={1.5} />
+                    Ajouter un effet
+                  </button>
+                )}
+              </div>
+            ) : null}
 
             <Reorder.Group
               axis="y"
@@ -792,7 +837,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                   className={cn(
                     "flex cursor-grab items-center gap-2 rounded-lg border px-2 py-1.5 active:cursor-grabbing",
                     selectedId === layer.id
-                      ? "border-[rgba(164,139,232,0.55)] bg-white shadow-[0_2px_8px_rgba(96,84,140,0.12)]"
+                      ? "border-[rgba(164,139,232,0.55)] bg-white/5 shadow-[0_2px_8px_rgba(0,0,0,0.42)]"
                       : "border-transparent hover:bg-ink/[0.04]"
                   )}
                   onClick={() => setSelectedId(layer.id)}
@@ -821,7 +866,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                         mutateLayers((c) => c.filter((l) => l.id !== layer.id), true);
                         if (selectedId === layer.id) setSelectedId(null);
                       }}
-                      className="shrink-0 rounded p-1 text-mist transition-colors hover:text-[#B4443C]"
+                      className="shrink-0 rounded p-1 text-mist transition-colors hover:text-[#E08A84]"
                       aria-label="Supprimer"
                     >
                       <Trash2 size={12} />
@@ -877,7 +922,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                             className={cn(
                               "rounded-lg border px-1 py-1.5 text-[10.5px] transition-colors",
                               (selected.variant ?? "color") === variant
-                                ? "border-[rgba(164,139,232,0.6)] bg-white text-ink"
+                                ? "border-[rgba(164,139,232,0.6)] bg-white/5 text-ink"
                                 : "border-[color:var(--hairline)] text-steel hover:text-ink"
                             )}
                           >
@@ -918,7 +963,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
               initial={{ opacity: 0, y: 18, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 12, scale: 0.98 }}
-              className="w-full max-w-md rounded-2xl border border-[color:var(--hairline-strong)] bg-white p-6 shadow-[0_32px_80px_rgba(43,36,80,0.35)]"
+              className="w-full max-w-md rounded-2xl border border-[color:var(--hairline-strong)] bg-abyss p-6 shadow-[0_32px_80px_rgba(0,0,0,0.6)]"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start justify-between">
@@ -954,12 +999,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                   type="button"
                   disabled={instructBusy || instruction.trim().length < 3}
                   onClick={handleInstruct}
-                  className={cn(
-                    "inline-flex h-10 items-center gap-2 rounded-full px-5 text-[13px] font-medium transition-colors",
-                    !instructBusy && instruction.trim().length >= 3
-                      ? "bg-ink text-white hover:bg-[#35305E]"
-                      : "cursor-not-allowed bg-ink/10 text-mist"
-                  )}
+                  className="pv-btn nv-btn-sm"
                 >
                   {instructBusy ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
                   {instructBusy ? "Génération…" : "Appliquer"}
@@ -984,10 +1024,10 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
               initial={{ opacity: 0, y: 18, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 12, scale: 0.98 }}
-              className="w-full max-w-md rounded-2xl border border-[color:var(--hairline-strong)] bg-white p-6 text-center shadow-[0_32px_80px_rgba(43,36,80,0.35)]"
+              className="w-full max-w-md rounded-2xl border border-[color:var(--hairline-strong)] bg-abyss p-6 text-center shadow-[0_32px_80px_rgba(0,0,0,0.6)]"
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(61,122,88,0.4)] text-[#3D7A58]">
+              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(111,191,159,0.40)] text-[#6FBF9F]">
                 <Check size={20} />
               </span>
               <h2 className="pv-display mt-4 text-xl text-ink">Export livré.</h2>
@@ -1006,7 +1046,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                   download
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex h-10 items-center gap-2 rounded-full bg-ink px-5 text-[13px] font-medium text-white transition-colors hover:bg-[#35305E]"
+                  className="pv-btn nv-btn-sm"
                 >
                   <Download size={13} />
                   Télécharger

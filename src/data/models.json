@@ -1,0 +1,38 @@
+[
+  {
+    "id": "night-city",
+    "name": "Night City",
+    "preview": "/generative/models/night-city.svg",
+    "capabilities": { "name": true, "theme": true, "color": true, "extraText": true }
+  },
+  {
+    "id": "lowrider",
+    "name": "Lowrider",
+    "preview": "/generative/models/lowrider.svg",
+    "capabilities": { "name": true, "theme": false, "color": true, "extraText": true }
+  },
+  {
+    "id": "palm-sunset",
+    "name": "Palm Sunset",
+    "preview": "/generative/models/palm-sunset.svg",
+    "capabilities": { "name": true, "theme": true, "color": false, "extraText": false }
+  },
+  {
+    "id": "neon-grid",
+    "name": "Neon Grid",
+    "preview": "/generative/models/neon-grid.svg",
+    "capabilities": { "name": true, "theme": false, "color": true, "extraText": false }
+  },
+  {
+    "id": "street-royal",
+    "name": "Street Royal",
+    "preview": "/generative/models/street-royal.svg",
+    "capabilities": { "name": true, "theme": true, "color": true, "extraText": false }
+  },
+  {
+    "id": "minimal-ink",
+    "name": "Minimal Ink",
+    "preview": "/generative/models/minimal-ink.svg",
+    "capabilities": { "name": true, "theme": false, "color": false, "extraText": false }
+  }
+]

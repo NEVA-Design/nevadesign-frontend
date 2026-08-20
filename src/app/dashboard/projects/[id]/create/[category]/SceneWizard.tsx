@@ -248,7 +248,7 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
       <div className="mx-auto flex w-full max-w-[860px] flex-1 flex-col items-center justify-center px-4 py-16 text-center">
         <div className="relative h-16 w-16">
           <span className="absolute inset-0 animate-ping rounded-full bg-[rgba(164,139,232,0.25)]" />
-          <span className="relative flex h-16 w-16 items-center justify-center rounded-full border border-[rgba(164,139,232,0.5)] bg-white/70">
+          <span className="relative flex h-16 w-16 items-center justify-center rounded-full border border-[rgba(164,139,232,0.5)] bg-white/5">
             <Wand2 size={22} className="text-[color:var(--num-color)]" />
           </span>
         </div>
@@ -330,7 +330,7 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
                       className={cn(
                         "group overflow-hidden rounded-2xl border text-left transition-all duration-300",
                         selected
-                          ? "border-[rgba(164,139,232,0.65)] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_18px_44px_rgba(96,84,140,0.22)]"
+                          ? "border-[rgba(164,139,232,0.65)] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_18px_44px_rgba(0,0,0,0.52)]"
                           : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
                       )}
                     >
@@ -338,12 +338,12 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
                       <div className="relative aspect-video overflow-hidden">
                         <SceneGlyph id={template.id} sceneType={template.scene_type} personnages={template.personnages} />
                         {selected ? (
-                          <span className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-white shadow-[0_2px_8px_rgba(43,36,80,0.4)]">
+                          <span className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-[#060606] shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
                             <Check size={13} strokeWidth={2.6} />
                           </span>
                         ) : null}
                       </div>
-                      <div className="bg-white/70 px-4 py-3">
+                      <div className="bg-white/5 px-4 py-3">
                         <span className="block truncate text-[13px] font-medium text-ink">{template.titre}</span>
                       </div>
                     </button>
@@ -360,7 +360,7 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
                   className={cn(
                     "group flex flex-col items-center justify-center gap-3 rounded-2xl border p-6 text-center transition-all duration-300",
                     custom
-                      ? "border-[rgba(164,139,232,0.65)] bg-white/70 shadow-[0_0_0_1px_rgba(164,139,232,0.4)]"
+                      ? "border-[rgba(164,139,232,0.65)] bg-white/5 shadow-[0_0_0_1px_rgba(164,139,232,0.4)]"
                       : "border-dashed border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
                   )}
                 >
@@ -392,18 +392,18 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
                       className={cn(
                         "group overflow-hidden rounded-2xl border text-left transition-all duration-300",
                         selected
-                          ? "border-[rgba(164,139,232,0.65)] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_14px_36px_rgba(96,84,140,0.2)]"
+                          ? "border-[rgba(164,139,232,0.65)] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_14px_36px_rgba(0,0,0,0.5)]"
                           : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
                       )}
                     >
                       <div className="relative h-[86px]" style={{ background: item.gradient }}>
                         {selected ? (
-                          <span className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-white text-ink">
+                          <span className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#060606]">
                             <Check size={13} strokeWidth={2.6} />
                           </span>
                         ) : null}
                       </div>
-                      <div className="bg-white/70 px-3.5 py-3">
+                      <div className="bg-white/5 px-3.5 py-3">
                         <span className="block text-[13px] font-medium text-ink">{item.label}</span>
                         <span className="mt-0.5 block text-[10.5px] leading-snug text-steel">{item.detail}</span>
                       </div>
@@ -457,7 +457,7 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
                   <span
                     className={cn(
                       "flex h-5 w-5 items-center justify-center rounded-md border",
-                      logoInScene ? "border-transparent bg-ink text-white" : "border-[color:var(--hairline-strong)]"
+                      logoInScene ? "border-transparent bg-ink text-[#060606]" : "border-[color:var(--hairline-strong)]"
                     )}
                   >
                     {logoInScene ? <Check size={12} /> : null}
@@ -471,7 +471,7 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
       </AnimatePresence>
 
       {error ? (
-        <p className="mt-6 rounded-xl border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-4 py-3 text-[13px] text-[#B4443C]">
+        <p className="mt-6 rounded-xl border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-4 py-3 text-[13px] text-[#E08A84]">
           {error}
         </p>
       ) : null}
@@ -492,23 +492,14 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
             type="button"
             disabled={!canContinue}
             onClick={() => go(1)}
-            className={cn(
-              "inline-flex h-11 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium transition-all",
-              canContinue
-                ? "bg-ink text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] hover:bg-[#35305E]"
-                : "cursor-not-allowed bg-ink/10 text-mist"
-            )}
+            className="pv-btn"
           >
             Continuer
-            <ArrowRight size={15} />
+            <ArrowRight size={15} strokeWidth={1.5} />
           </button>
         ) : (
-          <button
-            type="button"
-            onClick={launch}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] transition-colors hover:bg-[#35305E]"
-          >
-            <Sparkles size={15} />
+          <button type="button" onClick={launch} className="pv-btn">
+            <Sparkles size={15} strokeWidth={1.5} />
             Générer le visuel
           </button>
         )}

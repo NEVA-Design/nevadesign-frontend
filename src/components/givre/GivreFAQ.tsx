@@ -3,6 +3,7 @@
 import * as Accordion from "@radix-ui/react-accordion";
 import { ChevronDown } from "lucide-react";
 import { useTranslations } from "@/components/LanguageProvider";
+import { DISCORD_URL } from "@/lib/links";
 import { RevealBlock, RevealMask } from "@/components/prisme/Motion";
 
 /*
@@ -20,7 +21,7 @@ export default function GivreFAQ() {
       q: t("faq.q1", "Neva Design, c'est quoi exactement ?"),
       a: t(
         "faq.a1",
-        "Un studio créatif complet piloté par IA : vous décrivez une intention, il compose miniatures YouTube, logos, chartes graphiques et visuels gaming prêts à publier — avec une vraie direction artistique, pas une génération au hasard."
+        "Un studio créatif complet piloté par IA : vous décrivez une intention, il compose packs FiveM, bannières, affiches et scènes GTA prêts à publier — avec une vraie direction artistique, pas une génération au hasard."
       ),
     },
     {
@@ -41,7 +42,7 @@ export default function GivreFAQ() {
       q: t("faq.q4", "Le Creative Director, encore un chatbot ?"),
       a: t(
         "faq.a4",
-        "Non. Il connaît vos références, votre historique et les codes de votre terrain — miniature YouTube, identité de marque ou serveur GTA RP. Il propose des concepts, structure des briefs et peut lancer une génération depuis la conversation."
+        "Non. Il connaît vos références, votre historique et les codes de votre terrain — pack serveur, bannière Discord ou affiche GTA RP. Il propose des concepts, structure des briefs et peut lancer une génération depuis la conversation."
       ),
     },
     {
@@ -86,7 +87,7 @@ export default function GivreFAQ() {
               {t("faq.subtitle", "Une question plus précise ? Le Discord répond dans la journée.")}
             </p>
             <a
-              href="https://discord.gg/nevadesign"
+              href={DISCORD_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="pv-btn pv-btn--ghost mt-8"
@@ -103,7 +104,7 @@ export default function GivreFAQ() {
               <Accordion.Item
                 key={item.q}
                 value={`item-${i}`}
-                className="group border-t border-[rgba(43,36,80,0.07)] last:border-b"
+                className="group border-t border-[rgba(255,255,255,0.08)] last:border-b"
               >
                 <Accordion.Header>
                   <Accordion.Trigger className="flex w-full cursor-pointer items-baseline gap-5 py-6 text-left sm:gap-7">

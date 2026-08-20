@@ -7,26 +7,27 @@ export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://nevadesign.
 
 export const siteName = "Neva Design";
 
+/* Purge 20/08 (passe whaou P5.6) : le studio ne vend plus que le
+   terrain FiveM — miniatures YouTube, branding généraliste,
+   chartes et flyers sortent des méta. */
 export const defaultSeo = {
-  title: "Neva Design — Studio créatif IA : miniatures, logos, identités",
+  title: "Neva Design — Studio graphique FiveM : packs, bannières, affiches",
   description:
-    "Neva Design compose vos visuels avec une vraie direction artistique : miniatures YouTube, logos, chartes graphiques, assets gaming et FiveM. Brief en français, rendus prêts à publier, exports jusqu'en 8K.",
+    "Neva Design compose les visuels de votre serveur FiveM avec une vraie direction artistique : packs complets, bannières Discord, affiches, loading screens et scènes GTA génératives. Brief sur Discord, rendus prêts à publier, exports jusqu'en 8K.",
   keywords: [
     "Neva Design",
     "Neva AI",
-    "studio créatif IA",
-    "miniature YouTube IA",
-    "générateur miniature YouTube",
-    "logo IA",
-    "création logo en ligne",
-    "charte graphique IA",
-    "identité visuelle IA",
-    "branding IA",
-    "design gaming",
     "studio créatif FiveM",
-    "FiveM IA",
+    "graphiste FiveM",
+    "pack graphique FiveM",
+    "bannière Discord FiveM",
     "affiche FiveM",
+    "loading screen FiveM",
+    "overlay stream",
+    "scène GTA IA",
+    "FiveM IA",
     "GTA RP design",
+    "design gaming",
     "direction artistique IA",
   ],
 };

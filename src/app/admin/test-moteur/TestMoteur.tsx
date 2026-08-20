@@ -154,7 +154,7 @@ export default function TestMoteur() {
 
   if (loadError) {
     return (
-      <p className="rounded-xl border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-4 py-3 text-[13px] text-[#B4443C]">
+      <p className="rounded-xl border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-4 py-3 text-[13px] text-[#E08A84]">
         {loadError}
       </p>
     );
@@ -172,8 +172,8 @@ export default function TestMoteur() {
             className={cn(
               "mt-4 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 font-mono text-[11px] tracking-[0.04em]",
               entrainement.installed
-                ? "border-[rgba(61,122,88,0.35)] bg-[rgba(61,122,88,0.07)] text-[#3D7A58]"
-                : "border-[rgba(220,80,80,0.35)] bg-[rgba(220,80,80,0.06)] text-[#B4443C]"
+                ? "border-[rgba(111,191,159,0.40)] bg-[rgba(111,191,159,0.10)] text-[#6FBF9F]"
+                : "border-[rgba(220,80,80,0.35)] bg-[rgba(220,80,80,0.06)] text-[#E08A84]"
             )}
           >
             {entrainement.installed ? <ShieldCheck size={13} /> : <AlertTriangle size={13} />}
@@ -182,7 +182,7 @@ export default function TestMoteur() {
           </div>
         ) : null}
         {bloque ? (
-          <p className="mt-3 max-w-2xl rounded-xl border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-4 py-3 text-[13px] leading-relaxed text-[#B4443C]">
+          <p className="mt-3 max-w-2xl rounded-xl border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-4 py-3 text-[13px] leading-relaxed text-[#E08A84]">
             {messageBlocage ?? "Entraînement requis"} — les cas sont grisés :{" "}
             {entrainement?.manques.join(" ; ")}.
           </p>
@@ -200,7 +200,7 @@ export default function TestMoteur() {
         {compteurs ? (
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-6">
             {COMPTEUR_TILES.map((tile) => (
-              <div key={tile.id} className="rounded-2xl border border-[color:var(--hairline-strong)] bg-white/60 px-4 py-3">
+              <div key={tile.id} className="rounded-2xl border border-[color:var(--hairline-strong)] bg-white/[0.05] px-4 py-3">
                 <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">{tile.label}</p>
                 <p className="mt-1 text-[20px] font-medium text-ink">
                   {tile.id === "coutCumuleEur" ? compteurs.coutCumuleEur.toFixed(3) : compteurs[tile.id]}
@@ -214,14 +214,14 @@ export default function TestMoteur() {
       {cases.map((testCase, index) => (
         <section key={testCase.id} className="pv-glass pv-glass--card pv-edge rounded-[20px] p-6">
           <div className="flex items-start gap-4">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink font-mono text-[12px] text-white">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink font-mono text-[12px] text-[#060606]">
               {index + 1}
             </span>
             <div className="min-w-0">
               <h2 className="text-[16px] font-medium text-ink">{testCase.titre}</h2>
               <p className="mt-1 text-[12.5px] leading-relaxed text-steel">{testCase.attendu}</p>
               {testCase.brief ? (
-                <pre className="mt-3 max-h-48 overflow-auto rounded-lg border border-[color:var(--hairline)] bg-white/70 p-3 text-[10.5px] leading-relaxed text-ink whitespace-pre-wrap">
+                <pre className="mt-3 max-h-48 overflow-auto rounded-lg border border-[color:var(--hairline)] bg-white/[0.05] p-3 text-[10.5px] leading-relaxed text-ink whitespace-pre-wrap">
                   {testCase.brief}
                 </pre>
               ) : null}
@@ -235,7 +235,7 @@ export default function TestMoteur() {
               const isRunning = running === key;
               const promptOpen = openPrompts[key] ?? false;
               return (
-                <div key={variant.id} className="rounded-2xl border border-[color:var(--hairline-strong)] bg-white/60 p-4">
+                <div key={variant.id} className="rounded-2xl border border-[color:var(--hairline-strong)] bg-white/[0.05] p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
                       <p className="truncate text-[13.5px] font-medium text-ink">{variant.label}</p>
@@ -252,10 +252,7 @@ export default function TestMoteur() {
                       disabled={Boolean(running) || bloque}
                       onClick={() => run(testCase.id, variant.id)}
                       title={bloque ? messageBlocage ?? "Entraînement requis" : undefined}
-                      className={cn(
-                        "inline-flex h-9 shrink-0 items-center gap-2 rounded-full px-4 text-[13px] font-medium transition-colors",
-                        !running && !bloque ? "bg-ink text-white hover:bg-[#35305E]" : "cursor-not-allowed bg-ink/10 text-mist"
-                      )}
+                      className="pv-btn nv-btn-sm shrink-0"
                     >
                       {isRunning ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />}
                       {isRunning ? "En cours…" : bloque ? "Grisé" : "Lancer"}
@@ -279,7 +276,7 @@ export default function TestMoteur() {
                   ) : null}
 
                   {runErrors[key] ? (
-                    <p className="mt-3 rounded-lg border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-3 py-2 text-[12px] text-[#B4443C]">
+                    <p className="mt-3 rounded-lg border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-3 py-2 text-[12px] text-[#E08A84]">
                       {runErrors[key]}
                     </p>
                   ) : null}
@@ -291,7 +288,7 @@ export default function TestMoteur() {
                         const cKey = `${key}:concept:${i}`;
                         const open = openConcepts[cKey] ?? false;
                         return (
-                          <div key={i} className="rounded-xl border border-[color:var(--hairline)] bg-white/70 p-3">
+                          <div key={i} className="rounded-xl border border-[color:var(--hairline)] bg-white/[0.05] p-3">
                             <div className="flex items-start gap-2">
                               <Sparkles size={13} className="mt-0.5 shrink-0 text-[#7C6BD4]" />
                               <div className="min-w-0">
@@ -340,7 +337,7 @@ export default function TestMoteur() {
                           <figure key={i} className="overflow-hidden rounded-lg border border-[color:var(--hairline)]">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={prop.dataUrl} alt={`Proposition ${i + 1} — ${prop.concept.nom}`} className="w-full object-contain" />
-                            <figcaption className="bg-white/70 px-2 py-1.5">
+                            <figcaption className="bg-white/[0.05] px-2 py-1.5">
                               <p className="truncate text-[10.5px] font-medium text-ink">
                                 {prop.concept.nom}
                                 <span className="ml-1.5 font-mono text-[8.5px] uppercase tracking-[0.06em] text-dusk">{prop.concept.rendu}</span>
@@ -350,24 +347,24 @@ export default function TestMoteur() {
                                 <span>relief {prop.scores?.relief ?? 0}/10</span>
                                 <span>glow {prop.scores?.glow ?? 0}/10</span>
                                 {prop.adnOk ? (
-                                  <span className="inline-flex items-center gap-0.5 text-[#3D7A58]">
+                                  <span className="inline-flex items-center gap-0.5 text-[#6FBF9F]">
                                     <ShieldCheck size={10} /> ADN ok
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center gap-0.5 text-[#B4443C]">
+                                  <span className="inline-flex items-center gap-0.5 text-[#E08A84]">
                                     <AlertTriangle size={10} /> {prop.serveurLogo ? "échec ADN" : "icône d’appli"}
                                   </span>
                                 )}
-                                <span className={prop.lisible64 ? "" : "text-[#B4443C]"}>{prop.lisible64 ? "64 px ok" : "64 px illisible"}</span>
+                                <span className={prop.lisible64 ? "" : "text-[#E08A84]"}>{prop.lisible64 ? "64 px ok" : "64 px illisible"}</span>
                               </p>
                               <p className="mt-0.5 flex flex-wrap items-center gap-x-2 font-mono text-[9.5px] text-dusk">
                                 {prop.ocrRejects > 0 ? `${prop.ocrRejects} rejet${prop.ocrRejects > 1 ? "s" : ""} OCR` : "OCR ok"}
                                 {prop.conceptOk ? (
-                                  <span className="inline-flex items-center gap-0.5 text-[#3D7A58]">
+                                  <span className="inline-flex items-center gap-0.5 text-[#6FBF9F]">
                                     <ShieldCheck size={10} /> concept ok
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center gap-0.5 text-[#B4443C]">
+                                  <span className="inline-flex items-center gap-0.5 text-[#E08A84]">
                                     <AlertTriangle size={10} /> {prop.defauts[0] ?? "échec concept"}
                                   </span>
                                 )}
@@ -391,7 +388,7 @@ export default function TestMoteur() {
                           <figure key={i} className="overflow-hidden rounded-lg border border-[color:var(--hairline)]">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={f.previewDataUrl} alt={`Fond ${i + 1} composé`} className="w-full object-contain" />
-                            <figcaption className="bg-white/70 px-2 py-1 font-mono text-[9.5px] text-dusk">
+                            <figcaption className="bg-white/[0.05] px-2 py-1 font-mono text-[9.5px] text-dusk">
                               fond #{i + 1} — composé
                             </figcaption>
                           </figure>
@@ -430,14 +427,14 @@ export default function TestMoteur() {
                           <figure key={i} className="overflow-hidden rounded-lg border border-[color:var(--hairline)]">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={r.dataUrl} alt={`Résultat ${i + 1}`} className="w-full object-contain" />
-                            <figcaption className="flex items-center justify-between bg-white/70 px-2 py-1 font-mono text-[9.5px] text-dusk">
+                            <figcaption className="flex items-center justify-between bg-white/[0.05] px-2 py-1 font-mono text-[9.5px] text-dusk">
                               <span>#{i + 1}</span>
                               <span className="flex items-center gap-1">
                                 {r.ocrRejects > 0 ? (
                                   `${r.ocrRejects} rejet${r.ocrRejects > 1 ? "s" : ""} OCR`
                                 ) : variant.ocrAttendus.length ? (
                                   <>
-                                    <ShieldCheck size={10} className="text-[#3D7A58]" /> OCR ok
+                                    <ShieldCheck size={10} className="text-[#6FBF9F]" /> OCR ok
                                   </>
                                 ) : (
                                   "—"

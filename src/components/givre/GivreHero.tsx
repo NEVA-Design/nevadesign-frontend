@@ -9,7 +9,6 @@
  * la scène parle.
  */
 
-import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
@@ -22,11 +21,13 @@ const GlassSculpture = dynamic(() => import("./GlassSculpture"), {
   ssr: false,
 });
 
+/* Purge 20/08 (passe whaou P5) : les 4 VRAIS terrains du studio —
+   plus jamais de miniatures YouTube ni de branding généraliste. */
 const FIELD_ITEMS = [
-  { key: "fields.thumbs.kicker", fallback: "01 — Miniatures YouTube", active: true },
-  { key: "fields.logos.kicker", fallback: "02 — Logos & branding", active: false },
-  { key: "fields.charts.kicker", fallback: "03 — Chartes graphiques", active: false },
-  { key: "fields.gaming.kicker", fallback: "04 — Gaming & FiveM", active: false },
+  { key: "fields.packs.kicker", fallback: "01 — Packs FiveM", active: true },
+  { key: "fields.banners.kicker", fallback: "02 — Bannières Discord & réseaux", active: false },
+  { key: "fields.posters.kicker", fallback: "03 — Affiches & loading screens", active: false },
+  { key: "fields.ia.kicker", fallback: "04 — IA générative", active: false },
 ];
 
 /* « 01 — Miniatures YouTube » → « Miniatures YouTube » */
@@ -42,6 +43,11 @@ export default function GivreHero() {
      et il ne part qu'APRÈS le first paint (deux rAF : la frame du
      poster est composée avant que le réseau ne s'occupe de la 3D) */
   const [tier, setTier] = useState<SceneTier | null>(null);
+  /* MAJ soie : le canvas 3D est transparent — une fois la scène
+     prête, le poster s'efface pour laisser la soie VIVANTE derrière
+     le verre (il reste l'écran de chargement et la scène du tier
+     low). Retombe à false si le tier redescend en low. */
+  const [sceneReady, setSceneReady] = useState(false);
   /* bfcache (run 3, LOT 6) : un retour back/forward restaure un
      état GELÉ — contexte WebGL potentiellement perdu, canvas
      figé. pageshow persisted remonte la scène (textures en cache
@@ -59,6 +65,21 @@ export default function GivreHero() {
   useEffect(() => {
     let raf = 0;
     raf = requestAnimationFrame(() => {
+      /* MAJ 20/08 — le chunk three (~262 Ko gzip) part dès la 1re
+         frame, EN PARALLÈLE de la détection de tier : réseau+parse
+         ne s'additionnent plus à la peinture des textures.
+         Exceptions (le chunk ne part pas) : session déjà classée
+         low, et mobiles tactiles < 1024 px (leur scène EST le
+         poster — même critère que scene-tier). */
+      try {
+        const touchOnly = window.matchMedia("(pointer: coarse) and (hover: none)").matches;
+        const mobileLow = touchOnly && window.innerWidth < 1024;
+        if (!mobileLow && window.sessionStorage.getItem("neva-scene-tier") !== "low") {
+          import("./GlassSculpture");
+        }
+      } catch {
+        import("./GlassSculpture");
+      }
       raf = requestAnimationFrame(() => {
         const next = detectSceneTier().tier;
         setTier(next);
@@ -92,10 +113,24 @@ export default function GivreHero() {
         typeof window !== "undefined" &&
         (window as unknown as { __prismLoaded?: boolean }).__prismLoaded;
 
+      /* MAJ 20/08 — mobile tactile (tier low) : pas de 3D à
+         attendre, le poster est déjà là — l'entrée joue tout de
+         suite et 30 % plus vite (LCP mobile mesuré à 5,1 s à
+         cause du délai chorégraphique sous CPU lent). */
+      let mobileLow = false;
+      try {
+        mobileLow =
+          window.matchMedia("(pointer: coarse) and (hover: none)").matches &&
+          window.innerWidth < 1024;
+      } catch {
+        /* matchMedia indisponible */
+      }
+
       const tl = gsap.timeline({
-        delay: loaded ? 0.15 : 1.05,
+        delay: loaded || mobileLow ? 0.12 : 1.05,
         defaults: { ease: "expo.out" },
       });
+      if (mobileLow) tl.timeScale(1.3);
 
       tl.fromTo(
         ".gh-num",
@@ -111,8 +146,13 @@ export default function GivreHero() {
         )
         .fromTo(
           ".gh-eyebrow, .gh-sub",
-          { opacity: 0, y: 16 },
-          { opacity: 1, y: 0, duration: 0.8, stagger: 0.08 },
+          /* mobile : le sous-titre est l'élément LCP — il reste
+             peint dès le SSR (jamais opacity 0 sous CPU lent),
+             seul le glissement anime */
+          mobileLow ? { y: 16 } : { opacity: 0, y: 16 },
+          mobileLow
+            ? { y: 0, duration: 0.8, stagger: 0.08 }
+            : { opacity: 1, y: 0, duration: 0.8, stagger: 0.08 },
           0.72
         )
         .fromTo(
@@ -160,7 +200,13 @@ export default function GivreHero() {
           Les media queries suivent EXACTEMENT les frontières des
           poses caméra (GlassSculpture.POSES) : le fondu poster →
           canvas reste un raccord, jamais un saut. */}
-      <picture className={tier === "low" ? "pv-hero-parallax" : undefined}>
+      <picture
+        className={tier === "low" ? "pv-hero-parallax" : undefined}
+        style={{
+          opacity: sceneReady && (tier === "high" || tier === "mid") ? 0 : 1,
+          transition: "opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
+      >
         {/* Tier LOW (run 3) : la scène EST ce poster — versions AVIF
             haute qualité dédiées (≤ 120 Ko), micro-parallaxe CSS au
             scroll, zéro WebGL. Les autres tiers gardent les WebP
@@ -170,30 +216,31 @@ export default function GivreHero() {
             Retina) recevait un poster 1440w étiré — LE fond flou du
             F5 pendant toute la phase poster. Le 4K (min-3560)
             recevait même un 1920w (×2) : corrigé par le 3840. */}
-        {tier === "low" ? (
-          <>
-            <source
-              media="(min-width: 2880px) and (min-aspect-ratio: 2/1)"
-              srcSet="/scene/low/hero-poster-3440.avif"
-              type="image/avif"
-            />
-            <source
-              media="(min-width: 1920px)"
-              srcSet="/scene/low/hero-poster-1920.avif 1x, /scene/low/hero-poster-3840.avif 2x"
-              type="image/avif"
-            />
-            <source
-              media="(min-width: 1024px)"
-              srcSet="/scene/low/hero-poster-1440.avif 1x, /scene/low/hero-poster-2880.avif 2x"
-              type="image/avif"
-            />
-            <source
-              media="(max-width: 1023px)"
-              srcSet="/scene/low/hero-poster-390.avif 2x, /scene/low/hero-poster-1170.avif 3x"
-              type="image/avif"
-            />
-          </>
-        ) : null}
+        {/* MAJ 20/08 : les AVIF (scène noire) sont plus légers que
+            les WebP ET rendus côté serveur pour TOUS les tiers —
+            l'ancien montage conditionnel (tier low, après
+            hydratation) déclenchait un 2e chargement d'image qui
+            repoussait le LCP mobile à ~5,3 s mesurées. */}
+        <source
+          media="(min-width: 2880px) and (min-aspect-ratio: 2/1)"
+          srcSet="/scene/low/hero-poster-3440.avif"
+          type="image/avif"
+        />
+        <source
+          media="(min-width: 1920px)"
+          srcSet="/scene/low/hero-poster-1920.avif 1x, /scene/low/hero-poster-3840.avif 2x"
+          type="image/avif"
+        />
+        <source
+          media="(min-width: 1024px)"
+          srcSet="/scene/low/hero-poster-1440.avif 1x, /scene/low/hero-poster-2880.avif 2x"
+          type="image/avif"
+        />
+        <source
+          media="(max-width: 1023px)"
+          srcSet="/scene/low/hero-poster-390.avif 2x, /scene/low/hero-poster-1170.avif 3x"
+          type="image/avif"
+        />
         <source
           media="(min-width: 2880px) and (min-aspect-ratio: 2/1)"
           srcSet="/scene/hero-poster-3440.webp"
@@ -232,14 +279,37 @@ export default function GivreHero() {
           par-dessus son poster. Montée après le first paint (deux
           rAF), jamais en tier low : le chunk three n'est alors
           jamais téléchargé. */}
+      {/* Le backdrop à réfracter (passe whaou P2.2) — nappe aurore
+          lilas→pêche en dérive 26 s + deux light streaks à 22°,
+          ≤ 8 % perçus : discret à l'œil, mais le verre le PLIE —
+          c'est la référence qui fait lire la réfraction. */}
+      <div
+        aria-hidden
+        className="pv-hero-aurora pointer-events-none absolute inset-[-4%]"
+        style={{
+          background:
+            "radial-gradient(30% 42% at 58% 30%, rgba(184,161,232,0.085) 0%, rgba(184,161,232,0) 70%), radial-gradient(27% 38% at 74% 64%, rgba(240,197,168,0.075) 0%, rgba(240,197,168,0) 72%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-[-2%] right-0 hidden w-[58%] lg:block"
+        style={{
+          background:
+            "linear-gradient(112deg, transparent 40%, rgba(255,255,255,0.05) 44.5%, transparent 49%), linear-gradient(112deg, transparent 62%, rgba(255,255,255,0.032) 65%, transparent 68%)",
+        }}
+      />
+
       {tier === "high" || tier === "mid" ? (
         <GlassSculpture
           key={`scene-${sceneEpoch}`}
           className="absolute inset-0"
           tier={tier}
+          onReady={() => setSceneReady(true)}
           onDemote={(to, fps) => {
             demoteSceneTier(to, fps);
             setTier(to);
+            if (to === "low") setSceneReady(false);
           }}
         />
       ) : null}
@@ -279,7 +349,7 @@ export default function GivreHero() {
             <p className="gh-eyebrow mt-5 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist lg:mt-8">
               {t(
                 "hero.eyebrow",
-                "Studio créatif IA — Miniatures · Logos · Identités · Gaming"
+                "Studio de graphisme — Logos · Packs FiveM · Bannières · IA générative"
               )}
             </p>
 
@@ -308,31 +378,32 @@ export default function GivreHero() {
             <p className="gh-sub mt-4 max-w-[400px] text-[15px] leading-[1.65] text-slate lg:mt-7 lg:leading-[1.7]">
               {t(
                 "hero.subtitle",
-                "Miniatures YouTube, logos, identités de marque, assets gaming. Décrivez ce que vous voulez — le studio IA compose des rendus prêts à publier, jusqu'en 8K."
+                "Des graphistes pour vos logos, packs FiveM, bannières et affiches — et Neva Generative, l'IA qui compose des scènes GTA photoréalistes. Brief sur Discord, suivi en direct, livraison rapide."
               )}
             </p>
 
-            {/* CTA desktop — dans la colonne, à gauche de la scène */}
+            {/* CTA desktop — pivot 20/08 : le studio d'abord, la
+                Generative ensuite (les outils de création sont « À
+                venir », plus aucun CTA ne pointe dessus) */}
             <div className="mt-9 hidden flex-wrap items-center gap-4 lg:flex">
-              <Link href="/signup" className="gh-cta pv-btn">
-                {t("hero.cta.primary", "Créer mon premier visuel")}
+              <a href="#studio" className="gh-cta pv-btn">
+                {t("hero.cta.primary", "Découvrir le studio")}
                 <ArrowRight size={15} strokeWidth={1.8} />
-              </Link>
-              <a href="#creations" className="gh-cta pv-btn pv-btn--ghost">
-                {t("hero.cta.secondary", "Voir les créations")}
+              </a>
+              <a href="#generative" className="gh-cta pv-btn pv-btn--ghost">
+                {t("hero.cta.secondary", "Neva Generative")}
               </a>
             </div>
 
-            {/* La preuve tarifaire — intégrée sous les CTA (D05),
-                plus jamais orpheline en bord de cadre */}
+            {/* La preuve sociale — la note des avis clients */}
             <a
-              href="#pricing"
+              href="#avis"
               className="gh-price pv-pill mt-5 hidden font-mono text-[10px] uppercase tracking-[0.14em] text-slate transition-colors duration-300 hover:text-ink lg:inline-flex"
             >
               <span className="font-display text-[15px] font-medium normal-case tracking-normal text-ink">
-                0&nbsp;€
+                5/5
               </span>
-              {t("hero.proof", "Sans carte bancaire")}
+              {t("hero.proof", "Avis clients vérifiés")}
             </a>
           </div>
         </div>
@@ -349,21 +420,18 @@ export default function GivreHero() {
             largeur, cibles tactiles ≥ 48px */}
         <div className="lg:hidden">
           <p className="gh-price pv-pill flex w-full items-center justify-center whitespace-nowrap px-4 py-2 text-center font-mono text-[9.5px] uppercase tracking-[0.13em] text-slate">
-            {t("hero.proof", "Sans carte bancaire")}
+            {t("hero.proof", "Avis clients vérifiés")}
           </p>
           <div className="mt-3 flex flex-col gap-3">
-            <Link
-              href="/signup"
-              className="gh-cta pv-btn min-h-[50px] w-full"
-            >
-              {t("hero.cta.primary", "Créer mon premier visuel")}
+            <a href="#studio" className="gh-cta pv-btn min-h-[50px] w-full">
+              {t("hero.cta.primary", "Découvrir le studio")}
               <ArrowRight size={15} strokeWidth={1.8} />
-            </Link>
+            </a>
             <a
-              href="#creations"
+              href="#generative"
               className="gh-cta pv-btn pv-btn--ghost min-h-[50px] w-full"
             >
-              {t("hero.cta.secondary", "Voir les créations")}
+              {t("hero.cta.secondary", "Neva Generative")}
             </a>
           </div>
         </div>
@@ -393,7 +461,7 @@ export default function GivreHero() {
                     }
                   >
                     {item.active ? (
-                      <span className="h-px w-5 bg-[rgba(43,36,80,0.55)]" aria-hidden />
+                      <span className="h-px w-5 bg-[rgba(242,242,240,0.55)]" aria-hidden />
                     ) : null}
                     {label}
                   </a>

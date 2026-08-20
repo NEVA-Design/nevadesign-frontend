@@ -410,7 +410,7 @@ export default function SettingsClient({
             <section className="border-b border-[color:var(--hairline)] pb-9">
               <h2 className="pv-label mb-6">Photo de profil</h2>
               <div className="flex items-center gap-5">
-                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-[color:var(--hairline-strong)] bg-white">
+                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-[color:var(--hairline-strong)] bg-white/5">
                   {avatarUrl ? (
                     <Image src={avatarUrl} alt="Photo de profil" fill sizes="64px" className="object-cover" />
                   ) : (
@@ -481,14 +481,14 @@ export default function SettingsClient({
                       id="settings-email"
                       value={email}
                       readOnly
-                      className="cursor-default select-all bg-[rgba(43,36,80,0.03)] text-ink"
+                      className="cursor-default select-all bg-[rgba(255,255,255,0.05)] text-ink"
                     />
                   </div>
                 </div>
                 <div>
                   <Label>Discord</Label>
                   {discord ? (
-                    <div className="flex items-center gap-3 rounded-[12px] border border-[color:var(--hairline)] bg-white/60 px-4 py-3">
+                    <div className="flex items-center gap-3 rounded-[12px] border border-[color:var(--hairline)] bg-white/5 px-4 py-3">
                       <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-[#5865F2]/10">
                         {discord.avatarUrl ? (
                           <Image src={discord.avatarUrl} alt="" width={36} height={36} className="h-full w-full object-cover" />
@@ -714,7 +714,7 @@ export default function SettingsClient({
                   </div>
                 </div>
               ) : mfaEnrolling ? (
-                <div className="mt-6 flex flex-col gap-5 rounded-[12px] border border-[color:var(--hairline)] bg-white/60 p-5 sm:flex-row sm:items-start">
+                <div className="mt-6 flex flex-col gap-5 rounded-[12px] border border-[color:var(--hairline)] bg-white/5 p-5 sm:flex-row sm:items-start">
                   {mfaQrCode && (
                     <div className="h-[176px] w-[176px] shrink-0 overflow-hidden rounded-lg border border-[color:var(--hairline)] bg-white p-2">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -733,7 +733,7 @@ export default function SettingsClient({
                       Authenticator, Authy…), ou saisissez la clé manuellement :
                     </p>
                     {mfaSecret && (
-                      <p className="mt-2 select-all break-all rounded-md bg-[rgba(43,36,80,0.05)] px-3 py-2 font-mono text-[11px] tracking-[0.05em] text-ink">
+                      <p className="mt-2 select-all break-all rounded-md bg-[rgba(255,255,255,0.05)] px-3 py-2 font-mono text-[11px] tracking-[0.05em] text-ink">
                         {mfaSecret}
                       </p>
                     )}

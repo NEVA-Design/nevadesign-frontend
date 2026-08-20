@@ -327,7 +327,7 @@ export default function DevPreviewClient({ screen }: { screen: string }) {
 function WizardScene({ children }: { children: React.ReactNode }) {
   return (
     <div className="pv-light pv-atelier relative flex min-h-screen flex-col bg-paper text-ink">
-      <style>{`html{color-scheme:light}`}</style>
+      <style>{`html{color-scheme:dark}`}</style>
       <div aria-hidden className="pv-scene-bg--dawn-calm pointer-events-none fixed inset-0" />
       <div className="relative flex flex-1 flex-col">{children}</div>
     </div>
@@ -339,7 +339,7 @@ function WizardScene({ children }: { children: React.ReactNode }) {
 function AdminScene({ children }: { children: React.ReactNode }) {
   return (
     <div className="pv-light pv-atelier relative min-h-screen bg-paper text-ink">
-      <style>{`html{color-scheme:light}`}</style>
+      <style>{`html{color-scheme:dark}`}</style>
       <div aria-hidden className="pv-scene-bg--dawn-calm pointer-events-none fixed inset-0" />
       <div className="relative px-4 py-8 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-[1200px]">{children}</div>

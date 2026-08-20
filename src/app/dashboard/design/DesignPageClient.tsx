@@ -605,7 +605,7 @@ export function DesignPageClient({ userPlan, initialCharacters }: { userPlan: st
         ? "cursor-not-allowed border-[color:var(--hairline)] text-ink/15"
         : active
           ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
-          : "border-[color:var(--hairline-strong)] bg-white/70 text-steel hover:border-[#C9C9C0] hover:text-ink"
+          : "border-[color:var(--hairline-strong)] bg-white/5 text-steel hover:border-[#4A4A4A] hover:text-ink"
     }`;
 
   const settingRowClass = "flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-[color:var(--hairline)] py-4";
@@ -683,7 +683,7 @@ export function DesignPageClient({ userPlan, initialCharacters }: { userPlan: st
                     key={style.label}
                     type="button"
                     onClick={() => setPrompt((current) => current ? `${current}, ${style.label} style` : `${style.label} FiveM premium visual`)}
-                    className="inline-flex h-10 items-center rounded-full border border-[color:var(--hairline-strong)] bg-white/70 px-4 font-mono text-[11px] uppercase tracking-[0.08em] text-steel transition-colors duration-[var(--dur-base)] hover:border-[rgba(164,139,232,0.35)] hover:text-[color:var(--num-color)]"
+                    className="inline-flex h-10 items-center rounded-full border border-[color:var(--hairline-strong)] bg-white/5 px-4 font-mono text-[11px] uppercase tracking-[0.08em] text-steel transition-colors duration-[var(--dur-base)] hover:border-[rgba(164,139,232,0.35)] hover:text-[color:var(--num-color)]"
                   >
                     {style.label}
                   </button>
@@ -782,7 +782,7 @@ export function DesignPageClient({ userPlan, initialCharacters }: { userPlan: st
                         </button>
 
                         {showCharPicker && (
-                          <div className="pv-scale-in absolute left-0 top-full z-40 mt-2 w-60 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] bg-white shadow-[var(--shadow-float)]">
+                          <div className="pv-scale-in absolute left-0 top-full z-40 mt-2 w-60 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] bg-abyss shadow-[var(--shadow-float)]">
                             <div className="border-b border-[color:var(--hairline)] px-3.5 py-2.5">
                               <span className="pv-label">Personnages mémorisés</span>
                             </div>
@@ -837,8 +837,8 @@ export function DesignPageClient({ userPlan, initialCharacters }: { userPlan: st
                 <span
                   className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] ${
                     isFreePlan
-                      ? "border-[#EAD9A8] bg-[#FBF6E9] text-[#8A6D1F]"
-                      : "border-[#C5DCD2] bg-[#EEF4F1] text-[#5E9B84]"
+                      ? "border-[rgba(217,178,74,0.40)] bg-[rgba(217,178,74,0.10)] text-[#D9B24A]"
+                      : "border-[rgba(111,191,159,0.40)] bg-[rgba(111,191,159,0.10)] text-[#6FBF9F]"
                   }`}
                 >
                   <span className={`h-1.5 w-1.5 rounded-full ${isFreePlan ? "bg-warn" : "bg-ok"}`} />
@@ -852,7 +852,7 @@ export function DesignPageClient({ userPlan, initialCharacters }: { userPlan: st
                 <div className="relative" onClick={e => e.stopPropagation()}>
                   <button
                     onClick={() => setModelPickerOpen(v => !v)}
-                    className="inline-flex h-10 items-center gap-2.5 rounded-lg border border-[color:var(--hairline-strong)] px-3.5 text-[13px] text-ink transition-colors duration-300 hover:border-[#C9C9C0]"
+                    className="inline-flex h-10 items-center gap-2.5 rounded-lg border border-[color:var(--hairline-strong)] px-3.5 text-[13px] text-ink transition-colors duration-300 hover:border-[#4A4A4A]"
                   >
                     <span className="rounded-full border border-[rgba(164,139,232,0.3)] bg-[rgba(164,139,232,0.08)] px-1.5 py-0.5 font-mono text-[9px] font-medium uppercase tracking-[0.12em] text-[color:var(--num-color)]">
                       {selectedImageModel.badge}
@@ -862,7 +862,7 @@ export function DesignPageClient({ userPlan, initialCharacters }: { userPlan: st
                   </button>
 
                   {modelPickerOpen && (
-                    <div className="pv-scale-in absolute left-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] bg-white shadow-[var(--shadow-float)]">
+                    <div className="pv-scale-in absolute left-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] bg-abyss shadow-[var(--shadow-float)]">
                       {imageModelList.map(m => {
                         const locked = !canUseModel(userPlan, m.requiredPlan);
                         return (
@@ -874,7 +874,7 @@ export function DesignPageClient({ userPlan, initialCharacters }: { userPlan: st
                               setModelPickerOpen(false);
                             }}
                             className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors ${
-                              selectedImageModel.id === m.id ? "bg-white" : "hover:bg-ink/[0.03]"
+                              selectedImageModel.id === m.id ? "bg-white/5" : "hover:bg-ink/[0.03]"
                             }`}
                           >
                             <span className={`shrink-0 rounded-full border border-[rgba(164,139,232,0.3)] bg-[rgba(164,139,232,0.08)] px-1.5 py-0.5 font-mono text-[9px] font-medium uppercase tracking-[0.12em] text-[color:var(--num-color)] ${locked ? "opacity-35" : ""}`}>
@@ -979,7 +979,7 @@ export function DesignPageClient({ userPlan, initialCharacters }: { userPlan: st
                           className={`flex h-10 w-11 items-center justify-center rounded-lg border transition-colors duration-300 ${
                             active
                               ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)]"
-                              : "border-[color:var(--hairline-strong)] hover:border-[#C9C9C0]"
+                              : "border-[color:var(--hairline-strong)] hover:border-[#4A4A4A]"
                           }`}
                         >
                           <span
@@ -1128,13 +1128,13 @@ export function DesignPageClient({ userPlan, initialCharacters }: { userPlan: st
 
               {/* Résultat — l'œuvre exposée dans son passe-partout */}
               {result && !loading && (
-                <div className="overflow-hidden rounded-2xl border border-[color:var(--hairline)] bg-white shadow-[var(--shadow-print)]">
+                <div className="overflow-hidden rounded-2xl border border-[color:var(--hairline)] bg-white/5 shadow-[var(--shadow-print)]">
 
                   {/* Image unique */}
                   {result.images.length === 1 && (
                     <div className="bg-linen p-5">
                       <div
-                        className="group relative cursor-zoom-in bg-white p-4 shadow-[var(--shadow-print)]"
+                        className="group relative cursor-zoom-in bg-white/5 p-4 shadow-[var(--shadow-print)]"
                         onClick={() => { setFullscreenIdx(0); setFullscreen(true); }}
                       >
                         <div className="relative overflow-hidden">
@@ -1159,7 +1159,7 @@ export function DesignPageClient({ userPlan, initialCharacters }: { userPlan: st
                       {result.images.map((img, i) => (
                         <div
                           key={i}
-                          className="group relative cursor-zoom-in bg-white p-2 shadow-[var(--shadow-print)]"
+                          className="group relative cursor-zoom-in bg-white/5 p-2 shadow-[var(--shadow-print)]"
                           onClick={() => { setFullscreenIdx(i); setFullscreen(true); }}
                         >
                           <div className="relative overflow-hidden">
@@ -1204,28 +1204,28 @@ export function DesignPageClient({ userPlan, initialCharacters }: { userPlan: st
                   <div className="flex flex-wrap items-center gap-2 px-4 py-3">
                     <button
                       onClick={() => copyText(result.enhancedPrompt)}
-                      className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-[color:var(--hairline-strong)] px-3 text-[12px] text-steel transition-colors duration-300 hover:border-[#C9C9C0] hover:text-ink"
+                      className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-[color:var(--hairline-strong)] px-3 text-[12px] text-steel transition-colors duration-300 hover:border-[#4A4A4A] hover:text-ink"
                     >
                       {copied ? <Check size={11} className="text-ok" /> : <Copy size={11} />}
                       {copied ? "Copié" : "Copier"}
                     </button>
                     <button
                       onClick={() => generate()}
-                      className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-[color:var(--hairline-strong)] px-3 text-[12px] text-steel transition-colors duration-300 hover:border-[#C9C9C0] hover:text-ink"
+                      className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-[color:var(--hairline-strong)] px-3 text-[12px] text-steel transition-colors duration-300 hover:border-[#4A4A4A] hover:text-ink"
                     >
                       <RefreshCw size={11} />
                       Regénérer
                     </button>
                     <button
                       onClick={() => setShowBetterResultGuide(v => !v)}
-                      className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-[color:var(--hairline-strong)] px-3 text-[12px] text-steel transition-colors duration-300 hover:border-[#C9C9C0] hover:text-ink"
+                      className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-[color:var(--hairline-strong)] px-3 text-[12px] text-steel transition-colors duration-300 hover:border-[#4A4A4A] hover:text-ink"
                     >
                       <Settings2 size={11} />
                       Je ne suis pas satisfait
                     </button>
                     <button
                       onClick={downloadAll}
-                      className="ml-auto inline-flex h-10 items-center gap-1.5 rounded-full bg-ink px-4 text-[12px] font-medium text-white shadow-[0_1px_2px_rgba(43,36,80,0.12),0_8px_22px_rgba(43,36,80,0.16)] transition-colors duration-300 hover:bg-[#35305E]"
+                      className="ml-auto inline-flex h-10 items-center gap-1.5 rounded-full bg-ink px-4 text-[12px] font-medium text-[#060606] shadow-[0_1px_2px_rgba(0,0,0,0.42),0_8px_22px_rgba(0,0,0,0.46)] transition-colors duration-300 hover:bg-white"
                     >
                       <Download size={11} />
                       {result.images.length > 1 ? "Tout télécharger" : "Télécharger"}
@@ -1481,14 +1481,14 @@ export function DesignPageClient({ userPlan, initialCharacters }: { userPlan: st
               <button
                 onClick={e => { e.stopPropagation(); setFullscreenIdx(i => (i - 1 + result.images.length) % result.images.length); }}
                 aria-label="Image précédente"
-                className="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg border border-[color:var(--hairline-strong)] bg-white/80 text-ink transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)] hover:text-[color:var(--num-color)]"
+                className="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg border border-[color:var(--hairline-strong)] bg-white/5 text-ink transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)] hover:text-[color:var(--num-color)]"
               >
                 <ChevronLeft size={18} />
               </button>
               <button
                 onClick={e => { e.stopPropagation(); setFullscreenIdx(i => (i + 1) % result.images.length); }}
                 aria-label="Image suivante"
-                className="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg border border-[color:var(--hairline-strong)] bg-white/80 text-ink transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)] hover:text-[color:var(--num-color)]"
+                className="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg border border-[color:var(--hairline-strong)] bg-white/5 text-ink transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)] hover:text-[color:var(--num-color)]"
               >
                 <ChevronRight size={18} />
               </button>
@@ -1501,13 +1501,13 @@ export function DesignPageClient({ userPlan, initialCharacters }: { userPlan: st
           <button
             onClick={() => setFullscreen(false)}
             aria-label="Fermer la visionneuse"
-            className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg border border-[color:var(--hairline-strong)] bg-white/80 text-ink transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)] hover:text-[color:var(--num-color)]"
+            className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg border border-[color:var(--hairline-strong)] bg-white/5 text-ink transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)] hover:text-[color:var(--num-color)]"
           >
             <X size={16} />
           </button>
           <button
             onClick={e => { e.stopPropagation(); downloadSingleImage(result.images[fullscreenIdx], fullscreenIdx); }}
-            className="absolute bottom-4 right-4 inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-white shadow-[0_1px_2px_rgba(43,36,80,0.12),0_8px_22px_rgba(43,36,80,0.16)] transition-colors duration-300 hover:bg-[#35305E]"
+            className="absolute bottom-4 right-4 inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-[#060606] shadow-[0_1px_2px_rgba(0,0,0,0.42),0_8px_22px_rgba(0,0,0,0.46)] transition-colors duration-300 hover:bg-white"
           >
             <Download size={14} />
             Télécharger

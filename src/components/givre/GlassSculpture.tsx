@@ -39,6 +39,14 @@ import { currentSceneTier, type SceneTier } from "./scene-tier";
    EN DIRECT passe par les props (DPR, dispersion, passes). */
 const IS_MID = currentSceneTier() === "mid";
 
+/* MAJ soie : le mur/sol peints ne sont plus rendus à l'écran (la
+   soie DOM vit derrière le canvas transparent) — leurs textures ne
+   servent plus qu'à la réfraction du verre. En conséquence la
+   couche atelier (grille, annotations) n'est plus peinte : à
+   travers le verre givré elle se lisait en « carrés » flottants.
+   Repasser à true pour retrouver le fond opaque complet. */
+const MUR_PEINT = false;
+
 /* ── Petits outils de peinture ─────────────────────────────────── */
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
@@ -258,11 +266,13 @@ const VIEW = (() => {
   }
   const visible = Math.min(WALL_W, frustum.width);
   const idealW = Math.ceil((1.5 * vw * WALL_W) / visible / 64) * 64;
-  /* plafond 6144 : 1,5 × est atteint jusqu'à 3440 (le 34″ du
-     brief) ; un 4K NATIF sans scaling tombe à 1,3 × — compromis
-     mémoire GPU (75 Mo vs 101 Mo) documenté au rapport */
+  /* MAJ 20/08 — plafond wide 6144 → 3072 : sur le fond NOIR, le
+     contenu est basse fréquence (dégradés sombres + grain) — le
+     surplus de densité était invisible et coûtait ~75 % du temps
+     de peinture (mur 18,9 Mpx + sol 20,4 Mpx → 4,7 + 5,2 Mpx).
+     Le grain natif continue de tuer le banding. */
   const wallOutW = wide
-    ? Math.min(6144, maxTex, Math.max(2048, idealW))
+    ? Math.min(3072, maxTex, Math.max(2048, idealW))
     : IS_MID
       ? 1024
       : 2048;
@@ -271,11 +281,11 @@ const VIEW = (() => {
      verticalement — 0,72 × la densité du mur suffit à ses détails
      (reflets/ombres floues par nature), le grain reste natif */
   const floorOutW = wide
-    ? Math.min(8192, maxTex, Math.max(1536, Math.round(wallOutW * 0.72)))
+    ? Math.min(3072, maxTex, Math.max(1536, Math.round(wallOutW * 0.72)))
     : IS_MID
       ? 768
       : 1536;
-  const floorOutH = Math.min(4608, Math.round((floorOutW * floorD) / WALL_W));
+  const floorOutH = Math.min(2304, Math.round((floorOutW * floorD) / WALL_W));
   return {
     wide, spread, aspect, vw, vh, frustum, gridStep, haloScale,
     wallZ, floorD, wallOutW, wallOutH, floorOutW, floorOutH,
@@ -288,11 +298,14 @@ const WALL_Z = VIEW.wallZ;
 const FLOOR_D = VIEW.floorD;
 
 /* MID : peinture directement à la résolution finale ÷2 — moitié de
-   long tasks au boot, quart de mémoire GPU */
-const WALL_TEX_W = IS_MID ? 1024 : 2048;
-const WALL_TEX_H = Math.round((WALL_TEX_W * 11) / WALL_W); // 1024 (512 mid)
-const FLOOR_TEX_W = IS_MID ? 768 : 1536;
-const FLOOR_TEX_H = Math.round((FLOOR_TEX_W * FLOOR_D) / WALL_W); // legacy ≈ 1222 (611 mid)
+   long tasks au boot, quart de mémoire GPU.
+   MAJ 20/08 : high 2048→1536 (mur) et 1536→1152 (sol) — sur le
+   fond NOIR le contenu est basse fréquence, le grain porte le
+   détail ; −45 % de pixels peints au boot, écart invisible. */
+const WALL_TEX_W = IS_MID ? 1024 : 1536;
+const WALL_TEX_H = Math.round((WALL_TEX_W * 11) / WALL_W);
+const FLOOR_TEX_W = IS_MID ? 768 : 1152;
+const FLOOR_TEX_H = Math.round((FLOOR_TEX_W * FLOOR_D) / WALL_W);
 
 /* La sculpture vit autour de x = SCULPT_X, posée au sol. Les
    positions des satellites sont partagées avec le peintre du sol
@@ -342,9 +355,14 @@ const PANE_SOFT = 0.35;
 /* Derrière la sculpture, les lames s'effacent (−50 % de gain) : le
    verre garde son propre modelé au lieu d'être lavé par la lumière. */
 function sculptShield(wx: number, wy: number): number {
+  /* MAJ whaou — le mur n'est plus affiché (MUR_PEINT=false) : il
+     n'existe QUE réfracté. Le bouclier qui éteignait les rais
+     derrière la sculpture privait le verre de ses lignes à plier
+     — réduit à 15 % pour que les streaks traversent le champ
+     réfracté du monogramme. */
   return (
     1 -
-    0.5 *
+    0.15 *
       smoothstep(1.0, 0.3, Math.hypot((wx - MONO_X) / 2.35, (wy - 1.35) / 1.95))
   );
 }
@@ -369,7 +387,9 @@ function paneWall(wx: number, wy: number): [number, number] {
   /* falloff vertical : la lame respire vers sa source (haut-gauche) */
   const srcA = 0.66 + 0.4 * smoothstep(1.9, -0.9, u) * smoothstep(-0.6, 4.6, wy);
   const shield = sculptShield(wx, wy);
-  const gain = (a * srcA * 0.052 + a2 * 0.028 + b * 0.018) * shield;
+  /* MAJ whaou — gains ×3 : ces rais ne vivent plus qu'à travers le
+     verre (backdrop à réfracter, brief P2.2) — light streaks nets */
+  const gain = (a * srcA * 0.2 + a2 * 0.1 + b * 0.07) * shield;
   /* croisillons : deux montants + une traverse, adoucis */
   let shade = 0;
   shade += bandf(u, -0.12, 0.05, 0.06) * a;
@@ -415,8 +435,134 @@ function accentWall(wx: number, wy: number): [number, number, number] {
    n'existe pas. dist = distance à la jonction le long de la
    surface (mur : wy − FLOOR_Y ; sol : wz − WALL_Z). */
 const CYC_R = 1.05;
-const CYC_SEAT: readonly number[] = [0.902, 0.895, 0.876];
-const CYC_HOLLOW: readonly number[] = [0.836, 0.828, 0.812];
+/* MAJ 20/08 — cyclorama NOIR : assise #0B0B0B, creux #060606.
+   Noirs neutres (R=G=B), le relief vient des rais et du halo. */
+const CYC_SEAT: readonly number[] = [0.042, 0.042, 0.042];
+const CYC_HOLLOW: readonly number[] = [0.022, 0.022, 0.022];
+
+/* ── Le SATIN (MAJ soie, porté de Neva Agency) ──────────────────
+   Le fond DOM du site est un drapé de velours temps réel
+   (SoieNoire) ; le cyclorama peint reprend la MÊME grammaire —
+   plis ridged anisotropes en diagonale, éclairés haut-gauche —
+   pour que le verre réfracte la même matière que la page.
+   Champ précalculé sur GRILLE GROSSIÈRE (le satin est basse
+   fréquence, pas 0,15 u) + bilinéaire par pixel : le coût de boot
+   reste négligeable (~40 k évaluations, pas 3 M). Déterministe
+   (hash2) : captures et posters stables. */
+const SATIN = {
+  angle: -0.52,
+  aniso: 2.5,
+  freq: 0.16, /* ~3 grandes vagues sur les 22 u du mur */
+  foldPow: 2.1,
+  ridgeAmp: 0.052, /* crêtes : base 0,046 → ~0,10 (#1A) maxi */
+  dirGain: 0.020, /* modelé directionnel (lumière haut-gauche) */
+  step: 0.09, /* pas de la grille monde (0,15 marquait des cellules) */
+};
+
+function vnoise2(x: number, y: number): number {
+  const xi = Math.floor(x);
+  const yi = Math.floor(y);
+  const xf = x - xi;
+  const yf = y - yi;
+  const u = xf * xf * (3 - 2 * xf);
+  const v = yf * yf * (3 - 2 * yf);
+  const a = hash2(xi, yi);
+  const b = hash2(xi + 1, yi);
+  const c = hash2(xi, yi + 1);
+  const d = hash2(xi + 1, yi + 1);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+
+/* le champ ridged du shader soie, en JS : fbm 2 octaves + warp */
+function satinRidge(px: number, py: number, seed: number): number {
+  const ca = Math.cos(SATIN.angle);
+  const sa = Math.sin(SATIN.angle);
+  const rx = px * ca - py * sa;
+  const ry = px * sa + py * ca;
+  const ws = SATIN.freq * 0.5;
+  const wx = vnoise2(rx * ws + seed, ry * ws * SATIN.aniso);
+  const wy = vnoise2(rx * ws + 5.2 + seed, ry * ws * SATIN.aniso + 1.3);
+  const fx = rx * SATIN.freq + 1.15 * wx;
+  const fy = ry * SATIN.freq * SATIN.aniso + 1.15 * wy;
+  const n1 = vnoise2(fx + seed, fy) * 2 - 1;
+  const n2 = vnoise2(fx * 2 + seed, fy * 2) * 2 - 1;
+  const h = 0.5 + 0.5 * (n1 * 0.75 + n2 * 0.25);
+  return Math.pow(1 - Math.abs(2 * h - 1), SATIN.foldPow);
+}
+
+type SatinMap = {
+  data: Float32Array;
+  gw: number;
+  gh: number;
+  x0: number;
+  y0: number;
+  inv: number;
+};
+
+function buildSatinMap(
+  x0: number,
+  y0: number,
+  w: number,
+  h: number,
+  seed: number,
+  amp: number
+): SatinMap {
+  const step = SATIN.step;
+  const gw = Math.ceil(w / step) + 2;
+  const gh = Math.ceil(h / step) + 2;
+  const data = new Float32Array(gw * gh);
+  for (let j = 0; j < gh; j++) {
+    const v = y0 + j * step;
+    for (let i = 0; i < gw; i++) {
+      const u = x0 + i * step;
+      const h0 = satinRidge(u, v, seed);
+      const hx = satinRidge(u + step, v, seed);
+      const hy = satinRidge(u, v + step, seed);
+      /* lumière haut-gauche : les flancs qui la regardent s'allument */
+      const shade = ((h0 - hx) * -0.6 + (h0 - hy) * 0.55) * (SATIN.dirGain / step);
+      data[j * gw + i] =
+        h0 * amp + Math.max(-0.018, Math.min(0.018, shade));
+    }
+  }
+  return { data, gw, gh, x0, y0, inv: 1 / step };
+}
+
+function sampleSatin(m: SatinMap, x: number, y: number): number {
+  const fx = (x - m.x0) * m.inv;
+  const fy = (y - m.y0) * m.inv;
+  const i = Math.max(0, Math.min(m.gw - 2, Math.floor(fx)));
+  const j = Math.max(0, Math.min(m.gh - 2, Math.floor(fy)));
+  /* poids SMOOTHSTEP (comme un value noise) : la dérivée est
+     continue aux frontières de cellules — le bilinéaire brut
+     dessinait un quadrillage de mach bands, lisible en « carrés »
+     à travers le verre givré. */
+  let u = Math.max(0, Math.min(1, fx - i));
+  let v = Math.max(0, Math.min(1, fy - j));
+  u = u * u * (3 - 2 * u);
+  v = v * v * (3 - 2 * v);
+  const a = m.data[j * m.gw + i];
+  const b = m.data[j * m.gw + i + 1];
+  const c = m.data[(j + 1) * m.gw + i];
+  const d = m.data[(j + 1) * m.gw + i + 1];
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+
+let wallSatinMap: SatinMap | null = null;
+let floorSatinMap: SatinMap | null = null;
+function wallSatin(): SatinMap {
+  if (!wallSatinMap) {
+    wallSatinMap = buildSatinMap(WALL_X0, FLOOR_Y, WALL_W, WALL_TOP - FLOOR_Y, 0, SATIN.ridgeAmp);
+  }
+  return wallSatinMap;
+}
+function floorSatin(): SatinMap {
+  if (!floorSatinMap) {
+    /* champ distinct (seed) et plus doux : le sol reçoit le drapé
+       en écho, jamais en miroir */
+    floorSatinMap = buildSatinMap(WALL_X0, WALL_Z, WALL_W, FLOOR_D, 11.7, SATIN.ridgeAmp * 0.55);
+  }
+  return floorSatinMap;
+}
 const cycBlend = (dist: number) => smoothstep(CYC_R + 0.35, 0.0, dist);
 const cycOcc = (dist: number) =>
   Math.pow(smoothstep(CYC_R, 0.0, dist), 1.4);
@@ -447,6 +593,18 @@ const LOBE_PEACH = {
 };
 const PEACH: readonly number[] = [0.98, 0.762, 0.598];
 const LILAC: readonly number[] = [0.755, 0.702, 0.918];
+/* MAJ whaou — le 3e lobe : PILE derrière la sculpture. Les deux
+   lobes flanquent le monogramme — le couloir central que les
+   rayons réfractés traversent était noir (test d en échec). Ce
+   cœur ivoire-lilas n'existe que dans le monde réfracté
+   (MUR_PEINT=false) : le verre s'allume, la page reste nuit. */
+const LOBE_CORE = {
+  cx: MONO_X + 0.2,
+  cy: 1.45,
+  rx: 2.4 * HS,
+  ry: 2.1 * HS,
+};
+const CORE_TINT: readonly number[] = [0.86, 0.82, 0.94];
 
 /* Gaussienne réelle (fondu sans bord) — nulle au-delà de 1,6 r */
 function lobe(wx: number, wy: number, L: { cx: number; cy: number; rx: number; ry: number }) {
@@ -455,27 +613,43 @@ function lobe(wx: number, wy: number, L: { cx: number; cy: number; rx: number; r
   return Math.exp(-rr * rr * 2.6) * smoothstep(1.6, 1.15, rr);
 }
 
+/* MAJ 20/08 — sur le noir, le halo aurore est un GLOW derrière la
+   sculpture de verre, opacité réduite (poids 0,16/0,18 au lieu de
+   0,78/0,88) : jamais un aplat de couleur. */
+/* MAJ whaou — poids 0,24/0,27 → 0,58/0,62 : le mur n'existe plus
+   qu'à travers le verre (MUR_PEINT=false) — c'est LE backdrop à
+   réfracter du brief P2.2 : les teintes lilas/pêche doivent se
+   lire dans l'épaisseur du verre (test d'acceptation c). */
 function auroraWall(wx: number, wy: number): [number, number, number] {
   const gl = lobe(wx, wy, LOBE_LILAC);
   const gp = lobe(wx, wy, LOBE_PEACH);
-  if (gl + gp <= 0.002) return [0, 0, 0];
-  const wl = gl * 0.78;
-  const wp = gp * 0.88;
+  const gc = lobe(wx, wy, LOBE_CORE);
+  if (gl + gp + gc <= 0.002) return [0, 0, 0];
+  const wl = gl * 0.58;
+  const wp = gp * 0.62;
+  const wc = gc * 0.72;
   return [
-    LILAC[0] * wl + PEACH[0] * wp,
-    LILAC[1] * wl + PEACH[1] * wp,
-    LILAC[2] * wl + PEACH[2] * wp,
+    LILAC[0] * wl + PEACH[0] * wp + CORE_TINT[0] * wc,
+    LILAC[1] * wl + PEACH[1] * wp + CORE_TINT[1] * wc,
+    LILAC[2] * wl + PEACH[2] * wp + CORE_TINT[2] * wc,
   ];
 }
-/* Poids du halo (0–1) au même point — pour fondre l'ivoire dessous */
+/* Poids du halo (0–1) au même point — pour fondre le noir dessous */
 function auroraMask(wx: number, wy: number): number {
-  return clamp01(lobe(wx, wy, LOBE_LILAC) * 0.78 + lobe(wx, wy, LOBE_PEACH) * 0.88);
+  return clamp01(
+    lobe(wx, wy, LOBE_LILAC) * 0.58 +
+      lobe(wx, wy, LOBE_PEACH) * 0.62 +
+      lobe(wx, wy, LOBE_CORE) * 0.72
+  );
 }
 
 function wallColor(wx: number, wy: number): [number, number, number] {
-  const top: readonly number[] = [0.925, 0.917, 0.895];
-  const mid: readonly number[] = [0.949, 0.943, 0.925];
-  const low: readonly number[] = [0.958, 0.953, 0.938];
+  /* MAJ 20/08 — mur NOIR neutre : #0F haut, #0C milieu, #0A bas.
+     Le modelé reste (gradient, vignettes, rais, halo) mais tout
+     vit entre 0,022 et 0,10 de luminance. */
+  const top: readonly number[] = [0.058, 0.058, 0.058];
+  const mid: readonly number[] = [0.046, 0.046, 0.046];
+  const low: readonly number[] = [0.040, 0.040, 0.040];
 
   const h = clamp01((wy - FLOOR_Y) / (WALL_TOP - FLOOR_Y));
   const col: number[] =
@@ -483,12 +657,20 @@ function wallColor(wx: number, wy: number): [number, number, number] {
       ? lerp3(low, mid, smoothstep(0, 0.42, h))
       : lerp3(mid, top, smoothstep(0.42, 1, h));
 
-  /* vignette neutre chaude des bords — le plateau se referme sans
+  /* vignette neutre des bords — le plateau se referme sans
      jamais se colorer */
-  mix3(col, [0.888, 0.881, 0.862], smoothstep(6.4, 10.8, Math.abs(wx)) * 0.5);
-  mix3(col, [0.902, 0.895, 0.876], smoothstep(6.2, 9.2, wy) * 0.35);
+  mix3(col, [0.030, 0.030, 0.030], smoothstep(6.4, 10.8, Math.abs(wx)) * 0.5);
+  mix3(col, [0.034, 0.034, 0.034], smoothstep(6.2, 9.2, wy) * 0.35);
 
-  /* le halo aurore — la seule couleur du fond : l'ivoire cède sa
+  /* le SATIN — le drapé du fond DOM replié dans le mur (fondu près
+     du congé : la couture mur/sol reste sereine) */
+  const satW =
+    sampleSatin(wallSatin(), wx, wy) * smoothstep(0.5, 2.2, wy - FLOOR_Y);
+  col[0] += satW;
+  col[1] += satW;
+  col[2] += satW;
+
+  /* le halo aurore — la seule couleur du fond : le noir cède sa
      place au prorata du masque, la lueur prend le relais — un
      fondu, jamais une addition qui sature */
   const am = auroraMask(wx, wy);
@@ -518,9 +700,9 @@ function wallColor(wx: number, wy: number): [number, number, number] {
   mix3(col, CYC_HOLLOW, cycOcc(dist) * 0.5);
 
   return [
-    Math.min(0.985, Math.max(0.14, col[0])),
-    Math.min(0.985, Math.max(0.14, col[1])),
-    Math.min(0.985, Math.max(0.14, col[2])),
+    Math.min(0.985, Math.max(0.010, col[0])),
+    Math.min(0.985, Math.max(0.010, col[1])),
+    Math.min(0.985, Math.max(0.010, col[2])),
   ];
 }
 
@@ -531,8 +713,9 @@ function wallColor(wx: number, wy: number): [number, number, number] {
    les ombres portées gris-mauve de la sculpture, ses reflets
    verticaux discrets, une caustique au pied du monogramme. */
 function floorColor(wx: number, wz: number): [number, number, number] {
-  const nearJ: readonly number[] = [0.952, 0.946, 0.93];
-  const farC: readonly number[] = [0.912, 0.905, 0.886];
+  /* MAJ 20/08 — sol NOIR neutre : #0C au congé, #09 en avant-scène */
+  const nearJ: readonly number[] = [0.048, 0.048, 0.048];
+  const farC: readonly number[] = [0.036, 0.036, 0.036];
 
   const d = wz - WALL_Z; /* profondeur depuis le mur */
   const col: number[] = lerp3(nearJ, farC, smoothstep(0.8, 9.0, d));
@@ -540,20 +723,36 @@ function floorColor(wx: number, wz: number): [number, number, number] {
      profondeur, elle, remonte vers le mur (voir fondu d'horizon en
      fin de fonction) — l'ancienne vignette de fond créait la
      marche claire mesurée à la ligne d'horizon (57 niv/px). */
-  mix3(col, [0.872, 0.865, 0.848], smoothstep(6.2, 10.8, Math.abs(wx)) * 0.4 * (1 - smoothstep(6.0, 14.0, d) * 0.85));
+  mix3(col, [0.028, 0.028, 0.028], smoothstep(6.2, 10.8, Math.abs(wx)) * 0.4 * (1 - smoothstep(6.0, 14.0, d) * 0.85));
 
-  /* reflet du halo aurore — le lobe pêche se pose sur le sol,
-     fondu en ~2,5 unités ; une trace lilas plus discrète à gauche */
+  /* le SATIN au sol — l'écho du drapé, plus doux, fondu au congé */
+  const satF = sampleSatin(floorSatin(), wx, wz) * smoothstep(0.5, 2.5, d);
+  col[0] += satF;
+  col[1] += satF;
+  col[2] += satF;
+
+  /* reflet du halo aurore — MAJ whaou : renforcé (le sol n'existe
+     plus que réfracté — il teinte l'épaisseur du verre) */
   const glowP = smoothstep(1.0, 0.08, Math.hypot((wx - LOBE_PEACH.cx) / 3.0, d / 2.5));
   if (glowP > 0.001) {
-    const k = glowP * 0.3;
+    const k = glowP * 0.30;
     col[0] = col[0] * (1 - k) + PEACH[0] * k;
     col[1] = col[1] * (1 - k) + PEACH[1] * k;
     col[2] = col[2] * (1 - k) + PEACH[2] * k;
   }
+  /* MAJ whaou — l'écho du 3e lobe au sol : les faces BASSES du
+     monogramme et le tore réfractent le sol — sans lui, elles
+     restaient noires (test d) */
+  const glowC = smoothstep(1.0, 0.12, Math.hypot((wx - MONO_X - 0.2) / 2.8, (wz - 0.8) / 2.4));
+  if (glowC > 0.001) {
+    const k = glowC * 0.3;
+    col[0] = col[0] * (1 - k) + CORE_TINT[0] * k;
+    col[1] = col[1] * (1 - k) + CORE_TINT[1] * k;
+    col[2] = col[2] * (1 - k) + CORE_TINT[2] * k;
+  }
   const glowL = smoothstep(1.0, 0.1, Math.hypot((wx - LOBE_LILAC.cx) / 2.6, d / 1.9));
   if (glowL > 0.001) {
-    const k = glowL * 0.14;
+    const k = glowL * 0.16;
     col[0] = col[0] * (1 - k) + LILAC[0] * k;
     col[1] = col[1] * (1 - k) + LILAC[1] * k;
     col[2] = col[2] * (1 - k) + LILAC[2] * k;
@@ -586,22 +785,22 @@ function floorColor(wx: number, wz: number): [number, number, number] {
   col[1] += pc[1] * puddle * 0.10;
   col[2] += pc[2] * puddle * 0.10;
 
-  /* ── ombres portées — gris-mauve doux (colorées, jamais noires,
-     jamais lourdes : un cyc éclairé large fait des ombres tendres) */
+  /* ── ombres portées — sur le noir elles s'enfoncent vers le
+     noir profond (toujours neutres, jamais teintées) */
   const shx = (wx - MONO_X - 0.5) / 2.3;
   const shz = (wz - 0.55) / 1.4;
-  mix3(col, [0.708, 0.696, 0.762], smoothstep(1.0, 0.12, Math.hypot(shx, shz)) * 0.5);
+  mix3(col, [0.020, 0.020, 0.024], smoothstep(1.0, 0.12, Math.hypot(shx, shz)) * 0.5);
   /* cœur de contact du monogramme */
   mix3(
     col,
-    [0.598, 0.585, 0.668],
+    [0.012, 0.012, 0.016],
     smoothstep(0.92, 0.1, Math.hypot((wx - MONO_X - 0.1) / 1.62, (wz - 0.3) / 0.66)) *
       0.55
   );
   /* ombre de l'anneau */
   mix3(
     col,
-    [0.665, 0.652, 0.728],
+    [0.016, 0.016, 0.020],
     smoothstep(
       0.9,
       0.14,
@@ -612,14 +811,14 @@ function floorColor(wx: number, wz: number): [number, number, number] {
      décalée bas-droite (la clé vient du haut-gauche), cœur alpha
      0,22 et bord fondu ≈ 24 px : elle POSE la sphère dans la scène */
   const sphD = Math.hypot((wx - SPHERE_X - 0.22) / 0.52, (wz - SPHERE_Z - 0.16) / 0.36);
-  mix3(col, [0.598, 0.585, 0.668], smoothstep(1.0, 0.3, sphD) * 0.22);
-  mix3(col, [0.665, 0.652, 0.728], smoothstep(1.9, 0.85, sphD) * 0.1);
+  mix3(col, [0.012, 0.012, 0.016], smoothstep(1.0, 0.3, sphD) * 0.22);
+  mix3(col, [0.016, 0.016, 0.020], smoothstep(1.9, 0.85, sphD) * 0.1);
   /* la bille haute : une ombre plus diffuse (elle flotte à 3,3) */
   const beadD = Math.hypot((wx - BEAD_X - 0.16) / 0.32, (wz + 0.7 - 0.12) / 0.23);
-  mix3(col, [0.7, 0.688, 0.755], smoothstep(1.0, 0.3, beadD) * 0.09);
+  mix3(col, [0.020, 0.020, 0.025], smoothstep(1.0, 0.3, beadD) * 0.09);
 
-  /* ── reflets — un cyc peint est mat : traces verticales à peine
-     suggérées */
+  /* ── reflets — traces verticales CLAIRES sur le sol noir : c'est
+     elles qui posent le verre dans la nuit */
   const reflMono =
     slab(wx, MONO_X - 1.42, MONO_X + 1.42, 0.22) *
     slab(wz, 0.45, 2.6, 0.3) *
@@ -630,7 +829,7 @@ function floorColor(wx: number, wz: number): [number, number, number] {
           band(wx, MONO_X - 0.82, 0.34),
           band(wx, MONO_X + 0.55, 0.42)
         ));
-  mix3(col, [0.792, 0.782, 0.845], reflMono * 0.14);
+  mix3(col, [0.085, 0.085, 0.095], reflMono * 0.14);
   const reflHi =
     Math.max(band(wx, MONO_X - 0.28, 0.16), band(wx, MONO_X + 1.05, 0.13)) *
     slab(wz, 0.5, 2.0, 0.3) *
@@ -642,12 +841,12 @@ function floorColor(wx: number, wz: number): [number, number, number] {
     band(wx, RING_X + 0.1, 0.44) *
     slab(wz, RING_Z + 0.5, RING_Z + 1.2, 0.25) *
     (1 - smoothstep(RING_Z + 0.5, RING_Z + 1.2, wz));
-  mix3(col, [0.808, 0.798, 0.858], reflRing * 0.11);
+  mix3(col, [0.090, 0.090, 0.100], reflRing * 0.11);
   const reflSph =
     band(wx, SPHERE_X, 0.36) *
     slab(wz, SPHERE_Z + 0.4, SPHERE_Z + 1.2, 0.3) *
     (1 - smoothstep(SPHERE_Z + 0.4, SPHERE_Z + 1.2, wz));
-  mix3(col, [0.845, 0.838, 0.885], reflSph * 0.06);
+  mix3(col, [0.095, 0.095, 0.105], reflSph * 0.06);
 
   /* caustique — le pied du cristal concentre un éclat, teinté aube */
   const caust =
@@ -686,9 +885,9 @@ function floorColor(wx: number, wz: number): [number, number, number] {
   }
 
   return [
-    Math.min(0.985, Math.max(0.14, col[0])),
-    Math.min(0.985, Math.max(0.14, col[1])),
-    Math.min(0.985, Math.max(0.14, col[2])),
+    Math.min(0.985, Math.max(0.010, col[0])),
+    Math.min(0.985, Math.max(0.010, col[1])),
+    Math.min(0.985, Math.max(0.010, col[2])),
   ];
 }
 
@@ -855,7 +1054,9 @@ function upscaleCanvas(src: HTMLCanvasElement, w: number, h: number) {
    vectoriel 2D sur le canvas AVANT la création de la texture :
    elle vit dans la scène, derrière le verre — le monogramme la
    réfracte. Tout est en positions FIXES : déterministe au pixel. */
-const INK_R = 43, INK_G = 36, INK_B = 80; /* encre aurore #2B2450 */
+/* MAJ 20/08 — sur le mur noir, l'encre de l'atelier devient une
+   craie claire (les mêmes alphas, tracés lumineux au lieu d'encrés) */
+const INK_R = 235, INK_G = 235, INK_B = 232; /* craie #EBEBE8 */
 
 function drawAtelierLayer(canvas: HTMLCanvasElement) {
   const W = canvas.width;
@@ -1083,7 +1284,7 @@ async function buildWallBaseAsync(yieldFn: YieldFn, onStep: (p: number) => void)
     const c = await paintCanvasInto(WALL_TEX_W, WALL_TEX_H, wallField, true, yieldFn, (row) =>
       onStep((row / WALL_TEX_H) * 0.9)
     );
-    drawAtelierLayer(c);
+    if (MUR_PEINT) drawAtelierLayer(c);
     onStep(1);
     wallBaseCanvas = c;
   } else {
@@ -1094,7 +1295,7 @@ async function buildWallBaseAsync(yieldFn: YieldFn, onStep: (p: number) => void)
     onStep(0.55);
     await addFilmGrain(up, yieldFn);
     onStep(0.9);
-    drawAtelierLayer(up);
+    if (MUR_PEINT) drawAtelierLayer(up);
     onStep(1);
     wallBaseCanvas = up;
   }
@@ -1106,14 +1307,14 @@ function getWallBaseCanvas() {
     if (!VIEW.wide) {
       /* legacy : le pipeline du run 1, identique au pixel */
       wallBaseCanvas = paintCanvas(WALL_TEX_W, WALL_TEX_H, wallField);
-      drawAtelierLayer(wallBaseCanvas);
+      if (MUR_PEINT) drawAtelierLayer(wallBaseCanvas);
     } else {
       /* wide : champs 2048 → upscale → grain natif → vectoriel
          natif (grille, filigrane, annotations à pleine densité) */
       const fields = paintCanvas(WALL_TEX_W, WALL_TEX_H, wallField, false);
       wallBaseCanvas = upscaleCanvas(fields, VIEW.wallOutW, VIEW.wallOutH);
       addFilmGrain(wallBaseCanvas);
-      drawAtelierLayer(wallBaseCanvas);
+      if (MUR_PEINT) drawAtelierLayer(wallBaseCanvas);
     }
   }
   return wallBaseCanvas;
@@ -1173,9 +1374,10 @@ function drawMonogramReflection(canvas: HTMLCanvasElement) {
      s'ÉTIRE (×1,4) pour rester lisible à l'écran (~120 px) */
   const STRETCH = 1.4;
   const grad = ctx.createLinearGradient(0, ZP(0.32), 0, ZP(0.32 + LOGO_H * STRETCH));
-  grad.addColorStop(0, "rgba(43,36,80,0.16)");
-  grad.addColorStop(0.45, "rgba(52,44,96,0.07)");
-  grad.addColorStop(1, "rgba(43,36,80,0)");
+  /* sol noir : le reflet est une lueur claire, pas une ombre */
+  grad.addColorStop(0, "rgba(238,238,244,0.11)");
+  grad.addColorStop(0.45, "rgba(238,238,244,0.05)");
+  grad.addColorStop(1, "rgba(238,238,244,0)");
   ctx.save();
   /* le blur suit la densité de la texture (5 px @ 1536) */
   ctx.filter = `blur(${((5 * W) / 1536).toFixed(1)}px)`;
@@ -1264,6 +1466,33 @@ function getFloorTexture() {
   return floorTexture;
 }
 
+/* Yield rapide (MAJ 20/08) : setTimeout(0) est clampé à ≥ 4 ms par
+   les navigateurs (mesuré ~33 % de surcoût pur sur la peinture).
+   scheduler.yield() quand il existe, sinon MessageChannel — les
+   deux rendent la main SANS temps mort. */
+type SchedulerLike = { yield?: () => Promise<void> };
+const fastYield: () => Promise<void> = (() => {
+  if (typeof window !== "undefined") {
+    const sched = (window as unknown as { scheduler?: SchedulerLike }).scheduler;
+    if (sched?.yield) return () => sched.yield!();
+    if (typeof MessageChannel !== "undefined") {
+      const ch = new MessageChannel();
+      let pending: (() => void) | null = null;
+      ch.port1.onmessage = () => {
+        const r = pending;
+        pending = null;
+        r?.();
+      };
+      return () =>
+        new Promise<void>((resolve) => {
+          pending = resolve;
+          ch.port2.postMessage(0);
+        });
+    }
+  }
+  return () => new Promise<void>((r) => setTimeout(r, 0));
+})();
+
 /* ── Préparation asynchrone des textures — la scène sans gel ────
    Peint tout AVANT le montage du Canvas, en tranches qui rendent
    la main (~10-20 ms de travail par macro-tâche) : le poster et
@@ -1275,7 +1504,7 @@ export function prepareSceneTextures(
   onProgress?: (p: number) => void
 ): Promise<void> {
   if (scenePrepPromise) return scenePrepPromise;
-  const yieldFn: YieldFn = () => new Promise((r) => setTimeout(r, 0));
+  const yieldFn: YieldFn = fastYield;
   /* pondération : mur (peinture+grain) ~55 %, lame 8 %, sol 37 % */
   const emit = (p: number) => {
     onProgress?.(p);
@@ -1288,6 +1517,7 @@ export function prepareSceneTextures(
     }
   };
   scenePrepPromise = (async () => {
+    try { performance.mark("neva:paint-start"); } catch { /* silencieux */ }
     await buildWallBaseAsync(yieldFn, (p) => emit(p * 0.5));
     const base = wallBaseCanvas!;
     if (!wallFinalCanvas) {
@@ -1301,6 +1531,7 @@ export function prepareSceneTextures(
     emit(0.58);
     await buildFloorAsync(yieldFn, (p) => emit(0.58 + p * 0.4));
     emit(1);
+    try { performance.mark("neva:paint-done"); } catch { /* silencieux */ }
   })();
   return scenePrepPromise;
 }
@@ -1337,7 +1568,9 @@ function DawnBreath({ mid }: { mid: boolean }) {
   const matRef = useRef<THREE.MeshBasicMaterial>(null);
 
   const texture = useMemo(() => {
-    const w = 1024;
+    /* MAJ 20/08 : 512 suffit — le voile est un dégradé flou, et sa
+       peinture vivait en SYNCHRONE dans le render React */
+    const w = 512;
     const h = Math.round((w * (WALL_TOP - FLOOR_Y)) / WALL_W);
     const canvas = document.createElement("canvas");
     canvas.width = w;
@@ -1514,26 +1747,32 @@ const GLSL_SAMPLER = `
 		float tBack = rd.z > 0.0001 ? ( ${fmt(BACK_WALL_Z)} - ro.z ) / rd.z : 1e8;
 		if ( tBack < 0.0 ) tBack = 1e8;
 		float rr = applyIorToRoughness( roughness, ior );
+		/* MAJ soie : le flou de réfraction est PLAFONNÉ (lod ≤ 3,5) —
+		   au-delà, les mips grossiers du satin se lisaient en gros
+		   carrés mous dans le verre givré. */
 		vec4 s;
 		if ( tFloor < tWall && tFloor < tBack ) {
 			vec3 p = ro + rd * tFloor;
 			vec2 uv = vec2( ( p.x - ${fmt(WALL_X0)} ) / ${fmt(WALL_W)}, 1.0 - ( p.z - ${fmt(WALL_Z)} ) / ${fmt(FLOOR_D)} );
-			s = textureBicubic( uFloorMap, clamp( uv, 0.002, 0.998 ), ${fmt(Math.log2(VIEW.floorOutW))} * rr );
+			s = textureBicubic( uFloorMap, clamp( uv, 0.002, 0.998 ), min( ${fmt(Math.log2(VIEW.floorOutW))} * rr, 3.5 ) );
 		} else if ( tBack < tWall ) {
 			/* mur virtuel derrière la caméra — même matière, en miroir */
 			vec3 p = ro + rd * tBack;
 			vec2 uv = vec2( 1.0 - ( p.x - ${fmt(WALL_X0)} ) / ${fmt(WALL_W)}, ( p.y - ${fmt(FLOOR_Y)} ) / ${fmt(WALL_TOP - FLOOR_Y)} );
-			s = textureBicubic( uWallMap, clamp( uv, 0.002, 0.998 ), ${fmt(Math.log2(VIEW.wallOutW))} * ( rr + 0.06 ) );
+			s = textureBicubic( uWallMap, clamp( uv, 0.002, 0.998 ), min( ${fmt(Math.log2(VIEW.wallOutW))} * ( rr + 0.06 ), 3.5 ) );
 		} else {
 			vec3 p = ro + rd * min( tWall, 44.0 );
 			vec2 uv = vec2( ( p.x - ${fmt(WALL_X0)} ) / ${fmt(WALL_W)}, ( p.y - ${fmt(FLOOR_Y)} ) / ${fmt(WALL_TOP - FLOOR_Y)} );
-			s = textureBicubic( uWallMap, clamp( uv, 0.002, 0.998 ), ${fmt(Math.log2(VIEW.wallOutW))} * rr );
+			s = textureBicubic( uWallMap, clamp( uv, 0.002, 0.998 ), min( ${fmt(Math.log2(VIEW.wallOutW))} * rr, 3.5 ) );
 		}
 		/* le cristal concentre : gain de contraste sur le décor
-		   traversé, pivot calé sur l'ivoire du cyc (~0.88) — les
-		   ombres, la grille et la lettre fantôme s'enfoncent dans le
-		   verre, les clairs restent clairs sans jamais saturer */
-		s.rgb = clamp( ( s.rgb - 0.88 ) * 1.34 + 0.878, vec3( 0.10 ), vec3( 0.988 ) );
+		   traversé, pivot calé sur le NOIR du cyc (~0.046, MAJ 20/08)
+		   avec une pointe de lift — le verre reste lisible sur la
+		   nuit sans jamais virer au blob sombre.
+		   MAJ whaou : gain 1,55 → 1,9 — le backdrop enrichi (lobes
+		   aurore, streaks) doit se DÉFORMER visiblement à travers
+		   chaque pièce (test d'acceptation a). */
+		s.rgb = clamp( ( s.rgb - 0.042 ) * 2.05 + 0.105, vec3( 0.014 ), vec3( 0.95 ) );
 		return s;
 	}
 `;
@@ -1576,7 +1815,7 @@ function patchGlassShader(
     chunk
   );
 }
-const glassCacheKey = () => "dawn-glass-14";
+const glassCacheKey = () => "dawn-glass-18-lumen";
 
 type GlassProps = {
   thickness?: number;
@@ -1587,17 +1826,30 @@ type GlassProps = {
   attenuationColor?: string;
   envMapIntensity?: number;
   bend?: number;
+  iridescence?: number;
+  clearcoat?: number;
+  clearcoatRoughness?: number;
 };
 
 function Glass({
   thickness = 1.0,
   ior = 1.5,
-  roughness = 0.025,
-  dispersion = 0.25,
-  attenuationDistance = 6,
-  attenuationColor = "#f1edfb",
-  envMapIntensity = 0.35,
+  /* MAJ whaou — recette P2.3 : roughness 0.06 par défaut (sphères),
+     0.10 monogramme ; clearcoat 1.0 / 0.05 (le vernis « verre
+     mouillé » qui attrape les softbox) ; iridescence ≤ 0.12 en
+     appoint SEULEMENT (le 0.85 posait un film beige laiteux) ;
+     attenuationColor #cfc2ee — la teinte lilas DANS l'épaisseur. */
+  roughness = 0.06,
+  dispersion = 0.3,
+  attenuationDistance = 2.2,
+  attenuationColor = "#cfc2ee",
+  envMapIntensity = 1.5,
   bend = DEFAULT_BEND,
+  /* TOUJOURS > 0 sur toutes les pièces : les defines du shader
+     restent les mêmes, le programme partagé (cache key) unique. */
+  iridescence = 0.1,
+  clearcoat = 1.0,
+  clearcoatRoughness = 0.05,
 }: GlassProps) {
   /* Matériau construit impérativement : R3F n'applique pas
      onBeforeCompile/customProgramCacheKey passés en props JSX — le
@@ -1615,6 +1867,14 @@ function Glass({
       attenuationDistance,
       specularIntensity: 1,
       envMapIntensity,
+      iridescence,
+      iridescenceIOR: 1.32,
+      /* plage d'épaisseur TRÈS large : le film déroule le spectre
+         plusieurs fois au fil de l'angle — l'arc-en-ciel VISIBLE
+         des reflets, façon bulle de savon */
+      iridescenceThicknessRange: [140, 940],
+      clearcoat,
+      clearcoatRoughness,
     });
     m.userData.bend = bend;
     m.onBeforeCompile = patchGlassShader;
@@ -1629,6 +1889,9 @@ function Glass({
     attenuationColor,
     envMapIntensity,
     bend,
+    iridescence,
+    clearcoat,
+    clearcoatRoughness,
   ]);
 
   useEffect(() => () => material.dispose(), [material]);
@@ -1745,7 +2008,8 @@ function Monogram({ mid }: { mid: boolean }) {
     if (mid) return;
     const mat = mesh.current.material as THREE.MeshPhysicalMaterial;
     if (mat && "dispersion" in mat) {
-      mat.dispersion = 0.55 + 0.12 * Math.sin((t * Math.PI * 2) / 28);
+      /* le spectre respire dans la plage du brief (0,2-0,35) */
+      mat.dispersion = 0.28 + 0.06 * Math.sin((t * Math.PI * 2) / 28);
     }
   });
 
@@ -1757,13 +2021,18 @@ function Monogram({ mid }: { mid: boolean }) {
       rotation={[0, -0.34, 0]}
     >
       <Glass
-        thickness={1.45}
-        ior={1.52}
-        dispersion={mid ? 0 : 0.55}
-        roughness={0.015}
-        attenuationDistance={2.4}
-        attenuationColor="#f2eefb"
-        envMapIntensity={0.85}
+        thickness={1.2}
+        ior={1.5}
+        /* dispersion 0,2-0,35 (brief P2.3) : arêtes irisées effet
+           joaillerie — le 0,95 délavait tout en arc-en-ciel flou */
+        dispersion={mid ? 0 : 0.32}
+        roughness={0.1}
+        attenuationDistance={1.6}
+        attenuationColor="#cfc2ee"
+        envMapIntensity={1.7}
+        iridescence={0.12}
+        clearcoat={1.0}
+        clearcoatRoughness={0.05}
       />
     </mesh>
   );
@@ -1834,14 +2103,15 @@ function Sculpture({ mid }: { mid: boolean }) {
       >
         <torusGeometry args={[0.42, 0.185, 64, 160]} />
         <Glass
-          thickness={0.3}
+          thickness={0.6}
           ior={1.5}
-          dispersion={mid ? 0 : 0.22}
-          roughness={0.02}
-          attenuationDistance={1.4}
-          attenuationColor="#eae5f6"
-          envMapIntensity={0.15}
-          bend={0.34}
+          dispersion={mid ? 0 : 0.35}
+          roughness={0.06}
+          attenuationDistance={1.2}
+          attenuationColor="#cfc2ee"
+          envMapIntensity={1.8}
+          iridescence={0.12}
+          bend={0.5}
         />
       </mesh>
 
@@ -1852,12 +2122,13 @@ function Sculpture({ mid }: { mid: boolean }) {
         <sphereGeometry args={[0.4, 64, 64]} />
         <Glass
           thickness={0.8}
-          ior={1.45}
-          dispersion={mid ? 0 : 0.08}
-          roughness={0.17}
-          attenuationDistance={2.8}
-          attenuationColor="#eee9f8"
-          envMapIntensity={1.0}
+          ior={1.5}
+          dispersion={mid ? 0 : 0.2}
+          /* verre CLAIR (le 0,17 en faisait une bille laiteuse) */
+          roughness={0.06}
+          attenuationDistance={2.0}
+          attenuationColor="#cfc2ee"
+          envMapIntensity={1.6}
           bend={0.5}
         />
       </mesh>
@@ -1868,8 +2139,8 @@ function Sculpture({ mid }: { mid: boolean }) {
         <sphereGeometry args={[0.14, 48, 48]} />
         <Glass
           thickness={0.28}
-          roughness={0.02}
-          dispersion={mid ? 0 : 0.15}
+          roughness={0.06}
+          dispersion={mid ? 0 : 0.35}
           bend={0.45}
         />
       </mesh>
@@ -1887,9 +2158,16 @@ function Sculpture({ mid }: { mid: boolean }) {
 function SceneLights() {
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[-4, 7, 5]} intensity={0.45} color="#fff6f2" />
-      <Environment resolution={512} frames={1}>
+      {/* MAJ whaou — DEUX rims en contre (~120-140° de la caméra,
+          brief P2.4) : le liseré lumineux continu qui fait exister
+          le verre sur la nuit. Jamais de blob sombre. */}
+      <ambientLight intensity={0.22} />
+      <directionalLight position={[-4, 7, 5]} intensity={0.55} color="#fff6f2" />
+      <directionalLight position={[5.5, 2.2, -4.5]} intensity={2.2} color="#cfc7f2" />
+      <directionalLight position={[-5.2, 3.4, -4.2]} intensity={1.6} color="#e8d9c8" />
+      {/* budget documenté GIVRE §4 : 256 (le 512 était un écart) —
+          cubemap rendu une seule fois, reflets doux */}
+      <Environment resolution={256} frames={1}>
         {/* softbox fenêtre — deux montants ÉTROITS : le verre poli
             se reconnaît à ses reflets fins, les grandes nappes
             rendent les courbes laiteuses */}
@@ -1925,19 +2203,54 @@ function SceneLights() {
           scale={[5, 1.5, 1]}
           target={[0.8, 0, 0]}
         />
-        {/* rim froid à droite — détache les bords */}
+        {/* rim froid à droite — détache les bords (renforcé sur la
+            nuit : c'est lui qui dessine la silhouette du verre) */}
         <Lightformer
           form="rect"
-          intensity={2.2}
+          intensity={4.5}
           position={[6.2, 1.6, 1.6]}
           scale={[0.22, 4.5, 1]}
           target={[0.8, 0.2, 0]}
         />
-        {/* strip bas-avant très faible : les chanfreins inférieurs
-            ne meurent pas noirs */}
+        {/* MAJ whaou — rims ARRIÈRE (en contre, ~130° caméra) : le
+            liseré continu sur TOUTES les silhouettes (test b) */}
         <Lightformer
           form="rect"
-          intensity={0.55}
+          intensity={7}
+          position={[5.0, 2.4, -3.6]}
+          scale={[0.34, 5.4, 1]}
+          target={[0.8, 0.4, 0]}
+        />
+        <Lightformer
+          form="rect"
+          intensity={6.5}
+          position={[-4.4, 1.6, -3.2]}
+          scale={[0.32, 5.4, 1]}
+          target={[0.6, 0.2, 0]}
+        />
+        {/* étincelles — strips FINES très intenses (le sparkle sans
+            bloom, brief P2.6) : des points blancs qui accrochent
+            les chanfreins et le clearcoat */}
+        <Lightformer
+          form="rect"
+          intensity={14}
+          position={[-2.6, 6.4, 3.2]}
+          scale={[0.07, 1.6, 1]}
+          target={[0.6, 0.6, 0]}
+        />
+        <Lightformer
+          form="rect"
+          intensity={11}
+          position={[3.4, 5.2, 2.4]}
+          scale={[0.06, 1.3, 1]}
+          target={[1.0, 0.4, 0]}
+        />
+        {/* strip bas-avant : les chanfreins inférieurs ne meurent
+            pas noirs (MAJ whaou : 0,55 → 1,3 — la pointe du V se
+            confondait avec la nuit) */}
+        <Lightformer
+          form="rect"
+          intensity={1.3}
           position={[0.5, -2.6, 5]}
           scale={[6, 0.3, 1]}
           target={[0.8, -0.4, 0]}
@@ -1950,12 +2263,23 @@ function SceneLights() {
           scale={[11, 6, 1]}
           target={[0, 0, 0]}
         />
+        {/* MAJ whaou — la carte blanche DERRIÈRE la caméra : les
+            faces avant du verre reflètent ce qui vit côté
+            photographe — sans elle, elles ne renvoyaient que du
+            noir (le monogramme lisait « plastique charbon ») */}
+        <Lightformer
+          form="rect"
+          intensity={0.8}
+          position={[0.6, 2.2, 10]}
+          scale={[9, 5, 1]}
+          target={[0.8, 0.6, 0]}
+        />
         {/* rebonds du halo : les deux lobes du mur existent aussi
             dans l'environnement — la sphère satinée et les chanfreins
             attrapent le lilas haut-gauche et la pêche bas-droite */}
         <Lightformer
           form="rect"
-          intensity={0.55}
+          intensity={2.4}
           color="#c3b0f0"
           position={[-5.4, 4.6, -1.2]}
           scale={[4.5, 4, 1]}
@@ -1963,11 +2287,22 @@ function SceneLights() {
         />
         <Lightformer
           form="rect"
-          intensity={0.5}
+          intensity={2.1}
           color="#f6c9a2"
           position={[6.4, 0.5, 0.8]}
           scale={[3.5, 3, 1]}
           target={[0.5, 0.5, 0]}
+        />
+        {/* troisième teinte — un bleu glacier discret : avec le
+            lilas et la pêche, les reflets portent un vrai spectre
+            (l'« arc-en-ciel » vit dans le verre, jamais au mur) */}
+        <Lightformer
+          form="rect"
+          intensity={0.8}
+          color="#a9c8ff"
+          position={[-2.2, 2.2, 4.6]}
+          scale={[0.5, 3.4, 1]}
+          target={[0.8, 0.6, 0]}
         />
       </Environment>
     </>
@@ -2126,6 +2461,7 @@ function FpsGuard({
 }
 
 /* ── Le canvas — visibilité, DPR, crossfade ──────────────────── */
+
 export default function GlassSculpture({
   className,
   onReady,
@@ -2218,7 +2554,8 @@ export default function GlassSculpture({
       className={className}
       style={{
         opacity: ready ? 1 : 0,
-        transition: `opacity ${seenSession ? "0.6s" : "1.4s"} cubic-bezier(0.16, 1, 0.3, 1)`,
+        /* MAJ 20/08 : reveal ≤ 600 ms dans tous les cas (spec §3) */
+        transition: `opacity ${seenSession ? "0.5s" : "0.6s"} cubic-bezier(0.16, 1, 0.3, 1)`,
       }}
       aria-hidden
     >
@@ -2228,9 +2565,9 @@ export default function GlassSculpture({
           design. */}
       {texReady ? (
       <Canvas
-        /* run 2 : plafond 2 (un 4K en scaling 200 % rend natif) —
-           jamais au-delà, budget GIVRE §4. MID (run 3) : 1,5. */
-        dpr={tier === "mid" ? [1, 1.5] : [1, 2]}
+        /* MAJ 20/08 : plafond DPR 1,75 (spec chargement §5) —
+           MID reste à 1,5. */
+        dpr={tier === "mid" ? [1, 1.5] : [1, 1.75]}
         flat
         fallback={null}
         frameloop={booted && inView && pageVisible ? "always" : "never"}
@@ -2241,7 +2578,8 @@ export default function GlassSculpture({
           powerPreference: "high-performance",
         }}
         onCreated={(state) => {
-          state.gl.setClearColor("#f1efe9", 1);
+          /* fond TRANSPARENT : la soie DOM traverse le canvas */
+          state.gl.setClearColor(0x000000, 0);
           /* La passe de transmission interne n'est plus lue (le
              verre raycast le décor) : on la réduit à néant. */
           (
@@ -2251,7 +2589,7 @@ export default function GlassSculpture({
              macro-tâches, puis compile parallèle des programmes ;
              la boucle de rendu ne part qu'ensuite */
           (async () => {
-            const next = () => new Promise((r) => setTimeout(r, 0));
+            const next = fastYield;
             try {
               state.gl.initTexture(getWallTexture());
               await next();
@@ -2263,6 +2601,8 @@ export default function GlassSculpture({
             }
             setBooted(true);
             setReady(true);
+            /* mesure du chargement (spec §6) : temps jusqu'au reveal */
+            try { performance.mark("neva:reveal"); } catch { /* silencieux */ }
             onReady?.();
             try {
               window.dispatchEvent(
@@ -2282,10 +2622,24 @@ export default function GlassSculpture({
         style={{ pointerEvents: "none" }}
       >
         <CameraRig />
-        <DawnRoom />
-        <DawnBreath mid={tier === "mid"} />
-        <FloorCaustics mid={tier === "mid"} />
-        <AccentReveal />
+        {/* MAJ soie (2e passe) — le canvas est TRANSPARENT : la vraie
+            soie temps réel (SoieNoire, DOM) vit derrière le verre.
+            Le mur peint (DawnRoom/DawnBreath/AccentReveal) n'est plus
+            monté (il cachait le satin vivant) mais ses TEXTURES
+            restent uploadées : le raycast de réfraction du verre les
+            échantillonne toujours — le monogramme réfracte le drapé
+            peint, la page montre le drapé vivant, même matière.
+            Repasser MUR_PEINT à true pour retrouver le fond opaque. */}
+        {MUR_PEINT ? (
+          <>
+            <DawnRoom />
+            <DawnBreath mid={tier === "mid"} />
+            <AccentReveal />
+            {/* les caustiques n'existent que posées sur un sol —
+                flottantes sur la soie, elles se lisaient en voile */}
+            <FloorCaustics mid={tier === "mid"} />
+          </>
+        ) : null}
         <SceneLights />
         <Sculpture mid={tier === "mid"} />
         <FpsGuard tier={tier} onDemote={onDemote} />
@@ -2297,9 +2651,9 @@ export default function GlassSculpture({
           position={[SCULPT_X, FLOOR_Y + 0.01, 0.35]}
           scale={8.5}
           far={3}
-          blur={2.1}
-          opacity={0.26}
-          color="#8b7fa9"
+          blur={2.7}
+          opacity={0.38}
+          color="#000000"
           resolution={512}
         />
       </Canvas>

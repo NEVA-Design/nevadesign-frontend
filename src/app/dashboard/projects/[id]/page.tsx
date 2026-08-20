@@ -2,6 +2,7 @@ import { ArrowLeft, ArrowRight, Plus, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { backendGetJson } from "@/lib/api/backend-server";
+import { COMING_SOON } from "@/lib/feature-flags";
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
@@ -36,7 +37,7 @@ type ProjectDetail = {
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
   draft: { label: "Brouillon", className: "text-steel border-[color:var(--hairline-strong)]" },
-  ready: { label: "Prête", className: "text-[#3D7A58] border-[rgba(61,122,88,0.35)]" },
+  ready: { label: "Prête", className: "text-[#6FBF9F] border-[rgba(111,191,159,0.40)]" },
   exported: { label: "Exportée", className: "text-[color:var(--num-color)] border-[rgba(164,139,232,0.4)]" },
 };
 
@@ -86,12 +87,26 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       {/* En-tête projet — la DA du serveur en un regard */}
       <div className="mt-6 flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex items-start gap-5">
-          <span className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[color:var(--hairline)] bg-ink shadow-[0_12px_32px_rgba(43,36,80,0.25)]">
+          {/* Le logo exporté, présenté comme une pièce : un radial
+              aurore discret derrière, une ombre portée douce */}
+          <span className="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.10] bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_24px_48px_rgba(0,0,0,0.5)]">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(50% 60% at 50% 45%, rgba(184,161,232,0.06), transparent 70%)",
+              }}
+            />
             {project.logo_master?.url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={project.logo_master.url} alt="" className="h-full w-full object-contain p-2" />
+              <img
+                src={project.logo_master.url}
+                alt=""
+                className="relative h-full w-full object-contain p-2.5"
+              />
             ) : (
-              <span className="pv-display text-2xl text-white">{project.name.slice(0, 2).toUpperCase()}</span>
+              <span className="pv-display relative text-2xl text-ink">{project.name.slice(0, 2).toUpperCase()}</span>
             )}
           </span>
           <div className="min-w-0">
@@ -112,36 +127,45 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                 </span>
               ))}
               {project.palette.length > 0 ? (
-                <span className="ml-1 inline-flex h-5 items-center gap-1">
-                  {project.palette.slice(0, 6).map((color, i) => (
-                    <span
-                      key={`${color}-${i}`}
-                      className="h-3.5 w-3.5 rounded-full border border-white/60 shadow-[0_1px_3px_rgba(43,36,80,0.25)]"
-                      style={{ background: color }}
-                    />
+                <span className="nv-swatches ml-1" aria-hidden>
+                  {project.palette.slice(0, 5).map((color, i) => (
+                    <span key={`${color}-${i}`} style={{ background: color }} />
                   ))}
                 </span>
               ) : null}
             </div>
+            <p className="mt-3 font-mono text-[10px] tracking-[0.1em] text-mist">
+              {assets.length} création{assets.length > 1 ? "s" : ""} · projet créé {timeAgo(project.created_at)}
+            </p>
           </div>
         </div>
 
         {hasLogo ? (
-          <Link href={`/dashboard/projects/${project.id}/create`} className="shrink-0">
-            <span className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] transition-colors hover:bg-[#35305E]">
-              <Plus size={15} />
+          COMING_SOON ? (
+            <span
+              title="Disponible prochainement"
+              aria-disabled
+              className="inline-flex h-11 shrink-0 cursor-default items-center justify-center gap-2.5 rounded-[14px] border border-white/[0.12] bg-white/[0.04] px-5 text-sm font-medium text-ink opacity-55 shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
+            >
+              <Plus size={15} strokeWidth={1.5} />
               Nouvelle création
+              <span className="nv-badge-soon">À venir</span>
             </span>
-          </Link>
+          ) : (
+            <Link href={`/dashboard/projects/${project.id}/create`} className="pv-btn shrink-0">
+              <Plus size={15} strokeWidth={1.5} />
+              Nouvelle création
+            </Link>
+          )
         ) : null}
       </div>
 
       {/* Étape 1 obligatoire — le logo */}
       {!hasLogo ? (
-        <section className="pv-glass pv-edge relative mt-10 overflow-hidden rounded-2xl">
+        <section className="nv-card relative mt-10 overflow-hidden">
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-20 right-10 h-56 w-[420px] rounded-full bg-[radial-gradient(closest-side,rgba(164,139,232,0.16),transparent_70%)]"
+            className="pointer-events-none absolute -top-20 right-10 h-56 w-[420px] rounded-full bg-[radial-gradient(closest-side,rgba(184,161,232,0.16),transparent_70%)]"
           />
           <div className="relative flex flex-col gap-6 p-8 sm:p-10 md:flex-row md:items-center md:justify-between">
             <div className="max-w-xl">
@@ -155,12 +179,22 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                 jamais régénéré, toujours composé.
               </p>
             </div>
-            <Link href={`/dashboard/projects/${project.id}/create/logo`} className="shrink-0">
-              <span className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] transition-colors hover:bg-[#35305E]">
-                <Sparkles size={15} />
+            {COMING_SOON ? (
+              <span
+                title="Disponible prochainement"
+                aria-disabled
+                className="inline-flex h-12 shrink-0 cursor-default items-center justify-center gap-2.5 rounded-[14px] border border-white/[0.12] bg-white/[0.04] px-6 text-sm font-medium text-ink opacity-55 shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
+              >
+                <Sparkles size={15} strokeWidth={1.5} />
                 Créer le logo
+                <span className="nv-badge-soon">À venir</span>
               </span>
-            </Link>
+            ) : (
+              <Link href={`/dashboard/projects/${project.id}/create/logo`} className="pv-btn shrink-0">
+                <Sparkles size={15} strokeWidth={1.5} />
+                Créer le logo
+              </Link>
+            )}
           </div>
         </section>
       ) : null}
@@ -168,9 +202,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       {/* Créations par catégorie */}
       {categoriesWithAssets.length === 0 ? (
         hasLogo ? (
-          <div className="mt-12 rounded-xl border border-dashed border-[color:var(--hairline-strong)] px-6 py-14 text-center">
+          <div className="nv-card relative mt-12 overflow-hidden px-6 py-14 text-center">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 top-0 h-32 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(184,161,232,0.12),transparent_70%)]"
+            />
             <p className="text-lg font-semibold text-ink/85">Le logo est en place — à vous de jouer.</p>
-            <p className="mt-3 font-mono text-xs tracking-[0.06em] text-dusk">
+            <p className="mt-3 font-mono text-xs tracking-[0.06em] text-mist">
               Lancez votre première bannière depuis « Nouvelle création ».
             </p>
           </div>
@@ -210,8 +248,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                               className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
                             />
                           ) : (
-                            <span className="absolute inset-0 flex items-center justify-center font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">
-                              {asset.width} × {asset.height}
+                            <span className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                              <span aria-hidden className="pv-display text-lg text-mist">—</span>
+                              <span className="nv-badge-soon">Bientôt</span>
                             </span>
                           )}
                         </div>

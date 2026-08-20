@@ -223,7 +223,7 @@ function UserModal({
                   className={`min-h-[56px] rounded-lg border px-2 py-2.5 text-center transition-colors duration-300 ${
                     selectedPlan === p
                       ? "border-[rgba(164,139,232,0.35)] bg-[rgba(164,139,232,0.08)]"
-                      : "border-[color:var(--hairline)] hover:border-[#C9C9C0]"
+                      : "border-[color:var(--hairline)] hover:border-[rgba(255,255,255,0.14)]"
                   }`}
                 >
                   <span className={`block text-[13px] font-medium ${selectedPlan === p ? "text-[color:var(--num-color)]" : "text-ink/70"}`}>
@@ -267,8 +267,8 @@ function UserModal({
                 <span
                   className={`inline-flex items-center rounded-full border px-2 py-[3px] font-mono text-[10px] font-medium uppercase tracking-[0.14em] ${
                     user.subscription_status === "active"
-                      ? "border-[#C5DCD2] bg-[#EEF4F1] text-[#5E9B84]"
-                      : "border-[#EFC9C6] bg-[#FBEFEE] text-[#9E4A45]"
+                      ? "border-[rgba(111,191,159,0.40)] bg-[rgba(111,191,159,0.10)] text-[#6FBF9F]"
+                      : "border-[rgba(224,138,132,0.40)] bg-[rgba(224,138,132,0.10)] text-[#E08A84]"
                   }`}
                 >
                   {user.subscription_status ?? "inconnu"}

@@ -119,13 +119,21 @@ export default function GivreEnhance() {
         <div className="mx-auto max-w-[640px] text-center">
           <RevealBlock>
             <div className="pv-page-num justify-center [&>b]:text-[44px]">
-              <b>04</b>
+              <b>05</b>
               <span>/10</span>
             </div>
           </RevealBlock>
           <RevealBlock delay={0.06}>
-            <p className="mt-7 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
+            <p className="mt-7 flex items-center justify-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
               {t("enhance.label", "Enhance")}
+              {/* Pivot 20/08 : le module est « À venir » — la démo
+                  reste, l'accès est désactivé */}
+              <span
+                title={t("comingSoon.tooltip", "Disponible prochainement")}
+                className="rounded-full border border-[rgba(164,139,232,0.55)] bg-[rgba(164,139,232,0.14)] px-2.5 py-[3px] font-mono text-[9px] uppercase tracking-[0.12em] text-ink"
+              >
+                {t("comingSoon.badge", "À venir")}
+              </span>
             </p>
           </RevealBlock>
           <RevealMask className="mt-4">
@@ -150,7 +158,7 @@ export default function GivreEnhance() {
 
         {/* Le comparateur — dans son panneau de verre à arête chrome */}
         <RevealBlock delay={0.1}>
-          <div className="pv-glass pv-chrome-edge mt-10 rounded-[22px] p-[10px] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_2px_6px_rgba(96,84,140,0.1),0_16px_40px_rgba(96,84,140,0.13)] sm:mt-14">
+          <div className="pv-glass pv-chrome-edge mt-10 rounded-[22px] p-[10px] shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_2px_6px_rgba(0,0,0,0.40),0_16px_40px_rgba(0,0,0,0.50)] sm:mt-14">
             <div
               ref={frameRef}
               className="relative h-[50vh] min-h-[360px] w-full touch-none select-none overflow-hidden rounded-[12px] bg-pearl sm:h-[56vh] sm:max-h-[600px]"

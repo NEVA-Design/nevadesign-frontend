@@ -346,8 +346,8 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
       className={cn(
         "inline-flex items-center gap-2 rounded-full border px-4 py-1.5 font-mono text-[11px] tracking-[0.04em]",
         training?.installed
-          ? "border-[rgba(61,122,88,0.35)] bg-[rgba(61,122,88,0.07)] text-[#3D7A58]"
-          : "border-[rgba(220,80,80,0.35)] bg-[rgba(220,80,80,0.06)] text-[#B4443C]"
+          ? "border-[rgba(111,191,159,0.40)] bg-[rgba(111,191,159,0.10)] text-[#6FBF9F]"
+          : "border-[rgba(220,80,80,0.35)] bg-[rgba(220,80,80,0.06)] text-[#E08A84]"
       )}
     >
       {training?.installed ? <ShieldCheck size={13} /> : <AlertTriangle size={13} />}
@@ -372,7 +372,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
         <ul className="mt-6 flex flex-col gap-1.5 text-[13px] text-steel">
           {training.manques.map((m) => (
             <li key={m} className="flex items-center gap-2">
-              <AlertTriangle size={12} className="shrink-0 text-[#B4443C]" />
+              <AlertTriangle size={12} className="shrink-0 text-[#E08A84]" />
               {m}
             </li>
           ))}
@@ -417,7 +417,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={master.url} alt="Logo transparent" className="max-h-[84px] max-w-[84px] object-contain" />
                 </div>
-                <div className="bg-white/70 px-4 py-3">
+                <div className="bg-white/5 px-4 py-3">
                   <span className="block text-[14px] font-medium text-ink">Garder transparent</span>
                   <span className="mt-0.5 block text-xs leading-relaxed text-steel">
                     Le PNG alpha se pose partout — aucun fond, aucun coût.
@@ -452,7 +452,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                         <Icon size={26} className="text-white/85" />
                       )}
                     </div>
-                    <div className="bg-white/70 px-4 py-3">
+                    <div className="bg-white/5 px-4 py-3">
                       <span className="block text-[14px] font-medium text-ink">{item.label}</span>
                       <span className="mt-0.5 block text-xs leading-relaxed text-steel">{item.detail}</span>
                       <span className="mt-1 block font-mono text-[10px] text-dusk">2 propositions — 2 retouches</span>
@@ -484,14 +484,14 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                     className={cn(
                       "group relative block aspect-square w-full overflow-hidden rounded-2xl border transition-all duration-300",
                       selected
-                        ? "border-[rgba(164,139,232,0.75)] shadow-[0_0_0_2px_rgba(164,139,232,0.45),0_18px_44px_rgba(96,84,140,0.25)]"
+                        ? "border-[rgba(164,139,232,0.75)] shadow-[0_0_0_2px_rgba(164,139,232,0.45),0_18px_44px_rgba(0,0,0,0.55)]"
                         : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.45)]"
                     )}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={fond.previewUrl} alt="Fond proposé (aperçu composé)" className="h-full w-full object-cover" />
                     {selected ? (
-                      <span className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-ink text-white shadow-[0_2px_10px_rgba(43,36,80,0.45)]">
+                      <span className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-ink text-[#060606] shadow-[0_2px_10px_rgba(0,0,0,0.6)]">
                         <Check size={14} strokeWidth={2.6} />
                       </span>
                     ) : null}
@@ -499,7 +499,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                 );
               })}
               {fondsGenerating ? (
-                <div className="relative aspect-square overflow-hidden rounded-2xl border border-[color:var(--hairline)] bg-white/50">
+                <div className="relative aspect-square overflow-hidden rounded-2xl border border-[color:var(--hairline)] bg-white/5">
                   <div className="absolute inset-0 animate-pulse bg-[linear-gradient(120deg,transparent_30%,rgba(164,139,232,0.14)_50%,transparent_70%)]" />
                   <span className="absolute inset-0 flex items-center justify-center">
                     <Loader2 size={22} className="animate-spin text-mist" />
@@ -527,14 +527,9 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                   type="button"
                   disabled={!fondChosen || fondApplying}
                   onClick={validateFond}
-                  className={cn(
-                    "inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium transition-all",
-                    fondChosen && !fondApplying
-                      ? "bg-ink text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] hover:bg-[#35305E]"
-                      : "cursor-not-allowed bg-ink/10 text-mist"
-                  )}
+                  className="pv-btn"
                 >
-                  {fondApplying ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
+                  {fondApplying ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} strokeWidth={1.5} />}
                   {fondApplying ? "Déclinaisons…" : "Valider ce fond — déclinaisons"}
                 </button>
               </div>
@@ -605,11 +600,9 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
             ) : null}
 
             <div className="mt-10 flex flex-wrap items-center gap-4">
-              <Link href={`/dashboard/projects/${projectId}/create`}>
-                <span className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] transition-colors hover:bg-[#35305E]">
-                  <Sparkles size={15} />
-                  Lancer une création
-                </span>
+              <Link href={`/dashboard/projects/${projectId}/create`} className="pv-btn">
+                <Sparkles size={15} strokeWidth={1.5} />
+                Lancer une création
               </Link>
               {!logoScene ? (
                 <button type="button" onClick={() => setEtapeB("choix")} className="pv-link text-[13px]">
@@ -624,7 +617,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
         ) : null}
 
         {error ? (
-          <p className="mt-6 rounded-xl border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-4 py-3 text-[13px] text-[#B4443C]">
+          <p className="mt-6 rounded-xl border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-4 py-3 text-[13px] text-[#E08A84]">
             {error}
           </p>
         ) : null}
@@ -724,7 +717,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                 }}
                 placeholder="ex. fruit, été, juteux"
                 maxLength={80}
-                className="mt-8 h-14 w-full rounded-2xl border border-[color:var(--hairline-strong)] bg-white/70 px-5 text-[15px] text-ink outline-none transition-colors placeholder:text-mist focus:border-[rgba(164,139,232,0.65)]"
+                className="mt-8 h-14 w-full rounded-2xl border border-[color:var(--hairline-strong)] bg-white/5 px-5 text-[15px] text-ink outline-none transition-colors placeholder:text-mist focus:border-[rgba(164,139,232,0.65)]"
               />
               <div className="mt-5 flex flex-wrap gap-2">
                 {SUJET_CHIPS.map((chip) => {
@@ -787,7 +780,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                       className={cn(
                         "group overflow-hidden rounded-2xl border text-left transition-all duration-300",
                         selected
-                          ? "border-[rgba(164,139,232,0.65)] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_18px_44px_rgba(96,84,140,0.22)]"
+                          ? "border-[rgba(164,139,232,0.65)] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_18px_44px_rgba(0,0,0,0.52)]"
                           : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
                       )}
                     >
@@ -808,12 +801,12 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                           />
                         )}
                         {selected ? (
-                          <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-white text-ink">
+                          <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#060606]">
                             <Check size={13} strokeWidth={2.6} />
                           </span>
                         ) : null}
                       </div>
-                      <div className="bg-white/70 px-5 py-4">
+                      <div className="bg-white/5 px-5 py-4">
                         <span className="block text-[15px] font-medium text-ink">{item.label}</span>
                         <span className="mt-1 block text-xs leading-relaxed text-steel">{item.detail}</span>
                       </div>
@@ -846,7 +839,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                       className={cn(
                         "group overflow-hidden rounded-2xl border text-left transition-all duration-300",
                         selected
-                          ? "border-[rgba(164,139,232,0.65)] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_18px_44px_rgba(96,84,140,0.22)]"
+                          ? "border-[rgba(164,139,232,0.65)] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_18px_44px_rgba(0,0,0,0.52)]"
                           : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
                       )}
                     >
@@ -859,12 +852,12 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                           {projectName.trim()[0]?.toUpperCase() ?? "N"}
                         </span>
                         {selected ? (
-                          <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-white text-ink">
+                          <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#060606]">
                             <Check size={13} strokeWidth={2.6} />
                           </span>
                         ) : null}
                       </div>
-                      <div className="bg-white/70 px-4 py-3">
+                      <div className="bg-white/5 px-4 py-3">
                         <span className="block text-[14px] font-medium text-ink">{item.label}</span>
                         <span className="mt-0.5 block text-xs leading-relaxed text-steel">{item.detail}</span>
                       </div>
@@ -897,18 +890,18 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                       className={cn(
                         "group overflow-hidden rounded-2xl border text-left transition-all duration-300",
                         selected
-                          ? "border-[rgba(164,139,232,0.65)] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_18px_44px_rgba(96,84,140,0.22)]"
+                          ? "border-[rgba(164,139,232,0.65)] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_18px_44px_rgba(0,0,0,0.52)]"
                           : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
                       )}
                     >
                       <div className="relative h-[72px]" style={{ background: item.swatch }}>
                         {selected ? (
-                          <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-white text-ink">
+                          <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#060606]">
                             <Check size={13} strokeWidth={2.6} />
                           </span>
                         ) : null}
                       </div>
-                      <div className="bg-white/70 px-4 py-3">
+                      <div className="bg-white/5 px-4 py-3">
                         <span className="block text-[14px] font-medium text-ink">{item.label}</span>
                       </div>
                     </button>
@@ -951,7 +944,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
               </div>
 
               {couleurMode === "palette" ? (
-                <p className="mt-6 max-w-md rounded-2xl border border-[color:var(--hairline)] bg-white/60 px-5 py-4 text-[13px] leading-relaxed text-steel">
+                <p className="mt-6 max-w-md rounded-2xl border border-[color:var(--hairline)] bg-white/5 px-5 py-4 text-[13px] leading-relaxed text-steel">
                   Le moteur garde la palette dérivée de ton projet (univers, énergie,
                   couleur dominante) — le comportement d&apos;origine.
                 </p>
@@ -964,7 +957,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                     value={HEX_RE.test(couleurUnie) ? couleurUnie : "#7C6BD4"}
                     onChange={(e) => setCouleurUnie(e.target.value.toUpperCase())}
                     aria-label="Choisir la couleur"
-                    className="h-14 w-14 cursor-pointer rounded-2xl border border-[color:var(--hairline-strong)] bg-white/70 p-1"
+                    className="h-14 w-14 cursor-pointer rounded-2xl border border-[color:var(--hairline-strong)] bg-white/5 p-1"
                   />
                   <input
                     type="text"
@@ -972,7 +965,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                     onChange={(e) => setCouleurUnie(e.target.value.toUpperCase())}
                     maxLength={7}
                     className={cn(
-                      "h-12 w-36 rounded-xl border bg-white/70 px-4 font-mono text-[14px] text-ink outline-none transition-colors",
+                      "h-12 w-36 rounded-xl border bg-white/5 px-4 font-mono text-[14px] text-ink outline-none transition-colors",
                       HEX_RE.test(couleurUnie)
                         ? "border-[color:var(--hairline-strong)] focus:border-[rgba(164,139,232,0.65)]"
                         : "border-[rgba(220,80,80,0.5)]"
@@ -1008,7 +1001,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                             setDegradeCouleurs((prev) => prev.map((c, i) => (i === index ? e.target.value.toUpperCase() : c)))
                           }
                           aria-label={`Couleur ${index + 1} du dégradé`}
-                          className="h-11 w-11 cursor-pointer rounded-xl border border-[color:var(--hairline-strong)] bg-white/70 p-1"
+                          className="h-11 w-11 cursor-pointer rounded-xl border border-[color:var(--hairline-strong)] bg-white/5 p-1"
                         />
                         <input
                           type="text"
@@ -1018,7 +1011,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                           }
                           maxLength={7}
                           className={cn(
-                            "h-10 w-28 rounded-lg border bg-white/70 px-3 font-mono text-[13px] text-ink outline-none",
+                            "h-10 w-28 rounded-lg border bg-white/5 px-3 font-mono text-[13px] text-ink outline-none",
                             HEX_RE.test(couleur) ? "border-[color:var(--hairline-strong)]" : "border-[rgba(220,80,80,0.5)]"
                           )}
                         />
@@ -1080,7 +1073,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                 onChange={(e) => setInterdits(e.target.value)}
                 placeholder="ex. pas de noir, pas de blason"
                 maxLength={160}
-                className="mt-8 h-14 w-full rounded-2xl border border-[color:var(--hairline-strong)] bg-white/70 px-5 text-[15px] text-ink outline-none transition-colors placeholder:text-mist focus:border-[rgba(164,139,232,0.65)]"
+                className="mt-8 h-14 w-full rounded-2xl border border-[color:var(--hairline-strong)] bg-white/5 px-5 text-[15px] text-ink outline-none transition-colors placeholder:text-mist focus:border-[rgba(164,139,232,0.65)]"
               />
             </section>
           ) : null}
@@ -1095,7 +1088,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                 C&apos;est le brief exact transmis au directeur artistique. Clique une
                 ligne pour la corriger.
               </p>
-              <div className="mt-8 overflow-hidden rounded-2xl border border-[color:var(--hairline-strong)] bg-white/70">
+              <div className="mt-8 overflow-hidden rounded-2xl border border-[color:var(--hairline-strong)] bg-white/5">
                 {recapLines.map((line, index) => (
                   <button
                     key={line.label}
@@ -1150,7 +1143,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                   {[0, 1, 2].map((i) => (
                     <div
                       key={i}
-                      className="relative aspect-square overflow-hidden rounded-2xl border border-[color:var(--hairline)] bg-white/50"
+                      className="relative aspect-square overflow-hidden rounded-2xl border border-[color:var(--hairline)] bg-white/5"
                     >
                       <div className="absolute inset-0 animate-pulse bg-[linear-gradient(120deg,transparent_30%,rgba(164,139,232,0.14)_50%,transparent_70%)]" />
                       <span className="absolute inset-0 flex items-center justify-center">
@@ -1169,16 +1162,16 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                           type="button"
                           onClick={() => setChosen(prop.url)}
                           className={cn(
-                            "group relative block aspect-square w-full overflow-hidden rounded-2xl border bg-white transition-all duration-300",
+                            "group relative block aspect-square w-full overflow-hidden rounded-2xl border bg-white/5 transition-all duration-300",
                             selected
-                              ? "border-[rgba(164,139,232,0.75)] shadow-[0_0_0_2px_rgba(164,139,232,0.45),0_18px_44px_rgba(96,84,140,0.25)]"
+                              ? "border-[rgba(164,139,232,0.75)] shadow-[0_0_0_2px_rgba(164,139,232,0.45),0_18px_44px_rgba(0,0,0,0.55)]"
                               : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.45)]"
                           )}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={prop.url} alt={`Proposition ${index + 1} — ${prop.concept.nom}`} className="h-full w-full object-contain p-4" />
                           {selected ? (
-                            <span className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-ink text-white shadow-[0_2px_10px_rgba(43,36,80,0.45)]">
+                            <span className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-ink text-[#060606] shadow-[0_2px_10px_rgba(0,0,0,0.6)]">
                               <Check size={14} strokeWidth={2.6} />
                             </span>
                           ) : null}
@@ -1222,14 +1215,9 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
                     type="button"
                     disabled={!chosen || finalizing}
                     onClick={validateChoice}
-                    className={cn(
-                      "inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium transition-all",
-                      chosen && !finalizing
-                        ? "bg-ink text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] hover:bg-[#35305E]"
-                        : "cursor-not-allowed bg-ink/10 text-mist"
-                    )}
+                    className="pv-btn"
                   >
-                    {finalizing ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
+                    {finalizing ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} strokeWidth={1.5} />}
                     {finalizing ? "Master 4K…" : "Valider ce logo — master 4K"}
                   </button>
                 </div>
@@ -1240,7 +1228,7 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
       </AnimatePresence>
 
       {error ? (
-        <p className="mt-6 rounded-xl border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-4 py-3 text-[13px] text-[#B4443C]">
+        <p className="mt-6 rounded-xl border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-4 py-3 text-[13px] text-[#E08A84]">
           {error}
         </p>
       ) : null}
@@ -1264,15 +1252,10 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
             type="button"
             disabled={!canContinue}
             onClick={() => goTo(step + 1)}
-            className={cn(
-              "inline-flex h-11 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium transition-all",
-              canContinue
-                ? "bg-ink text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] hover:bg-[#35305E]"
-                : "cursor-not-allowed bg-ink/10 text-mist"
-            )}
+            className="pv-btn"
           >
             Continuer
-            <ChevronRight size={15} />
+            <ChevronRight size={15} strokeWidth={1.5} />
           </button>
         ) : null}
 
@@ -1281,16 +1264,11 @@ export default function LogoWizard({ projectId, projectName, devInitial }: Props
             type="button"
             disabled={!answers || generating}
             onClick={() => launchProposals(false)}
-            className={cn(
-              "inline-flex h-11 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium transition-all",
-              answers && !generating
-                ? "bg-ink text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] hover:bg-[#35305E]"
-                : "cursor-not-allowed bg-ink/10 text-mist"
-            )}
+            className="pv-btn"
           >
-            {generating ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
+            {generating ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} strokeWidth={1.5} />}
             Générer 3 propositions
-            <ArrowRight size={15} />
+            <ArrowRight size={15} strokeWidth={1.5} />
           </button>
         ) : null}
       </div>

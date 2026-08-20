@@ -126,8 +126,8 @@ export default function GivrePacks() {
                   className={cn(
                     "pv-card-hover relative flex h-full flex-col rounded-[22px] p-6 sm:p-7",
                     isHighlight
-                      ? "pv-glass pv-aurora-ring shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_2px_6px_rgba(96,84,140,0.1),0_16px_40px_rgba(96,84,140,0.13)]"
-                      : "pv-glass pv-glass--still shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_2px_5px_rgba(96,84,140,0.08),0_12px_30px_rgba(96,84,140,0.1)]"
+                      ? "pv-glass pv-aurora-ring shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_2px_6px_rgba(0,0,0,0.4),0_16px_40px_rgba(0,0,0,0.43)]"
+                      : "pv-glass pv-glass--still shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_2px_5px_rgba(0,0,0,0.38),0_12px_30px_rgba(0,0,0,0.4)]"
                   )}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">
@@ -159,7 +159,7 @@ export default function GivrePacks() {
                     </span>
                   </p>
 
-                  <ul className="mt-6 grid flex-1 content-start gap-2.5 border-t border-[rgba(43,36,80,0.07)] pt-6">
+                  <ul className="mt-6 grid flex-1 content-start gap-2.5 border-t border-[rgba(255,255,255,0.08)] pt-6">
                     {pack.features.map((feature, fi) => (
                       <li
                         key={feature}
@@ -204,7 +204,7 @@ export default function GivrePacks() {
         {/* Ressources du studio — les outils Photoshop, en carte
             secondaire : deux rangées d'un même registre */}
         <RevealBlock delay={0.18}>
-          <article className="pv-glass pv-glass--still mt-6 rounded-[22px] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_2px_5px_rgba(96,84,140,0.08),0_12px_30px_rgba(96,84,140,0.1)] sm:p-7">
+          <article className="pv-glass pv-glass--still mt-6 rounded-[22px] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_2px_5px_rgba(0,0,0,0.38),0_12px_30px_rgba(0,0,0,0.4)] sm:p-7">
             <div className="flex flex-wrap items-baseline justify-between gap-3">
               <h3 className="font-display text-[17px] font-medium tracking-[-0.01em] text-ink">
                 {t("resources.tools.title", "Ressources du studio")}

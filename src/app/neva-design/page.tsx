@@ -205,8 +205,8 @@ export default function Page() {
     <>
       {/* Givre impose sa lumière à la route : fond clair jusque
           sous l'overscroll, scrollbars et contrôles natifs clairs. */}
-      <style>{`html{color-scheme:light}body{background-color:#F1EFE9;color:#2B2450}`}</style>
-      <main className="pv-light min-h-screen bg-paper text-ink">
+      <style>{`html{color-scheme:dark}body{background-color:#060606;color:#F2F2F0}`}</style>
+      <main className="pv-light min-h-screen text-ink">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

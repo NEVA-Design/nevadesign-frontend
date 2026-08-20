@@ -8,16 +8,18 @@ import { useEffect, useRef } from "react";
  * (IntersectionObserver sur la bande centrale du viewport). Fixed :
  * il accompagne toute la lecture, en lg+ seulement.
  */
+/* Pivot 20/08 : studio (vitrine) puis avis, Neva Generative en 09
+   à la place de Tarifs/Packs (legacy sous flag). */
 const SECTIONS: readonly [string, string][] = [
-  ["top", "01 — Le studio"],
-  ["studio", "02 — Studio en direct"],
-  ["creations", "03 — Créations"],
-  ["enhance", "04 — Enhance"],
-  ["terrains", "05 — Terrains"],
-  ["modules", "06 — Modules"],
-  ["chiffres", "07 — Chiffres"],
-  ["pricing", "08 — Tarifs"],
-  ["packs", "09 — Packs"],
+  ["top", "01 — Accueil"],
+  ["studio", "02 — Le studio"],
+  ["avis", "03 — Avis clients"],
+  ["creations", "04 — Créations"],
+  ["enhance", "05 — Enhance"],
+  ["terrains", "06 — Terrains"],
+  ["modules", "07 — Modules"],
+  ["chiffres", "08 — Chiffres"],
+  ["generative", "09 — Neva Generative"],
   ["faq", "10 — FAQ"],
 ];
 

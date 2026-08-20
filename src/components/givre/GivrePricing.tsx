@@ -60,7 +60,7 @@ export default function GivrePricing() {
 
         {/* LE panneau — quatre plans en rangées, filets encre entre eux */}
         <RevealBlock delay={0.15} className="mt-12">
-          <div className="pv-glass relative mx-auto max-w-[clamp(940px,45vw,1180px)] rounded-[22px] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_2px_6px_rgba(96,84,140,0.1),0_16px_40px_rgba(96,84,140,0.13)] sm:px-5 sm:py-4">
+          <div className="pv-glass relative mx-auto max-w-[clamp(940px,45vw,1180px)] rounded-[22px] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_2px_6px_rgba(0,0,0,0.4),0_16px_40px_rgba(0,0,0,0.43)] sm:px-5 sm:py-4">
             {PLAN_ORDER.map((planId, index) => {
               const plan = PLANS[planId];
               const featured = planId === FEATURED_PLAN;
@@ -71,7 +71,7 @@ export default function GivrePricing() {
                        aurore porte seul l'emphase de la vedette */
                     <span
                       aria-hidden
-                      className="hidden h-px bg-[rgba(43,36,80,0.07)] lg:block"
+                      className="hidden h-px bg-[rgba(255,255,255,0.08)] lg:block"
                     />
                   ) : null}
 
@@ -83,7 +83,7 @@ export default function GivrePricing() {
                       "pv-ignite relative grid items-center gap-x-8 gap-y-5 rounded-[16px] px-4 py-5 sm:px-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.3fr)_auto]",
                       "mb-3 border border-carte-brd bg-carte lg:mb-0 lg:border-0 lg:bg-transparent",
                       featured &&
-                        "pv-aurora-ring border-transparent bg-[rgba(255,255,255,0.72)] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_22px_rgba(96,84,140,0.14)] lg:bg-[rgba(255,255,255,0.55)]"
+                        "pv-aurora-ring border-transparent bg-[rgba(255,255,255,0.05)] shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_8px_22px_rgba(0,0,0,0.44)] lg:bg-[rgba(255,255,255,0.05)]"
                     )}
                   >
                     {/* Identité du plan : badge DANS le flux (D11),

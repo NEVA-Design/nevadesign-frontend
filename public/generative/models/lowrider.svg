@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 240" width="680" height="240">
+  <defs>
+    <linearGradient id="sunset" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2A1030"/>
+      <stop offset="0.45" stop-color="#7A2242"/>
+      <stop offset="0.78" stop-color="#E8663A"/>
+      <stop offset="1" stop-color="#F7A83F"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFD98A"/>
+      <stop offset="1" stop-color="#F2603E"/>
+    </linearGradient>
+    <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.38" stop-color="#D9DDE8"/>
+      <stop offset="0.5" stop-color="#8A8FA6"/>
+      <stop offset="0.55" stop-color="#F4F6FB"/>
+      <stop offset="0.8" stop-color="#B9BECF"/>
+      <stop offset="1" stop-color="#6E7288"/>
+    </linearGradient>
+  </defs>
+  <rect width="680" height="240" fill="url(#sunset)"/>
+  <!-- soleil strié -->
+  <g>
+    <circle cx="340" cy="150" r="74" fill="url(#sun)"/>
+    <g fill="#7A2242">
+      <rect x="258" y="150" width="164" height="5" opacity="0.55"/>
+      <rect x="258" y="165" width="164" height="7" opacity="0.65"/>
+      <rect x="258" y="184" width="164" height="9" opacity="0.75"/>
+      <rect x="258" y="207" width="164" height="11" opacity="0.85"/>
+    </g>
+  </g>
+  <!-- route -->
+  <rect x="0" y="206" width="680" height="34" fill="#170A18"/>
+  <g stroke="#F7A83F" stroke-width="3" opacity="0.7">
+    <line x1="30" y1="223" x2="120" y2="223"/>
+    <line x1="200" y1="223" x2="290" y2="223"/>
+    <line x1="390" y1="223" x2="480" y2="223"/>
+    <line x1="560" y1="223" x2="650" y2="223"/>
+  </g>
+  <!-- le nom, chrome italique -->
+  <g transform="skewX(-8)">
+    <text x="368" y="118" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="92" font-weight="900" letter-spacing="6" fill="#170A18" opacity="0.5" transform="translate(4,5)">NEVA</text>
+    <text x="364" y="114" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="92" font-weight="900" letter-spacing="6" fill="url(#chrome)" stroke="#2A1030" stroke-width="1.5">NEVA</text>
+  </g>
+  <text x="340" y="150" text-anchor="middle" font-family="Consolas, 'Courier New', monospace" font-size="13" letter-spacing="10" fill="#FFD98A">LOWRIDER CLUB</text>
+</svg>

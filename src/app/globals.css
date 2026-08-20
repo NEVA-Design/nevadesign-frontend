@@ -1,71 +1,66 @@
 @import "tailwindcss";
 
 /* ════════════════════════════════════════════════════════════════════
-   NEVA DESIGN — GIVRE (docs/GIVRE.md)
-   Des panneaux de verre dépoli posés sur des scènes vivantes et
-   glacées. Le fond n'est jamais un aplat : dégradé lavande /
-   périwinkle / perle, rubans chromés, caustiques. Le verre floute
-   réellement ce qui passe derrière lui ; la typographie encre
-   indigo se pose dessus. La lumière vient du haut, légèrement à
-   gauche ; les ombres sont encrées bleutées, jamais noires.
+   NEVA DESIGN — GIVRE NOIR (MAJ 20/08 — pivot studio)
+   Le site vit sur un noir neutre : base #060606, sections alternées
+   #0A0A0A maximum (écart R/G/B ≤ 2, jamais de noir teinté). Le verre
+   devient du verre de nuit : cards bordure 1 px blanc 8 %, fond blanc
+   3-5 %. L'aurore lilas→pêche ne survit qu'en GLOW derrière les
+   éléments de verre (opacités réduites), jamais en aplat de fond.
+   Titres #F2F2F0, texte secondaire #9A9A9A — AA minimum partout.
    Deux voix typographiques : Geist (tout), Geist Mono (précision).
    ════════════════════════════════════════════════════════════════════ */
 
 @theme {
-  /* ── Fonds de scène — l'ivoire de l'atelier partout (D21) :
-     plus aucune base bleutée, le marketing et le produit vivent
-     dans la même lumière chaude. ─────────────────────────────── */
-  --color-frost: #F1EFE9;       /* base de page — ivoire atelier */
-  --color-pearl: #E9E7E1;       /* creux des scènes, ivoire posé */
-  --color-lavender: #C9C6E8;    /* pôle lavande des dégradés */
-  --color-periwinkle: #AFC2EC;  /* pôle froid des dégradés */
-  --color-glacier: #CBDCF2;     /* hautes lumières de scène */
-  --color-aurora: #E9D5E4;      /* aurore rosée, coins ≤ 12 % */
-  --color-blush: #F0D6DC;       /* rose des bords — scène dawn */
+  /* ── Fonds — noirs NEUTRES uniquement (écart R/G/B ≤ 2) :
+     base #060606, sections alternées #0A0A0A max. ───────────── */
+  --color-frost: #060606;       /* base de page — noir neutre */
+  --color-pearl: #0A0A0A;       /* creux des scènes, noir posé */
+  --color-lavender: #0A0A0A;    /* ex-pôle lavande — neutralisé (l'aurore ne vit qu'en glow) */
+  --color-periwinkle: #0A0A0A;  /* ex-pôle froid — neutralisé */
+  --color-glacier: #0A0A0A;     /* ex-hautes lumières — neutralisé */
+  --color-aurora: #0A0A0A;      /* ex-aurore rosée — neutralisé */
+  --color-blush: #0A0A0A;       /* ex-rose des bords — neutralisé */
 
-  /* Alias legacy (composants existants) — remappés atelier */
-  --color-paper: #F1EFE9;       /* = frost */
-  --color-porcelain: #FAF8F4;   /* surfaces posées, blanc chaud */
-  --color-linen: #E9E7E1;       /* = pearl */
-  --color-atelier: #F0EEEA;     /* fond produit — ivoire, pointe lilas */
+  /* Alias legacy (composants existants) — remappés noir */
+  --color-paper: #060606;       /* = frost */
+  --color-porcelain: #101010;   /* surfaces posées (cartes-tirages) */
+  --color-linen: #0A0A0A;       /* = pearl */
+  --color-atelier: #060606;     /* fond produit — même noir que le marketing */
 
-  /* ── Encres — violet nuit teinté, jamais de noir ni de bleu
-     froid (passe « encre aurore » 13/08) ─────────────────────── */
-  --color-ink: #2B2450;         /* titres, wordmark, nav — ≥ 12:1 */
-  --color-slate: #454060;       /* texte courant — ≥ 7:1 */
-  --color-mist: #5C6488;        /* tertiaire, métadonnées — ≥ 4,5:1 */
+  /* ── Textes — titres #F2F2F0, secondaire #9A9A9A (AA min) ─── */
+  --color-ink: #F2F2F0;         /* titres, wordmark, nav — 17,9:1 sur #060606 */
+  --color-slate: #B4B4B2;       /* texte courant — 9,7:1 */
+  --color-mist: #9A9A9A;        /* tertiaire, métadonnées — 7,1:1 */
 
   /* ── Chrome — matière, pas couleur ────────────────────────── */
   --color-silver: #C7CAD9;      /* creux des rubans */
   --color-chrome-low: #989DB4;  /* ombre chromée */
 
-  /* ── Surface encre — la seule surface sombre du produit ───── */
-  --color-void: #241F45;        /* surface encre (panneaux, lightbox) */
-  --color-abyss: #241F45;       /* alias historique — même encre */
-  --color-encre-relief: #35305E;/* relief éclairci de la surface encre */
+  /* ── Surfaces de relief — un cran au-dessus du fond ───────── */
+  --color-void: #101010;        /* panneaux, lightbox (ex-encre #241F45) */
+  --color-abyss: #101010;       /* alias historique — même surface */
+  --color-encre-relief: #1A1A1A;/* relief éclairci du panneau */
 
-  /* ── Aurore — la seule couleur d'ambiance autorisée ────────── */
+  /* ── Aurore — uniquement en glow derrière le verre ─────────── */
   --color-violet: #A48BE8;      /* lilas */
   --color-cyan: #EFB894;        /* pêche (alias historique du pôle) */
   --color-magenta: #EFB894;
 
-  /* ── Surface carte ─────────────────────────────────────────── */
-  --color-carte: #FBFAF8;
-  --color-carte-brd: #D8D5CE;
-  --color-sauge: #5E9B84;       /* unique couleur de validation */
+  /* ── Surface carte — glass léger : fond blanc 4 %, bord 8 % ── */
+  --color-carte: rgba(255, 255, 255, 0.04);
+  --color-carte-brd: rgba(255, 255, 255, 0.08);
+  --color-sauge: #6FBF9F;       /* unique couleur de validation — 9,8:1 */
 
-  /* ── Texte secondaire produit (fond clair) — violets-gris ;
-     sur surface encre, la règle D36 les remappe en ivoire ─────── */
-  --color-steel: #6B647F;       /* secondaire — 5:1 sur ivoire */
-  --color-dusk: #837C95;        /* métadonnées décor — 3,8:1 */
+  /* ── Texte secondaire produit — gris neutres ────────────────── */
+  --color-steel: #9A9A9A;       /* secondaire — 7,1:1 sur #060606 */
+  --color-dusk: #8C8C8C;        /* métadonnées décor — 5,9:1 */
 
-  /* ── États système (fond clair) ───────────────────────────────
-     ok en TEXTE = sauge encrée (AA 4,7:1) ; la sauge du brief
-     (#5E9B84, --color-sauge) reste celle des coches et fonds. */
-  --color-ok: #3A7560;
-  --color-err: #9E4A45;
-  --color-warn: #8A6D1F;
-  --color-info: #3E6C94;
+  /* ── États système (fond noir) — AA ≥ 4,5:1 sur #060606 ────── */
+  --color-ok: #6FBF9F;
+  --color-err: #E08A84;
+  --color-warn: #D9B24A;
+  --color-info: #7FAAD0;
 
   /* ── Rayons — 10 / 16 / 22, pilules full (resserrés 13/08 :
      les grands rayons donnaient des cards lourdes) ─────────── */
@@ -109,10 +104,10 @@
   inherits: false;
 }
 
-/* ── Peau GIVRE (défaut clair) ────────────────────────────────
-   Tout le produit vit dans cette lumière. Les îlots sombres
-   (.pv-dark-island : lightbox, CTA finale) reprennent une encre
-   profonde pour leur sous-arbre. */
+/* ── Peau GIVRE NOIR (défaut) ─────────────────────────────────
+   Le nom .pv-light est conservé pour ne pas toucher les ~90
+   fichiers qui le posent : depuis la MAJ 20/08 c'est la peau de
+   nuit. Verre = fond blanc 3-5 %, bordure blanc 8 %. */
 :root, .pv-light {
   /* Marge du cadre éditorial — partagée entre le cadre du hero,
      la navbar et les sections pour un alignement au pixel.
@@ -125,70 +120,73 @@
   --text-2: var(--color-slate);
   --text-3: var(--color-mist);
 
-  --hairline: rgba(43, 36, 80, 0.09);
-  --hairline-strong: rgba(43, 36, 80, 0.15);
+  /* P1.3 — hairlines structurantes : 1 px blanc 7 % */
+  --hairline: rgba(255, 255, 255, 0.07);
+  --hairline-strong: rgba(255, 255, 255, 0.14);
 
-  /* Verre Givre — n'existe qu'au-dessus d'une matière à flouter ;
-     chaque scène en fournit. Recette stricte : voir docs/GIVRE.md §2 */
-  --glass: rgba(255, 255, 255, 0.55);
-  --glass-strong: rgba(255, 255, 255, 0.72);
-  --glass-tint: rgba(240, 240, 250, 0.5);
-  --hairline-glass: rgba(255, 255, 255, 0.62);
+  /* Verre de nuit — cards glass : fond blanc 3-7 % en dégradé
+     (la lumière vient du haut), bordure 1 px blanc 10 %. */
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-strong: rgba(255, 255, 255, 0.08);
+  --glass-tint: rgba(255, 255, 255, 0.04);
+  --hairline-glass: rgba(255, 255, 255, 0.12);
 
-  --ink-70: rgba(43, 36, 80, 0.72);
-  --ink-45: rgba(43, 36, 80, 0.48);
-  --ink-28: rgba(43, 36, 80, 0.30);
+  --ink-70: rgba(242, 242, 240, 0.72);
+  --ink-45: rgba(242, 242, 240, 0.48);
+  --ink-28: rgba(242, 242, 240, 0.30);
 
   --beam: linear-gradient(100deg, #A48BE8 0%, #EFB894 100%);
   --beam-ink: linear-gradient(100deg, #A48BE8 0%, #EFB894 100%);
   --beam-soft: linear-gradient(100deg, rgba(164, 139, 232, 0.55), rgba(239, 184, 148, 0.55));
-  --halo-violet: rgba(164, 139, 232, 0.14);
-  --halo-cyan: rgba(239, 184, 148, 0.12);
-  --halo-magenta: rgba(239, 184, 148, 0.07);
+  /* Halos aurore : glow derrière le verre — assez présents pour
+     que le noir vive et que le blur du verre ait une matière. */
+  --halo-violet: rgba(164, 139, 232, 0.20);
+  --halo-cyan: rgba(239, 184, 148, 0.16);
+  --halo-magenta: rgba(239, 184, 148, 0.08);
 
   /* Chrome froid — gradients perpendiculaires à la course */
   --chrome: linear-gradient(90deg, #FFFFFF 0%, #DDE0EA 16%, #A4A9BE 36%, #FCFCFE 52%, #C7CAD9 72%, #EDEEF4 100%);
   --chrome-ring: linear-gradient(135deg, #FCFCFE 0%, #BFC3D4 22%, #FFFFFF 42%, #A4A9BE 62%, #E9EAF1 82%, #C7CAD9 100%);
 
-  /* Arête haute allumée + double ombre encrée (contact + diffuse) */
-  --sh-glass: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 1px 4px rgba(43, 36, 80, 0.045), 0 18px 44px rgba(43, 36, 80, 0.085);
-  --sh-float: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 2px 6px rgba(43, 36, 80, 0.055), 0 26px 64px rgba(43, 36, 80, 0.12);
-  --sh-modal: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 6px 14px rgba(43, 36, 80, 0.08), 0 52px 120px rgba(43, 36, 80, 0.20);
-  --sh-beam: 0 0 0 1px rgba(164, 139, 232, 0.28), 0 4px 20px rgba(164, 139, 232, 0.22), 0 1px 2px rgba(43, 36, 80, 0.18);
-  --sh-print: 0 1px 3px rgba(43, 36, 80, 0.07), 0 18px 44px rgba(43, 36, 80, 0.09);
-  --sh-print-lift: 0 3px 6px rgba(43, 36, 80, 0.08), 0 32px 72px rgba(43, 36, 80, 0.14);
+  /* Arête haute allumée + double ombre noire (contact + diffuse) */
+  --sh-glass: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.03), 0 1px 4px rgba(0, 0, 0, 0.45), 0 18px 44px rgba(0, 0, 0, 0.55);
+  --sh-float: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 2px 6px rgba(0, 0, 0, 0.50), 0 26px 64px rgba(0, 0, 0, 0.60);
+  --sh-modal: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 6px 14px rgba(0, 0, 0, 0.55), 0 52px 120px rgba(0, 0, 0, 0.70);
+  --sh-beam: 0 0 0 1px rgba(164, 139, 232, 0.28), 0 4px 20px rgba(164, 139, 232, 0.18), 0 1px 2px rgba(0, 0, 0, 0.45);
+  --sh-print: 0 1px 3px rgba(0, 0, 0, 0.40), 0 18px 44px rgba(0, 0, 0, 0.45);
+  --sh-print-lift: 0 3px 6px rgba(0, 0, 0, 0.45), 0 32px 72px rgba(0, 0, 0, 0.55);
 
-  /* Bouton primaire « verre encré » — la signature de la passe :
-     un dégradé violet nuit, une arête de lumière, le sheen aurore */
-  --btn-primary-bg: linear-gradient(170deg, #35305E 0%, #241F45 100%);
-  --btn-primary-text: #F6F3EE;
-  --btn-primary-hover: linear-gradient(170deg, #3B356A 0%, #2A2450 100%);
+  /* Bouton primaire — pilule ivoire sur la nuit : le seul objet
+     clair de la page, l'arête et le sheen aurore le sertissent */
+  --btn-primary-bg: linear-gradient(170deg, #F6F3EE 0%, #E8E5DE 100%);
+  --btn-primary-text: #060606;
+  --btn-primary-hover: linear-gradient(170deg, #FFFFFF 0%, #F2EFE8 100%);
 
-  --surface-hover: rgba(255, 255, 255, 0.5);
-  --ignite-hover-bg: rgba(255, 255, 255, 0.68);
-  --edge-light: rgba(255, 255, 255, 0.95);
-  --blueprint-line: rgba(43, 36, 80, 0.04);
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  --ignite-hover-bg: rgba(255, 255, 255, 0.07);
+  --edge-light: rgba(255, 255, 255, 0.22);
+  --blueprint-line: rgba(255, 255, 255, 0.04);
   --media-bg: var(--color-pearl);
-  --media-border: rgba(43, 36, 80, 0.08);
-  --field-bg: rgba(255, 255, 255, 0.72);
-  --field-bg-focus: rgba(255, 255, 255, 0.92);
-  --gauge-track: rgba(43, 36, 80, 0.09);
-  --skeleton-a: rgba(43, 36, 80, 0.05);
-  --skeleton-b: rgba(43, 36, 80, 0.1);
-  /* Numéros/accents mono : muted violet-gris — le lilas pur (2,4:1)
-     échoue AA sur du texte porteur ; il vit dans les fonds, liserés
-     et jauges, jamais en petites capitales d'information. */
+  --media-border: rgba(255, 255, 255, 0.08);
+  --field-bg: rgba(255, 255, 255, 0.05);
+  --field-bg-focus: rgba(255, 255, 255, 0.08);
+  --gauge-track: rgba(255, 255, 255, 0.09);
+  --skeleton-a: rgba(255, 255, 255, 0.05);
+  --skeleton-b: rgba(255, 255, 255, 0.10);
+  /* Numéros/accents mono : gris neutre AA sur noir. */
   --num-color: var(--color-mist);
   --link-color: var(--color-ink);
   --link-hover: var(--color-ink);
-  --noise-blend: multiply;
-  --noise-opacity: 0.025;
+  --noise-blend: screen;
+  --noise-opacity: 0.035;
   --scrollbar-track: var(--color-frost);
-  --scrollbar-thumb: #CCC9DB;
-  --scrollbar-thumb-hover: #B6B2CB;
-  --selection-bg: rgba(164, 139, 232, 0.28);
+  --scrollbar-thumb: #2E2E2E;
+  --scrollbar-thumb-hover: #3C3C3C;
+  --selection-bg: rgba(164, 139, 232, 0.35);
   --selection-text: var(--color-ink);
-  --focus-ring: rgba(43, 36, 80, 0.85);
+  /* Passe whaou P3.4 — focus visible AURORE partout : ring 2 px,
+     offset 2 px (le blanc se perdait sur les surfaces claires) */
+  --focus-ring: rgba(184, 161, 232, 0.9);
 }
 
 /* ── Surface encre — lightbox, panneaux de sortie, aperçus nuit ─
@@ -263,7 +261,7 @@
 }
 
 html {
-  color-scheme: light;
+  color-scheme: dark;
   scroll-padding-top: 96px;
 }
 
@@ -289,7 +287,7 @@ body {
    translucide posé sur la scène, qui s'affirme au survol. */
 html {
   scrollbar-width: thin;
-  scrollbar-color: rgba(43, 36, 80, 0.3) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
 }
 ::-webkit-scrollbar {
   width: 11px;
@@ -300,13 +298,13 @@ html {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(43, 36, 80, 0.26);
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 999px;
   border: 4px solid transparent;
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(43, 36, 80, 0.44);
+  background: rgba(255, 255, 255, 0.32);
   background-clip: content-box;
 }
 
@@ -327,42 +325,42 @@ html {
   contain: layout paint;
 }
 
-/* Dégradé de scène héroïque — lavande à gauche, périwinkle à
-   droite, brume au centre : la lumière du haut perce au milieu. */
+/* MAJ soie (20/08) — les fonds de section sont des VOILES
+   translucides posés sur le satin noir temps réel (SoieNoire,
+   fixe derrière tout le site) : le drapé respire à travers,
+   le voile garantit le contraste AA du texte. */
+/* Passe whaou P1 — TOUT voile fond au transparent sur ≥ 420 px à
+   ses DEUX bouts : les sections se raccordent sur le satin nu, la
+   couture n'existe plus (les anciens voiles démarraient à 0,28-0,40
+   d'opacité AU bord — la marche horizontale mesurée). Le champ de
+   lumière de section = radiaux aurore lilas #B8A1E8 / pêche
+   #F0C5A8 à 4-7 %, position variable par variante. */
 .pv-scene-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(120% 90% at 50% -20%, #FDFDFF 0%, rgba(253, 253, 255, 0) 55%),
-    radial-gradient(94% 110% at -12% 46%, rgba(193, 189, 233, 0.92) 0%, rgba(193, 189, 233, 0) 62%),
-    radial-gradient(94% 112% at 112% 48%, rgba(166, 189, 238, 0.88) 0%, rgba(166, 189, 238, 0) 64%),
-    radial-gradient(70% 60% at 84% 96%, rgba(233, 209, 226, 0.5) 0%, rgba(233, 209, 226, 0) 70%),
-    linear-gradient(180deg, #ECEEF7 0%, #E7E9F4 52%, #E2E4F0 100%);
+    radial-gradient(52% 44% at 12% 38%, rgba(184, 161, 232, 0.065) 0%, rgba(184, 161, 232, 0) 70%),
+    radial-gradient(48% 42% at 90% 72%, rgba(240, 197, 168, 0.055) 0%, rgba(240, 197, 168, 0) 72%),
+    linear-gradient(180deg, rgba(6, 6, 6, 0) 0px, rgba(6, 6, 6, 0.26) 420px, rgba(6, 6, 6, 0.26) calc(100% - 420px), rgba(6, 6, 6, 0) 100%);
 }
 
-/* Variante calme — ivoire perle, pour sections de respiration
-   (v28 : tout le monde vit dans la lumière du cyclorama).
-   Double sélecteur : la variante doit BATTRE la base quand un
-   élément porte les deux classes, quel que soit l'ordre/le layer. */
+/* Variante calme — champ haut-droit */
 .pv-scene-bg--calm,
 .pv-scene-bg.pv-scene-bg--calm {
   background:
-    radial-gradient(110% 80% at 50% -14%, #FCFBF8 0%, rgba(252, 251, 248, 0) 58%),
-    radial-gradient(80% 90% at -10% 70%, rgba(206, 200, 234, 0.2) 0%, rgba(206, 200, 234, 0) 60%),
-    radial-gradient(80% 90% at 110% 66%, rgba(244, 213, 194, 0.16) 0%, rgba(244, 213, 194, 0) 62%),
-    linear-gradient(180deg, #F3F1EC 0%, #EDEBE5 100%);
+    radial-gradient(46% 40% at 84% 8%, rgba(184, 161, 232, 0.05) 0%, rgba(184, 161, 232, 0) 68%),
+    radial-gradient(40% 36% at 96% 26%, rgba(240, 197, 168, 0.04) 0%, rgba(240, 197, 168, 0) 66%),
+    linear-gradient(180deg, rgba(6, 6, 6, 0) 0px, rgba(6, 6, 6, 0.30) 420px, rgba(6, 6, 6, 0.30) calc(100% - 420px), rgba(6, 6, 6, 0) 100%);
 }
 
-/* Variante glacier — ivoire froid et haut, pour les moments
-   produit : une pointe pervenche très diluée en tête, rien d'autre */
+/* Variante glacier — moments produit : champ bas-gauche */
 .pv-scene-bg--glacier,
 .pv-scene-bg.pv-scene-bg--glacier {
   background:
-    radial-gradient(120% 90% at 50% -18%, #FBFAF7 0%, rgba(251, 250, 247, 0) 52%),
-    radial-gradient(88% 100% at -10% 40%, rgba(196, 208, 238, 0.34) 0%, rgba(196, 208, 238, 0) 62%),
-    radial-gradient(92% 110% at 112% 44%, rgba(206, 200, 234, 0.22) 0%, rgba(206, 200, 234, 0) 60%),
-    linear-gradient(180deg, #F0EEE9 0%, #E9E7E1 100%);
+    radial-gradient(48% 42% at 10% 92%, rgba(184, 161, 232, 0.055) 0%, rgba(184, 161, 232, 0) 68%),
+    radial-gradient(40% 36% at 0% 70%, rgba(240, 197, 168, 0.042) 0%, rgba(240, 197, 168, 0) 66%),
+    linear-gradient(180deg, rgba(6, 6, 6, 0) 0px, rgba(6, 6, 6, 0.32) 420px, rgba(6, 6, 6, 0.32) calc(100% - 420px), rgba(6, 6, 6, 0) 100%);
 }
 
 /* Caustiques — deux nappes de lumière qui dérivent très lentement.
@@ -390,37 +388,24 @@ html {
 }
 .pv-caustics::before {
   background:
-    radial-gradient(34% 26% at 30% 24%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 70%),
-    radial-gradient(26% 22% at 72% 16%, rgba(246, 236, 224, 0.4) 0%, rgba(246, 236, 224, 0) 72%);
+    radial-gradient(34% 26% at 30% 24%, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%),
+    radial-gradient(26% 22% at 72% 16%, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 72%);
   animation: pv-caustic-a 46s ease-in-out infinite;
 }
 .pv-caustics::after {
   background:
-    radial-gradient(30% 24% at 64% 70%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0) 70%),
-    radial-gradient(24% 20% at 18% 78%, rgba(226, 219, 240, 0.26) 0%, rgba(226, 219, 240, 0) 72%);
+    radial-gradient(30% 24% at 64% 70%, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 70%),
+    radial-gradient(24% 20% at 18% 78%, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 72%);
   animation: pv-caustic-b 58s ease-in-out infinite;
 }
 
 /* ═══ Matière ════════════════════════════════════════════════ */
 
-/* Grain papier très léger — dans le FOND de chaque scène (z0,
-   GIVRE §6), jamais par-dessus le contenu : un grain en overlay
-   viewport voilait le canvas 3D et le texte. */
+/* Passe whaou P1 — le grain par-scène est retiré : son bord de
+   section dessinait une marche (+4 niveaux mesurés au raccord).
+   Le grain film vit désormais en UNE couche fixe site-wide
+   (.pv-grain-fixed, 1,8 %, tuile 128 px) — continuité parfaite. */
 .pv-scene::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 256px 256px;
-  opacity: var(--noise-opacity);
-  mix-blend-mode: var(--noise-blend);
-}
-
-/* Scène à canvas 3D (hero) : aucun grain DOM — le rendu WebGL
-   porte son propre dither, rien ne se pose au-dessus du canvas. */
-.pv-scene--canvas::after {
   content: none;
 }
 
@@ -428,7 +413,14 @@ html {
    Règle d'or : n'existe qu'au-dessus d'une matière à flouter. */
 .pv-glass {
   position: relative;
-  background: var(--glass);
+  /* dégradé 7 % → 2,5 % : la lumière tombe du haut, le verre a un
+     volume — plus jamais un aplat gris sur le noir */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.035) 52%,
+    rgba(255, 255, 255, 0.025) 100%
+  );
   border: 1px solid var(--hairline-glass);
   border-radius: var(--radius-xl);
   backdrop-filter: blur(28px) saturate(1.45);
@@ -449,7 +441,12 @@ html {
    le vrai verre reste réservé aux panneaux héroïques. */
 .pv-glass--still {
   backdrop-filter: none;
-  background: rgba(255, 255, 255, 0.66);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.03) 60%,
+    rgba(255, 255, 255, 0.022) 100%
+  );
 }
 
 /* L'îlot sombre garde un dépoli plus léger */
@@ -498,10 +495,10 @@ html {
   min-height: 32px;
   padding: 0 14px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--hairline-glass);
   backdrop-filter: blur(20px) saturate(1.4);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(43, 36, 80, 0.05), 0 10px 24px rgba(43, 36, 80, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 1px 2px rgba(0, 0, 0, 0.40), 0 10px 24px rgba(0, 0, 0, 0.45);
   color: var(--surface-text);
   font-size: 13px;
   font-weight: 500;
@@ -520,15 +517,15 @@ html {
   position: absolute;
   pointer-events: none;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   backdrop-filter: blur(18px) saturate(1.35);
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -22px 40px rgba(43, 36, 80, 0.06),
-    inset 16px 26px 48px rgba(255, 255, 255, 0.38),
-    0 2px 6px rgba(43, 36, 80, 0.05),
-    0 28px 56px rgba(43, 36, 80, 0.12);
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -22px 40px rgba(0, 0, 0, 0.30),
+    inset 16px 26px 48px rgba(255, 255, 255, 0.06),
+    0 2px 6px rgba(0, 0, 0, 0.40),
+    0 28px 56px rgba(0, 0, 0, 0.50);
 }
 /* Reflet spéculaire — l'arc de lumière haut-gauche */
 .pv-lens::before {
@@ -539,7 +536,7 @@ html {
   width: 44%;
   height: 30%;
   border-radius: 50%;
-  background: radial-gradient(50% 60% at 50% 40%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 100%);
+  background: radial-gradient(50% 60% at 50% 40%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%);
   transform: rotate(-18deg);
 }
 /* Caustique interne basse — la lumière ressort du verre */
@@ -551,7 +548,7 @@ html {
   width: 56%;
   height: 22%;
   border-radius: 50%;
-  background: radial-gradient(50% 70% at 50% 60%, rgba(203, 220, 242, 0.5) 0%, rgba(203, 220, 242, 0) 100%);
+  background: radial-gradient(50% 70% at 50% 60%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%);
 }
 
 /* Ombre au sol d'un objet de verre — le pose dans la scène */
@@ -559,7 +556,7 @@ html {
   position: absolute;
   pointer-events: none;
   border-radius: 50%;
-  background: radial-gradient(50% 50% at 50% 50%, rgba(43, 36, 80, 0.16) 0%, rgba(43, 36, 80, 0) 72%);
+  background: radial-gradient(50% 50% at 50% 50%, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 72%);
   filter: blur(14px);
 }
 
@@ -570,7 +567,7 @@ html {
   border: none;
   border-radius: 1px;
   background: var(--chrome);
-  box-shadow: 0 1px 1px rgba(43, 36, 80, 0.14);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
 }
 
 /* Arête chrome en tête de panneau */
@@ -586,7 +583,7 @@ html {
   height: 3px;
   border-radius: 0 0 2px 2px;
   background: var(--chrome);
-  box-shadow: 0 1px 2px rgba(43, 36, 80, 0.2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.50);
   pointer-events: none;
   z-index: 1;
 }
@@ -602,7 +599,7 @@ html {
   border-radius: inherit;
   padding: 2px;
   background: var(--chrome-ring);
-  box-shadow: 0 1px 2px rgba(43, 36, 80, 0.16);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -612,11 +609,11 @@ html {
 /* Passe-partout — un rendu exposé : marge de verre, filet, ombre */
 .pv-passepartout {
   position: relative;
-  background: rgba(255, 255, 255, 0.66);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--hairline-glass);
   border-radius: var(--radius-md);
   padding: 14px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), var(--sh-print);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), var(--sh-print);
 }
 .pv-passepartout > * {
   border-radius: var(--radius-xs);
@@ -654,9 +651,9 @@ html {
   align-items: center;
   gap: 8px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px) saturate(1.4);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(43, 36, 80, 0.05), 0 10px 24px rgba(43, 36, 80, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 1px 2px rgba(0, 0, 0, 0.40), 0 10px 24px rgba(0, 0, 0, 0.45);
 }
 .pv-credit-pill::before {
   content: "";
@@ -745,7 +742,7 @@ html {
   bottom: -60px;
   background: radial-gradient(
     50% 100% at 50% 0%,
-    rgba(43, 36, 80, 0.2) 0%,
+    rgba(0, 0, 0, 0.55) 0%,
     rgba(164, 139, 232, 0.06) 55%,
     transparent 100%
   );
@@ -762,11 +759,18 @@ html {
   -webkit-mask-image: radial-gradient(75% 60% at 50% 38%, rgba(0, 0, 0, 0.9), transparent 100%);
 }
 
-/* ═══ Boutons ════════════════════════════════════════════════ */
-
-/* Bouton « verre encré » — le primaire signature : dégradé violet
-   nuit, liseré interne = l'arête de lumière du verre, sheen aurore
-   qui balaie au survol (masqué par la pilule, zéro layout). */
+/* ═══ Boutons — système passe whaou (P3) ═════════════════════
+   Fini les pilules par défaut. Radius homogène site (14 px),
+   transitions 200 ms cubic-bezier(0.4,0,0.2,1), focus ring aurore
+   2 px / offset 2 px. Trois voix :
+   1. Primaire  .pv-btn         — ivoire #F2EFE9, texte #0A0A0A,
+      hover = glow aurore extérieur + flèche qui translate 4 px,
+      active = scale 0.98.
+   2. Secondaire .pv-btn--ghost — verre : fond blanc 4 %, bordure
+      blanc 12 %, top-light ; hover bordure 24 %, fond 7 %.
+   3. Ghost      .pv-btn--text  — texte + underline animé
+      gauche→droite 240 ms.
+   INTERDIT : toute pilule blanche pleine hors du primaire. */
 .pv-btn {
   position: relative;
   overflow: hidden;
@@ -776,9 +780,9 @@ html {
   gap: 8px;
   min-height: 44px;
   padding: 0 24px;
-  border-radius: 999px;
-  background: var(--btn-primary-bg);
-  color: var(--btn-primary-text);
+  border-radius: 14px;
+  background: #F2EFE9;
+  color: #0A0A0A;
   font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 500;
@@ -787,12 +791,19 @@ html {
   cursor: pointer;
   border: 1px solid transparent;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 1px 2px rgba(43, 36, 80, 0.16),
-    0 10px 30px rgba(43, 36, 80, 0.28);
-  transition: transform 0.35s var(--ease-out-expo), box-shadow 0.35s var(--ease-out-expo),
-    filter 0.35s var(--ease-smooth);
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.45),
+    0 10px 30px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* la flèche (svg) translate 4 px au survol du bouton */
+.pv-btn svg {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pv-btn:hover svg {
+  transform: translateX(4px);
 }
 /* Le sheen aurore : une lame diagonale qui traverse en 700 ms.
    Au repos il attend hors champ SANS transition — le retour de
@@ -814,34 +825,33 @@ html {
   transform: translateX(-130%) skewX(-14deg);
 }
 .pv-btn:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.04);
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+  /* le glow aurore extérieur — la signature du primaire */
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.26),
-    0 2px 4px rgba(43, 36, 80, 0.16),
-    0 16px 40px rgba(43, 36, 80, 0.32);
+    inset 0 1px 0 rgba(255, 255, 255, 0.60),
+    0 2px 4px rgba(0, 0, 0, 0.45),
+    0 0 24px rgba(184, 161, 232, 0.35);
 }
 .pv-btn:hover::after {
   transform: translateX(130%) skewX(-14deg);
   transition: transform 0.7s var(--ease-smooth);
 }
 .pv-btn:active {
-  transform: translateY(1px);
+  transform: scale(0.98);
   filter: brightness(0.99);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
-    0 1px 2px rgba(43, 36, 80, 0.16),
-    0 6px 16px rgba(43, 36, 80, 0.18);
+    0 1px 2px rgba(0, 0, 0, 0.45),
+    0 0 12px rgba(184, 161, 232, 0.2);
 }
 .pv-btn:disabled {
   cursor: not-allowed;
   transform: none;
   filter: none;
   background: var(--color-carte);
-  color: rgba(43, 36, 80, 0.28);
+  color: rgba(242, 242, 240, 0.28);
   border-color: var(--color-carte-brd);
-  box-shadow: 0 1px 2px rgba(43, 36, 80, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.40);
 }
 .pv-btn:disabled::after {
   content: none;
@@ -875,40 +885,76 @@ html {
 .pv-btn-sheen:disabled::after {
   content: none;
 }
-/* Focus clavier : anneau net qui épouse la pilule (l'outline
-   global radius 4px casserait la forme) */
+/* Focus clavier : ring aurore 2 px, offset 2 px (P3.4) */
 .pv-btn:focus-visible {
   outline: 2px solid var(--focus-ring);
-  outline-offset: 3px;
-  border-radius: 999px;
+  outline-offset: 2px;
+  border-radius: 14px;
 }
 
-/* Secondaire — la carte posée : surface ivoire, liseré défini,
-   le liseré s'allume lilas au survol. Pas de sheen (réservé au
-   primaire). */
+/* Secondaire VERRE (P3.2) — fond blanc 4 %, bordure blanc 12 %,
+   top-light ; hover : bordure 24 %, fond 7 %. */
 .pv-btn--ghost {
-  background: var(--color-carte);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--color-ink);
-  border: 1px solid var(--color-carte-brd);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(43, 36, 80, 0.05), 0 8px 20px rgba(43, 36, 80, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 1px 2px rgba(0, 0, 0, 0.40);
 }
 .pv-btn--ghost::after {
   content: none;
 }
 .pv-btn--ghost:hover {
   filter: none;
-  border-color: var(--color-violet);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 2px 4px rgba(43, 36, 80, 0.06), 0 14px 32px rgba(43, 36, 80, 0.1);
+  transform: none;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.24);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 2px 4px rgba(0, 0, 0, 0.40);
 }
 .pv-btn--ghost:active {
   filter: none;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(43, 36, 80, 0.05);
+  transform: scale(0.98);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 1px 2px rgba(0, 0, 0, 0.40);
 }
 
-/* Sur surface encre : pilule ivoire pleine */
-.pv-btn--reverse {
-  background: #F6F3EE;
+/* Ghost TEXTE (P3.3) — underline animé gauche→droite 240 ms */
+.pv-btn--text {
+  background: transparent;
   color: var(--color-ink);
+  border: none;
+  box-shadow: none;
+  padding: 0 4px;
+  border-radius: 6px;
+  overflow: visible;
+}
+.pv-btn--text::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 8px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pv-btn--text:hover {
+  transform: none;
+  filter: none;
+  box-shadow: none;
+}
+.pv-btn--text:hover::after {
+  transform: scaleX(1);
+}
+.pv-btn--text:active {
+  transform: scale(0.98);
+  box-shadow: none;
+}
+
+/* Sur surface encre : même primaire ivoire (radius homogène) */
+.pv-btn--reverse {
+  background: #F2EFE9;
+  color: #0A0A0A;
   border: none;
   box-shadow: 0 1px 2px rgba(16, 12, 36, 0.25), 0 10px 28px rgba(16, 12, 36, 0.3);
 }
@@ -918,7 +964,7 @@ html {
 .pv-btn--reverse:hover {
   background: #FDFBF7;
   filter: none;
-  box-shadow: 0 2px 4px rgba(16, 12, 36, 0.28), 0 18px 40px rgba(16, 12, 36, 0.36);
+  box-shadow: 0 2px 4px rgba(16, 12, 36, 0.28), 0 0 24px rgba(184, 161, 232, 0.35);
 }
 
 /* ═══ Typographie ════════════════════════════════════════════ */
@@ -1190,7 +1236,7 @@ html {
 }
 .pv-field:focus {
   outline: none;
-  border-color: rgba(43, 36, 80, 0.55);
+  border-color: rgba(242, 242, 240, 0.40);
   box-shadow: 0 0 0 3px rgba(164, 139, 232, 0.22);
   background: var(--field-bg-focus);
 }
@@ -1410,40 +1456,38 @@ html {
 }
 .pv-veil-fallback::before {
   background:
-    radial-gradient(42% 54% at 26% 30%, var(--veil-a, rgba(201, 198, 232, 0.4)), transparent 70%),
-    radial-gradient(36% 48% at 74% 22%, var(--veil-b, rgba(175, 194, 236, 0.32)), transparent 72%);
+    radial-gradient(42% 54% at 26% 30%, var(--veil-a, rgba(164, 139, 232, 0.08)), transparent 70%),
+    radial-gradient(36% 48% at 74% 22%, var(--veil-b, rgba(239, 184, 148, 0.06)), transparent 72%);
   animation: pv-veil-drift 26s ease-in-out infinite;
 }
 .pv-veil-fallback::after {
   background:
-    radial-gradient(38% 50% at 62% 68%, var(--veil-a, rgba(201, 198, 232, 0.24)), transparent 70%),
-    radial-gradient(30% 42% at 18% 74%, var(--veil-b, rgba(175, 194, 236, 0.2)), transparent 72%);
+    radial-gradient(38% 50% at 62% 68%, var(--veil-a, rgba(164, 139, 232, 0.05)), transparent 70%),
+    radial-gradient(30% 42% at 18% 74%, var(--veil-b, rgba(239, 184, 148, 0.04)), transparent 72%);
   animation: pv-veil-drift-b 32s ease-in-out infinite;
 }
 
-/* ═══ Dawn — la scène de la ref ═══════════════════════════════
-   Lilas en tête, brume au centre, rose sur le bord droit et le
-   pied. Ni noir pur ni blanc pur : tout vit entre porcelaine,
-   lavande, pervenche et une pointe de rose. */
+/* ═══ Dawn — recalibrée noir (MAJ 20/08) ══════════════════════
+   Le même vocabulaire (une percée en tête, une assise) mais en
+   noirs neutres : aucune teinte, l'aurore ne vit qu'en glow
+   derrière les objets de verre. */
 
+/* Dawn — champ haut-gauche + écho pêche bas-droit (P1) */
 .pv-scene-bg--dawn,
 .pv-scene-bg.pv-scene-bg--dawn {
   background:
-    radial-gradient(70% 60% at 22% -8%, rgba(252, 250, 246, 0.95) 0%, rgba(252, 250, 246, 0) 55%),
-    radial-gradient(58% 64% at 58% 42%, rgba(214, 202, 240, 0.42) 0%, rgba(214, 202, 240, 0) 62%),
-    radial-gradient(48% 55% at 62% 66%, rgba(246, 212, 190, 0.4) 0%, rgba(246, 212, 190, 0) 64%),
-    linear-gradient(172deg, #F1EFE9 0%, #F0EDE7 48%, #ECE9E2 100%);
+    radial-gradient(46% 50% at 22% 12%, rgba(184, 161, 232, 0.07) 0%, rgba(184, 161, 232, 0) 68%),
+    radial-gradient(42% 46% at 72% 68%, rgba(240, 197, 168, 0.06) 0%, rgba(240, 197, 168, 0) 70%),
+    linear-gradient(180deg, rgba(6, 6, 6, 0) 0px, rgba(6, 6, 6, 0.24) 420px, rgba(6, 6, 6, 0.24) calc(100% - 420px), rgba(6, 6, 6, 0) 100%);
 }
 
-/* Version diluée pour les sections courantes — le même atelier,
-   l'aurore à peine suggérée sur un bord. */
+/* Version diluée pour les sections courantes — champ bas-droit */
 .pv-scene-bg--dawn-calm,
 .pv-scene-bg.pv-scene-bg--dawn-calm {
   background:
-    radial-gradient(95% 70% at 40% -10%, rgba(252, 251, 248, 0.85) 0%, rgba(252, 251, 248, 0) 55%),
-    radial-gradient(70% 85% at -12% 44%, rgba(212, 203, 238, 0.28) 0%, rgba(212, 203, 238, 0) 60%),
-    radial-gradient(65% 80% at 110% 58%, rgba(246, 214, 194, 0.24) 0%, rgba(246, 214, 194, 0) 60%),
-    linear-gradient(174deg, #F2F0EB 0%, #F0EEE8 52%, #EBE8E1 100%);
+    radial-gradient(50% 55% at 88% 86%, rgba(240, 197, 168, 0.055) 0%, rgba(240, 197, 168, 0) 68%),
+    radial-gradient(44% 48% at 4% 30%, rgba(184, 161, 232, 0.048) 0%, rgba(184, 161, 232, 0) 66%),
+    linear-gradient(180deg, rgba(6, 6, 6, 0) 0px, rgba(6, 6, 6, 0.28) 420px, rgba(6, 6, 6, 0.28) calc(100% - 420px), rgba(6, 6, 6, 0) 100%);
 }
 
 /* Rais de fenêtre — la lumière entre en diagonale, haut-droite.
@@ -1479,11 +1523,11 @@ html {
   background:
     linear-gradient(90deg,
       transparent 0%,
-      rgba(255, 255, 255, 0.34) 9%, transparent 21%,
+      rgba(255, 255, 255, 0.06) 9%, transparent 21%,
       transparent 30%,
-      rgba(255, 255, 255, 0.26) 41%, transparent 55%,
+      rgba(255, 255, 255, 0.05) 41%, transparent 55%,
       transparent 66%,
-      rgba(253, 250, 255, 0.3) 78%, transparent 92%);
+      rgba(255, 255, 255, 0.055) 78%, transparent 92%);
   animation: pv-ray-drift 24s ease-in-out infinite;
 }
 .pv-windowlight::after {
@@ -1492,9 +1536,9 @@ html {
   background:
     linear-gradient(90deg,
       transparent 4%,
-      rgba(255, 253, 255, 0.2) 18%, transparent 34%,
+      rgba(255, 255, 255, 0.04) 18%, transparent 34%,
       transparent 52%,
-      rgba(255, 255, 255, 0.16) 68%, transparent 88%);
+      rgba(255, 255, 255, 0.035) 68%, transparent 88%);
   animation: pv-ray-drift-b 31s ease-in-out infinite;
 }
 
@@ -1661,9 +1705,9 @@ html {
   background: var(--ink-28);
 }
 
-/* Ombre mauve — l'ombre des objets sur scène dawn (jamais grise) */
+/* Ombre des objets sur scène noire — noir profond */
 .pv-shadow-mauve {
-  box-shadow: 0 2px 6px rgba(96, 84, 140, 0.1), 0 26px 60px rgba(96, 84, 140, 0.22);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.40), 0 26px 60px rgba(0, 0, 0, 0.55);
 }
 
 } /* fin @layer components */
@@ -1768,4 +1812,111 @@ html[data-prism-seen="1"] .pv-overture-core {
       transform: translateY(3%) scale(1.03);
     }
   }
+}
+
+/* ═══ Passe whaou P2.2 — le backdrop à réfracter ══════════════
+   Derrière les objets verre : une nappe aurore (lilas #B8A1E8 →
+   pêche #F0C5A8, ≤ 8 % perçus) et deux light streaks fins à 22°
+   (l'angle SLANT de la scène), en dérive très lente. C'est la
+   référence visuelle qui fait LIRE la réfraction : l'œil compare
+   le fond nu au fond plié dans le verre. Compositor only. */
+@keyframes pv-aurora-drift {
+  0% {
+    transform: translate3d(-1.6%, -1.1%, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(1.6%, 1.2%, 0) scale(1.045);
+  }
+}
+.pv-hero-aurora {
+  animation: pv-aurora-drift 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* ═══ Passe whaou P1 — le système d'atmosphère ════════════════
+   Toute page vit sur la même nuit : base #060606, sections ≤
+   #0A0A0A (noirs neutres). Par section, UN champ de lumière —
+   grand radial aurore (lilas #B8A1E8 → pêche #F0C5A8) à 4-7 %,
+   1200-1800 px, position qui tourne d'une section à l'autre pour
+   rythmer le scroll. Rendu en CSS gradient pur — JAMAIS de
+   backdrop-filter généralisé. À poser en enfant absolu (aria-
+   hidden) d'une section en position:relative + overflow:hidden
+   ou clip. z-0 : le contenu vit au-dessus (relative z-10). */
+.pv-field-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+/* haut-droit */
+.pv-field-light--tr {
+  background:
+    radial-gradient(760px 590px at 82% 6%, rgba(184, 161, 232, 0.062) 0%, rgba(184, 161, 232, 0.028) 42%, transparent 70%),
+    radial-gradient(640px 500px at 94% 24%, rgba(240, 197, 168, 0.05) 0%, transparent 68%);
+}
+/* bas-gauche */
+.pv-field-light--bl {
+  background:
+    radial-gradient(780px 600px at 12% 96%, rgba(184, 161, 232, 0.058) 0%, rgba(184, 161, 232, 0.026) 44%, transparent 70%),
+    radial-gradient(620px 480px at 2% 74%, rgba(240, 197, 168, 0.048) 0%, transparent 66%);
+}
+/* haut-gauche */
+.pv-field-light--tl {
+  background:
+    radial-gradient(740px 580px at 14% 4%, rgba(240, 197, 168, 0.055) 0%, rgba(240, 197, 168, 0.024) 42%, transparent 68%),
+    radial-gradient(600px 470px at 2% 26%, rgba(184, 161, 232, 0.05) 0%, transparent 66%);
+}
+/* bas-droit */
+.pv-field-light--br {
+  background:
+    radial-gradient(760px 590px at 88% 94%, rgba(240, 197, 168, 0.06) 0%, rgba(240, 197, 168, 0.026) 44%, transparent 70%),
+    radial-gradient(620px 480px at 98% 72%, rgba(184, 161, 232, 0.048) 0%, transparent 66%);
+}
+/* cœur (CTA final, pages centrées) */
+.pv-field-light--center {
+  background:
+    radial-gradient(900px 640px at 50% 42%, rgba(184, 161, 232, 0.055) 0%, rgba(184, 161, 232, 0.024) 46%, transparent 72%),
+    radial-gradient(700px 520px at 58% 60%, rgba(240, 197, 168, 0.045) 0%, transparent 68%);
+}
+
+/* Grain film statique — tuile 128 px (bruit déterministe, généré
+   par outillage sharp), 1,8 % : tue le banding des dégradés
+   sombres. Une SEULE couche fixe pour tout le site (jamais de
+   canvas animé). Au-dessus de tout le contenu, transparent aux
+   événements. */
+.pv-grain-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  background: url("/texture/grain-128.png") repeat;
+  background-size: 128px 128px;
+  opacity: 0.018;
+}
+
+/* Vignette douce 8-10 % sur les bords du viewport — la nuit se
+   referme, le centre respire. */
+.pv-vignette-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 79;
+  pointer-events: none;
+  background: radial-gradient(130% 105% at 50% 42%, transparent 56%, rgba(0, 0, 0, 0.095) 100%);
+}
+
+/* ═══ Passe whaou P4 — la citation des avis ═══════════════════
+   Transition de pull-quote : fade + rise 300 ms à chaque
+   changement d'entrée active du registre. */
+@keyframes pv-quote-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.pv-quote-in {
+  animation: pv-quote-in 300ms cubic-bezier(0.4, 0, 0.2, 1) both;
 }

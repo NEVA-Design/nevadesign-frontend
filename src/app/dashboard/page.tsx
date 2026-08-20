@@ -11,6 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ACCENT_STYLES, KIND_LABELS, type SiteAnnouncement } from "@/lib/announcements";
+import { COMING_SOON } from "@/lib/feature-flags";
 import { PLANS } from "@/lib/plans";
 import { backendGetJson } from "@/lib/api/backend-server";
 import LiveCreditMeter from "@/components/dashboard/LiveCreditMeter";
@@ -169,31 +170,42 @@ export default async function DashboardPage() {
             ambiance. Toutes ses créations en héritent.
           </p>
         </div>
-        <Link href="/dashboard/projects/new" className="shrink-0">
-          <span className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] transition-colors hover:bg-[#35305E]">
-            <Plus size={15} />
+        {COMING_SOON ? (
+          <span
+            title="Disponible prochainement"
+            aria-disabled
+            className="inline-flex h-11 shrink-0 cursor-default items-center justify-center gap-2.5 rounded-[14px] border border-white/[0.12] bg-white/[0.04] px-5 text-sm font-medium text-ink opacity-55 shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
+          >
+            <Plus size={15} strokeWidth={1.5} />
             Nouveau projet
+            <span className="nv-badge-soon">À venir</span>
           </span>
-        </Link>
+        ) : (
+          <Link href="/dashboard/projects/new" className="pv-btn shrink-0">
+            <Plus size={15} strokeWidth={1.5} />
+            Nouveau projet
+          </Link>
+        )}
       </div>
 
-      {/* Tuiles de statistiques */}
-      <section className="mt-10 grid gap-4 md:grid-cols-3">
-        <div className="pv-glass pv-edge rounded-2xl p-6">
+      {/* Tuiles de statistiques — une carte majeure (l'anneau des
+          créations restantes), deux cartes secondaires plus basses */}
+      <section className="mt-10 grid gap-4 md:grid-cols-3 md:items-start">
+        <div className="nv-card p-6">
           <LiveCreditMeter userId={me.id} initialCredits={credits} maxCredits={maxCredits} />
         </div>
-        <div className="pv-glass pv-edge rounded-2xl p-6">
+        <div className="nv-card px-6 py-4">
           <p className="pv-label">Plan actuel</p>
-          <p className="pv-display mt-3 text-[42px] leading-none text-ink">{planInfo.name}</p>
-          <p className="mt-4 font-mono text-[10px] tracking-[0.1em] text-dusk">{conversionHint}</p>
+          <p className="pv-display mt-2 text-[26px] leading-none text-ink">{planInfo.name}</p>
+          <p className="mt-3 font-mono text-[10px] tracking-[0.1em] text-mist">{conversionHint}</p>
         </div>
-        <div className="pv-glass pv-edge rounded-2xl p-6">
+        <div className="nv-card px-6 py-4">
           <p className="pv-label">Usage du mois</p>
-          <p className="pv-display mt-3 text-[42px] leading-none text-ink">
+          <p className="pv-display mt-2 text-[26px] leading-none text-ink">
             {monthCount ?? 0}
-            <span className="ml-2 font-mono text-xs tracking-[0.08em] text-dusk">générations</span>
+            <span className="ml-2 font-mono text-xs tracking-[0.08em] text-mist">générations</span>
           </p>
-          <p className="mt-4 font-mono text-[10px] tracking-[0.1em] text-[color:var(--num-color)]">
+          <p className="mt-3 font-mono text-[10px] tracking-[0.1em] text-[color:var(--num-color)]">
             {todayCount ?? 0} aujourd’hui
           </p>
         </div>
@@ -210,7 +222,7 @@ export default async function DashboardPage() {
 
         {projects.length === 0 ? (
           /* État vide composé — le texte à gauche, la preuve visuelle à droite */
-          <div className="pv-glass pv-edge relative overflow-hidden rounded-2xl">
+          <div className="nv-card relative overflow-hidden">
             <div
               aria-hidden
               className="pointer-events-none absolute -top-24 left-1/3 h-64 w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(164,139,232,0.16),transparent_70%)]"
@@ -226,25 +238,34 @@ export default async function DashboardPage() {
                   et chaque bannière, affiche ou wallpaper qui suit garde exactement
                   la même direction artistique.
                 </p>
-                <Link href="/dashboard/projects/new" className="mt-7 inline-block">
-                  <span className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] transition-colors hover:bg-[#35305E]">
+                {COMING_SOON ? (
+                  <span
+                    title="Disponible prochainement"
+                    aria-disabled
+                    className="mt-7 inline-flex h-11 cursor-default items-center justify-center gap-2.5 rounded-[14px] border border-white/[0.12] bg-white/[0.04] px-6 text-sm font-medium text-ink opacity-55 shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
+                  >
                     Créer un projet
-                    <ArrowRight size={15} />
+                    <span className="nv-badge-soon">À venir</span>
                   </span>
-                </Link>
+                ) : (
+                  <Link href="/dashboard/projects/new" className="pv-btn mt-7">
+                    Créer un projet
+                    <ArrowRight size={15} strokeWidth={1.5} />
+                  </Link>
+                )}
                 <p className="mt-4 font-mono text-[10px] tracking-[0.1em] text-dusk">
                   3 questions · logo d’abord · zéro prompt à écrire
                 </p>
               </div>
               {/* Éventail de créations — ce que le moteur produit */}
               <div className="relative mx-auto hidden h-[260px] w-full max-w-[420px] lg:block" aria-hidden>
-                <div className="absolute left-0 top-8 h-[210px] w-[150px] -rotate-6 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] shadow-[0_18px_44px_rgba(96,84,140,0.22)]">
+                <div className="absolute left-0 top-8 h-[210px] w-[150px] -rotate-6 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] shadow-[0_18px_44px_rgba(0,0,0,0.52)]">
                   <Image src="/affiche1.webp" alt="" fill sizes="150px" className="object-cover" />
                 </div>
-                <div className="absolute left-1/2 top-0 z-10 h-[240px] w-[170px] -translate-x-1/2 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] shadow-[0_24px_56px_rgba(96,84,140,0.3)]">
+                <div className="absolute left-1/2 top-0 z-10 h-[240px] w-[170px] -translate-x-1/2 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] shadow-[0_24px_56px_rgba(0,0,0,0.6)]">
                   <Image src="/postergrandfivem.webp" alt="" fill sizes="170px" className="object-cover" />
                 </div>
-                <div className="absolute right-0 top-10 h-[200px] w-[145px] rotate-6 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] shadow-[0_18px_44px_rgba(96,84,140,0.22)]">
+                <div className="absolute right-0 top-10 h-[200px] w-[145px] rotate-6 overflow-hidden rounded-xl border border-[color:var(--hairline-strong)] shadow-[0_18px_44px_rgba(0,0,0,0.52)]">
                   <Image src="/vice.webp" alt="" fill sizes="145px" className="object-cover" />
                 </div>
               </div>
@@ -256,19 +277,19 @@ export default async function DashboardPage() {
               <Link
                 key={project.id}
                 href={`/dashboard/projects/${project.id}`}
-                className="pv-glass pv-edge pv-ignite group flex flex-col rounded-2xl p-5"
+                className="nv-card nv-card--lift group flex flex-col p-5"
               >
                 <div className="flex items-center gap-4">
-                  <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-ink">
+                  <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-[12px] bg-white/[0.04] p-[10px]">
                     {project.logo_master?.url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={project.logo_master.url}
                         alt=""
-                        className="h-full w-full object-contain p-1.5"
+                        className="h-full w-full object-contain"
                       />
                     ) : (
-                      <span className="pv-display text-lg text-white">
+                      <span className="pv-display text-lg text-ink">
                         {project.name.slice(0, 2).toUpperCase()}
                       </span>
                     )}
@@ -280,32 +301,50 @@ export default async function DashboardPage() {
                     </span>
                   </span>
                 </div>
-                <div className="mt-5 flex items-center justify-between border-t border-[color:var(--hairline)] pt-4">
-                  <span className="font-mono text-[11px] text-steel">
-                    {project.assetCount} création{project.assetCount > 1 ? "s" : ""}
+                {/* Pied de carte : la palette en pastilles superposées
+                    au coin bas-gauche, la méta en mono */}
+                <div className="mt-5 flex items-center justify-between gap-3 border-t border-[color:var(--hairline)] pt-4">
+                  {project.palette.length > 0 ? (
+                    <span className="nv-swatches shrink-0" aria-hidden>
+                      {project.palette.slice(0, 5).map((color, i) => (
+                        <span key={`${color}-${i}`} style={{ background: color }} />
+                      ))}
+                    </span>
+                  ) : (
+                    <span aria-hidden />
+                  )}
+                  <span className="truncate font-mono text-[10.5px] tracking-[0.04em] text-mist">
+                    {project.assetCount} création{project.assetCount > 1 ? "s" : ""} · {timeAgo(project.lastActivity)}
                   </span>
-                  <span className="font-mono text-[10px] text-dusk">{timeAgo(project.lastActivity)}</span>
                 </div>
-                {project.palette.length > 0 ? (
-                  <div className="mt-3 flex h-1.5 overflow-hidden rounded-full">
-                    {project.palette.slice(0, 6).map((color, i) => (
-                      <span key={`${color}-${i}`} className="h-full flex-1" style={{ background: color }} />
-                    ))}
-                  </div>
-                ) : null}
               </Link>
             ))}
 
-            {/* Carte d'ajout — clôture la grille */}
-            <Link
-              href="/dashboard/projects/new"
-              className="group flex min-h-[150px] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-[color:var(--hairline-strong)] text-dusk transition-colors hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
-            >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] transition-colors group-hover:border-[rgba(164,139,232,0.5)]">
-                <Plus size={16} />
+            {/* Carte d'ajout — verre vide, un + centré, jamais de
+                pointillés */}
+            {COMING_SOON ? (
+              <span
+                title="Disponible prochainement"
+                aria-disabled
+                className="nv-card relative flex min-h-[150px] cursor-default flex-col items-center justify-center gap-3 text-mist opacity-55"
+              >
+                <span className="nv-badge-soon absolute right-3 top-3">À venir</span>
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)]">
+                  <Plus size={16} strokeWidth={1.5} />
+                </span>
+                <span className="text-[13px] font-medium">Nouveau projet</span>
               </span>
-              <span className="text-[13px] font-medium">Nouveau projet</span>
-            </Link>
+            ) : (
+              <Link
+                href="/dashboard/projects/new"
+                className="nv-card nv-card--lift group flex min-h-[150px] flex-col items-center justify-center gap-3 text-mist hover:text-ink"
+              >
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] transition-colors duration-200 group-hover:border-[rgba(184,161,232,0.5)]">
+                  <Plus size={16} strokeWidth={1.5} />
+                </span>
+                <span className="text-[13px] font-medium">Nouveau projet</span>
+              </Link>
+            )}
           </div>
         )}
       </section>
@@ -317,18 +356,18 @@ export default async function DashboardPage() {
           <span className="pv-label--dim pv-label">Synchronisée en direct</span>
         </div>
         {recentActivity.length === 0 ? (
-          <div className="relative overflow-hidden rounded-xl border border-dashed border-[color:var(--hairline-strong)] px-6 py-12 text-center">
+          <div className="nv-card relative overflow-hidden px-6 py-12 text-center">
             <div
               aria-hidden
-              className="pointer-events-none absolute left-1/2 top-0 h-32 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(164,139,232,0.12),transparent_70%)]"
+              className="pointer-events-none absolute left-1/2 top-0 h-32 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(184,161,232,0.12),transparent_70%)]"
             />
             <p className="text-lg font-semibold text-ink/85">Le registre est encore vierge.</p>
-            <p className="mt-3 font-mono text-xs tracking-[0.06em] text-dusk">
+            <p className="mt-3 font-mono text-xs tracking-[0.06em] text-mist">
               Créez un projet et lancez votre première génération.
             </p>
           </div>
         ) : (
-          <ul className="pv-glass pv-edge rounded-xl px-2">
+          <ul className="nv-card px-2">
             {recentActivity.map((item, index) => {
               const Icon = TYPE_ICONS[item.type] ?? ImageIcon;
               return (

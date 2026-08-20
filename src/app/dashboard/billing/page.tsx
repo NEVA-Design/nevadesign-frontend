@@ -3,6 +3,7 @@ import { useState, Suspense } from "react";
 import { ArrowUpRight, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormMessage } from "@/components/ui/field";
+import { LEGACY_PRICING } from "@/lib/feature-flags";
 import { PLANS, TOPUPS } from "@/lib/plans";
 import { useSearchParams } from "next/navigation";
 import { backendFetch } from "@/lib/api/backend-client";
@@ -85,7 +86,77 @@ function BillingContent() {
         </FormMessage>
       ) : null}
 
-      {/* ── Formules ────────────────────────────────────────────── */}
+      {/* ── Pivot 20/08 : les 2 formules Neva Generative ─────────
+          L'ancienne grille (4 plans + recharges) reste dans le code
+          sous LEGACY_PRICING. Les prix ne sont pas encore fixés :
+          l'état est designé (« — » + badge Bientôt), jamais un
+          placeholder brut. Le paiement s'activera quand les Price
+          IDs Stripe existeront. */}
+      {!LEGACY_PRICING ? (
+        <section className="relative mt-12">
+          <div className="mb-6 flex items-baseline justify-between gap-4">
+            <h2 className="pv-display text-xl text-ink">Neva Generative — abonnements</h2>
+            <span className="pv-label">Sans engagement</span>
+          </div>
+          <div className="grid gap-5 lg:grid-cols-2">
+            {[
+              {
+                id: "generative-gta",
+                name: "Scènes GTA",
+                features: [
+                  "Quota mensuel dévoilé à l'ouverture",
+                  "Formats bannière + poster",
+                  "Usage commercial autorisé",
+                ],
+              },
+              {
+                id: "generative-banner",
+                name: "Bannières Discord IA",
+                features: [
+                  "Quota mensuel dévoilé à l'ouverture",
+                  "Accès à tous les modèles",
+                  "Personnalisation nom / thème / couleur",
+                ],
+              },
+            ].map((formule) => (
+              <article
+                key={formule.id}
+                className="pv-glass pv-edge relative flex h-full flex-col rounded-2xl p-6"
+              >
+                <h3 className="pv-display text-xl text-ink">{formule.name}</h3>
+                <p className="mt-5 flex items-baseline gap-2.5">
+                  <span aria-hidden className="pv-display text-[34px] leading-none text-ink">
+                    —
+                  </span>
+                  <span className="pv-meta">€ / mois</span>
+                  <span className="nv-badge-soon">Bientôt</span>
+                  <span className="sr-only">Prix annoncé à l&apos;ouverture</span>
+                </p>
+                <ul className="mt-5 flex flex-col gap-2 border-t border-[color:var(--hairline)] pt-5">
+                  {formule.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2.5 text-[12.5px] leading-snug text-steel">
+                      <Check size={12} className="mt-[3px] shrink-0 text-[color:var(--num-color)]/70" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-auto pt-6">
+                  <Button variant="primary" className="w-full" disabled title="Disponible prochainement">
+                    S&apos;abonner
+                  </Button>
+                  <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-dusk">
+                    Ouverture prochaine
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {/* ── Formules legacy (LEGACY_PRICING) ────────────────────── */}
+      {LEGACY_PRICING ? (
+      <>
       <section className="relative mt-12">
         <div className="mb-6 flex items-baseline justify-between gap-4">
           <h2 className="pv-display text-xl text-ink">Formules mensuelles</h2>
@@ -170,8 +241,11 @@ function BillingContent() {
         </span>
         Report des créations non utilisées : 1 mois
       </p>
+      </>
+      ) : null}
 
-      {/* ── Recharges de créations (2,90 € l’unité) ─────────────── */}
+      {/* ── Recharges de créations (legacy, 2,90 € l'unité) ─────── */}
+      {LEGACY_PRICING ? (
       <section className="relative mt-14">
         <div className="mb-5 flex items-baseline justify-between gap-4">
           <h2 className="pv-display text-xl text-ink">Recharges de créations</h2>
@@ -206,6 +280,7 @@ function BillingContent() {
           ))}
         </div>
       </section>
+      ) : null}
 
       <p className="pv-meta relative mt-12 text-center">
         Paiements sécurisés via Stripe · Annulation à tout moment · Remboursement sous 7 jours

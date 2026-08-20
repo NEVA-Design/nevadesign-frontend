@@ -80,7 +80,7 @@ export default function SignupPage() {
       {/* Cadre éditorial — la page comme objet imprimé */}
       <div
         aria-hidden
-        className="pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.55)]"
+        className="pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.14)]"
         style={{ inset: "var(--frame-inset)" }}
       />
 
@@ -114,7 +114,7 @@ export default function SignupPage() {
           {/* La carte porteuse — verre fort, arête allumée, ombre mauve */}
           <section className="pv-glass pv-glass--strong pv-edge pv-shadow-mauve pv-fade-up px-6 py-8 sm:px-9 sm:py-10">
             <Link href="/" aria-label="Neva Design — accueil" className="inline-flex">
-              <BrandMark size={24} tone="ink" />
+              <BrandMark size={24} tone="white" />
             </Link>
 
             {success ? (
@@ -128,7 +128,7 @@ export default function SignupPage() {
                 <p className="mt-3 text-sm leading-relaxed text-slate">
                   {success}
                 </p>
-                <p className="mt-5 rounded-[12px] border border-[rgba(43,36,80,0.07)] bg-white/60 px-4 py-3.5 text-[13px] leading-relaxed text-slate">
+                <p className="mt-5 rounded-[12px] border border-[rgba(255,255,255,0.08)] bg-white/5 px-4 py-3.5 text-[13px] leading-relaxed text-slate">
                   Pensez aussi à vérifier les courriers indésirables. Une fois
                   l’adresse confirmée, vous pourrez vous connecter à votre espace.
                 </p>
@@ -232,14 +232,14 @@ export default function SignupPage() {
                 En créant un compte, vous acceptez nos{" "}
                 <Link
                   href="/terms"
-                  className="underline decoration-[rgba(43,36,80,0.3)] underline-offset-2 transition-colors hover:text-ink"
+                  className="underline decoration-[rgba(255,255,255,0.25)] underline-offset-2 transition-colors hover:text-ink"
                 >
                   Conditions d’utilisation
                 </Link>{" "}
                 et notre{" "}
                 <Link
                   href="/privacy"
-                  className="underline decoration-[rgba(43,36,80,0.3)] underline-offset-2 transition-colors hover:text-ink"
+                  className="underline decoration-[rgba(255,255,255,0.25)] underline-offset-2 transition-colors hover:text-ink"
                 >
                   Politique de confidentialité
                 </Link>

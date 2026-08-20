@@ -32,7 +32,7 @@ export default function GivreStats() {
         <RevealBlock>
           <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
             <div className="pv-page-num [&>b]:text-[44px]">
-              <b>07</b>
+              <b>08</b>
               <span>/10</span>
             </div>
             <p className="pb-1 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
@@ -43,16 +43,16 @@ export default function GivreStats() {
 
         {/* Le bandeau : deux filets blancs, quatre compteurs en ligne */}
         <RevealBlock delay={0.08} className="mt-7">
-          <div className="border-y border-[rgba(255,255,255,0.55)]">
+          <div className="border-y border-[rgba(255,255,255,0.14)]">
             <div className="grid grid-cols-2 lg:grid-cols-4">
               {stats.map((stat, i) => (
                 <div
                   key={stat.label}
                   className={[
                     "px-5 py-8 sm:px-8 lg:py-9",
-                    i > 0 ? "lg:border-l lg:border-[rgba(255,255,255,0.55)]" : "",
-                    i % 2 === 1 ? "border-l border-[rgba(255,255,255,0.55)]" : "",
-                    i > 1 ? "border-t border-[rgba(255,255,255,0.55)] lg:border-t-0" : "",
+                    i > 0 ? "lg:border-l lg:border-[rgba(255,255,255,0.14)]" : "",
+                    i % 2 === 1 ? "border-l border-[rgba(255,255,255,0.14)]" : "",
+                    i > 1 ? "border-t border-[rgba(255,255,255,0.14)] lg:border-t-0" : "",
                   ].join(" ")}
                 >
                   <p className="font-display text-[36px] font-light leading-none text-ink sm:text-[44px]">

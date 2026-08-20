@@ -107,7 +107,7 @@ export default function AppMockup({ className }: { className?: string }) {
       const setActiveModule = (idx: number) => {
         moduleEls.forEach((el, i) => {
           el.classList.toggle("bg-ink", i === idx);
-          el.classList.toggle("text-white", i === idx);
+          el.classList.toggle("text-[#060606]", i === idx);
           el.classList.toggle("font-medium", i === idx);
           el.classList.toggle("text-slate", i !== idx);
           const dot = el.querySelector<HTMLElement>("[data-demo-dot]");
@@ -261,7 +261,7 @@ export default function AppMockup({ className }: { className?: string }) {
     <div
       ref={scope}
       className={cn(
-        "pv-glass pv-chrome-edge relative overflow-hidden rounded-3xl shadow-[inset_0_1px_0_rgba(255,255,255,0.9),var(--shadow-float)]",
+        "pv-glass pv-chrome-edge relative overflow-hidden rounded-3xl shadow-[inset_0_1px_0_rgba(255,255,255,0.10),var(--shadow-float)]",
         className
       )}
     >
@@ -275,7 +275,7 @@ export default function AppMockup({ className }: { className?: string }) {
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate">
           {t("demo.window", "Design Studio — Neva")}
         </p>
-        <span className="hidden items-center gap-2 rounded-full border border-[color:var(--hairline-glass)] bg-white/55 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.14em] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-md sm:inline-flex">
+        <span className="hidden items-center gap-2 rounded-full border border-[color:var(--hairline-glass)] bg-white/5 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.14em] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.10)] backdrop-blur-md sm:inline-flex">
           <span className="pv-breathe h-1.5 w-1.5 rounded-full bg-ok" />
           {t("demo.label", "Design Studio — en direct")}
         </span>
@@ -285,7 +285,7 @@ export default function AppMockup({ className }: { className?: string }) {
         {/* Rail modules — le module actif porte la pilule encre */}
         <aside className="pv-hairline hidden flex-col justify-between border-r p-4 md:flex">
           <div>
-            <BrandMark size={16} tone="ink" className="mb-6 opacity-90" />
+            <BrandMark size={16} tone="white" className="mb-6 opacity-90" />
             <nav className="flex flex-col gap-1">
               {MODULES.map(({ icon: Icon, label }, i) => (
                 <span
@@ -293,7 +293,7 @@ export default function AppMockup({ className }: { className?: string }) {
                   data-demo-module
                   className={cn(
                     "flex items-center gap-3 rounded-full px-3 py-2 text-[12px] transition-colors duration-500",
-                    i === 0 ? "bg-ink font-medium text-white" : "text-slate"
+                    i === 0 ? "bg-ink font-medium text-[#060606]" : "text-slate"
                   )}
                 >
                   <Icon size={13} strokeWidth={1.8} />
@@ -346,7 +346,7 @@ export default function AppMockup({ className }: { className?: string }) {
                   <span
                     key={i}
                     data-demo-swatch
-                    className="h-8 w-8 rounded-full border border-ink/10 shadow-[0_1px_2px_rgba(43,36,80,0.08)]"
+                    className="h-8 w-8 rounded-full border border-ink/10 shadow-[0_1px_2px_rgba(0,0,0,0.38)]"
                   />
                 ))}
               </div>
@@ -366,7 +366,7 @@ export default function AppMockup({ className }: { className?: string }) {
           <div className="mt-auto pt-6">
             <span
               data-demo-btn
-              className="inline-flex h-9 cursor-default items-center gap-2 rounded-full bg-ink px-4 text-[12px] font-medium text-white shadow-[0_1px_2px_rgba(43,36,80,0.14),0_8px_22px_rgba(43,36,80,0.2)]"
+              className="inline-flex h-9 cursor-default items-center gap-2 rounded-full bg-ink px-4 text-[12px] font-medium text-[#060606] shadow-[0_1px_2px_rgba(0,0,0,0.44),0_8px_22px_rgba(0,0,0,0.5)]"
             >
               <span data-demo-btnlabel>{t("demo.compose", "Composer")}</span>
               <ArrowRight size={13} />

@@ -8,8 +8,8 @@ import SatinSphere from "@/components/givre/SatinSphere";
  */
 export default function NotFound() {
   return (
-    <div className="pv-light pv-scene relative min-h-[100svh] bg-paper text-ink">
-      <style>{`html{color-scheme:light}body{background-color:#F1EFE9;color:#2B2450}`}</style>
+    <div className="pv-light pv-scene relative min-h-[100svh] text-ink">
+      <style>{`html{color-scheme:dark}body{background-color:#060606;color:#F2F2F0}`}</style>
       <div aria-hidden className="pv-scene-bg--dawn-calm absolute inset-0" />
       <div aria-hidden className="pv-caustics" />
       <div aria-hidden className="pv-windowlight absolute inset-0 opacity-50" />
@@ -26,7 +26,7 @@ export default function NotFound() {
       {/* Cadre éditorial */}
       <div
         aria-hidden
-        className="pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.55)]"
+        className="pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.14)]"
         style={{ inset: "var(--frame-inset)" }}
       />
 

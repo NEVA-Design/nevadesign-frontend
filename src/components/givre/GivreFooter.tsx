@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { useTranslations } from "@/components/LanguageProvider";
 import LocalTime from "@/components/prisme/LocalTime";
 import { RevealBlock, RevealMask } from "@/components/prisme/Motion";
+import { DISCORD_URL } from "@/lib/links";
 
 /*
  * Finale + footer Givre — la boucle se boucle. La page s'était
@@ -25,12 +26,14 @@ export default function GivreFooter() {
 
   const columns: { title: string; links: FooterLink[] }[] = [
     {
+      /* Pivot 20/08 : plus d'ancres Tarifs/Packs (legacy sous flag)
+         — la colonne mène au studio, aux avis et à la Generative */
       title: t("footer.product", "Produit"),
       links: [
-        { label: t("footer.link.modules", "Modules"), href: "#modules" },
+        { label: t("nav.studio2", "Le studio"), href: "#studio" },
+        { label: t("nav.reviews", "Avis"), href: "#avis" },
         { label: t("nav.creations", "Créations"), href: "#creations" },
-        { label: t("footer.link.pricing", "Tarifs"), href: "#pricing" },
-        { label: t("footer.link.resources", "Packs"), href: "#packs" },
+        { label: t("nav.generative", "Neva Generative"), href: "#generative" },
         { label: "FAQ", href: "#faq" },
       ],
     },
@@ -39,7 +42,7 @@ export default function GivreFooter() {
       links: [
         { label: t("footer.link.studio", "Neva Design Studio"), href: "/neva-design" },
         { label: t("footer.link.agency", "Maison mère"), href: "https://neva-agency.fr", external: true },
-        { label: t("footer.link.discord", "Discord"), href: "https://discord.gg/nevadesign", external: true },
+        { label: t("footer.link.discord", "Discord"), href: DISCORD_URL, external: true },
         { label: t("footer.link.contact", "Contact"), href: "mailto:nevapro@nevadesign.fr", external: true },
       ],
     },
@@ -48,12 +51,15 @@ export default function GivreFooter() {
          recherche — leur seule porte d'entrée dans la navigation */
       title: t("footer.solutions", "Solutions"),
       links: [
+        /* Purge 20/08 : Miniature YouTube / Générateur de logo /
+           Flyer en ligne retirés — leurs landings sont en 301
+           vers les landings FiveM (SEO préservé). */
         { label: t("footer.link.fivemDesigner", "Graphiste FiveM"), href: "/graphiste-fivem" },
         { label: t("footer.link.fivemLogo", "Logo FiveM"), href: "/logo-fivem" },
         { label: t("footer.link.fivemPack", "Pack graphique FiveM"), href: "/pack-graphique-fivem" },
-        { label: t("footer.link.thumbnail", "Miniature YouTube"), href: "/miniature-youtube" },
-        { label: t("footer.link.logoMaker", "Générateur de logo"), href: "/generateur-de-logo" },
-        { label: t("footer.link.flyer", "Flyer en ligne"), href: "/flyer-en-ligne" },
+        { label: t("footer.link.fivemBanner", "Bannière Discord FiveM"), href: "/banniere-discord-fivem" },
+        { label: t("footer.link.fivemPoster", "Affiche serveur FiveM"), href: "/affiche-serveur-fivem" },
+        { label: t("footer.link.fivemLoading", "Loading screen FiveM"), href: "/loading-screen-fivem" },
       ],
     },
     {
@@ -81,7 +87,7 @@ export default function GivreFooter() {
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(34% 42% at 38% 30%, rgba(164,139,232,0.34) 0%, rgba(164,139,232,0) 70%), radial-gradient(30% 38% at 64% 62%, rgba(239,184,148,0.32) 0%, rgba(239,184,148,0) 72%)",
+              "radial-gradient(34% 42% at 38% 30%, rgba(164,139,232,0.16) 0%, rgba(164,139,232,0) 70%), radial-gradient(30% 38% at 64% 62%, rgba(239,184,148,0.14) 0%, rgba(239,184,148,0) 72%)",
           }}
         />
 
@@ -98,9 +104,9 @@ export default function GivreFooter() {
             height: 168,
             borderRadius: "999px",
             background:
-              "radial-gradient(58% 52% at 33% 26%, #FFFFFF 0%, rgba(255,255,255,0) 62%), radial-gradient(70% 66% at 68% 74%, rgba(239,184,148,0.5) 0%, rgba(239,184,148,0) 74%), radial-gradient(80% 76% at 26% 62%, rgba(164,139,232,0.42) 0%, rgba(164,139,232,0) 76%), radial-gradient(120% 120% at 50% 40%, #F7F4F0 0%, #E9E4DE 78%, #DCD6CF 100%)",
+              "radial-gradient(58% 52% at 33% 26%, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0) 62%), radial-gradient(70% 66% at 68% 74%, rgba(239,184,148,0.28) 0%, rgba(239,184,148,0) 74%), radial-gradient(80% 76% at 26% 62%, rgba(164,139,232,0.24) 0%, rgba(164,139,232,0) 76%), radial-gradient(120% 120% at 50% 40%, #1E1E1E 0%, #121212 78%, #0C0C0C 100%)",
             boxShadow:
-              "inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -14px 26px rgba(96,84,140,0.16), 0 26px 40px -18px rgba(43,36,80,0.28)",
+              "inset 0 1px 1px rgba(255,255,255,0.22), inset 0 -14px 26px rgba(0,0,0,0.45), 0 26px 40px -18px rgba(0,0,0,0.60)",
           }}
         />
         <div
@@ -113,7 +119,7 @@ export default function GivreFooter() {
             height: 40,
             borderRadius: "50%",
             background:
-              "radial-gradient(50% 50% at 50% 50%, rgba(43,36,80,0.2) 0%, rgba(43,36,80,0) 70%)",
+              "radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 70%)",
             filter: "blur(10px)",
           }}
         />
@@ -121,11 +127,11 @@ export default function GivreFooter() {
         {/* Cadre éditorial — les mêmes filets blancs que le hero */}
         <div
           aria-hidden
-          className="pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.68)] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_2px_6px_rgba(96,84,140,0.07),0_30px_80px_rgba(96,84,140,0.13)]"
+          className="pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.12)] shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_2px_6px_rgba(0,0,0,0.40),0_30px_80px_rgba(0,0,0,0.50)]"
           style={{
             inset: "var(--frame-inset)",
             background:
-              "radial-gradient(115% 115% at 50% 50%, rgba(255,255,255,0) 72%, rgba(255,255,255,0.1) 100%)",
+              "radial-gradient(115% 115% at 50% 50%, rgba(255,255,255,0) 72%, rgba(255,255,255,0.03) 100%)",
           }}
         />
 
@@ -134,7 +140,7 @@ export default function GivreFooter() {
             <p className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
               {t(
                 "hero.eyebrow",
-                "Studio créatif IA — Miniatures · Logos · Identités · Gaming"
+                "Studio de graphisme — Logos · Packs FiveM · Bannières · IA générative"
               )}
             </p>
           </RevealBlock>
@@ -152,37 +158,42 @@ export default function GivreFooter() {
             <p className="mx-auto mt-6 max-w-[440px] text-[15.5px] leading-[1.7] text-slate">
               {t(
                 "footer.cta.subtitle",
-                "Décrivez votre univers. Le premier visuel est prêt dans la minute."
+                "Commandez au studio sur Discord, ou abonnez-vous à Neva Generative."
               )}
             </p>
           </RevealBlock>
 
           <RevealBlock delay={0.16}>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-              <Link href="/signup" className="pv-btn">
-                {t("footer.cta.primary", "Commencer gratuitement")}
+              <a
+                href={DISCORD_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pv-btn"
+              >
+                {t("footer.cta.primary", "Commander sur Discord")}
                 <ArrowRight size={16} />
-              </Link>
-              <Link href="/neva-design" className="pv-btn pv-btn--ghost">
-                {t("footer.cta.secondary", "Parler au studio")}
-              </Link>
+              </a>
+              <a href="#generative" className="pv-btn pv-btn--ghost">
+                {t("footer.cta.secondary", "Neva Generative")}
+              </a>
             </div>
             <p className="mt-7 font-mono text-[10.5px] uppercase tracking-[0.18em] text-mist">
-              {t("footer.cta.note", "Aucune carte demandée")}
+              {t("footer.cta.note", "Réponse rapide sur Discord")}
             </p>
           </RevealBlock>
         </div>
       </section>
 
-      {/* ── Le registre — marque et colonnes sur la brume claire ── */}
-      <div className="relative overflow-hidden border-t border-[rgba(43,36,80,0.07)] bg-[#F0EEE8]">
+      {/* ── Le registre — marque et colonnes, voile sur le satin ── */}
+      <div className="relative overflow-hidden border-t border-[rgba(255,255,255,0.07)] bg-[rgba(8,8,8,0.45)]">
         {/* Filigrane ΛV géant en ligne de base (D08) — le gaufrage
             de la maison, coupé par le bord bas comme une marque à
             chaud. Ink 0,04 : présence, jamais salissure. */}
         <svg
           aria-hidden
           viewBox="0 0 1441 1000"
-          className="pointer-events-none absolute left-1/2 w-[min(860px,86vw)] -translate-x-1/2 fill-[rgba(43,36,80,0.04)]"
+          className="pointer-events-none absolute left-1/2 w-[min(860px,86vw)] -translate-x-1/2 fill-[rgba(255,255,255,0.04)]"
           style={{ bottom: "-34%" }}
         >
           <path d="M440.2 0 L864.6 1000 L694.6 1000 L441 379 L180.1 1000 L0 1000 Z" />
@@ -194,7 +205,7 @@ export default function GivreFooter() {
           <div className="grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr] lg:gap-14">
             <div>
               <Image
-                src="/brand/logo-noir.png"
+                src="/brand/logo-blanc.png"
                 alt="Neva Design"
                 width={72}
                 height={50}
@@ -203,7 +214,7 @@ export default function GivreFooter() {
               <p className="mt-5 max-w-[30ch] text-sm leading-relaxed text-slate">
                 {t(
                   "footer.baseline",
-                  "Le studio créatif IA des serveurs FiveM. La direction artistique en plus."
+                  "Studio de graphisme & IA générative — logos, packs FiveM, bannières, scènes GTA."
                 )}
               </p>
             </div>
@@ -233,7 +244,7 @@ export default function GivreFooter() {
         </div>
 
         {/* Rangée basse — copyright, heure du studio, réseaux */}
-        <div className="relative border-t border-[rgba(43,36,80,0.07)]">
+        <div className="relative border-t border-[rgba(255,255,255,0.07)]">
           <div className="mx-auto flex pv-container flex-col items-start justify-between gap-4 px-5 py-7 sm:flex-row sm:items-center sm:px-8">
             <p className="font-mono text-[11px] tracking-[0.1em] text-mist">
               © {year} Neva Design · {t("footer.rights", "Tous droits réservés.")}
@@ -241,7 +252,7 @@ export default function GivreFooter() {
             <div className="flex items-center gap-6">
               <LocalTime />
               <a
-                href="https://discord.gg/nevadesign"
+                href={DISCORD_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Discord"
@@ -270,7 +281,7 @@ export default function GivreFooter() {
             puis de l'air. Le wordmark géant a disparu avec l'îlot. */}
         <div
           aria-hidden
-          className="h-px bg-[rgba(255,255,255,0.8)]"
+          className="h-px bg-[rgba(255,255,255,0.22)]"
           style={{
             marginLeft: "var(--frame-inset)",
             marginRight: "var(--frame-inset)",

@@ -24,8 +24,8 @@ export default function LegalPage({
 }) {
   return (
     <>
-      <style>{`html{color-scheme:light}body{background-color:#F1EFE9;color:#2B2450}`}</style>
-      <main className="pv-light min-h-screen bg-paper text-ink">
+      <style>{`html{color-scheme:dark}body{background-color:#060606;color:#F2F2F0}`}</style>
+      <main className="pv-light min-h-screen text-ink">
         <header className="mx-auto flex w-full max-w-[820px] items-center justify-between px-6 pb-2 pt-7">
           <Link
             href="/"
@@ -71,11 +71,11 @@ export default function LegalPage({
             ))}
           </div>
 
-          <p className="mt-14 border-t border-[rgba(43,36,80,0.1)] pt-6 text-[13.5px] leading-[1.7] text-mist">
+          <p className="mt-14 border-t border-[rgba(255,255,255,0.08)] pt-6 text-[13.5px] leading-[1.7] text-mist">
             Une question sur ces conditions ou vos données ? Écrivez-nous :{" "}
             <a
               href="mailto:nevapro@nevadesign.fr"
-              className="text-slate underline decoration-[rgba(43,36,80,0.25)] underline-offset-4 hover:text-ink"
+              className="text-slate underline decoration-[rgba(255,255,255,0.20)] underline-offset-4 hover:text-ink"
             >
               nevapro@nevadesign.fr
             </a>

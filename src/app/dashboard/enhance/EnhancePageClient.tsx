@@ -263,7 +263,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
                       className={`w-full rounded-lg border px-4 py-3 text-left transition-colors duration-300 ${
                         isActive
                           ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)]"
-                          : "border-[color:var(--hairline)] hover:border-[#C9C9C0]"
+                          : "border-[color:var(--hairline)] hover:border-[#4A4A4A]"
                       }`}
                     >
                       <span className="flex items-center justify-between gap-3">
@@ -553,7 +553,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
             type="button"
             onClick={() => setFullscreen(null)}
             aria-label="Fermer l'aperçu plein écran"
-            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-lg border border-[color:var(--hairline-strong)] bg-white text-ink/70 transition-colors duration-300 hover:text-ink"
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-lg border border-[color:var(--hairline-strong)] bg-white/5 text-ink/70 transition-colors duration-300 hover:text-ink"
           >
             <X size={16} />
           </button>
@@ -594,7 +594,7 @@ function PreviewPanel({
       type="button"
       onClick={onFullscreen}
       aria-label="Afficher en plein écran"
-      className="group relative block w-full overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-abyss transition-colors duration-300 hover:border-[#C9C9C0]"
+      className="group relative block w-full overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-abyss transition-colors duration-300 hover:border-[#4A4A4A]"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={image} alt={label} className="h-auto w-full object-contain" />

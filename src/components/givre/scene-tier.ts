@@ -44,6 +44,21 @@ function classify(): { tier: SceneTier; reason: string } {
     /* stockage indisponible */
   }
 
+  /* MAJ 20/08 — téléphones et petites tablettes TACTILES : tier low
+     d'office. Le poster AVIF HQ + micro-parallaxe EST la scène du
+     mobile (design assumé du run 3) : zéro chunk three (−262 Ko),
+     zéro peinture de textures, zéro compile — le TBT mobile chute
+     et la batterie respire. Le desktop étroit (fenêtre réduite,
+     pointeur souris) garde sa 3D ; ?scene-tier= force toujours. */
+  try {
+    const touchOnly = window.matchMedia("(pointer: coarse) and (hover: none)").matches;
+    if (touchOnly && window.innerWidth < 1024) {
+      return { tier: "low", reason: `mobile tactile (${window.innerWidth} px)` };
+    }
+  } catch {
+    /* matchMedia indisponible : on classe normalement */
+  }
+
   /* le renderer WebGL est le meilleur signal : un rendu logiciel
      (SwiftShader…) ne tiendra jamais le shader de verre */
   let renderer = "";

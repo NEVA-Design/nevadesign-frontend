@@ -80,7 +80,7 @@ export default function LandingPage({ landing }: { landing: Landing }) {
 
   return (
     <>
-      <style>{`html{color-scheme:light}body{background-color:#F1EFE9;color:#2B2450}`}</style>
+      <style>{`html{color-scheme:dark}body{background-color:#060606;color:#F2F2F0}`}</style>
       <main className="pv-light min-h-screen bg-paper text-ink">
         <script
           type="application/ld+json"
@@ -96,8 +96,10 @@ export default function LandingPage({ landing }: { landing: Landing }) {
           >
             Neva Design
           </Link>
-          <Link href="/signup" className="pv-btn text-[13.5px]">
-            {tr(landing, "Essayer gratuitement", "Try it free")}
+          {/* Pivot 20/08 : les outils de création sont « À venir » —
+              la sortie utile est l'offre Neva Generative */}
+          <Link href="/#generative" className="pv-btn text-[13.5px]">
+            {tr(landing, "Découvrir Neva Generative", "Discover Neva Generative")}
             <ArrowRight size={14} strokeWidth={1.8} />
           </Link>
         </header>
@@ -134,7 +136,7 @@ export default function LandingPage({ landing }: { landing: Landing }) {
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <Link href="/signup" className="pv-btn">
+            <Link href="/#generative" className="pv-btn">
               {landing.ctaLabel}
               <ArrowRight size={15} strokeWidth={1.8} />
             </Link>
@@ -192,7 +194,7 @@ export default function LandingPage({ landing }: { landing: Landing }) {
             <div className="mt-6 overflow-x-auto">
               <table className="w-full min-w-[560px] border-collapse text-left text-[14px] leading-[1.6]">
                 <thead>
-                  <tr className="border-b border-[rgba(43,36,80,0.14)] font-mono text-[10.5px] uppercase tracking-[0.16em] text-mist">
+                  <tr className="border-b border-[rgba(255,255,255,0.14)] font-mono text-[10.5px] uppercase tracking-[0.16em] text-mist">
                     <th className="py-3 pr-4 font-normal">
                       {tr(landing, "Critère", "Criteria")}
                     </th>
@@ -206,7 +208,7 @@ export default function LandingPage({ landing }: { landing: Landing }) {
                   {landing.comparison.map((row) => (
                     <tr
                       key={row.criteria}
-                      className="border-b border-[rgba(43,36,80,0.07)] align-top"
+                      className="border-b border-[rgba(255,255,255,0.08)] align-top"
                     >
                       <td className="py-3.5 pr-4 font-medium text-ink">
                         {row.criteria}
@@ -235,11 +237,11 @@ export default function LandingPage({ landing }: { landing: Landing }) {
             <h2 className="font-display text-[clamp(24px,2.4vw,32px)] font-light leading-[1.15] tracking-[-0.01em] text-ink">
               {tr(landing, "Questions fréquentes", "Frequently asked questions")}
             </h2>
-            <div className="mt-6 border-t border-[rgba(43,36,80,0.1)]">
+            <div className="mt-6 border-t border-[rgba(255,255,255,0.08)]">
               {landing.faq.map((item) => (
                 <details
                   key={item.q}
-                  className="group border-b border-[rgba(43,36,80,0.1)] py-4"
+                  className="group border-b border-[rgba(255,255,255,0.08)] py-4"
                 >
                   <summary className="flex cursor-pointer list-none items-baseline justify-between gap-6 text-[15px] font-medium text-ink [&::-webkit-details-marker]:hidden">
                     {item.q}
@@ -259,17 +261,17 @@ export default function LandingPage({ landing }: { landing: Landing }) {
           </section>
 
           {/* clôture + maillage */}
-          <section className="mt-16 border-t border-[rgba(43,36,80,0.1)] pt-10">
+          <section className="mt-16 border-t border-[rgba(255,255,255,0.08)] pt-10">
             <p className="max-w-[560px] text-[15.5px] leading-[1.7] text-slate">
               {landing.ctaText}
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-4">
-              <Link href="/signup" className="pv-btn">
+              <Link href="/#generative" className="pv-btn">
                 {landing.ctaLabel}
                 <ArrowRight size={15} strokeWidth={1.8} />
               </Link>
-              <Link href="/#pricing" className="pv-btn pv-btn--ghost">
-                {tr(landing, "Voir les tarifs", "See pricing")}
+              <Link href="/#generative" className="pv-btn pv-btn--ghost">
+                {tr(landing, "Voir les formules", "See the plans")}
               </Link>
             </div>
             {landing.related.length ? (
@@ -288,7 +290,7 @@ export default function LandingPage({ landing }: { landing: Landing }) {
                       <li key={slug}>
                         <Link
                           href={`/${slug}`}
-                          className="text-slate underline decoration-[rgba(43,36,80,0.25)] underline-offset-4 transition-colors hover:text-ink"
+                          className="text-slate underline decoration-[rgba(255,255,255,0.20)] underline-offset-4 transition-colors hover:text-ink"
                         >
                           {rel.h1}
                         </Link>
@@ -302,7 +304,7 @@ export default function LandingPage({ landing }: { landing: Landing }) {
         </article>
 
         {/* pied de page minimal */}
-        <footer className="border-t border-[rgba(43,36,80,0.08)]">
+        <footer className="border-t border-[rgba(255,255,255,0.08)]">
           <div className="mx-auto flex w-full max-w-[1080px] flex-wrap items-center justify-between gap-4 px-6 py-8 font-mono text-[10.5px] uppercase tracking-[0.16em] text-mist">
             <Link href={home} className="transition-colors hover:text-slate">
               ← Neva Design

@@ -69,7 +69,7 @@ export default function GivreCreations() {
           style={{ paddingRight: "calc(var(--frame-inset) + 24px)" }}
         >
           <div className="pv-page-num [&>b]:text-[44px]">
-            <b>03</b>
+            <b>04</b>
             <span>/10</span>
           </div>
         </div>
@@ -78,11 +78,11 @@ export default function GivreCreations() {
       {/* Le bandeau — pleine largeur, serti de deux filets blancs */}
       <RevealBlock delay={0.12}>
         <div className="relative z-10 mt-6">
-          <div aria-hidden className="h-px w-full bg-[rgba(255,255,255,0.55)]" />
+          <div aria-hidden className="h-px w-full bg-[rgba(255,255,255,0.14)]" />
           <div className="py-4">
             <CreationsMarquee />
           </div>
-          <div aria-hidden className="h-px w-full bg-[rgba(255,255,255,0.55)]" />
+          <div aria-hidden className="h-px w-full bg-[rgba(255,255,255,0.14)]" />
         </div>
       </RevealBlock>
     </section>

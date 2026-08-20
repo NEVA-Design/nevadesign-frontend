@@ -207,7 +207,7 @@ export default function NewProjectWizard() {
                       className={cn(
                         "group flex items-start gap-3.5 rounded-2xl border p-4 text-left transition-all duration-300",
                         selected
-                          ? "border-[rgba(164,139,232,0.65)] bg-white/70 shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_14px_36px_rgba(96,84,140,0.18)]"
+                          ? "border-[rgba(164,139,232,0.65)] bg-white/5 shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_14px_36px_rgba(0,0,0,0.48)]"
                           : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
                       )}
                     >
@@ -328,7 +328,7 @@ export default function NewProjectWizard() {
                       aria-label={`Couleur ${hex}`}
                       className={cn(
                         "relative h-14 w-14 rounded-full border-2 transition-all duration-200",
-                        selected ? "scale-110 border-ink shadow-[0_6px_18px_rgba(43,36,80,0.3)]" : "border-black/10 hover:scale-105"
+                        selected ? "scale-110 border-ink shadow-[0_6px_18px_rgba(0,0,0,0.6)]" : "border-black/10 hover:scale-105"
                       )}
                       style={{ background: hex }}
                     >
@@ -346,7 +346,7 @@ export default function NewProjectWizard() {
                   className={cn(
                     "flex h-14 items-center gap-2 rounded-full border-2 px-5 text-[13px] font-medium transition-all duration-200",
                     couleur === "surprise"
-                      ? "scale-105 border-ink bg-white text-ink shadow-[0_6px_18px_rgba(43,36,80,0.25)]"
+                      ? "scale-105 border-ink bg-white/5 text-ink shadow-[0_6px_18px_rgba(0,0,0,0.55)]"
                       : "border-[color:var(--hairline-strong)] text-steel hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
                   )}
                 >
@@ -373,7 +373,7 @@ export default function NewProjectWizard() {
                     <button
                       type="button"
                       onClick={() => setReferences((c) => c.filter((r) => r !== url))}
-                      className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-ink/80 text-white"
+                      className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-ink/80 text-[#060606]"
                       aria-label="Retirer la référence"
                     >
                       <X size={11} />
@@ -409,7 +409,7 @@ export default function NewProjectWizard() {
       </AnimatePresence>
 
       {error ? (
-        <p className="mt-6 rounded-xl border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-4 py-3 text-[13px] text-[#B4443C]">
+        <p className="mt-6 rounded-xl border border-[rgba(220,80,80,0.3)] bg-[rgba(220,80,80,0.06)] px-4 py-3 text-[13px] text-[#E08A84]">
           {error}
         </p>
       ) : null}
@@ -430,27 +430,17 @@ export default function NewProjectWizard() {
             type="button"
             disabled={!canContinue}
             onClick={() => go(1)}
-            className={cn(
-              "inline-flex h-11 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium transition-all",
-              canContinue
-                ? "bg-ink text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] hover:bg-[#35305E]"
-                : "cursor-not-allowed bg-ink/10 text-mist"
-            )}
+            className="pv-btn"
           >
             Continuer
-            <ArrowRight size={15} />
+            <ArrowRight size={15} strokeWidth={1.5} />
           </button>
         ) : (
           <button
             type="button"
             disabled={!canContinue || submitting}
             onClick={handleSubmit}
-            className={cn(
-              "inline-flex h-11 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium transition-all",
-              canContinue && !submitting
-                ? "bg-ink text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)] hover:bg-[#35305E]"
-                : "cursor-not-allowed bg-ink/10 text-mist"
-            )}
+            className="pv-btn"
           >
             {submitting ? <Loader2 size={15} className="animate-spin" /> : null}
             Créer le projet

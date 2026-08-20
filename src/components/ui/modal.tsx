@@ -49,13 +49,13 @@ export function Modal({
       aria-modal="true"
     >
       <div
-        className="absolute inset-0 bg-[rgba(43,36,80,0.38)] backdrop-blur-[8px]"
+        className="absolute inset-0 bg-[rgba(0,0,0,0.60)] backdrop-blur-[8px]"
         onClick={onClose}
         aria-hidden
       />
       <div
         className={cn(
-          "pv-scale-in relative w-full rounded-2xl border border-[color:var(--hairline-glass)] bg-[rgba(255,255,255,0.86)] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),var(--shadow-modal)] backdrop-blur-2xl",
+          "pv-scale-in relative w-full rounded-2xl border border-[color:var(--hairline-glass)] bg-[rgba(18,18,18,0.92)] shadow-[inset_0_1px_0_rgba(255,255,255,0.10),var(--shadow-modal)] backdrop-blur-2xl",
           widthClassName,
           className
         )}

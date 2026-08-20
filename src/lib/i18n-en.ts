@@ -13,17 +13,22 @@ const EN: Record<string, string> = {
   "nav.resources": "Packs",
   "nav.faq": "FAQ",
   "nav.studio": "The studio",
+  /* Pivot 20/08 — studio showcase + Neva Generative navigation */
+  "nav.studio2": "The studio",
+  "nav.reviews": "Reviews",
+  "nav.generative": "Neva Generative",
+  "nav.portfolio": "Portfolio",
 
-  "hero.eyebrow": "AI creative studio — Thumbnails · Logos · Identities · Gaming",
+  "hero.eyebrow": "FiveM design studio — Server packs · Banners · Posters · Generative AI",
   "hero.line1": "Visuals that",
   "hero.line2.pre": "earn the",
   "hero.line2.beam": "click",
   "hero.line2.post": ".",
   "hero.subtitle":
-    "YouTube thumbnails, logos, brand identities, gaming assets. Describe what you want — the AI studio composes renders ready to publish, up to 8K.",
-  "hero.cta.primary": "Create my first visual",
-  "hero.cta.secondary": "See the work",
-  "hero.proof": "No credit card",
+    "Designers for your FiveM packs, Discord banners, posters and loading screens — plus Neva Generative, the AI that composes photorealistic GTA scenes. Brief on Discord, live follow-up, fast delivery.",
+  "hero.cta.primary": "Discover the studio",
+  "hero.cta.secondary": "Neva Generative",
+  "hero.proof": "Verified client reviews",
   "hero.marquee": "Produced by the studio — published by 2,400+ creators",
 
   "demo.label": "Design Studio — live",
@@ -67,56 +72,56 @@ const EN: Record<string, string> = {
   "enhance.handle": "Compare before and after",
   "enhance.meta": "Render 5504 × 3072 · Sharpness +64% · Neva cold grading",
 
-  "typemoment.word": "Click",
+  "typemoment.word": "Recruit",
   "typemoment.caption":
-    "Thumbnails built for the click — face, massive title, contrast. Readable at 120 pixels.",
+    "Recruitment posters built for impact — character, massive title, contrast. Readable in one scroll.",
 
   "fields.label": "Playing fields",
   "fields.title": "One studio, four playing fields.",
   "fields.subtitle":
     "The same art director, four crafts. Every piece below is a studio deliverable, shown in its working format.",
-  "fields.thumbs.kicker": "( 01 ) YouTube thumbnails",
-  "fields.thumbs.title": "The face, the title, the click.",
-  "fields.thumbs.desc":
-    "Compositions built for the tile: expression, hierarchy, readability — even at 120 pixels wide.",
-  "fields.thumbs.meta": "1280 × 720 · CTR-first",
-  "fields.logos.kicker": "( 02 ) Logos & branding",
-  "fields.logos.title": "Brands that stand on their own.",
-  "fields.logos.desc":
-    "Monograms, wordmarks and symbols delivered as vectors — from favicon to storefront.",
-  "fields.logos.meta": "SVG · every variant",
-  "fields.charts.kicker": "( 03 ) Brand guidelines",
-  "fields.charts.title": "Consistency, documented.",
-  "fields.charts.desc":
-    "Palette, typography, usage rules: the board that aligns every surface, socials included.",
-  "fields.charts.meta": "palette · type · variants",
-  "fields.gaming.kicker": "( 04 ) Gaming & FiveM",
-  "fields.gaming.title": "Home turf.",
-  "fields.gaming.desc":
-    "Posters, server packs and team identities — the world where the studio earned its stripes.",
-  "fields.gaming.meta": "8K · full campaigns",
+  "fields.packs.kicker": "( 01 ) FiveM packs",
+  "fields.packs.title": "The server’s complete identity.",
+  "fields.packs.desc":
+    "Logo, banner, posters, loading screen: one coherent pack, ready for Discord and in-game.",
+  "fields.packs.meta": "full pack · every variant",
+  "fields.banners.kicker": "( 02 ) Discord & social banners",
+  "fields.banners.title": "Your server’s first impression.",
+  "fields.banners.desc":
+    "Banners, avatars and shop visuals in Discord’s exact formats — sharp at every display size.",
+  "fields.banners.meta": "960 × 540 · Discord & socials",
+  "fields.posters.kicker": "( 03 ) Posters & loading screens",
+  "fields.posters.title": "The event, writ large.",
+  "fields.posters.desc":
+    "Recruitment drives, openings, events: compositions that hold a loading screen as well as print.",
+  "fields.posters.meta": "4K · screen & print",
+  "fields.ia.kicker": "( 04 ) Generative AI",
+  "fields.ia.title": "Photorealistic GTA scenes.",
+  "fields.ia.desc":
+    "Neva Generative stages your scenes — characters, light, mood — inside your server’s universe.",
+  "fields.ia.meta": "photorealistic · up to 8K",
 
   "bento.label": "Modules",
   "bento.title": "Six modules. One art direction.",
   "bento.subtitle":
-    "Every module shapes the same material: your image. From thumbnail to full brand book, without ever losing the line.",
+    "Every module shapes the same material: your server. From a banner to a full pack, without ever losing the line.",
   "bento.design.title": "Design Studio",
   "bento.design.desc":
-    "Thumbnails, posters, banners: one brief, renders ready to publish.",
+    "Posters, banners, loading screens: one brief, renders ready to publish.",
   "bento.design.brief": "Brief",
   "bento.design.prompt":
-    "“Thumbnail for a PC review — shocked face, huge price in red, dark background.”",
+    "“Recruitment poster for my server — character up front, purple neons, massive title.",
   "bento.design.action": "Compose",
   "bento.design.meta": "3 renders · 12 s",
   "bento.design.render": "Render",
-  "bento.design.campaign": "Thumbnail delivered · 2560 × 1440",
+  "bento.design.campaign": "Poster delivered · 2304 × 4096",
   "bento.brand.title": "Brand",
   "bento.brand.desc":
-    "Logos and full brand guidelines: palette, typography, variants.",
+    "Your server’s identity: palette, typography, variants.",
   "bento.brand.wordmark": "Wordmark",
   "bento.brand.palette": "Palette",
   "bento.brand.usage": "Variants",
-  "bento.brand.meta": "Kova identity · vector",
+  "bento.brand.meta": "Server identity · vector",
   "bento.enhance.title": "Enhance",
   "bento.enhance.desc":
     "Your existing visuals go back through the studio — sharpness, light, 8K.",
@@ -126,13 +131,13 @@ const EN: Record<string, string> = {
   "bento.director.title": "Creative Director",
   "bento.director.desc":
     "The art director that talks back, pitches and launches the generation.",
-  "bento.director.user": "I need an identity for my tech channel.",
+  "bento.director.user": "I need an identity for my RP server.",
   "bento.director.answer":
     "Three directions, moodboards attached. Compose the first?",
   "bento.director.typing": "composing a moodboard…",
   "bento.character.title": "Character",
   "bento.character.desc":
-    "Characters and mascots for your servers and your channels.",
+    "Characters and mascots for your server and your community.",
   "bento.character.state": "State of San Andreas",
   "bento.character.name": "Name",
   "bento.character.job": "Occupation",
@@ -248,16 +253,16 @@ const EN: Record<string, string> = {
   "faq.subtitle": "Something more specific? The Discord answers within the day.",
   "faq.q1": "What exactly is Neva Design?",
   "faq.a1":
-    "A full AI-driven creative studio: you describe an intent, it composes YouTube thumbnails, logos, brand guidelines and gaming visuals ready to publish — with real art direction, not random generation.",
+    "A full AI-driven creative studio: you describe an intent, it composes FiveM packs, banners, posters and GTA scenes ready to publish — with real art direction, not random generation.",
   "faq.q2": "How good is the free plan, really?",
   "faq.a2":
     "The Discovery plan lets you explore the full flow, brief included, with no creations credited. Paid plans unlock HD exports, commercial use and generation priority",
   "faq.q3": "Can I sell what I create?",
   "faq.a3":
-    "Yes. From the first paid plan, every creation is commercially yours: channel, store, socials, server, client deliverables.",
+    "Yes. From the first paid plan, every creation is commercially yours: server, store, socials, client deliverables.",
   "faq.q4": "The Creative Director — another chatbot?",
   "faq.a4":
-    "No. It knows your references, your history and the codes of your field — YouTube thumbnails, brand identity or GTA RP servers. It pitches concepts, structures briefs and can launch a generation right from the conversation.",
+    "No. It knows your references, your history and the codes of your field — server packs, Discord banners or GTA RP posters. It pitches concepts, structures briefs and can launch a generation right from the conversation.",
   "faq.q5": "I can't design. Is that a problem?",
   "faq.a5":
     "That's exactly why Neva exists. Describe the result you want; composition, typography and grading are handled. The Audit module even tells you what to improve.",
@@ -268,12 +273,12 @@ const EN: Record<string, string> = {
 
   "footer.cta.title.a": "Publish something your audience",
   "footer.cta.title.beam": "will be proud of.",
-  "footer.cta.subtitle": "Describe your universe. The first visual is ready within a minute.",
-  "footer.cta.primary": "Start for free",
-  "footer.cta.secondary": "Talk to the studio",
-  "footer.cta.note": "No card required",
+  "footer.cta.subtitle": "Order from the studio on Discord, or subscribe to Neva Generative.",
+  "footer.cta.primary": "Order on Discord",
+  "footer.cta.secondary": "Neva Generative",
+  "footer.cta.note": "Fast replies on Discord",
   "footer.baseline":
-    "The AI creative studio — thumbnails, logos, identities, gaming. Art direction included.",
+    "Graphic design studio & generative AI — FiveM packs, banners, posters, GTA scenes.",
   "footer.product": "Product",
   "footer.company": "Studio",
   "footer.legal": "Legal",
@@ -293,9 +298,79 @@ const EN: Record<string, string> = {
   "footer.link.fivemDesigner": "FiveM graphic designer",
   "footer.link.fivemLogo": "FiveM logo maker",
   "footer.link.fivemPack": "FiveM graphics pack",
-  "footer.link.thumbnail": "YouTube thumbnail maker",
-  "footer.link.logoMaker": "Logo maker",
-  "footer.link.flyer": "Online flyer maker",
+  "footer.link.fivemBanner": "FiveM Discord banner",
+  "footer.link.fivemPoster": "FiveM server poster",
+  "footer.link.fivemLoading": "FiveM loading screen",
+
+  /* ── Pivot 20/08 — studio showcase ───────────────────────────── */
+  "studio.eyebrow": "The studio — real designers, live",
+  "studio.title.a": "A graphic design studio",
+  "studio.title.beam": "at your service.",
+  "studio.pitch":
+    "Neva Design is first and foremost a team of designers. Identities, FiveM packs, banners, posters, loading screens, overlays — briefed on Discord, followed live on voice, delivered fast.",
+  "studio.service.1": "Logos & identities",
+  "studio.service.2": "Complete FiveM packs",
+  "studio.service.3": "Discord & social banners",
+  "studio.service.4": "Posters & artwork",
+  "studio.service.5": "Loading screens",
+  "studio.service.6": "Stream overlays",
+  "studio.service.7": "Custom work",
+  "studio.team.label": "The team",
+  "studio.process.label": "The process",
+  "studio.process.1.title": "Brief",
+  "studio.process.1.desc":
+    "Describe your needs on Discord: references, mood, deadlines.",
+  "studio.process.2.title": "Live follow-up",
+  "studio.process.2.desc":
+    "The designer works with you on voice — you watch the piece take shape.",
+  "studio.process.3.title": "Revisions",
+  "studio.process.3.desc":
+    "Adjustments happen on the spot, until the version is approved.",
+  "studio.process.4.title": "Fast delivery",
+  "studio.process.4.desc":
+    "Final files delivered quickly, ready to use.",
+  "studio.cta": "Order on Discord",
+  "studio.cta.note": "Brief, follow-up and delivery — everything happens on Discord",
+
+  /* ── Pivot 20/08 — client reviews ────────────────────────────── */
+  "reviews.label": "Client reviews",
+  "reviews.title.a": "They ordered.",
+  "reviews.title.beam": "They come back.",
+  "reviews.note": "5/5 — 9 reviews",
+
+  /* ── Pivot 20/08 — Neva Generative ───────────────────────────── */
+  "generative.eyebrow": "Neva Generative — two subscription plans",
+  "generative.title.a": "The studio's AI,",
+  "generative.title.beam": "as a subscription.",
+  "generative.perMonth": "€ / month",
+  "generative.subscribe": "Subscribe",
+  "generative.earlyAccess": "Early access — pricing soon",
+  "generative.gta.num": "Plan 01",
+  "generative.gta.title": "GTA Scenes",
+  "generative.gta.pitch":
+    "Photorealistic AI-generated GTA scenes — banners, posters, server and social visuals. Built for designers and FiveM servers: the tool many designers will use for their own clients.",
+  "generative.gta.f1": "Monthly quota revealed at launch",
+  "generative.gta.f2": "Banner + poster formats",
+  "generative.gta.f3": "Commercial use allowed",
+  "generative.banner.num": "Plan 02",
+  "generative.banner.title": "AI Discord Banners",
+  "generative.banner.pitch":
+    "A library of banner templates: type the name you want, the banner is generated with it. Depending on the template, also change the theme, the color, or add extra text.",
+  "generative.banner.f1": "Monthly quota revealed at launch",
+  "generative.banner.f2": "Access to every template",
+  "generative.banner.f3": "Name / theme / color customization",
+  "generative.cap.name": "Custom name",
+  "generative.cap.name.off": "Custom name: not available on this template",
+  "generative.cap.theme": "Editable theme",
+  "generative.cap.theme.off": "Theme: not editable on this template",
+  "generative.cap.color": "Editable color",
+  "generative.cap.color.off": "Color: not editable on this template",
+  "generative.cap.extraText": "Extra text",
+  "generative.cap.extraText.off": "Extra text: not available on this template",
+
+  /* ── Pivot 20/08 — tools "Coming soon" ───────────────────────── */
+  "comingSoon.badge": "Coming soon",
+  "comingSoon.tooltip": "Available soon",
 };
 
 export default EN;

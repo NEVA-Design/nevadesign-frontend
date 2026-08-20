@@ -1,3 +1,5 @@
+import '@/components/dashboard/dashboard-skin.css'
+
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -42,25 +44,25 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const adminInitial = adminLabel.charAt(0).toUpperCase()
 
   return (
-    <div className="pv-light pv-atelier relative min-h-screen bg-paper text-ink">
-      <style>{`html{color-scheme:light}`}</style>
+    <div className="pv-light pv-atelier relative min-h-screen text-ink">
+      <style>{`html{color-scheme:dark}`}</style>
       {/* La scène de la régie — l'aube diluée, fixe, et rien d'autre */}
       <div aria-hidden className="pv-scene-bg--dawn-calm pointer-events-none fixed inset-0" />
 
       {/* ── Sidebar desktop — panneau de verre flottant ────────── */}
       <aside className="pv-glass pv-glass--card pv-edge pv-shadow-mauve fixed bottom-4 left-4 top-4 z-50 hidden w-[264px] flex-col overflow-hidden lg:flex">
-        <div className="relative flex h-[72px] shrink-0 items-center border-b border-[rgba(43,36,80,0.06)] px-6">
-          <Brand href="/admin" size={20} tone="ink" sub="Console" />
+        <div className="relative flex h-[72px] shrink-0 items-center border-b border-[rgba(255,255,255,0.06)] px-6">
+          <Brand href="/admin" size={20} tone="white" sub="Console" />
         </div>
 
         <nav className="relative flex-1 overflow-y-auto px-3.5 py-5" aria-label="Navigation de la console">
           <AdminSidebarNav items={navItems} />
         </nav>
 
-        <div className="relative border-t border-[rgba(43,36,80,0.06)] p-3.5">
+        <div className="relative border-t border-[rgba(255,255,255,0.06)] p-3.5">
           <Link
             href="/dashboard"
-            className="group flex h-10 items-center gap-3 rounded-[12px] px-3.5 text-[13px] text-slate transition-colors duration-[var(--dur-base)] hover:bg-[rgba(255,255,255,0.5)] hover:text-ink"
+            className="group flex h-10 items-center gap-3 rounded-[12px] px-3.5 text-[13px] text-slate transition-colors duration-[var(--dur-base)] hover:bg-[rgba(255,255,255,0.05)] hover:text-ink"
           >
             <ArrowLeft
               size={14}
@@ -78,18 +80,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <div className="pv-glass pv-glass--card pv-edge pv-shadow-mauve mx-auto flex h-16 w-full max-w-[1440px] items-center justify-between gap-4 px-5 sm:px-7">
             <div className="flex min-w-0 items-center gap-3">
               <span className="shrink-0 lg:hidden">
-                <BrandMark size={20} tone="ink" />
+                <BrandMark size={20} tone="white" />
               </span>
               <p className="truncate font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
                 Neva Design — Console
               </p>
             </div>
-            <p className="flex min-w-0 shrink-0 items-center gap-2.5 rounded-full border border-[color:var(--hairline-glass)] bg-white/60 py-1.5 pl-1.5 pr-4 font-mono text-[11px] tracking-[0.06em] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_6px_16px_rgba(96,84,140,0.1)]">
+            <p className="flex min-w-0 shrink-0 items-center gap-2.5 rounded-full border border-[color:var(--hairline-glass)] bg-white/[0.05] py-1.5 pl-1.5 pr-4 font-mono text-[11px] tracking-[0.06em] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_6px_16px_rgba(0,0,0,0.4)]">
               <span className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full bg-ink">
                 {admin.avatarUrl ? (
                   <Image src={admin.avatarUrl} alt="" fill sizes="28px" className="object-cover" />
                 ) : (
-                  <span className="flex h-full w-full items-center justify-center text-[10px] font-semibold text-white">
+                  <span className="flex h-full w-full items-center justify-center text-[10px] font-semibold text-[#060606]">
                     {adminInitial}
                   </span>
                 )}
@@ -109,14 +111,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
         {/* ── Nav mobile — rail horizontal sur la scène ─────────── */}
         <nav
-          className="border-b border-[rgba(43,36,80,0.06)] px-4 pb-3 pt-4 lg:hidden"
+          className="border-b border-[rgba(255,255,255,0.06)] px-4 pb-3 pt-4 lg:hidden"
           aria-label="Navigation de la console"
         >
           <div className="flex gap-2 overflow-x-auto pb-1">
             <AdminRailNav items={navItems} />
             <Link
               href="/dashboard"
-              className="flex h-10 shrink-0 items-center gap-2 rounded-[12px] border border-[rgba(43,36,80,0.1)] px-4 text-xs text-slate transition-colors duration-[var(--dur-base)] hover:bg-[rgba(255,255,255,0.45)] hover:text-ink"
+              className="flex h-10 shrink-0 items-center gap-2 rounded-[12px] border border-[rgba(255,255,255,0.10)] px-4 text-xs text-slate transition-colors duration-[var(--dur-base)] hover:bg-[rgba(255,255,255,0.05)] hover:text-ink"
             >
               <ArrowLeft size={12} strokeWidth={1.8} />
               Retour au produit
@@ -124,9 +126,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </div>
         </nav>
 
-        {/* ── Contenu — posé nu sur la scène ────────────────────── */}
+        {/* ── Contenu — posé nu sur la scène, sous le champ de
+            lumière aurore de la zone de travail ──────────────────── */}
         <main className="relative mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
-          {children}
+          <div aria-hidden className="pv-field-light pv-field-light--tr" />
+          <div className="relative z-10">{children}</div>
         </main>
       </div>
     </div>

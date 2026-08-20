@@ -436,7 +436,7 @@ export default function CharacterPageClient({ initialCharacters }: { initialChar
                       className={`flex min-h-[64px] items-start gap-2.5 rounded-lg border px-3 py-2.5 text-left transition-colors duration-300 ${
                         isActive
                           ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)]"
-                          : "border-[color:var(--hairline)] hover:border-[#C9C9C0]"
+                          : "border-[color:var(--hairline)] hover:border-[#4A4A4A]"
                       }`}
                     >
                       <asset.icon

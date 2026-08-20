@@ -3,7 +3,9 @@ import PrismShell from "@/components/prisme/Shell";
 import GivreNavbar from "@/components/givre/GivreNavbar";
 import PrismLoader from "@/components/prisme/PrismLoader";
 import GivreHero from "@/components/givre/GivreHero";
-import GivreStudio from "@/components/givre/GivreStudio";
+import GivreStudioVitrine from "@/components/givre/GivreStudioVitrine";
+import GivreReviews from "@/components/givre/GivreReviews";
+import GivreGenerative from "@/components/givre/GivreGenerative";
 import GivreEnhance from "@/components/givre/GivreEnhance";
 import GivreType from "@/components/givre/GivreType";
 import GivreFields from "@/components/givre/GivreFields";
@@ -20,6 +22,7 @@ import { defaultSeo, siteName, siteUrl } from "@/lib/seo";
 import { PLANS, TOPUPS } from "@/lib/plans";
 import { CREATION_PACKS } from "@/lib/resources";
 import { TRANSLATIONS_FR } from "@/lib/i18n";
+import { LEGACY_PRICING } from "@/lib/feature-flags";
 
 /* JSON-LD Product — abonnements et packs depuis la source de vérité
    des prix (run 3, LOT 5) : jamais de montant en dur ici. */
@@ -143,20 +146,21 @@ export default function Home() {
             "Youtubeurs et créateurs de contenu, entrepreneurs et marques, équipes esport, serveurs GTA RP et communautés gaming",
         },
       },
-      ...planNodes,
-      ...packNodes,
-      topupNode,
+      /* MAJ 20/08 : les offres legacy sortent du JSON-LD tant que
+         LEGACY_PRICING est faux (les 2 formules Neva Generative
+         n'y entrent qu'une fois leurs prix connus — TODO_PRIX). */
+      ...(LEGACY_PRICING ? [...planNodes, ...packNodes, topupNode] : []),
       faqNode,
     ],
   };
 
   return (
     <PrismShell>
-      {/* Givre impose sa lumière à la route : l'ivoire de
-          l'atelier jusque sous l'overscroll, scrollbars et
-          contrôles natifs clairs. */}
-      <style>{`html{color-scheme:light}body{background-color:#F1EFE9;color:#2B2450}`}</style>
-      <main className="pv-light min-h-screen bg-paper text-ink">
+      {/* Givre noir impose sa nuit à la route : le noir neutre
+          jusque sous l'overscroll, scrollbars et contrôles
+          natifs sombres. */}
+      <style>{`html{color-scheme:dark}body{background-color:#060606;color:#F2F2F0}`}</style>
+      <main className="pv-light min-h-screen text-ink">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -184,8 +188,15 @@ export default function Home() {
               serveur reste affiché tel quel pendant ce temps —
               fallback jamais montré, zéro changement visuel. */}
           <GivreHero />
+          {/* Pivot 20/08 : 02 = vitrine du studio (l'ancienne démo
+              GivreStudio reste dans le code, non montée), 03 = avis
+              clients, 09 = Neva Generative (remplace à l'affichage
+              GivrePricing + GivrePacks, conservés sous flag). */}
           <Suspense>
-            <GivreStudio />
+            <GivreStudioVitrine />
+          </Suspense>
+          <Suspense>
+            <GivreReviews />
           </Suspense>
           <Suspense>
             <GivreCreations />
@@ -205,12 +216,20 @@ export default function Home() {
           <Suspense>
             <GivreStats />
           </Suspense>
-          <Suspense>
-            <GivrePricing />
-          </Suspense>
-          <Suspense>
-            <GivrePacks />
-          </Suspense>
+          {LEGACY_PRICING ? (
+            <>
+              <Suspense>
+                <GivrePricing />
+              </Suspense>
+              <Suspense>
+                <GivrePacks />
+              </Suspense>
+            </>
+          ) : (
+            <Suspense>
+              <GivreGenerative />
+            </Suspense>
+          )}
           <Suspense>
             <GivreFAQ />
           </Suspense>

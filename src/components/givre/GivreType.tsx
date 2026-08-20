@@ -21,7 +21,7 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 export default function GivreType() {
   const { t } = useTranslations();
   const scope = useRef<HTMLElement>(null);
-  const word = t("typemoment.word", "Cliquez");
+  const word = t("typemoment.word", "Recrutez");
   /* Le mot va du bord au bord quelle que soit sa longueur :
      « Cliquez » (7 lettres) comme « Click » (5). */
   const vw = (164 / Math.max(word.length, 4)).toFixed(1);
@@ -79,7 +79,7 @@ export default function GivreType() {
       <div
         aria-hidden
         data-rule
-        className="relative h-px w-full bg-[rgba(255,255,255,0.55)]"
+        className="relative h-px w-full bg-[rgba(255,255,255,0.14)]"
       />
 
       <div className="relative overflow-hidden py-6 sm:py-9">
@@ -91,13 +91,13 @@ export default function GivreType() {
             /* Base encre sous la mosaïque : les lettres restent encrées
                sur la brume, les miniatures vivent par transparence. */
             backgroundImage:
-              "linear-gradient(rgba(43,36,80,0.44), rgba(43,36,80,0.44)), url(/showcase/cliquez-fill.webp)",
+              "linear-gradient(rgba(242,242,240,0.44), rgba(242,242,240,0.44)), url(/typo-fill-recrutez.webp)",
             backgroundSize: "cover, cover",
             backgroundPosition: "50% 50%, 50% 50%",
             WebkitBackgroundClip: "text",
             backgroundClip: "text",
             color: "transparent",
-            WebkitTextStroke: "1px rgba(43,36,80,0.24)",
+            WebkitTextStroke: "1px rgba(255,255,255,0.20)",
           }}
         >
           {word}
@@ -108,14 +108,14 @@ export default function GivreType() {
       <div
         aria-hidden
         data-rule
-        className="relative h-px w-full bg-[rgba(255,255,255,0.55)]"
+        className="relative h-px w-full bg-[rgba(255,255,255,0.14)]"
       />
 
       <RevealBlock delay={0.1}>
         <p className="relative mx-auto mt-7 max-w-[880px] px-5 text-center font-mono text-[11px] uppercase leading-[2] tracking-[0.18em] text-slate">
           {t(
             "typemoment.caption",
-            "Miniatures pensées pour le clic — visage, titre massif, contraste. Lisibles à 120 pixels."
+            "Affiches de recrutement pensées pour l'impact — personnage, titre massif, contraste. Lisibles en un scroll."
           )}
         </p>
       </RevealBlock>

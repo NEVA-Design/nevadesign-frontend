@@ -50,8 +50,8 @@ function SidebarLink({ item }: { item: AdminNavItem }) {
       className={cn(
         "group relative flex h-10 items-center gap-3 rounded-[12px] px-3.5 text-[13px] transition-colors duration-[var(--dur-base)]",
         active
-          ? "bg-[rgba(255,255,255,0.6)] font-medium text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_1px_2px_rgba(96,84,140,0.08),0_10px_24px_rgba(96,84,140,0.14)]"
-          : "text-slate hover:bg-[rgba(255,255,255,0.38)] hover:text-ink"
+          ? "bg-[rgba(255,255,255,0.05)] font-medium text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_1px_2px_rgba(0,0,0,0.38),0_10px_24px_rgba(0,0,0,0.44)]"
+          : "text-slate hover:bg-[rgba(255,255,255,0.05)] hover:text-ink"
       )}
     >
       {Icon ? (
@@ -91,8 +91,8 @@ function RailLink({ item }: { item: AdminNavItem }) {
       className={cn(
         "flex h-10 shrink-0 items-center rounded-[12px] border px-4 text-xs transition-colors duration-[var(--dur-base)]",
         active
-          ? "border-[rgba(255,255,255,0.62)] bg-[rgba(255,255,255,0.6)] font-medium text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_8px_20px_rgba(96,84,140,0.14)]"
-          : "border-[rgba(43,36,80,0.1)] text-slate hover:bg-[rgba(255,255,255,0.4)] hover:text-ink"
+          ? "border-[rgba(255,255,255,0.14)] bg-[rgba(255,255,255,0.05)] font-medium text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_8px_20px_rgba(0,0,0,0.44)]"
+          : "border-[rgba(255,255,255,0.10)] text-slate hover:bg-[rgba(255,255,255,0.05)] hover:text-ink"
       )}
     >
       {item.label}

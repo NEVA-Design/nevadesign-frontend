@@ -23,6 +23,17 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  /* Purge 20/08 (passe whaou P5.5) : les landings des offres
+     supprimées partent en 301 vers la landing FiveM la plus
+     proche — jamais de 404, le jus SEO est transféré. */
+  async redirects() {
+    return [
+      { source: "/miniature-youtube", destination: "/graphiste-fivem", permanent: true },
+      { source: "/generateur-de-logo", destination: "/logo-fivem", permanent: true },
+      { source: "/flyer-en-ligne", destination: "/affiche-serveur-fivem", permanent: true },
+      { source: "/en/youtube-thumbnail-maker", destination: "/en/fivem-graphic-designer", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

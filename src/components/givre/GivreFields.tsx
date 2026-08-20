@@ -5,12 +5,12 @@ import { useTranslations } from "@/components/LanguageProvider";
 import { RevealBlock, RevealMask, RevealMedia } from "@/components/prisme/Motion";
 
 /*
- * Les terrains, réécrits Givre — le registre éditorial. Fini la
- * mosaïque : un en-tête paginé à gauche (05/10), puis quatre
- * grandes rangées entre filets, kicker mono à gauche, un média
- * de preuve à droite. Les rangées 2 et 4 s'inversent pour le
- * rythme ; le chrome YouTube factice reste sur la première —
- * c'est lui qui prouve. Scène dawn-calm, caustiques, aucune
+ * Les terrains, réécrits Givre — le registre éditorial. Purge
+ * 20/08 : quatre terrains RÉELS (packs FiveM, bannières Discord,
+ * affiches & loading screens, IA générative), illustrés par les
+ * livrables du repo. Quatre grandes rangées entre filets, kicker
+ * mono à gauche, un média de preuve à droite ; les rangées 2 et 4
+ * s'inversent pour le rythme. Scène dawn-calm, caustiques, aucune
  * carte blanche opaque : les œuvres restent la couleur de la page.
  */
 
@@ -54,57 +54,8 @@ function FieldRow({
   );
 }
 
-/* Chrome YouTube factice — la miniature en situation réelle */
-function YouTubeFrame({
-  src,
-  alt,
-  title,
-  channel,
-  stats,
-  duration,
-}: {
-  src: string;
-  alt: string;
-  title: string;
-  channel: string;
-  stats: string;
-  duration: string;
-}) {
-  return (
-    <figure>
-      <div className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes="(max-width: 1024px) 92vw, 55vw"
-          className="object-cover group-hover:scale-[1.04]"
-        />
-        {/* Durée — le badge YouTube */}
-        <span className="absolute bottom-3 right-3 z-[1] rounded-md bg-[rgba(0,0,0,0.82)] px-2 py-1 font-mono text-[11px] font-medium tracking-[0.04em] text-white">
-          {duration}
-        </span>
-        {/* Barre de lecture amorcée */}
-        <span className="absolute inset-x-0 bottom-0 z-[1] h-[3px] bg-white/20">
-          <span className="block h-full w-[38%] bg-[#FF0000]" />
-        </span>
-      </div>
-      <figcaption className="mt-3 flex gap-3">
-        <span className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#FFE816,#FF9A2E)] text-[13px] font-medium text-[#111]">
-          {channel.charAt(0)}
-        </span>
-        <span>
-          <span className="block text-[14px] font-medium leading-snug text-ink">
-            {title}
-          </span>
-          <span className="mt-1 block font-mono text-[10.5px] uppercase tracking-[0.1em] text-mist">
-            {channel} · {stats}
-          </span>
-        </span>
-      </figcaption>
-    </figure>
-  );
-}
+/* (Purge 20/08 — le chrome YouTube factice a disparu avec l'offre
+   miniatures : les livrables FiveM se montrent en tirages nus.) */
 
 export default function GivreFields() {
   const { t } = useTranslations();
@@ -126,7 +77,7 @@ export default function GivreFields() {
         <header className="max-w-[760px]">
           <RevealBlock>
             <div className="pv-page-num [&>b]:text-[44px]">
-              <b>05</b>
+              <b>06</b>
               <span>/10</span>
             </div>
           </RevealBlock>
@@ -153,36 +104,37 @@ export default function GivreFields() {
           </RevealBlock>
         </header>
 
-        {/* Le registre — quatre grandes rangées entre filets */}
+        {/* Le registre — quatre grandes rangées entre filets.
+            Purge 20/08 : les quatre VRAIS terrains, illustrés par
+            les livrables FiveM du repo. */}
         <div className="mt-14 sm:mt-16">
-          {/* ── 01 · Miniatures — la scène YouTube + deux tuiles ── */}
+          {/* ── 01 · Packs FiveM — le pack complet + deux tuiles ── */}
           <FieldRow
-            kicker={t("fields.thumbs.kicker", "( 01 ) Miniatures YouTube")}
-            title={t("fields.thumbs.title", "Le visage, le titre, le clic.")}
+            kicker={t("fields.packs.kicker", "( 01 ) Packs FiveM")}
+            title={t("fields.packs.title", "L'identité complète du serveur.")}
             desc={t(
-              "fields.thumbs.desc",
-              "Compositions pensées pour la vignette : expression, hiérarchie, lisibilité — même à 120 pixels de large."
+              "fields.packs.desc",
+              "Logo, bannière, affiches, loading screen : un pack cohérent, prêt à poser sur Discord et en jeu."
             )}
-            meta={t("fields.thumbs.meta", "1280 × 720 · pensées CTR")}
+            meta={t("fields.packs.meta", "pack complet · toutes déclinaisons")}
           >
             <RevealMedia>
-              <div>
-                <YouTubeFrame
-                  src="/showcase/thumb-invest.webp"
-                  alt="Miniature YouTube finance composée par Neva Design"
-                  title="J'ai tout vendu — ce que personne ne comprend"
-                  channel="Lena Invest"
-                  stats="214 k vues · 3 jours"
-                  duration="14:32"
+              <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
+                <Image
+                  src="/Prime_-_preview_serveur_pack_4.webp"
+                  alt="Pack graphique complet de serveur FiveM par Neva Design"
+                  fill
+                  sizes="(max-width: 1024px) 92vw, 55vw"
+                  className="object-cover group-hover:scale-[1.04]"
                 />
-              </div>
+              </figure>
             </RevealMedia>
             <div className="mt-4 grid grid-cols-2 gap-4">
               <RevealMedia delay={0.08}>
                 <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
                   <Image
-                    src="/showcase/thumb-esport.webp"
-                    alt="Miniature YouTube esport composée par Neva Design"
+                    src="/Prime_-_preview_serveur_pack_7.webp"
+                    alt="Déclinaisons d'un pack serveur FiveM"
                     fill
                     sizes="(max-width: 1024px) 45vw, 27vw"
                     className="object-cover group-hover:scale-[1.04]"
@@ -192,8 +144,8 @@ export default function GivreFields() {
               <RevealMedia delay={0.16}>
                 <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
                   <Image
-                    src="/showcase/thumb-defi.webp"
-                    alt="Miniature YouTube défi composée par Neva Design"
+                    src="/Prime_-_preview_serveur_pack_15.webp"
+                    alt="Visuel boutique d'un pack serveur FiveM"
                     fill
                     sizes="(max-width: 1024px) 45vw, 27vw"
                     className="object-cover group-hover:scale-[1.04]"
@@ -203,69 +155,93 @@ export default function GivreFields() {
             </div>
           </FieldRow>
 
-          {/* ── 02 · Logos — la planche Kova, média à gauche ── */}
+          {/* ── 02 · Bannières — le kit Discord, média à gauche ── */}
           <FieldRow
             reversed
-            kicker={t("fields.logos.kicker", "( 02 ) Logos & branding")}
-            title={t("fields.logos.title", "Des marques qui tiennent debout.")}
+            kicker={t("fields.banners.kicker", "( 02 ) Bannières Discord & réseaux")}
+            title={t("fields.banners.title", "La première image de votre serveur.")}
             desc={t(
-              "fields.logos.desc",
-              "Monogrammes, wordmarks et symboles livrés en vectoriel — du favicon à l'enseigne."
+              "fields.banners.desc",
+              "Bannières, avatars et boutiques aux formats exacts de Discord et des réseaux — nets à chaque taille d'affichage."
             )}
-            meta={t("fields.logos.meta", "SVG · toutes déclinaisons")}
-          >
-            <RevealMedia>
-              <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-[4/3]">
-                <Image
-                  src="/showcase/logo-kova.webp"
-                  alt="Logo Kova, banque mobile"
-                  fill
-                  sizes="(max-width: 1024px) 92vw, 55vw"
-                  className="object-cover group-hover:scale-[1.04]"
-                />
-              </figure>
-            </RevealMedia>
-          </FieldRow>
-
-          {/* ── 03 · Chartes — la planche documentée Méridien ── */}
-          <FieldRow
-            kicker={t("fields.charts.kicker", "( 03 ) Chartes graphiques")}
-            title={t("fields.charts.title", "La cohérence, documentée.")}
-            desc={t(
-              "fields.charts.desc",
-              "Palette, typographies, usages : la planche qui aligne tous vos supports, réseaux compris."
-            )}
-            meta={t("fields.charts.meta", "palette · typos · déclinaisons")}
-          >
-            <RevealMedia>
-              <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-[16/10]">
-                <Image
-                  src="/showcase/charte-meridien.webp"
-                  alt="Charte graphique Méridien composée par Neva Design"
-                  fill
-                  sizes="(max-width: 1024px) 92vw, 55vw"
-                  className="object-cover group-hover:scale-[1.04]"
-                />
-              </figure>
-            </RevealMedia>
-          </FieldRow>
-
-          {/* ── 04 · Gaming — la campagne Larya, média à gauche ── */}
-          <FieldRow
-            reversed
-            kicker={t("fields.gaming.kicker", "( 04 ) Gaming & FiveM")}
-            title={t("fields.gaming.title", "Le terrain d'origine.")}
-            desc={t(
-              "fields.gaming.desc",
-              "Affiches, packs serveur et identités d'équipe — l'univers où le studio a fait ses armes."
-            )}
-            meta={t("fields.gaming.meta", "8K · campagnes complètes")}
+            meta={t("fields.banners.meta", "960 × 540 · Discord & réseaux")}
           >
             <RevealMedia>
               <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
                 <Image
-                  src="/posterlarya.webp"
-                  alt="Campagne Larya serveur GTA RP"
+                  src="/Prime_-_preview_serveur_pack_8.webp"
+                  alt="Kit de bannières Discord d'un serveur FiveM"
+                  fill
+                  sizes="(max-width: 1024px) 92vw, 55vw"
+                  className="object-cover group-hover:scale-[1.04]"
+                />
+              </figure>
+            </RevealMedia>
+          </FieldRow>
+
+          {/* ── 03 · Affiches & loading screens ── */}
+          <FieldRow
+            kicker={t("fields.posters.kicker", "( 03 ) Affiches & loading screens")}
+            title={t("fields.posters.title", "L'événement, en grand format.")}
+            desc={t(
+              "fields.posters.desc",
+              "Recrutements, ouvertures, soirées : des compositions qui tiennent l'écran de chargement comme l'impression."
+            )}
+            meta={t("fields.posters.meta", "4K · écran & impression")}
+          >
+            <RevealMedia>
+              <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
+                <Image
+                  src="/affiche3.webp"
+                  alt="Affiche d'événement pour serveur GTA RP"
+                  fill
+                  sizes="(max-width: 1024px) 92vw, 55vw"
+                  className="object-cover group-hover:scale-[1.04]"
+                />
+              </figure>
+            </RevealMedia>
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <RevealMedia delay={0.08}>
+                <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
+                  <Image
+                    src="/posterlarya.webp"
+                    alt="Campagne d'affiches serveur GTA RP"
+                    fill
+                    sizes="(max-width: 1024px) 45vw, 27vw"
+                    className="object-cover group-hover:scale-[1.04]"
+                  />
+                </figure>
+              </RevealMedia>
+              <RevealMedia delay={0.16}>
+                <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
+                  <Image
+                    src="/postergrandfivem2.webp"
+                    alt="Série d'affiches verticales pour serveur FiveM"
+                    fill
+                    sizes="(max-width: 1024px) 45vw, 27vw"
+                    className="object-cover group-hover:scale-[1.04]"
+                  />
+                </figure>
+              </RevealMedia>
+            </div>
+          </FieldRow>
+
+          {/* ── 04 · IA générative — la scène GTA, média à gauche ── */}
+          <FieldRow
+            reversed
+            kicker={t("fields.ia.kicker", "( 04 ) IA générative")}
+            title={t("fields.ia.title", "Des scènes GTA photoréalistes.")}
+            desc={t(
+              "fields.ia.desc",
+              "Neva Generative compose vos mises en scène — personnages, lumière, ambiance — dans l'univers de votre serveur."
+            )}
+            meta={t("fields.ia.meta", "photoréaliste · jusqu'au 8K")}
+          >
+            <RevealMedia>
+              <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
+                <Image
+                  src="/jetski.webp"
+                  alt="Scène GTA photoréaliste composée par Neva Generative"
                   fill
                   sizes="(max-width: 1024px) 92vw, 55vw"
                   className="object-cover group-hover:scale-[1.04]"

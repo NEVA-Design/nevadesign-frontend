@@ -1,7 +1,31 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { COMING_SOON } from '@/lib/feature-flags'
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:4000'
 const ACCESS_COOKIE = 'neva_access_token'
+
+/* Pivot 20/08 — les routes DIRECTES des outils de création sont
+   redirigées vers la section Neva Generative de la home tant que
+   COMING_SOON est vrai. L'UI qui y menait est inerte (badges « À
+   venir ») ; ceci couvre les URL tapées/enregistrées. */
+function isCreationToolRoute(pathname: string) {
+  if (
+    pathname === '/dashboard/design' ||
+    pathname === '/dashboard/chat' ||
+    pathname === '/dashboard/enhance' ||
+    pathname === '/dashboard/character' ||
+    pathname === '/dashboard/audit' ||
+    pathname === '/dashboard/brand' ||
+    pathname === '/dashboard/code' ||
+    pathname === '/dashboard/landing' ||
+    pathname === '/dashboard/prompt' ||
+    pathname === '/dashboard/projects/new'
+  ) {
+    return true
+  }
+  /* wizards de création d'un projet : /dashboard/projects/<id>/create… */
+  return /^\/dashboard\/projects\/[^/]+\/create(\/|$)/.test(pathname)
+}
 
 function maintenanceIsActive(settings: { enabled?: boolean | null; starts_at?: string | null; ends_at?: string | null } | null) {
   if (!settings?.enabled) return false
@@ -98,6 +122,13 @@ async function getMaintenanceStatus(): Promise<MaintenanceCheck> {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const hasSession = Boolean(request.cookies.get(ACCESS_COOKIE)?.value)
+
+  // Outils de création désactivés (COMING_SOON) → section Neva
+  // Generative de la home. AVANT le check maintenance : la réponse
+  // ne dépend ni du backend ni de la session.
+  if (COMING_SOON && isCreationToolRoute(pathname)) {
+    return NextResponse.redirect(new URL('/#generative', request.url))
+  }
 
   if (!isAlwaysMaintenanceBypassed(pathname)) {
     const { row: maintenance, backendDown } = await getMaintenanceStatus()

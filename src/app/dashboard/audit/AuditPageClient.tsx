@@ -202,7 +202,7 @@ export default function AuditPageClient() {
                   className={`min-h-[40px] rounded-lg border px-3 py-2 text-[13px] transition-colors duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] ${
                     assetType === type.id
                       ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
-                      : "border-[color:var(--hairline)] text-steel hover:border-[#C9C9C0] hover:text-ink"
+                      : "border-[color:var(--hairline)] text-steel hover:border-[#4A4A4A] hover:text-ink"
                   }`}
                 >
                   {type.label}
@@ -222,7 +222,7 @@ export default function AuditPageClient() {
                   className={`min-h-[40px] rounded-lg border px-3 py-2 text-[13px] transition-colors duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] ${
                     reportLanguage === language.id
                       ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
-                      : "border-[color:var(--hairline)] text-steel hover:border-[#C9C9C0] hover:text-ink"
+                      : "border-[color:var(--hairline)] text-steel hover:border-[#4A4A4A] hover:text-ink"
                   }`}
                 >
                   {language.label}
@@ -231,7 +231,7 @@ export default function AuditPageClient() {
             </div>
           </div>
 
-          <label className="mt-7 flex min-h-[48px] cursor-pointer items-center gap-3 rounded-lg border border-[color:var(--hairline)] bg-abyss px-4 py-3 transition-colors duration-300 hover:border-[#C9C9C0]">
+          <label className="mt-7 flex min-h-[48px] cursor-pointer items-center gap-3 rounded-lg border border-[color:var(--hairline)] bg-abyss px-4 py-3 transition-colors duration-300 hover:border-[#4A4A4A]">
             <input
               type="checkbox"
               checked={generateImprovedVersion}
@@ -265,7 +265,7 @@ export default function AuditPageClient() {
           ) : (
             <div className="pv-fade-up">
               {/* Verdict — le score comme une scène */}
-              <div className="relative overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-white px-6 py-8 shadow-[var(--shadow-print)] sm:px-8">
+              <div className="relative overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-white/5 px-6 py-8 shadow-[var(--shadow-print)] sm:px-8">
                 <div aria-hidden className="pv-halo--violet pv-halo left-[-10%] top-[-40%] h-[320px] w-[420px]" />
                 <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                   <div>

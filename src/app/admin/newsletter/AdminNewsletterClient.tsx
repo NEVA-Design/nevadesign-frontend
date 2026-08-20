@@ -151,8 +151,8 @@ export function AdminNewsletterClient({
         <span
           className={`inline-flex h-9 items-center rounded-full border px-4 font-mono text-[10px] font-medium uppercase tracking-[0.12em] ${
             stats.resendConfigured
-              ? "border-[#C5DCD2] bg-[#EEF4F1] text-[#5E9B84]"
-              : "border-[#EAD9A8] bg-[#FBF6E9] text-[#8A6D1F]"
+              ? "border-[rgba(111,191,159,0.40)] bg-[rgba(111,191,159,0.10)] text-[#6FBF9F]"
+              : "border-[rgba(217,178,74,0.40)] bg-[rgba(217,178,74,0.10)] text-[#D9B24A]"
           }`}
         >
           {stats.resendConfigured ? `Expéditeur · ${stats.fromEmail}` : "Resend non configuré"}
@@ -192,7 +192,7 @@ export function AdminNewsletterClient({
                       className={`min-h-10 rounded-lg border px-2.5 py-2 text-left transition-colors duration-300 ${
                         active
                           ? "border-[rgba(164,139,232,0.35)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
-                          : "border-[color:var(--hairline)] text-steel hover:border-[#C9C9C0] hover:text-ink"
+                          : "border-[color:var(--hairline)] text-steel hover:border-[rgba(255,255,255,0.14)] hover:text-ink"
                       }`}
                     >
                       <span className="block text-xs font-medium">{item.label}</span>
@@ -339,7 +339,7 @@ export function AdminNewsletterClient({
                   ))
                 )}
                 {ctaUrl && (
-                  <div className="mt-6 inline-flex h-11 items-center rounded-full bg-ink px-6 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)]">
+                  <div className="mt-6 inline-flex h-11 items-center rounded-full bg-ink px-6 text-sm font-medium text-[#060606] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)]">
                     {ctaLabel || "Passer au niveau supérieur"}
                   </div>
                 )}

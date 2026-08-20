@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { geist, geistMono, outfit } from "./fonts";
 import LanguageProvider from "@/components/LanguageProvider";
+import SoieNoire from "@/components/prisme/SoieNoire";
 import { ConfirmDialogProvider } from "@/components/ui/confirm-dialog";
 import { defaultSeo, siteName, siteUrl } from "@/lib/seo";
 
@@ -46,7 +47,7 @@ export const metadata: Metadata = {
         url: "/brand/og.jpg",
         width: 1200,
         height: 630,
-        alt: "Neva Design — studio créatif IA : miniatures, logos, identités, gaming",
+        alt: "Neva Design — studio graphique FiveM : packs, bannières, affiches, scènes GTA",
       },
     ],
     locale: "fr_FR",
@@ -75,7 +76,16 @@ export default function RootLayout({
          pattern qu'un attribut de thème, mismatch d'attribut voulu */
       suppressHydrationWarning
     >
-      <body className="bg-void text-white min-h-screen antialiased">
+      <body className="bg-frost text-ink min-h-screen antialiased">
+        {/* Le satin noir temps réel (porté de Neva Agency) — fixe
+            derrière tout le site ; les fonds de section sont des
+            voiles translucides au-dessus. */}
+        <SoieNoire />
+        {/* Passe whaou P1 — l'atmosphère site-wide : vignette douce
+            (8-10 % aux bords) puis grain film statique 1,8 % (tuile
+            128 px) qui tue le banding des dégradés sombres. */}
+        <div className="pv-vignette-fixed" aria-hidden />
+        <div className="pv-grain-fixed" aria-hidden />
         <LanguageProvider>
           <ConfirmDialogProvider>{children}</ConfirmDialogProvider>
         </LanguageProvider>

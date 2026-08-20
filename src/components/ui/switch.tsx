@@ -38,8 +38,8 @@ export function Switch({
         className={cn(
           "absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-white transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
           checked
-            ? "left-[24px] shadow-[0_1px_2px_rgba(43,36,80,0.2)]"
-            : "left-[3px] shadow-[0_1px_2px_rgba(43,36,80,0.14)]"
+            ? "left-[24px] shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
+            : "left-[3px] shadow-[0_1px_2px_rgba(0,0,0,0.40)]"
         )}
       />
     </button>

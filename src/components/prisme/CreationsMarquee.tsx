@@ -5,31 +5,33 @@ import Image from "next/image";
 /*
  * La galerie en mouvement — les vraies productions du studio,
  * exposées comme des tirages posés sur une table : chaque carte
- * porte sa propre ombre, les formats se mélangent (miniatures,
- * logos, chartes, affiches FiveM), deux rangées en sens opposés.
+ * porte sa propre ombre, les formats se mélangent (packs FiveM,
+ * bannières, affiches, scènes GTA), deux rangées en sens opposés.
+ * Purge 20/08 : plus AUCUNE vignette miniatures YouTube / kova /
+ * Méridien — FiveM, bannières et scènes uniquement.
  */
 type Piece = { src: string; alt: string; ratio: string };
 
 const ROW_A: Piece[] = [
-  { src: "/showcase/thumb-gtarp.webp", alt: "Miniature YouTube GTA RP", ratio: "aspect-[16/9]" },
-  { src: "/showcase/logo-kova.webp", alt: "Logo Kova, banque mobile", ratio: "aspect-[4/3]" },
+  { src: "/affiche1.webp", alt: "Affiche de recrutement serveur FiveM", ratio: "aspect-[16/9]" },
+  { src: "/Prime_-_preview_serveur_pack_8.webp", alt: "Kit bannières Discord d'un serveur", ratio: "aspect-[4/3]" },
   { src: "/posterlarya.webp", alt: "Campagne serveur GTA RP", ratio: "aspect-[3/4]" },
-  { src: "/showcase/charte-meridien.webp", alt: "Charte graphique Méridien", ratio: "aspect-[16/10]" },
-  { src: "/showcase/thumb-esport.webp", alt: "Miniature YouTube esport", ratio: "aspect-[16/9]" },
-  { src: "/Prime_-_preview_serveur_pack_8.webp", alt: "Pack graphique complet", ratio: "aspect-[4/3]" },
-  { src: "/showcase/logo-volt.webp", alt: "Logo Volt Esports", ratio: "aspect-[4/3]" },
-  { src: "/showcase/thumb-invest.webp", alt: "Miniature YouTube finance", ratio: "aspect-[16/9]" },
+  { src: "/jetski.webp", alt: "Scène GTA photoréaliste", ratio: "aspect-[16/10]" },
+  { src: "/Prime_-_preview_serveur_pack_7.webp", alt: "Pack graphique serveur FiveM", ratio: "aspect-[16/9]" },
+  { src: "/Prime_-_preview_serveur_pack_15.webp", alt: "Visuel boutique serveur FiveM", ratio: "aspect-[4/3]" },
+  { src: "/neva-design/packs/Prime_-_preview_serveur_pack_18.webp", alt: "Déclinaisons pack serveur", ratio: "aspect-[4/3]" },
+  { src: "/affiche2.webp", alt: "Affiche staff serveur FiveM", ratio: "aspect-[16/9]" },
 ];
 
 const ROW_B: Piece[] = [
   { src: "/postergrandfivem2.webp", alt: "Affiche grand format FiveM", ratio: "aspect-[3/4]" },
-  { src: "/showcase/thumb-secret.webp", alt: "Miniature YouTube tutoriel", ratio: "aspect-[16/9]" },
-  { src: "/showcase/charte-kova.webp", alt: "Charte graphique Kova", ratio: "aspect-[16/10]" },
-  { src: "/showcase/logo-meridien.webp", alt: "Logo Méridien café", ratio: "aspect-[4/3]" },
-  { src: "/affiche3.webp", alt: "Identité visuelle serveur", ratio: "aspect-[3/4]" },
-  { src: "/showcase/thumb-pc.webp", alt: "Miniature YouTube test PC", ratio: "aspect-[16/9]" },
+  { src: "/Prime_-_preview_serveur_pack_9.webp", alt: "Pack complet serveur FiveM", ratio: "aspect-[16/9]" },
+  { src: "/neva-design/packs/Prime_-_preview_serveur_pack_19.webp", alt: "Kit réseaux d'un serveur", ratio: "aspect-[16/10]" },
+  { src: "/neva-design/packs/Prime_-_preview_serveur_pack_3.webp", alt: "Bannière boutique serveur", ratio: "aspect-[4/3]" },
+  { src: "/affiche3.webp", alt: "Affiche événement serveur", ratio: "aspect-[3/4]" },
+  { src: "/postergrandfivem.webp", alt: "Série d'affiches serveur FiveM", ratio: "aspect-[16/9]" },
   { src: "/Prime_-_preview_serveur_pack_4.webp", alt: "Pack graphique serveur", ratio: "aspect-[4/3]" },
-  { src: "/vice.webp", alt: "Visuel ambiance Vice", ratio: "aspect-[16/10]" },
+  { src: "/vice.webp", alt: "Scène GTA ambiance Vice", ratio: "aspect-[16/10]" },
 ];
 
 function Row({

@@ -277,7 +277,7 @@ export default function PrismLoader() {
     <div
       ref={veilRef}
       aria-hidden
-      className="fixed inset-0 z-[120] flex items-center justify-center bg-[#F1EFE9]"
+      className="fixed inset-0 z-[120] flex items-center justify-center bg-[#060606]"
     >
       {/* le halo de l'atelier respire déjà derrière le monogramme */}
       <div
@@ -293,8 +293,8 @@ export default function PrismLoader() {
         style={{
           backgroundImage: GRAIN_URI,
           backgroundSize: "256px 256px",
-          opacity: 0.028,
-          mixBlendMode: "multiply",
+          opacity: 0.035,
+          mixBlendMode: "screen",
         }}
       />
       <div
@@ -304,9 +304,9 @@ export default function PrismLoader() {
         <svg viewBox="0 0 1441 1120" className="w-[120px]">
           <defs>
             <linearGradient id="pvGlassFill" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="rgba(164,139,232,0.2)" />
-              <stop offset="55%" stopColor="rgba(246,243,238,0.55)" />
-              <stop offset="100%" stopColor="rgba(239,184,148,0.24)" />
+              <stop offset="0%" stopColor="rgba(164,139,232,0.28)" />
+              <stop offset="55%" stopColor="rgba(246,243,238,0.30)" />
+              <stop offset="100%" stopColor="rgba(239,184,148,0.30)" />
             </linearGradient>
             <clipPath id="pvMonoClip">
               <path d="M440.2 0 L864.6 1000 L694.6 1000 L441 379 L180.1 1000 L0 1000 Z" />
@@ -322,7 +322,7 @@ export default function PrismLoader() {
             cy="1078"
             rx="560"
             ry="26"
-            fill="rgba(43,36,80,1)"
+            fill="rgba(0,0,0,1)"
             style={{ opacity: 0, filter: "blur(14px)" }}
           />
           {/* le verre — monte dans le tracé, avec sa lame */}
@@ -344,7 +344,7 @@ export default function PrismLoader() {
           <g
             ref={strokeRef}
             fill="none"
-            stroke="#2B2450"
+            stroke="#F2F2F0"
             strokeWidth="7"
             pathLength={1}
             strokeDasharray="1"

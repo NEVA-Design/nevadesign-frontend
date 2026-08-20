@@ -21,8 +21,9 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
             variant === "default",
           "border border-[rgba(164,139,232,0.45)] bg-[rgba(164,139,232,0.1)] text-[color:var(--surface-text)]":
             variant === "neva",
-          "border border-[color:var(--hairline)] bg-white text-mist": variant === "subtle",
-          "border-0 bg-[linear-gradient(100deg,#A48BE8,#EFB894)] font-semibold text-[color:var(--surface-text)]":
+          "border border-[color:var(--hairline)] bg-[rgba(255,255,255,0.05)] text-mist": variant === "subtle",
+          /* plus d'aplat aurore sur le noir : fond lilas 14 % + liseré */
+          "border border-[rgba(164,139,232,0.55)] bg-[rgba(164,139,232,0.14)] font-semibold text-[color:var(--surface-text)]":
             variant === "popular",
         },
         className

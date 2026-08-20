@@ -160,7 +160,7 @@ export function AdminMaintenanceClient({
               className={`rounded-xl border px-4 py-4 text-left transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-60 ${
                 !form.enabled
                   ? "border-ok/40 bg-ok/10"
-                  : "border-[color:var(--hairline)] hover:border-[#C9C9C0]"
+                  : "border-[color:var(--hairline)] hover:border-[rgba(255,255,255,0.14)]"
               }`}
             >
               <Check size={14} strokeWidth={1.8} className={`mb-2.5 ${!form.enabled ? "text-ok" : "text-ink/30"}`} />
@@ -179,7 +179,7 @@ export function AdminMaintenanceClient({
               className={`rounded-xl border px-4 py-4 text-left transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-60 ${
                 form.enabled
                   ? "border-warn/40 bg-warn/10"
-                  : "border-[color:var(--hairline)] hover:border-[#C9C9C0]"
+                  : "border-[color:var(--hairline)] hover:border-[rgba(255,255,255,0.14)]"
               }`}
             >
               <TriangleAlert
@@ -301,7 +301,7 @@ export function AdminMaintenanceClient({
             </div>
             {/* L'aperçu reflète la VRAIE page publique : le rideau
                 ivoire de l'atelier, plus jamais un aplat sombre (D45) */}
-            <div className="relative flex min-h-[300px] flex-col items-center justify-center overflow-hidden bg-[#F1EFE9] px-6 py-14 text-center">
+            <div className="relative flex min-h-[300px] flex-col items-center justify-center overflow-hidden bg-[#0A0A0A] px-6 py-14 text-center">
               <div aria-hidden className="pv-scene-bg--dawn-calm absolute inset-0" />
               <div
                 aria-hidden
@@ -312,7 +312,7 @@ export function AdminMaintenanceClient({
                 }}
               />
               <div className="relative flex flex-col items-center">
-                <BrandMark size={30} tone="ink" />
+                <BrandMark size={30} tone="white" />
                 <p className="pv-label mt-7">Neva Design</p>
                 <h3 className="pv-display mt-4 max-w-lg text-[clamp(1.6rem,3.2vw,2.3rem)] text-ink">
                   {form.title}

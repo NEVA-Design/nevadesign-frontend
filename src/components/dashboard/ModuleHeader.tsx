@@ -37,7 +37,7 @@ export function ModuleHeader({
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <div className="mb-4 flex items-center gap-3">
-            <span className="relative flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(255,255,255,0.68)] bg-[rgba(255,255,255,0.55)] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_6px_16px_rgba(96,84,140,0.12)]">
+            <span className="relative flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(255,255,255,0.10)] bg-[rgba(255,255,255,0.05)] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_6px_16px_rgba(0,0,0,0.42)]">
               <Icon size={14} strokeWidth={1.8} />
             </span>
             <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">

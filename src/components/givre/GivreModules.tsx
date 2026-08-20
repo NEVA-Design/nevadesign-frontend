@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { useTranslations } from "@/components/LanguageProvider";
 import { RevealBlock, RevealMask, CountUp } from "@/components/prisme/Motion";
+import { COMING_SOON } from "@/lib/feature-flags";
 import { cn } from "@/lib/utils";
 
 /*
@@ -21,21 +22,33 @@ function Tile({
   children,
   title,
   description,
+  comingSoonBadge,
 }: {
   className?: string;
   children: React.ReactNode;
   title: string;
   description: string;
+  comingSoonBadge?: string;
 }) {
+  /* Pivot 20/08 — modules « À venir » : tuile visible mais inerte
+     (opacité 55 %, cursor default, badge pill haut-droit, tooltip). */
+  const soon = COMING_SOON && comingSoonBadge;
   return (
     <article
+      title={soon ? "Disponible prochainement" : undefined}
       className={cn(
-        "pv-glass pv-glass--still pv-ignite group relative flex flex-col overflow-hidden !rounded-[16px]",
+        "pv-glass pv-glass--still group relative flex flex-col overflow-hidden !rounded-[16px]",
+        soon ? "cursor-default opacity-55" : "pv-ignite",
         className
       )}
     >
+      {soon ? (
+        <span className="absolute right-3 top-3 z-10 rounded-full border border-[rgba(164,139,232,0.55)] bg-[rgba(164,139,232,0.14)] px-2.5 py-[3px] font-mono text-[9px] uppercase tracking-[0.12em] text-ink">
+          {comingSoonBadge}
+        </span>
+      ) : null}
       <div className="relative flex-1">{children}</div>
-      <div className="relative border-t border-[rgba(43,36,80,0.07)] px-5 py-4">
+      <div className="relative border-t border-[color:var(--hairline)] px-5 py-4">
         <h3 className="text-[16px] font-medium tracking-[-0.01em] text-ink">
           {title}
         </h3>
@@ -45,7 +58,7 @@ function Tile({
   );
 }
 
-/* ── Tuile 1 : Design Studio — le brief devient une miniature ──── */
+/* ── Tuile 1 : Design Studio — le brief devient une affiche ──── */
 function DesignStudioScene() {
   const { t } = useTranslations();
   return (
@@ -57,7 +70,7 @@ function DesignStudioScene() {
         <p className="text-[13px] leading-[1.65] text-slate">
           {t(
             "bento.design.prompt",
-            "« Miniature pour un test PC — visage choqué, prix énorme en rouge, fond sombre. »"
+            "« Affiche de recrutement pour mon serveur — personnage au premier plan, néons violets, titre massif. »"
           )}
         </p>
         <div className="mt-3 flex items-center gap-2">
@@ -74,7 +87,7 @@ function DesignStudioScene() {
           ENTIER (D48) ; desktop : la tuile remplit sa hauteur. */}
       <figure className="pv-media aspect-video w-full lg:aspect-auto lg:min-h-[220px] lg:flex-1">
         <Image
-          src="/showcase/thumb-pc.webp"
+          src="/affiche1.webp"
           alt=""
           fill
           sizes="(max-width: 1024px) 90vw, 46vw"
@@ -82,7 +95,7 @@ function DesignStudioScene() {
         />
         <figcaption className="absolute bottom-3 left-4 z-[1] flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.14em] text-white/85">
           <span className="h-1.5 w-1.5 rounded-full bg-ok" />
-          {t("bento.design.campaign", "Miniature livrée · 2560 × 1440")}
+          {t("bento.design.campaign", "Affiche livrée · 2304 × 4096")}
         </figcaption>
       </figure>
     </div>
@@ -98,14 +111,14 @@ function BrandScene() {
       {/* La planche logo posée sur la grille de construction */}
       <figure className="pv-media pv-blueprint min-h-[170px] flex-1 bg-abyss">
         <Image
-          src="/showcase/logo-kova.webp"
+          src="/neva-design/logos/vulcainlogo.webp"
           alt=""
           fill
           sizes="(max-width: 1024px) 90vw, 34vw"
           className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
         />
-        <figcaption className="absolute bottom-3 left-3 z-[1] rounded-full border border-[rgba(43,36,80,0.08)] bg-[rgba(255,255,255,0.85)] px-3 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-ink">
-          {t("bento.brand.meta", "Identité Kova · vectoriel")}
+        <figcaption className="absolute bottom-3 left-3 z-[1] rounded-full border border-[rgba(255,255,255,0.14)] bg-[rgba(6,6,6,0.72)] px-3 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-ink">
+          {t("bento.brand.meta", "Identité serveur · vectoriel")}
         </figcaption>
       </figure>
       {/* Palette + typographies : la charte en raccourci */}
@@ -176,14 +189,14 @@ function EnhanceScene() {
 function DirectorScene() {
   const { t } = useTranslations();
   const moods = [
-    { src: "/showcase/thumb-esport.webp", label: "Néon" },
-    { src: "/showcase/logo-volt.webp", label: "Carbone" },
-    { src: "/showcase/charte-kova.webp", label: "Lime" },
+    { src: "/postergrandfivem2.webp", label: "Néon" },
+    { src: "/Prime_-_preview_serveur_pack_9.webp", label: "Carbone" },
+    { src: "/vice.webp", label: "Vice" },
   ];
   return (
     <div className="flex h-full min-h-[250px] flex-col justify-end gap-3 p-6">
       <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-white/60 px-4 py-3 text-[12.5px] leading-[1.6] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(43,36,80,0.05)]">
-        {t("bento.director.user", "Il me faut une identité pour ma chaîne tech.")}
+        {t("bento.director.user", "Il me faut une identité pour mon serveur RP.")}
       </div>
       <div className="mr-auto max-w-[94%] rounded-2xl rounded-bl-md border border-[rgba(164,139,232,0.3)] bg-[rgba(164,139,232,0.06)] px-4 py-3 text-[12.5px] leading-[1.6] text-slate">
         {t(
@@ -332,7 +345,7 @@ export default function GivreModules() {
         <div className="flex flex-col items-end text-right">
           <RevealBlock>
             <div className="pv-page-num justify-end [&>b]:text-[44px]">
-              <b>06</b>
+              <b>07</b>
               <span>/10</span>
             </div>
             <p className="mt-6 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
@@ -348,7 +361,7 @@ export default function GivreModules() {
             <p className="mt-5 max-w-[500px] text-[15px] leading-[1.7] text-slate">
               {t(
                 "bento.subtitle",
-                "Chaque module travaille la même matière : votre image. De la miniature à la charte complète, sans jamais perdre la ligne."
+                "Chaque module travaille la même matière : votre serveur. De la bannière au pack complet, sans jamais perdre la ligne."
               )}
             </p>
           </RevealBlock>
@@ -361,10 +374,11 @@ export default function GivreModules() {
           <RevealBlock className="lg:col-span-7">
             <Tile
               className="h-full"
+              comingSoonBadge={t("comingSoon.badge", "À venir")}
               title={t("bento.design.title", "Design Studio")}
               description={t(
                 "bento.design.desc",
-                "Miniatures, affiches, bannières : un brief, des rendus prêts à publier."
+                "Affiches, bannières, loading screens : un brief, des rendus prêts à publier."
               )}
             >
               <DesignStudioScene />
@@ -373,10 +387,11 @@ export default function GivreModules() {
           <RevealBlock delay={0.08} className="lg:col-span-5">
             <Tile
               className="h-full"
+              comingSoonBadge={t("comingSoon.badge", "À venir")}
               title={t("bento.brand.title", "Brand")}
               description={t(
                 "bento.brand.desc",
-                "Logos et chartes complètes : palette, typographies, déclinaisons."
+                "L'identité de votre serveur : palette, typographies, déclinaisons."
               )}
             >
               <BrandScene />
@@ -385,6 +400,7 @@ export default function GivreModules() {
           <RevealBlock className="lg:col-span-4">
             <Tile
               className="h-full"
+              comingSoonBadge={t("comingSoon.badge", "À venir")}
               title={t("bento.enhance.title", "Enhance")}
               description={t(
                 "bento.enhance.desc",
@@ -397,6 +413,7 @@ export default function GivreModules() {
           <RevealBlock delay={0.08} className="lg:col-span-4">
             <Tile
               className="h-full"
+              comingSoonBadge={t("comingSoon.badge", "À venir")}
               title={t("bento.director.title", "Creative Director")}
               description={t(
                 "bento.director.desc",
@@ -409,6 +426,7 @@ export default function GivreModules() {
           <RevealBlock delay={0.16} className="lg:col-span-4">
             <Tile
               className="h-full"
+              comingSoonBadge={t("comingSoon.badge", "À venir")}
               title={t("bento.character.title", "Character")}
               description={t(
                 "bento.character.desc",
@@ -421,6 +439,7 @@ export default function GivreModules() {
           <RevealBlock delay={0.1} className="lg:col-span-12">
             <Tile
               className="h-full"
+              comingSoonBadge={t("comingSoon.badge", "À venir")}
               title={t("bento.audit.title", "Audit")}
               description={t(
                 "bento.audit.desc",

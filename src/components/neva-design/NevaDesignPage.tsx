@@ -151,11 +151,11 @@ export default function NevaDesignPage({
 
   return (
     <PrismShell>
-      <div id="top" className="relative bg-frost text-ink">
+      <div id="top" className="relative text-ink">
         {/* ── En-tête — pilule de verre ───────────────────────── */}
         <header className="fixed inset-x-0 top-0 z-[90] flex flex-col items-center px-4 pt-4 sm:px-6">
-          <nav className="relative flex h-[56px] w-full max-w-[1080px] items-center justify-between rounded-full border border-[color:var(--hairline-glass)] bg-[rgba(248,249,252,0.66)] px-3 pl-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(43,36,80,0.05),0_12px_36px_rgba(43,36,80,0.1)] backdrop-blur-xl">
-            <Brand size={20} tone="ink" sub="Studio graphique" />
+          <nav className="relative flex h-[56px] w-full max-w-[1080px] items-center justify-between rounded-full border border-[color:var(--hairline-glass)] bg-[rgba(10,10,10,0.66)] px-3 pl-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_1px_2px_rgba(0,0,0,0.35),0_12px_36px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+            <Brand size={20} tone="white" sub="Studio graphique" />
             <div className="hidden items-center gap-7 lg:flex">
               {NAV_ANCHORS.map((anchor) => (
                 <a
@@ -180,7 +180,7 @@ export default function NevaDesignPage({
             </div>
           </nav>
           {/* Ancres mobiles — la nav ne disparaît jamais */}
-          <div className="mt-2 flex w-full max-w-[1080px] items-center justify-center gap-6 overflow-x-auto rounded-full border border-[color:var(--hairline-glass)] bg-[rgba(248,249,252,0.55)] px-5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-lg lg:hidden">
+          <div className="mt-2 flex w-full max-w-[1080px] items-center justify-center gap-6 overflow-x-auto rounded-full border border-[color:var(--hairline-glass)] bg-[rgba(10,10,10,0.55)] px-5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.10)] backdrop-blur-lg lg:hidden">
             {NAV_ANCHORS.map((anchor) => (
               <a
                 key={anchor.href}
@@ -217,7 +217,7 @@ export default function NevaDesignPage({
             {/* Cadre — filets blancs, la page comme objet imprimé */}
             <div
               aria-hidden
-              className="pv-fade-up pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.68)] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_2px_6px_rgba(96,84,140,0.07),0_30px_80px_rgba(96,84,140,0.13)]"
+              className="pv-fade-up pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.14)] shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_2px_6px_rgba(0,0,0,0.37),0_30px_80px_rgba(0,0,0,0.43)]"
               style={{
                 inset: "var(--frame-inset)",
                 background:
@@ -232,7 +232,7 @@ export default function NevaDesignPage({
 
             <div className="relative mx-auto flex w-full pv-container--wide flex-1 flex-col items-center justify-center px-5 text-center sm:px-8">
               <RevealBlock className="mb-8">
-                <span className="inline-flex min-h-[32px] items-center gap-2.5 rounded-full border border-[color:var(--hairline-glass)] bg-[rgba(255,255,255,0.6)] px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(43,36,80,0.05),0_10px_24px_rgba(43,36,80,0.06)]">
+                <span className="inline-flex min-h-[32px] items-center gap-2.5 rounded-full border border-[color:var(--hairline-glass)] bg-[rgba(255,255,255,0.05)] px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_1px_2px_rgba(0,0,0,0.35),0_10px_24px_rgba(0,0,0,0.36)]">
                   <span className="pv-breathe h-[5px] w-[5px] rounded-full bg-periwinkle" />
                   <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
                     Studio graphique · FiveM & GTA RP
@@ -279,9 +279,9 @@ export default function NevaDesignPage({
 
           {/* Fleuve de créations — serti de deux filets blancs */}
           <RevealBlock delay={0.3} className="relative mt-4">
-            <div aria-hidden className="h-px w-full bg-[rgba(255,255,255,0.55)]" />
+            <div aria-hidden className="h-px w-full bg-[rgba(255,255,255,0.14)]" />
             <CreationsMarquee duration={58} />
-            <div aria-hidden className="h-px w-full bg-[rgba(255,255,255,0.55)]" />
+            <div aria-hidden className="h-px w-full bg-[rgba(255,255,255,0.14)]" />
           </RevealBlock>
 
           {/* Logos clients — encre noire sur la brume */}
@@ -355,8 +355,8 @@ export default function NevaDesignPage({
                       className={cn(
                         "cursor-pointer rounded-full border px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] transition-all duration-300",
                         activeFilter === filter
-                          ? "border-transparent bg-ink text-white shadow-[0_1px_2px_rgba(43,36,80,0.18),0_8px_20px_rgba(43,36,80,0.2)]"
-                          : "border-[color:var(--hairline-glass)] bg-[rgba(255,255,255,0.6)] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] hover:bg-white/80 hover:text-ink"
+                          ? "border-transparent bg-ink text-[#060606] shadow-[0_1px_2px_rgba(0,0,0,0.48),0_8px_20px_rgba(0,0,0,0.5)]"
+                          : "border-[color:var(--hairline-glass)] bg-[rgba(255,255,255,0.05)] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.10)] hover:bg-white/10 hover:text-ink"
                       )}
                     >
                       {filter}
@@ -380,7 +380,7 @@ export default function NevaDesignPage({
                         <span
                           className={cn(
                             "pv-frame pv-print pv-shadow-mauve relative block w-full overflow-hidden !rounded-[16px]",
-                            isLogo && "!bg-[rgba(255,255,255,0.66)]"
+                            isLogo && "!bg-[rgba(255,255,255,0.05)]"
                           )}
                         >
                           <Image
@@ -395,7 +395,7 @@ export default function NevaDesignPage({
                           />
                           <span
                             aria-hidden
-                            className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(255,255,255,0.7)] bg-[rgba(255,255,255,0.85)] opacity-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_2px_6px_rgba(43,36,80,0.12)] transition-opacity duration-300 group-hover:opacity-100"
+                            className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(255,255,255,0.14)] bg-[rgba(255,255,255,0.05)] opacity-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_2px_6px_rgba(0,0,0,0.42)] transition-opacity duration-300 group-hover:opacity-100"
                           >
                             <ArrowUpRight size={14} className="text-ink" />
                           </span>
@@ -543,9 +543,9 @@ export default function NevaDesignPage({
           </div>
 
           {/* Bas de page — un filet blanc sur la scène */}
-          <div className="relative border-t border-[rgba(255,255,255,0.55)]">
+          <div className="relative border-t border-[rgba(255,255,255,0.14)]">
             <div className="mx-auto flex pv-container--wide flex-col items-start justify-between gap-4 px-5 py-7 sm:flex-row sm:items-center sm:px-8">
-              <Brand size={18} tone="ink" />
+              <Brand size={18} tone="white" />
               <p className="font-mono text-[11px] tracking-[0.1em] text-mist">
                 © {new Date().getFullYear()} Neva Design · Tous droits réservés.
               </p>

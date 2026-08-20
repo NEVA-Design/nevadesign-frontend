@@ -38,7 +38,7 @@ export function ToastViewport({ toasts }: { toasts: Toast[] }) {
           key={toast.id}
           role="status"
           className={cn(
-            "pv-toast-in pointer-events-auto rounded-lg border border-[color:var(--hairline-glass)] bg-[rgba(255,255,255,0.72)] py-3 pl-4 pr-5 text-sm text-ink/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),var(--shadow-float)] backdrop-blur-xl",
+            "pv-toast-in pointer-events-auto rounded-lg border border-[color:var(--hairline-glass)] bg-[rgba(18,18,18,0.88)] py-3 pl-4 pr-5 text-sm text-ink/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.10),var(--shadow-float)] backdrop-blur-xl",
             "border-l-2",
             {
               "border-l-violet": toast.tone === "default" || !toast.tone,
