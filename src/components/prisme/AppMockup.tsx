@@ -261,7 +261,7 @@ export default function AppMockup({ className }: { className?: string }) {
     <div
       ref={scope}
       className={cn(
-        "pv-glass pv-chrome-edge relative overflow-hidden rounded-3xl shadow-[inset_0_1px_0_rgba(255,255,255,0.10),var(--shadow-float)]",
+        "pv-glass pv-chrome-edge relative overflow-hidden rounded-[22px] shadow-[inset_0_1px_0_rgba(255,255,255,0.10),var(--shadow-float)]",
         className
       )}
     >
@@ -383,7 +383,7 @@ export default function AppMockup({ className }: { className?: string }) {
             {/* Skeleton pendant la composition */}
             <div
               data-demo-skeleton
-              className="pv-skeleton absolute inset-4 rounded-lg"
+              className="pv-skeleton absolute inset-4 rounded-[10px]"
             />
             {/* Les trois rendus superposés — un seul visible à la fois */}
             {BRIEFS.map((brief) => (

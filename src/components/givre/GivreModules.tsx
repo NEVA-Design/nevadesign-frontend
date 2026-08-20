@@ -63,7 +63,7 @@ function DesignStudioScene() {
   const { t } = useTranslations();
   return (
     <div className="flex h-full flex-col gap-4 p-6">
-      <div className="rounded-[12px] border border-[rgba(255,255,255,0.10)] bg-white/[0.05] p-4">
+      <div className="rounded-[10px] border border-[rgba(255,255,255,0.10)] bg-white/[0.05] p-4">
         <p className="mb-3 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
           {t("bento.design.brief", "Brief")}
         </p>
@@ -157,7 +157,7 @@ function EnhanceScene() {
           <Image src="/jetski.webp" alt="" fill sizes="(max-width: 1024px) 40vw, 16vw" className="object-cover" />
           <span
             aria-hidden
-            className="absolute left-[40%] top-[16%] z-[1] h-[42%] w-[26%] rounded-md border border-[rgba(184,161,232,0.85)] shadow-[0_0_16px_rgba(184,161,232,0.45)]"
+            className="absolute left-[40%] top-[16%] z-[1] h-[42%] w-[26%] rounded-[10px] border border-[rgba(184,161,232,0.85)] shadow-[0_0_16px_rgba(184,161,232,0.45)]"
           />
           <figcaption className="absolute bottom-3 left-3 z-[1] font-mono text-[9px] uppercase tracking-[0.14em] text-white/75">
             {t("bento.enhance.source", "Source")}
@@ -231,7 +231,7 @@ function CharacterScene() {
   const { t } = useTranslations();
   return (
     <div className="flex h-full min-h-[250px] items-center justify-center p-6">
-      <div className="relative w-full max-w-[300px] -rotate-2 overflow-hidden rounded-[12px] border border-[rgba(255,255,255,0.62)] bg-white/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.92),var(--shadow-print)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-0">
+      <div className="relative w-full max-w-[300px] -rotate-2 overflow-hidden rounded-[10px] border border-[rgba(255,255,255,0.62)] bg-white/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.92),var(--shadow-print)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-0">
         <div className="flex items-center justify-between border-b border-[rgba(43,36,80,0.07)] px-4 py-3">
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-slate">
             {t("bento.character.state", "État de San Andreas")}
@@ -241,7 +241,7 @@ function CharacterScene() {
           </span>
         </div>
         <div className="flex gap-4 p-4">
-          <div className="relative h-[84px] w-[68px] shrink-0 overflow-hidden rounded-md bg-abyss">
+          <div className="relative h-[84px] w-[68px] shrink-0 overflow-hidden rounded-[10px] bg-abyss">
             <Image
               src="/poser.webp"
               alt=""

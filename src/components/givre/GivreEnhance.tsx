@@ -161,7 +161,7 @@ export default function GivreEnhance() {
           <div className="pv-glass pv-chrome-edge mt-10 rounded-[22px] p-[10px] shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_2px_6px_rgba(0,0,0,0.40),0_16px_40px_rgba(0,0,0,0.50)] sm:mt-14">
             <div
               ref={frameRef}
-              className="relative h-[50vh] min-h-[360px] w-full touch-none select-none overflow-hidden rounded-[12px] bg-pearl sm:h-[56vh] sm:max-h-[600px]"
+              className="relative h-[50vh] min-h-[360px] w-full touch-none select-none overflow-hidden rounded-[10px] bg-pearl sm:h-[56vh] sm:max-h-[600px]"
               style={{ cursor: "ew-resize" }}
               onPointerDown={onPointerDown}
               onPointerMove={onPointerMove}

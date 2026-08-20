@@ -112,7 +112,7 @@ export default function GivreStudio() {
             style={{ perspective: "1700px" }}
           >
             <div data-stage className="relative will-change-transform">
-              <div className="pv-shadow-mauve rounded-[24px]">
+              <div className="pv-shadow-mauve rounded-[22px]">
                 <AppMockup className="relative" />
               </div>
             </div>

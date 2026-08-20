@@ -150,7 +150,7 @@ function CapabilityIcon({
           />
         ) : null}
       </span>
-      <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-[color:var(--hairline)] bg-[#141414] px-2.5 py-1.5 font-mono text-[9.5px] tracking-[0.06em] text-ink group-hover:block">
+      <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-[10px] border border-[color:var(--hairline)] bg-[#141414] px-2.5 py-1.5 font-mono text-[9.5px] tracking-[0.06em] text-ink group-hover:block">
         {tip}
       </span>
     </span>
@@ -177,7 +177,7 @@ function ModelPreview({ model }: { model: BannerModel }) {
         <span className="font-display text-[22px] font-medium tracking-[0.08em] text-ink">
           {model.name}
         </span>
-        <span className="rounded-[6px] border border-[rgba(255,255,255,0.14)] px-2 py-[2px] font-mono text-[9px] uppercase tracking-[0.12em] text-mist">
+        <span className="rounded-[10px] border border-[rgba(255,255,255,0.14)] px-2 py-[2px] font-mono text-[9px] uppercase tracking-[0.12em] text-mist">
           Aperçu bientôt
         </span>
       </div>
@@ -224,7 +224,7 @@ function PriceCard({
         </span>
       </p>
       {pending ? (
-        <p className="mt-3 inline-flex w-fit items-center gap-2 rounded-[6px] border border-[rgba(184,161,232,0.4)] bg-[rgba(184,161,232,0.08)] px-2.5 py-[4px] font-mono text-[9.5px] uppercase tracking-[0.12em] text-ink">
+        <p className="mt-3 inline-flex w-fit items-center gap-2 rounded-[10px] border border-[rgba(184,161,232,0.4)] bg-[rgba(184,161,232,0.08)] px-2.5 py-[4px] font-mono text-[9.5px] uppercase tracking-[0.12em] text-ink">
           <span aria-hidden className="h-1 w-1 rounded-full bg-[#B8A1E8]" />
           {t("generative.earlyAccess", "Accès anticipé — prix bientôt")}
         </p>
@@ -314,7 +314,7 @@ export default function GivreGenerative() {
                   hover scale 1.03 / 300 ms, coins 12 px partout. */}
               <div className="mt-8 grid gap-4 sm:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
                 <RevealBlock delay={0.06}>
-                  <figure className="h-full overflow-hidden rounded-[12px] border border-[rgba(255,255,255,0.08)]">
+                  <figure className="h-full overflow-hidden rounded-[10px] border border-[rgba(255,255,255,0.08)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={`/generative/${GALLERY[0].slug}.webp`}
@@ -331,7 +331,7 @@ export default function GivreGenerative() {
                 <div className="grid gap-4">
                   {GALLERY.slice(1).map((g, i) => (
                     <RevealBlock key={g.slug} delay={0.13 + i * 0.07}>
-                      <figure className="overflow-hidden rounded-[12px] border border-[rgba(255,255,255,0.08)]">
+                      <figure className="overflow-hidden rounded-[10px] border border-[rgba(255,255,255,0.08)]">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={`/generative/${g.slug}.webp`}

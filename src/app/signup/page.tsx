@@ -106,7 +106,7 @@ export default function SignupPage() {
                 <p className="mt-3 text-sm leading-relaxed text-slate">
                   {success}
                 </p>
-                <p className="mt-5 rounded-[12px] border border-[rgba(255,255,255,0.08)] bg-white/5 px-4 py-3.5 text-[13px] leading-relaxed text-slate">
+                <p className="mt-5 rounded-[10px] border border-[rgba(255,255,255,0.08)] bg-white/5 px-4 py-3.5 text-[13px] leading-relaxed text-slate">
                   Pensez aussi à vérifier les courriers indésirables. Une fois
                   l’adresse confirmée, vous pourrez vous connecter à votre espace.
                 </p>

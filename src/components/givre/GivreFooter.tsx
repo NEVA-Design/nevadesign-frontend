@@ -127,7 +127,7 @@ export default function GivreFooter() {
         {/* Cadre éditorial — les mêmes filets blancs que le hero */}
         <div
           aria-hidden
-          className="pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.12)] shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_2px_6px_rgba(0,0,0,0.40),0_30px_80px_rgba(0,0,0,0.50)]"
+          className="pointer-events-none absolute rounded-[22px] border border-[rgba(255,255,255,0.12)] shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_2px_6px_rgba(0,0,0,0.40),0_30px_80px_rgba(0,0,0,0.50)]"
           style={{
             inset: "var(--frame-inset)",
             background:
