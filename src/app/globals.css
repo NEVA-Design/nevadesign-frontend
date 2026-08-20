@@ -43,9 +43,9 @@
   --color-encre-relief: #1A1A1A;/* relief éclairci du panneau */
 
   /* ── Aurore — uniquement en glow derrière le verre ─────────── */
-  --color-violet: #A48BE8;      /* lilas */
-  --color-cyan: #EFB894;        /* pêche (alias historique du pôle) */
-  --color-magenta: #EFB894;
+  --color-violet: #B8A1E8;      /* lilas */
+  --color-cyan: #F0C5A8;        /* pêche (alias historique du pôle) */
+  --color-magenta: #F0C5A8;
 
   /* ── Surface carte — glass léger : fond blanc 4 %, bord 8 % ── */
   --color-carte: rgba(255, 255, 255, 0.04);
@@ -135,14 +135,14 @@
   --ink-45: rgba(242, 242, 240, 0.48);
   --ink-28: rgba(242, 242, 240, 0.30);
 
-  --beam: linear-gradient(100deg, #A48BE8 0%, #EFB894 100%);
-  --beam-ink: linear-gradient(100deg, #A48BE8 0%, #EFB894 100%);
-  --beam-soft: linear-gradient(100deg, rgba(164, 139, 232, 0.55), rgba(239, 184, 148, 0.55));
+  --beam: linear-gradient(100deg, #B8A1E8 0%, #F0C5A8 100%);
+  --beam-ink: linear-gradient(100deg, #B8A1E8 0%, #F0C5A8 100%);
+  --beam-soft: linear-gradient(100deg, rgba(184, 161, 232, 0.55), rgba(240, 197, 168, 0.55));
   /* Halos aurore : glow derrière le verre — assez présents pour
      que le noir vive et que le blur du verre ait une matière. */
-  --halo-violet: rgba(164, 139, 232, 0.20);
-  --halo-cyan: rgba(239, 184, 148, 0.16);
-  --halo-magenta: rgba(239, 184, 148, 0.08);
+  --halo-violet: rgba(184, 161, 232, 0.20);
+  --halo-cyan: rgba(240, 197, 168, 0.16);
+  --halo-magenta: rgba(240, 197, 168, 0.08);
 
   /* Chrome froid — gradients perpendiculaires à la course */
   --chrome: linear-gradient(90deg, #FFFFFF 0%, #DDE0EA 16%, #A4A9BE 36%, #FCFCFE 52%, #C7CAD9 72%, #EDEEF4 100%);
@@ -152,7 +152,7 @@
   --sh-glass: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.03), 0 1px 4px rgba(0, 0, 0, 0.45), 0 18px 44px rgba(0, 0, 0, 0.55);
   --sh-float: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 2px 6px rgba(0, 0, 0, 0.50), 0 26px 64px rgba(0, 0, 0, 0.60);
   --sh-modal: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 6px 14px rgba(0, 0, 0, 0.55), 0 52px 120px rgba(0, 0, 0, 0.70);
-  --sh-beam: 0 0 0 1px rgba(164, 139, 232, 0.28), 0 4px 20px rgba(164, 139, 232, 0.18), 0 1px 2px rgba(0, 0, 0, 0.45);
+  --sh-beam: 0 0 0 1px rgba(184, 161, 232, 0.28), 0 4px 20px rgba(184, 161, 232, 0.18), 0 1px 2px rgba(0, 0, 0, 0.45);
   --sh-print: 0 1px 3px rgba(0, 0, 0, 0.40), 0 18px 44px rgba(0, 0, 0, 0.45);
   --sh-print-lift: 0 3px 6px rgba(0, 0, 0, 0.45), 0 32px 72px rgba(0, 0, 0, 0.55);
 
@@ -182,7 +182,7 @@
   --scrollbar-track: var(--color-frost);
   --scrollbar-thumb: #2E2E2E;
   --scrollbar-thumb-hover: #3C3C3C;
-  --selection-bg: rgba(164, 139, 232, 0.35);
+  --selection-bg: rgba(184, 161, 232, 0.35);
   --selection-text: var(--color-ink);
   /* Passe whaou P3.4 — focus visible AURORE partout : ring 2 px,
      offset 2 px (le blanc se perdait sur les surfaces claires) */
@@ -205,8 +205,8 @@
   --ink-70: rgba(255, 255, 255, 0.72);
   --ink-45: rgba(255, 255, 255, 0.48);
   --ink-28: rgba(255, 255, 255, 0.3);
-  --halo-violet: rgba(164, 139, 232, 0.18);
-  --halo-cyan: rgba(239, 184, 148, 0.14);
+  --halo-violet: rgba(184, 161, 232, 0.18);
+  --halo-cyan: rgba(240, 197, 168, 0.14);
 
   --sh-glass: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 18px 46px rgba(16, 12, 36, 0.42);
   --sh-float: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 30px 80px rgba(16, 12, 36, 0.55);
@@ -225,7 +225,7 @@
   --field-bg: rgba(255, 255, 255, 0.05);
   --field-bg-focus: rgba(255, 255, 255, 0.07);
   --gauge-track: rgba(255, 255, 255, 0.09);
-  --num-color: #A48BE8;
+  --num-color: #B8A1E8;
   --link-color: #F6F3EE;
   --link-hover: #F6F3EE;
 
@@ -329,12 +329,15 @@ html {
    translucides posés sur le satin noir temps réel (SoieNoire,
    fixe derrière tout le site) : le drapé respire à travers,
    le voile garantit le contraste AA du texte. */
-/* Passe whaou P1 — TOUT voile fond au transparent sur ≥ 420 px à
-   ses DEUX bouts : les sections se raccordent sur le satin nu, la
-   couture n'existe plus (les anciens voiles démarraient à 0,28-0,40
-   d'opacité AU bord — la marche horizontale mesurée). Le champ de
-   lumière de section = radiaux aurore lilas #B8A1E8 / pêche
-   #F0C5A8 à 4-7 %, position variable par variante. */
+/* Passe whaou P1 → QA 20/08 : le voile de section est un APLAT
+   (plateau constant) — c'est le MASQUE commun (plus bas) qui fond
+   toutes les couches lumineuses au transparent à leurs deux bouts.
+   Les anciennes rampes 420 px codées dans le background dégénéraient
+   sur les sections < 840 px (stops croisés → marche à mi-hauteur,
+   la bande RECRUTEZ mesurée) et s'arrêtaient net à leur plateau
+   (bande de Mach). Le champ de lumière de section = radiaux aurore
+   lilas #B8A1E8 / pêche #F0C5A8 à 4-7 %, position variable par
+   variante. */
 .pv-scene-bg {
   position: absolute;
   inset: 0;
@@ -342,7 +345,7 @@ html {
   background:
     radial-gradient(52% 44% at 12% 38%, rgba(184, 161, 232, 0.065) 0%, rgba(184, 161, 232, 0) 70%),
     radial-gradient(48% 42% at 90% 72%, rgba(240, 197, 168, 0.055) 0%, rgba(240, 197, 168, 0) 72%),
-    linear-gradient(180deg, rgba(6, 6, 6, 0) 0px, rgba(6, 6, 6, 0.26) 420px, rgba(6, 6, 6, 0.26) calc(100% - 420px), rgba(6, 6, 6, 0) 100%);
+    linear-gradient(180deg, rgba(6, 6, 6, 0.26), rgba(6, 6, 6, 0.26));
 }
 
 /* Variante calme — champ haut-droit */
@@ -351,7 +354,7 @@ html {
   background:
     radial-gradient(46% 40% at 84% 8%, rgba(184, 161, 232, 0.05) 0%, rgba(184, 161, 232, 0) 68%),
     radial-gradient(40% 36% at 96% 26%, rgba(240, 197, 168, 0.04) 0%, rgba(240, 197, 168, 0) 66%),
-    linear-gradient(180deg, rgba(6, 6, 6, 0) 0px, rgba(6, 6, 6, 0.30) 420px, rgba(6, 6, 6, 0.30) calc(100% - 420px), rgba(6, 6, 6, 0) 100%);
+    linear-gradient(180deg, rgba(6, 6, 6, 0.30), rgba(6, 6, 6, 0.30));
 }
 
 /* Variante glacier — moments produit : champ bas-gauche */
@@ -360,7 +363,43 @@ html {
   background:
     radial-gradient(48% 42% at 10% 92%, rgba(184, 161, 232, 0.055) 0%, rgba(184, 161, 232, 0) 68%),
     radial-gradient(40% 36% at 0% 70%, rgba(240, 197, 168, 0.042) 0%, rgba(240, 197, 168, 0) 66%),
-    linear-gradient(180deg, rgba(6, 6, 6, 0) 0px, rgba(6, 6, 6, 0.32) 420px, rgba(6, 6, 6, 0.32) calc(100% - 420px), rgba(6, 6, 6, 0) 100%);
+    linear-gradient(180deg, rgba(6, 6, 6, 0.32), rgba(6, 6, 6, 0.32));
+}
+
+/* ── Le fondu de raccord (G2 — jamais de bord horizontal net) ──
+   Dans une scène de section, TOUTE couche décorative (voile,
+   caustiques, rais, champ radial) fond au transparent sur ses deux
+   bouts : les sections se raccordent sur le satin nu, quelle que
+   soit leur hauteur (min() protège les sections courtes). Courbe
+   en S (stops intermédiaires) : pas de bande de Mach au point où
+   la rampe rejoint le plateau. Les usages plein-viewport (dashboard
+   fixed, overlay navbar) ne sont pas dans .pv-scene : intacts. */
+.pv-scene > .pv-caustics,
+.pv-scene > .pv-windowlight,
+.pv-scene > .pv-scene-bg,
+.pv-scene > [class*="pv-scene-bg--"] {
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0,
+    rgba(0, 0, 0, 0.38) calc(min(420px, 32%) * 0.5),
+    rgba(0, 0, 0, 0.82) calc(min(420px, 32%) * 0.82),
+    #000 min(420px, 32%),
+    #000 calc(100% - min(420px, 32%)),
+    rgba(0, 0, 0, 0.82) calc(100% - min(420px, 32%) * 0.82),
+    rgba(0, 0, 0, 0.38) calc(100% - min(420px, 32%) * 0.5),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0,
+    rgba(0, 0, 0, 0.38) calc(min(420px, 32%) * 0.5),
+    rgba(0, 0, 0, 0.82) calc(min(420px, 32%) * 0.82),
+    #000 min(420px, 32%),
+    #000 calc(100% - min(420px, 32%)),
+    rgba(0, 0, 0, 0.82) calc(100% - min(420px, 32%) * 0.82),
+    rgba(0, 0, 0, 0.38) calc(100% - min(420px, 32%) * 0.5),
+    transparent 100%
+  );
 }
 
 /* Caustiques — deux nappes de lumière qui dérivent très lentement.
@@ -661,7 +700,7 @@ html {
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(115deg, rgba(164, 139, 232, 0.55), rgba(239, 184, 148, 0.45));
+  background: linear-gradient(115deg, rgba(184, 161, 232, 0.55), rgba(240, 197, 168, 0.45));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -692,7 +731,7 @@ html {
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(130deg, rgba(164, 139, 232, 0.45), rgba(239, 184, 148, 0.32) 50%, transparent 80%);
+  background: linear-gradient(130deg, rgba(184, 161, 232, 0.45), rgba(240, 197, 168, 0.32) 50%, transparent 80%);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -743,7 +782,7 @@ html {
   background: radial-gradient(
     50% 100% at 50% 0%,
     rgba(0, 0, 0, 0.55) 0%,
-    rgba(164, 139, 232, 0.06) 55%,
+    rgba(184, 161, 232, 0.06) 55%,
     transparent 100%
   );
   filter: blur(28px);
@@ -818,8 +857,8 @@ html {
   background: linear-gradient(
     100deg,
     transparent 32%,
-    rgba(164, 139, 232, 0.34) 46%,
-    rgba(239, 184, 148, 0.38) 56%,
+    rgba(184, 161, 232, 0.34) 46%,
+    rgba(240, 197, 168, 0.38) 56%,
     transparent 70%
   );
   transform: translateX(-130%) skewX(-14deg);
@@ -872,8 +911,8 @@ html {
   background: linear-gradient(
     100deg,
     transparent 32%,
-    rgba(164, 139, 232, 0.34) 46%,
-    rgba(239, 184, 148, 0.38) 56%,
+    rgba(184, 161, 232, 0.34) 46%,
+    rgba(240, 197, 168, 0.38) 56%,
     transparent 70%
   );
   transform: translateX(-130%) skewX(-14deg);
@@ -1170,7 +1209,7 @@ html {
 .pv-rule--beam {
   height: 1px;
   border: none;
-  background: linear-gradient(90deg, transparent, rgba(164, 139, 232, 0.4) 30%, rgba(239, 184, 148, 0.4) 70%, transparent);
+  background: linear-gradient(90deg, transparent, rgba(184, 161, 232, 0.4) 30%, rgba(240, 197, 168, 0.4) 70%, transparent);
 }
 
 /* ═══ Chips de réglage — l'état se lit sans effort (D26/D39) ══
@@ -1203,7 +1242,7 @@ html {
   cursor: not-allowed;
 }
 .pv-chip--on {
-  background: rgba(164, 139, 232, 0.12);
+  background: rgba(184, 161, 232, 0.12);
   border-color: var(--color-ink);
   color: var(--color-ink);
 }
@@ -1237,7 +1276,7 @@ html {
 .pv-field:focus {
   outline: none;
   border-color: rgba(242, 242, 240, 0.40);
-  box-shadow: 0 0 0 3px rgba(164, 139, 232, 0.22);
+  box-shadow: 0 0 0 3px rgba(184, 161, 232, 0.22);
   background: var(--field-bg-focus);
 }
 .pv-field:disabled {
@@ -1304,8 +1343,8 @@ html {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 1.5px solid rgba(164, 139, 232, 0.25);
-  border-top-color: #A48BE8;
+  border: 1.5px solid rgba(184, 161, 232, 0.25);
+  border-top-color: #B8A1E8;
   animation: pv-spin 0.8s linear infinite;
 }
 
@@ -1390,8 +1429,8 @@ html {
   background: conic-gradient(
     from var(--pv-ang),
     transparent 0 8%,
-    rgba(164, 139, 232, 0.9) 16%,
-    rgba(239, 184, 148, 0.9) 24%,
+    rgba(184, 161, 232, 0.9) 16%,
+    rgba(240, 197, 168, 0.9) 24%,
     transparent 32% 100%
   );
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -1456,14 +1495,14 @@ html {
 }
 .pv-veil-fallback::before {
   background:
-    radial-gradient(42% 54% at 26% 30%, var(--veil-a, rgba(164, 139, 232, 0.08)), transparent 70%),
-    radial-gradient(36% 48% at 74% 22%, var(--veil-b, rgba(239, 184, 148, 0.06)), transparent 72%);
+    radial-gradient(42% 54% at 26% 30%, var(--veil-a, rgba(184, 161, 232, 0.08)), transparent 70%),
+    radial-gradient(36% 48% at 74% 22%, var(--veil-b, rgba(240, 197, 168, 0.06)), transparent 72%);
   animation: pv-veil-drift 26s ease-in-out infinite;
 }
 .pv-veil-fallback::after {
   background:
-    radial-gradient(38% 50% at 62% 68%, var(--veil-a, rgba(164, 139, 232, 0.05)), transparent 70%),
-    radial-gradient(30% 42% at 18% 74%, var(--veil-b, rgba(239, 184, 148, 0.04)), transparent 72%);
+    radial-gradient(38% 50% at 62% 68%, var(--veil-a, rgba(184, 161, 232, 0.05)), transparent 70%),
+    radial-gradient(30% 42% at 18% 74%, var(--veil-b, rgba(240, 197, 168, 0.04)), transparent 72%);
   animation: pv-veil-drift-b 32s ease-in-out infinite;
 }
 
@@ -1478,7 +1517,7 @@ html {
   background:
     radial-gradient(46% 50% at 22% 12%, rgba(184, 161, 232, 0.07) 0%, rgba(184, 161, 232, 0) 68%),
     radial-gradient(42% 46% at 72% 68%, rgba(240, 197, 168, 0.06) 0%, rgba(240, 197, 168, 0) 70%),
-    linear-gradient(180deg, rgba(6, 6, 6, 0) 0px, rgba(6, 6, 6, 0.24) 420px, rgba(6, 6, 6, 0.24) calc(100% - 420px), rgba(6, 6, 6, 0) 100%);
+    linear-gradient(180deg, rgba(6, 6, 6, 0.24), rgba(6, 6, 6, 0.24));
 }
 
 /* Version diluée pour les sections courantes — champ bas-droit */
@@ -1487,7 +1526,7 @@ html {
   background:
     radial-gradient(50% 55% at 88% 86%, rgba(240, 197, 168, 0.055) 0%, rgba(240, 197, 168, 0) 68%),
     radial-gradient(44% 48% at 4% 30%, rgba(184, 161, 232, 0.048) 0%, rgba(184, 161, 232, 0) 66%),
-    linear-gradient(180deg, rgba(6, 6, 6, 0) 0px, rgba(6, 6, 6, 0.28) 420px, rgba(6, 6, 6, 0.28) calc(100% - 420px), rgba(6, 6, 6, 0) 100%);
+    linear-gradient(180deg, rgba(6, 6, 6, 0.28), rgba(6, 6, 6, 0.28));
 }
 
 /* Rais de fenêtre — la lumière entre en diagonale, haut-droite.

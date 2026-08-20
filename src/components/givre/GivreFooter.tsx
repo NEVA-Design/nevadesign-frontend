@@ -87,7 +87,7 @@ export default function GivreFooter() {
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(34% 42% at 38% 30%, rgba(164,139,232,0.16) 0%, rgba(164,139,232,0) 70%), radial-gradient(30% 38% at 64% 62%, rgba(239,184,148,0.14) 0%, rgba(239,184,148,0) 72%)",
+              "radial-gradient(34% 42% at 38% 30%, rgba(184,161,232,0.16) 0%, rgba(184,161,232,0) 70%), radial-gradient(30% 38% at 64% 62%, rgba(240,197,168,0.14) 0%, rgba(240,197,168,0) 72%)",
           }}
         />
 
@@ -104,7 +104,7 @@ export default function GivreFooter() {
             height: 168,
             borderRadius: "999px",
             background:
-              "radial-gradient(58% 52% at 33% 26%, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0) 62%), radial-gradient(70% 66% at 68% 74%, rgba(239,184,148,0.28) 0%, rgba(239,184,148,0) 74%), radial-gradient(80% 76% at 26% 62%, rgba(164,139,232,0.24) 0%, rgba(164,139,232,0) 76%), radial-gradient(120% 120% at 50% 40%, #1E1E1E 0%, #121212 78%, #0C0C0C 100%)",
+              "radial-gradient(58% 52% at 33% 26%, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0) 62%), radial-gradient(70% 66% at 68% 74%, rgba(240,197,168,0.28) 0%, rgba(240,197,168,0) 74%), radial-gradient(80% 76% at 26% 62%, rgba(184,161,232,0.24) 0%, rgba(184,161,232,0) 76%), radial-gradient(120% 120% at 50% 40%, #1E1E1E 0%, #121212 78%, #0C0C0C 100%)",
             boxShadow:
               "inset 0 1px 1px rgba(255,255,255,0.22), inset 0 -14px 26px rgba(0,0,0,0.45), 0 26px 40px -18px rgba(0,0,0,0.60)",
           }}

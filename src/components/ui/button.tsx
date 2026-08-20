@@ -34,7 +34,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               variant === "secondary",
             "text-slate hover:bg-ink/5 hover:text-ink active:scale-[0.99] disabled:opacity-45":
               variant === "ghost",
-            "border border-[color:var(--hairline-strong)] text-ink hover:border-[color:var(--color-violet)] hover:shadow-[0_0_16px_rgba(164,139,232,0.22)] active:scale-[0.99] disabled:opacity-45":
+            "border border-[color:var(--hairline-strong)] text-ink hover:border-[color:var(--color-violet)] hover:shadow-[0_0_16px_rgba(184,161,232,0.22)] active:scale-[0.99] disabled:opacity-45":
               variant === "outline",
           },
           className

@@ -225,7 +225,7 @@ export default async function DashboardPage() {
           <div className="nv-card relative overflow-hidden">
             <div
               aria-hidden
-              className="pointer-events-none absolute -top-24 left-1/3 h-64 w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(164,139,232,0.16),transparent_70%)]"
+              className="pointer-events-none absolute -top-24 left-1/3 h-64 w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(184,161,232,0.16),transparent_70%)]"
             />
             <div className="relative grid items-center gap-10 p-8 sm:p-12 lg:grid-cols-2">
               <div>

@@ -403,7 +403,7 @@ export default function GivreGenerative() {
               <div className="mt-6 grid gap-4 sm:grid-cols-2 min-[1680px]:grid-cols-3">
                 {list.map((model, i) => (
                   <RevealBlock key={model.id} delay={0.05 + (i % 2) * 0.06}>
-                    <div className="pv-glass pv-glass--card pv-card-hover p-4">
+                    <div data-qa="modele-carte" className="pv-glass pv-glass--card pv-card-hover p-4">
                       <ModelPreview model={model} />
                       <div className="mt-3.5 flex items-center justify-between gap-3">
                         <p className="truncate text-[14px] font-medium text-ink">{model.name}</p>

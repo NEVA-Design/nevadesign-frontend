@@ -191,7 +191,7 @@ export function AdminNewsletterClient({
                       onClick={() => setAudience(item.id)}
                       className={`min-h-10 rounded-lg border px-2.5 py-2 text-left transition-colors duration-300 ${
                         active
-                          ? "border-[rgba(164,139,232,0.35)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
+                          ? "border-[rgba(184,161,232,0.35)] bg-[rgba(184,161,232,0.08)] text-[color:var(--num-color)]"
                           : "border-[color:var(--hairline)] text-steel hover:border-[rgba(255,255,255,0.14)] hover:text-ink"
                       }`}
                     >
@@ -339,7 +339,7 @@ export function AdminNewsletterClient({
                   ))
                 )}
                 {ctaUrl && (
-                  <div className="mt-6 inline-flex h-11 items-center rounded-full bg-ink px-6 text-sm font-medium text-[#060606] shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_4px_24px_rgba(164,139,232,0.28)]">
+                  <div className="mt-6 inline-flex h-11 items-center rounded-full bg-ink px-6 text-sm font-medium text-[#060606] shadow-[0_0_0_1px_rgba(184,161,232,0.4),0_4px_24px_rgba(184,161,232,0.28)]">
                     {ctaLabel || "Passer au niveau supérieur"}
                   </div>
                 )}

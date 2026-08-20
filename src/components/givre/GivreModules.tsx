@@ -43,7 +43,7 @@ function Tile({
       )}
     >
       {soon ? (
-        <span className="absolute right-3 top-3 z-10 rounded-full border border-[rgba(164,139,232,0.55)] bg-[rgba(164,139,232,0.14)] px-2.5 py-[3px] font-mono text-[9px] uppercase tracking-[0.12em] text-ink">
+        <span className="absolute right-3 top-3 z-10 rounded-full border border-[rgba(184,161,232,0.55)] bg-[rgba(184,161,232,0.14)] px-2.5 py-[3px] font-mono text-[9px] uppercase tracking-[0.12em] text-ink">
           {comingSoonBadge}
         </span>
       ) : null}
@@ -63,7 +63,7 @@ function DesignStudioScene() {
   const { t } = useTranslations();
   return (
     <div className="flex h-full flex-col gap-4 p-6">
-      <div className="rounded-[12px] border border-[rgba(43,36,80,0.07)] bg-white/55 p-4">
+      <div className="rounded-[12px] border border-[rgba(255,255,255,0.10)] bg-white/[0.05] p-4">
         <p className="mb-3 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
           {t("bento.design.brief", "Brief")}
         </p>
@@ -74,7 +74,7 @@ function DesignStudioScene() {
           )}
         </p>
         <div className="mt-3 flex items-center gap-2">
-          <span className="inline-flex h-7 items-center gap-2 rounded-full bg-ink px-3 text-[11px] font-medium text-white">
+          <span className="inline-flex h-7 items-center gap-2 rounded-full bg-ink px-3 text-[11px] font-medium text-[#0B0B0B]">
             {t("bento.design.action", "Composer")}
             <ArrowRight size={11} />
           </span>
@@ -105,7 +105,7 @@ function DesignStudioScene() {
 /* ── Tuile 2 : Brand — l'identité en construction ──────────────── */
 function BrandScene() {
   const { t } = useTranslations();
-  const palette = ["#C7F464", "#0C0F14", "#1F2530", "#E8ECF2", "#4A5468"];
+  const palette = ["#B8A1E8", "#F0C5A8", "#F2EFE9", "#2E2E30", "#0B0B0B"];
   return (
     <div className="flex h-full flex-col gap-4 p-6">
       {/* La planche logo posée sur la grille de construction */}
@@ -127,7 +127,7 @@ function BrandScene() {
           {palette.map((c) => (
             <span
               key={c}
-              className="h-7 w-7 rounded-full border border-[rgba(43,36,80,0.1)]"
+              className="h-7 w-7 rounded-full border border-[rgba(255,255,255,0.12)]"
               style={{ backgroundColor: c }}
             />
           ))}
@@ -157,13 +157,13 @@ function EnhanceScene() {
           <Image src="/jetski.webp" alt="" fill sizes="(max-width: 1024px) 40vw, 16vw" className="object-cover" />
           <span
             aria-hidden
-            className="absolute left-[40%] top-[16%] z-[1] h-[42%] w-[26%] rounded-md border border-[rgba(164,139,232,0.85)] shadow-[0_0_16px_rgba(164,139,232,0.45)]"
+            className="absolute left-[40%] top-[16%] z-[1] h-[42%] w-[26%] rounded-md border border-[rgba(184,161,232,0.85)] shadow-[0_0_16px_rgba(184,161,232,0.45)]"
           />
           <figcaption className="absolute bottom-3 left-3 z-[1] font-mono text-[9px] uppercase tracking-[0.14em] text-white/75">
             {t("bento.enhance.source", "Source")}
           </figcaption>
         </figure>
-        <figure className="pv-media border-[rgba(164,139,232,0.35)]">
+        <figure className="pv-media border-[rgba(184,161,232,0.35)]">
           <Image
             src="/jetski.webp"
             alt=""
@@ -195,10 +195,10 @@ function DirectorScene() {
   ];
   return (
     <div className="flex h-full min-h-[250px] flex-col justify-end gap-3 p-6">
-      <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-white/60 px-4 py-3 text-[12.5px] leading-[1.6] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(43,36,80,0.05)]">
+      <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-md border border-[rgba(255,255,255,0.10)] bg-white/[0.07] px-4 py-3 text-[12.5px] leading-[1.6] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
         {t("bento.director.user", "Il me faut une identité pour mon serveur RP.")}
       </div>
-      <div className="mr-auto max-w-[94%] rounded-2xl rounded-bl-md border border-[rgba(164,139,232,0.3)] bg-[rgba(164,139,232,0.06)] px-4 py-3 text-[12.5px] leading-[1.6] text-slate">
+      <div className="mr-auto max-w-[94%] rounded-2xl rounded-bl-md border border-[rgba(184,161,232,0.3)] bg-[rgba(184,161,232,0.06)] px-4 py-3 text-[12.5px] leading-[1.6] text-slate">
         {t(
           "bento.director.answer",
           "Trois pistes, moodboards à l'appui. Je compose la première ?"
@@ -304,7 +304,7 @@ function AuditScene() {
           {t("bento.audit.imageLabel", "Visuel audité")}
         </figcaption>
       </figure>
-      <p className="flex items-baseline gap-2 md:flex-col md:items-center md:gap-1 md:border-x md:border-[rgba(43,36,80,0.07)] md:px-10">
+      <p className="flex items-baseline gap-2 md:flex-col md:items-center md:gap-1 md:border-x md:border-[rgba(255,255,255,0.10)] md:px-10">
         <span className="font-display text-[56px] font-light leading-none text-ink md:text-[64px]">
           <CountUp value={84} />
         </span>

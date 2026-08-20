@@ -38,7 +38,7 @@ type ProjectDetail = {
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
   draft: { label: "Brouillon", className: "text-steel border-[color:var(--hairline-strong)]" },
   ready: { label: "Prête", className: "text-[#6FBF9F] border-[rgba(111,191,159,0.40)]" },
-  exported: { label: "Exportée", className: "text-[color:var(--num-color)] border-[rgba(164,139,232,0.4)]" },
+  exported: { label: "Exportée", className: "text-[color:var(--num-color)] border-[rgba(184,161,232,0.4)]" },
 };
 
 function timeAgo(date: string) {
@@ -237,7 +237,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                         className="group"
                       >
                         <div
-                          className="relative overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-abyss transition-colors duration-500 group-hover:border-[rgba(164,139,232,0.45)]"
+                          className="relative overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-abyss transition-colors duration-500 group-hover:border-[rgba(184,161,232,0.45)]"
                           style={{ aspectRatio: `${asset.width} / ${asset.height}` }}
                         >
                           {asset.preview_url ? (

@@ -48,7 +48,7 @@ function FormatShape({ category }: { category: AssetCategory }) {
   return (
     <span className="flex h-[72px] w-[120px] items-center justify-center" aria-hidden>
       <span
-        className="rounded-[4px] border border-[rgba(164,139,232,0.55)] bg-[linear-gradient(135deg,rgba(164,139,232,0.16),rgba(124,107,212,0.06))] shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
+        className="rounded-[4px] border border-[rgba(184,161,232,0.55)] bg-[linear-gradient(135deg,rgba(184,161,232,0.16),rgba(124,107,212,0.06))] shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
         style={{ width: `${w}px`, height: `${Math.max(h, 8)}px` }}
       />
     </span>
@@ -101,7 +101,7 @@ export default async function CreateHubPage({ params }: { params: Promise<{ id: 
               className={
                 locked || logoDone
                   ? "flex items-center gap-5 rounded-2xl border border-[color:var(--hairline)] bg-white/5 p-5"
-                  : "pv-glass pv-edge pv-ignite group flex items-center gap-5 rounded-2xl p-5 transition-all duration-300 hover:border-[rgba(164,139,232,0.5)]"
+                  : "pv-glass pv-edge pv-ignite group flex items-center gap-5 rounded-2xl p-5 transition-all duration-300 hover:border-[rgba(184,161,232,0.5)]"
               }
             >
               <FormatShape category={category} />

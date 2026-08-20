@@ -249,7 +249,7 @@ export default function CharacterPageClient({ initialCharacters }: { initialChar
                     <Image src={sourceImage.preview} alt="Personnage téléversé" fill sizes="620px" className="object-contain" />
                   </div>
                 ) : (
-                  <span className="mb-5 flex h-14 w-14 items-center justify-center rounded-lg border border-violet/25 bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]">
+                  <span className="mb-5 flex h-14 w-14 items-center justify-center rounded-lg border border-violet/25 bg-[rgba(184,161,232,0.08)] text-[color:var(--num-color)]">
                     <UserRound size={22} />
                   </span>
                 )}
@@ -334,7 +334,7 @@ export default function CharacterPageClient({ initialCharacters }: { initialChar
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="group relative flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-lg border border-dashed border-[rgba(246,243,238,0.22)] bg-abyss transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)]"
+                className="group relative flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-lg border border-dashed border-[rgba(246,243,238,0.22)] bg-abyss transition-colors duration-300 hover:border-[rgba(184,161,232,0.45)]"
               >
                 {sourceImage ? (
                   <Image src={sourceImage.preview} alt="Personnage téléversé" fill sizes="430px" className="object-contain" />
@@ -366,7 +366,7 @@ export default function CharacterPageClient({ initialCharacters }: { initialChar
                         <li
                           key={character.id}
                           className={`pv-row flex items-center gap-3 px-1 py-2.5 ${
-                            isSelected ? "bg-[rgba(164,139,232,0.06)]" : ""
+                            isSelected ? "bg-[rgba(184,161,232,0.06)]" : ""
                           }`}
                         >
                           <button
@@ -435,7 +435,7 @@ export default function CharacterPageClient({ initialCharacters }: { initialChar
                       aria-pressed={isActive}
                       className={`flex min-h-[64px] items-start gap-2.5 rounded-lg border px-3 py-2.5 text-left transition-colors duration-300 ${
                         isActive
-                          ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)]"
+                          ? "border-[color:var(--color-ink)] bg-[rgba(184,161,232,0.12)]"
                           : "border-[color:var(--hairline)] hover:border-[#4A4A4A]"
                       }`}
                     >

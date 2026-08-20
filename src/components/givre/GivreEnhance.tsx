@@ -130,7 +130,7 @@ export default function GivreEnhance() {
                   reste, l'accès est désactivé */}
               <span
                 title={t("comingSoon.tooltip", "Disponible prochainement")}
-                className="rounded-full border border-[rgba(164,139,232,0.55)] bg-[rgba(164,139,232,0.14)] px-2.5 py-[3px] font-mono text-[9px] uppercase tracking-[0.12em] text-ink"
+                className="rounded-full border border-[rgba(184,161,232,0.55)] bg-[rgba(184,161,232,0.14)] px-2.5 py-[3px] font-mono text-[9px] uppercase tracking-[0.12em] text-ink"
               >
                 {t("comingSoon.badge", "À venir")}
               </span>
@@ -216,7 +216,7 @@ export default function GivreEnhance() {
               >
                 <span
                   aria-hidden
-                  className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[linear-gradient(180deg,transparent,rgba(164,139,232,0.95)_22%,rgba(239,184,148,0.95)_78%,transparent)] shadow-[0_0_22px_rgba(164,139,232,0.6)]"
+                  className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[linear-gradient(180deg,transparent,rgba(184,161,232,0.95)_22%,rgba(240,197,168,0.95)_78%,transparent)] shadow-[0_0_22px_rgba(184,161,232,0.6)]"
                 />
                 <span className="pv-pill absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 gap-3 whitespace-nowrap px-4">
                   <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink">

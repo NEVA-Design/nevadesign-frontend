@@ -39,7 +39,7 @@ export default function CodePage() {
         eyebrow="Neva Code"
         title="Du code prêt à intégrer sur votre serveur"
         description="Décrivez la ressource dont vous avez besoin : Neva Code écrira des scripts Lua propres, structurés et compatibles avec votre framework."
-        accent="#A48BE8"
+        accent="#B8A1E8"
         meta="Inclus selon votre plan"
         activeStep={0}
         steps={[
@@ -62,7 +62,7 @@ export default function CodePage() {
                   disabled
                   className={`h-10 flex-1 rounded-lg border px-3 font-mono text-[11px] uppercase tracking-[0.1em] transition-colors duration-300 disabled:cursor-not-allowed ${
                     index === 0
-                      ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
+                      ? "border-[color:var(--color-ink)] bg-[rgba(184,161,232,0.12)] text-ink"
                       : "border-carte-brd bg-carte text-slate"
                   }`}
                 >

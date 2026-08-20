@@ -618,7 +618,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden border-b border-[color:var(--hairline)] bg-[rgba(164,139,232,0.05)]"
+            className="overflow-hidden border-b border-[color:var(--hairline)] bg-[rgba(184,161,232,0.05)]"
           >
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-2.5">
               <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-dusk">
@@ -837,7 +837,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                   className={cn(
                     "flex cursor-grab items-center gap-2 rounded-lg border px-2 py-1.5 active:cursor-grabbing",
                     selectedId === layer.id
-                      ? "border-[rgba(164,139,232,0.55)] bg-white/5 shadow-[0_2px_8px_rgba(0,0,0,0.42)]"
+                      ? "border-[rgba(184,161,232,0.55)] bg-white/5 shadow-[0_2px_8px_rgba(0,0,0,0.42)]"
                       : "border-transparent hover:bg-ink/[0.04]"
                   )}
                   onClick={() => setSelectedId(layer.id)}
@@ -922,7 +922,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                             className={cn(
                               "rounded-lg border px-1 py-1.5 text-[10.5px] transition-colors",
                               (selected.variant ?? "color") === variant
-                                ? "border-[rgba(164,139,232,0.6)] bg-white/5 text-ink"
+                                ? "border-[rgba(184,161,232,0.6)] bg-white/5 text-ink"
                                 : "border-[color:var(--hairline)] text-steel hover:text-ink"
                             )}
                           >
@@ -984,7 +984,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                   onKeyDown={(e) => { if (e.key === "Enter") void handleInstruct(); }}
                   placeholder="Passe le titre en chrome, scène de nuit, retire le personnage de gauche…"
                   maxLength={240}
-                  className="w-full rounded-xl border border-[color:var(--hairline-strong)] px-4 py-3 text-[14px] text-ink outline-none placeholder:text-mist focus:shadow-[0_0_0_2px_rgba(164,139,232,0.3)]"
+                  className="w-full rounded-xl border border-[color:var(--hairline-strong)] px-4 py-3 text-[14px] text-ink outline-none placeholder:text-mist focus:shadow-[0_0_0_2px_rgba(184,161,232,0.3)]"
                 />
               </label>
               <p className="mt-2 text-[11.5px] leading-relaxed text-mist">

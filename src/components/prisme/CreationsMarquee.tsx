@@ -23,11 +23,15 @@ const ROW_A: Piece[] = [
   { src: "/affiche2.webp", alt: "Affiche staff serveur FiveM", ratio: "aspect-[16/9]" },
 ];
 
+/* Doublons d'artwork bannis (QA 20/08) : pack_19 répétait le visuel
+   TICKETS de la rangée A (pack_15), pack_3 répétait le REWIND de
+   pack_9 — remplacés par des pièces inédites (455 : New Paradise,
+   4_1 : Essential V). Jamais deux fois le même artwork à l'écran. */
 const ROW_B: Piece[] = [
   { src: "/postergrandfivem2.webp", alt: "Affiche grand format FiveM", ratio: "aspect-[3/4]" },
   { src: "/Prime_-_preview_serveur_pack_9.webp", alt: "Pack complet serveur FiveM", ratio: "aspect-[16/9]" },
-  { src: "/neva-design/packs/Prime_-_preview_serveur_pack_19.webp", alt: "Kit réseaux d'un serveur", ratio: "aspect-[16/10]" },
-  { src: "/neva-design/packs/Prime_-_preview_serveur_pack_3.webp", alt: "Bannière boutique serveur", ratio: "aspect-[4/3]" },
+  { src: "/neva-design/packs/Prime_-_preview_serveur_pack_455.webp", alt: "Kit réseaux d'un serveur", ratio: "aspect-[16/10]" },
+  { src: "/neva-design/packs/Prime_-_preview_serveur_pack_4_1.webp", alt: "Bannière boutique serveur", ratio: "aspect-[4/3]" },
   { src: "/affiche3.webp", alt: "Affiche événement serveur", ratio: "aspect-[3/4]" },
   { src: "/postergrandfivem.webp", alt: "Série d'affiches serveur FiveM", ratio: "aspect-[16/9]" },
   { src: "/Prime_-_preview_serveur_pack_4.webp", alt: "Pack graphique serveur", ratio: "aspect-[4/3]" },
@@ -57,6 +61,7 @@ function Row({
       {pieces.map((piece, i) => (
         <figure
           key={`${piece.src}-${copy}`}
+          data-qa={copy === 0 ? "marquee-tuile" : undefined}
           className={`pv-print group h-[150px] shrink-0 sm:h-[176px] ${piece.ratio}`}
         >
           <Image

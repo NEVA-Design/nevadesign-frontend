@@ -90,14 +90,22 @@ export default function GivreStats() {
                   className="flex shrink-0 items-center gap-14 pr-14"
                 >
                   {CLIENT_LOGOS.map((logo) => (
-                    <Image
+                    /* encombrement FIXE par logo (h-7 × w-20, logo
+                       contain centré) : le rythme du marquee reste
+                       régulier quelles que soient les proportions ;
+                       opacité 45 % → 70 % au survol (hover system) */
+                    <span
                       key={`${logo.src}-${hidden ? "b" : "a"}`}
-                      src={logo.src}
-                      alt={hidden ? "" : logo.alt}
-                      width={88}
-                      height={22}
-                      className="h-[22px] w-auto opacity-55 transition-opacity duration-300 hover:opacity-90"
-                    />
+                      className="flex h-7 w-20 shrink-0 items-center justify-center"
+                    >
+                      <Image
+                        src={logo.src}
+                        alt={hidden ? "" : logo.alt}
+                        width={88}
+                        height={22}
+                        className="max-h-[22px] w-auto object-contain opacity-45 transition-opacity duration-200 hover:opacity-70"
+                      />
+                    </span>
                   ))}
                 </div>
               ))}

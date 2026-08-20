@@ -246,7 +246,7 @@ export function AdminAnnouncementsClient({
                     onClick={() => updateForm("kind", kind)}
                     className={`flex min-h-10 items-center justify-center rounded-lg border px-2 py-2 text-xs transition-colors duration-300 ${
                       form.kind === kind
-                        ? "border-[rgba(164,139,232,0.35)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
+                        ? "border-[rgba(184,161,232,0.35)] bg-[rgba(184,161,232,0.08)] text-[color:var(--num-color)]"
                         : "border-[color:var(--hairline)] text-steel hover:border-[rgba(255,255,255,0.14)] hover:text-ink"
                     }`}
                   >
@@ -445,7 +445,7 @@ export function AdminAnnouncementsClient({
                         <button
                           onClick={() => toggleActive(item)}
                           disabled={loading}
-                          className="flex h-10 items-center rounded-full border border-[color:var(--hairline)] px-4 font-mono text-[10px] uppercase tracking-[0.12em] text-steel transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)] hover:text-ink disabled:pointer-events-none disabled:opacity-45"
+                          className="flex h-10 items-center rounded-full border border-[color:var(--hairline)] px-4 font-mono text-[10px] uppercase tracking-[0.12em] text-steel transition-colors duration-300 hover:border-[rgba(184,161,232,0.45)] hover:text-ink disabled:pointer-events-none disabled:opacity-45"
                         >
                           {item.is_active ? "Masquer" : "Activer"}
                         </button>

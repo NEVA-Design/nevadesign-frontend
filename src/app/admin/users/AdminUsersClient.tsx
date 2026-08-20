@@ -200,7 +200,7 @@ function UserModal({
             onClick={() => { setTab(t); clearMessages(); }}
             className={`h-10 rounded-lg border font-mono text-[10px] font-medium uppercase tracking-[0.12em] transition-colors duration-300 ${
               tab === t
-                ? "border-[rgba(164,139,232,0.35)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]"
+                ? "border-[rgba(184,161,232,0.35)] bg-[rgba(184,161,232,0.08)] text-[color:var(--num-color)]"
                 : "border-[color:var(--hairline)] text-steel hover:text-ink"
             }`}
           >
@@ -222,7 +222,7 @@ function UserModal({
                   onClick={() => setSelectedPlan(p)}
                   className={`min-h-[56px] rounded-lg border px-2 py-2.5 text-center transition-colors duration-300 ${
                     selectedPlan === p
-                      ? "border-[rgba(164,139,232,0.35)] bg-[rgba(164,139,232,0.08)]"
+                      ? "border-[rgba(184,161,232,0.35)] bg-[rgba(184,161,232,0.08)]"
                       : "border-[color:var(--hairline)] hover:border-[rgba(255,255,255,0.14)]"
                   }`}
                 >
@@ -501,7 +501,7 @@ export function AdminUsersClient() {
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
               aria-label="Page précédente"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] text-steel transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)] hover:text-ink disabled:pointer-events-none disabled:opacity-30"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] text-steel transition-colors duration-300 hover:border-[rgba(184,161,232,0.45)] hover:text-ink disabled:pointer-events-none disabled:opacity-30"
             >
               <ChevronLeft size={15} strokeWidth={1.8} />
             </button>
@@ -510,7 +510,7 @@ export function AdminUsersClient() {
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
               aria-label="Page suivante"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] text-steel transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)] hover:text-ink disabled:pointer-events-none disabled:opacity-30"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] text-steel transition-colors duration-300 hover:border-[rgba(184,161,232,0.45)] hover:text-ink disabled:pointer-events-none disabled:opacity-30"
             >
               <ChevronRight size={15} strokeWidth={1.8} />
             </button>

@@ -18,17 +18,21 @@ import team from "@/data/team.json";
 
 type TeamMember = {
   id: string;
-  pseudo: string;
+  /* null tant que les pseudos réels ne sont pas fournis (Sami) :
+     la carte se présente alors par métier — jamais de placeholder */
+  pseudo: string | null;
   role: string;
+  mission: string;
   avatar: string | null;
 };
 
-/* Initiales du pseudo — fallback avatar tant que les photos ne
-   sont pas fournies : 2 lettres, tags [XXX] ignorés. */
+/* Initiales du pseudo (ou du métier en attendant) — fallback avatar
+   tant que les photos ne sont pas fournies : 2 lettres, tags [XXX]
+   ignorés. */
 function initials(pseudo: string) {
   const words = pseudo
     .replace(/\[.*?\]/g, "")
-    .split(/[\s_.-]+/)
+    .split(/[\s_.&-]+/)
     .filter(Boolean);
   const a = words[0]?.[0] ?? "?";
   const b = words[1]?.[0] ?? words[0]?.[1] ?? "";
@@ -148,7 +152,7 @@ export default function GivreStudioVitrine() {
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={m.avatar}
-                      alt={m.pseudo}
+                      alt={m.pseudo ?? m.role}
                       width={64}
                       height={64}
                       loading="lazy"
@@ -160,16 +164,24 @@ export default function GivreStudioVitrine() {
                       className="flex h-16 w-16 items-center justify-center rounded-full font-display text-[20px] font-medium text-ink"
                       style={{
                         background:
-                          "linear-gradient(135deg, rgba(164,139,232,0.30), rgba(239,184,148,0.26))",
+                          "linear-gradient(135deg, rgba(184,161,232,0.30), rgba(240,197,168,0.26))",
                       }}
                     >
-                      {initials(m.pseudo)}
+                      {initials(m.pseudo ?? m.role)}
                     </span>
                   )}
-                  <p className="mt-4 text-[15px] font-medium text-ink">{m.pseudo}</p>
-                  <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-mist">
-                    {m.role}
+                  <p className="mt-4 text-[15px] font-medium text-ink">
+                    {m.pseudo ?? t(`studio.team.${m.id}.role`, m.role)}
                   </p>
+                  {m.pseudo ? (
+                    <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-mist">
+                      {t(`studio.team.${m.id}.role`, m.role)}
+                    </p>
+                  ) : (
+                    <p className="mt-2 max-w-[220px] text-[12.5px] leading-[1.6] text-mist">
+                      {t(`studio.team.${m.id}.mission`, m.mission)}
+                    </p>
+                  )}
                 </div>
               </RevealBlock>
             ))}

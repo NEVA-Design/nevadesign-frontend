@@ -33,7 +33,7 @@ export const KIND_LABELS: Record<AnnouncementKind, string> = {
 export const ACCENT_STYLES: Record<AnnouncementAccent, { color: string; bg: string; border: string }> = {
   coral: { color: "#F08A85", bg: "#F08A8514", border: "#F08A8533" },
   orange: { color: "#E5C36E", bg: "#E5C36E14", border: "#E5C36E33" },
-  yellow: { color: "#A48BE8", bg: "#B4A8FF12", border: "#B4A8FF33" },
+  yellow: { color: "#B8A1E8", bg: "#B4A8FF12", border: "#B4A8FF33" },
   green: { color: "#8FC7B2", bg: "#7ED4A612", border: "#7ED4A633" },
 };
 

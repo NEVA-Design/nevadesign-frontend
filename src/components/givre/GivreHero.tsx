@@ -317,6 +317,21 @@ export default function GivreHero() {
       {/* Aucun cadre au-dessus de la scène : le canvas est nu, seule
           la vraie interface (texte, boutons, rails) se pose dessus. */}
 
+      {/* Fondu de raccord (G2 — QA 20/08) : le cyclorama peint
+          s'arrêtait NET au bas de la section (marche mesurée sur
+          toute la largeur). 220 px de rampe vers le noir de page à
+          92 % — le drapé s'éteint, la section suivante monte depuis
+          le satin nu. Au-dessus du canvas ET du poster, sous le
+          contenu. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-[220px]"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(6,6,6,0) 0%, rgba(6,6,6,0.5) 52%, rgba(6,6,6,0.92) 100%)",
+        }}
+      />
+
       {/* Le rail de sections vit désormais en fixed (SectionRail,
           monté par la page) : synchronisé au scroll, cliquable.
           La grille de pastilles décorative est retirée (D05 : un
@@ -386,11 +401,11 @@ export default function GivreHero() {
                 Generative ensuite (les outils de création sont « À
                 venir », plus aucun CTA ne pointe dessus) */}
             <div className="mt-9 hidden flex-wrap items-center gap-4 lg:flex">
-              <a href="#studio" className="gh-cta pv-btn">
+              <a href="#studio" data-qa="cta-primaire" className="gh-cta pv-btn">
                 {t("hero.cta.primary", "Découvrir le studio")}
                 <ArrowRight size={15} strokeWidth={1.8} />
               </a>
-              <a href="#generative" className="gh-cta pv-btn pv-btn--ghost">
+              <a href="#generative" data-qa="cta-secondaire" className="gh-cta pv-btn pv-btn--ghost">
                 {t("hero.cta.secondary", "Neva Generative")}
               </a>
             </div>

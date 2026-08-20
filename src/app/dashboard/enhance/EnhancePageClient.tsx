@@ -216,7 +216,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="group flex min-h-[72px] w-full items-center gap-4 rounded-lg border border-dashed border-[rgba(246,243,238,0.22)] bg-abyss p-3 text-left transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)]"
+                className="group flex min-h-[72px] w-full items-center gap-4 rounded-lg border border-dashed border-[rgba(246,243,238,0.22)] bg-abyss p-3 text-left transition-colors duration-300 hover:border-[rgba(184,161,232,0.45)]"
               >
                 {sourceImage ? (
                   <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-[color:var(--hairline)]">
@@ -262,7 +262,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
                       aria-pressed={isActive}
                       className={`w-full rounded-lg border px-4 py-3 text-left transition-colors duration-300 ${
                         isActive
-                          ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)]"
+                          ? "border-[color:var(--color-ink)] bg-[rgba(184,161,232,0.12)]"
                           : "border-[color:var(--hairline)] hover:border-[#4A4A4A]"
                       }`}
                     >
@@ -307,7 +307,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
                       aria-pressed={isActive}
                       className={`min-h-[56px] rounded-lg border px-3 py-2.5 text-left transition-colors duration-300 ${
                         isActive
-                          ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
+                          ? "border-[color:var(--color-ink)] bg-[rgba(184,161,232,0.12)] text-ink"
                           : "border-[color:var(--hairline)] text-steel hover:text-ink"
                       }`}
                     >
@@ -340,7 +340,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
                       aria-pressed={isActive}
                       className={`min-h-[40px] rounded-lg border px-3 py-2 text-xs transition-colors duration-300 ${
                         isActive
-                          ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
+                          ? "border-[color:var(--color-ink)] bg-[rgba(184,161,232,0.12)] text-ink"
                           : "border-[color:var(--hairline)] text-steel hover:text-ink"
                       }`}
                     >
@@ -465,7 +465,7 @@ export function EnhancePageClient({ userPlan }: { userPlan: string }) {
                   <span className="absolute left-4 top-4 rounded-full border border-[color:var(--hairline-strong)] bg-ink/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink/80">
                     Avant
                   </span>
-                  <span className="absolute right-4 top-4 rounded-full border border-[rgba(164,139,232,0.35)] bg-ink/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-[color:var(--num-color)]">
+                  <span className="absolute right-4 top-4 rounded-full border border-[rgba(184,161,232,0.35)] bg-ink/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-[color:var(--num-color)]">
                     Après
                   </span>
                 </div>

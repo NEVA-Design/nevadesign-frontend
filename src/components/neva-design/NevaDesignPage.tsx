@@ -207,7 +207,7 @@ export default function NevaDesignPage({
             }}
           >
             {/* le halo aurore de l'atelier — la vitrine parle la même lumière que la maison (D29) */}
-            <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(38% 46% at 30% 24%, rgba(164,139,232,0.3) 0%, rgba(164,139,232,0) 70%), radial-gradient(34% 42% at 72% 60%, rgba(239,184,148,0.28) 0%, rgba(239,184,148,0) 72%)" }} />
+            <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(38% 46% at 30% 24%, rgba(184,161,232,0.3) 0%, rgba(184,161,232,0) 70%), radial-gradient(34% 42% at 72% 60%, rgba(240,197,168,0.28) 0%, rgba(240,197,168,0) 72%)" }} />
           </div>
           <div aria-hidden className="pv-windowlight" />
           <div aria-hidden className="pv-caustics" />
@@ -501,7 +501,7 @@ export default function NevaDesignPage({
                 "radial-gradient(88% 76% at 50% 54%, black 40%, transparent 100%)",
             }}
           >
-            <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(36% 44% at 36% 30%, rgba(164,139,232,0.26) 0%, rgba(164,139,232,0) 70%), radial-gradient(32% 40% at 66% 66%, rgba(239,184,148,0.24) 0%, rgba(239,184,148,0) 72%)" }} />
+            <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(36% 44% at 36% 30%, rgba(184,161,232,0.26) 0%, rgba(184,161,232,0) 70%), radial-gradient(32% 40% at 66% 66%, rgba(240,197,168,0.24) 0%, rgba(240,197,168,0) 72%)" }} />
           </div>
           <div aria-hidden className="pv-windowlight opacity-60" />
           <div aria-hidden className="pv-caustics" />

@@ -47,7 +47,7 @@ const modelList = Object.values(NEVA_MODELS);
 
 /* Badges des modèles — tokens Prisme uniquement. */
 const BADGE_STYLES: Record<string, string> = {
-  STUDIO: "border-[rgba(164,139,232,0.3)] bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]",
+  STUDIO: "border-[rgba(184,161,232,0.3)] bg-[rgba(184,161,232,0.08)] text-[color:var(--num-color)]",
   CORE: "border-info/30 bg-info/10 text-info",
 };
 const BADGE_FALLBACK = "border-[color:var(--hairline-strong)] bg-linen text-steel";
@@ -191,7 +191,7 @@ function AssistantAvatar() {
   return (
     <div
       aria-hidden
-      className="mt-0.5 flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-lg border border-violet/25 bg-[rgba(164,139,232,0.08)]"
+      className="mt-0.5 flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-lg border border-violet/25 bg-[rgba(184,161,232,0.08)]"
     >
       <span className="pv-display text-[13px] text-[color:var(--num-color)]">N</span>
     </div>
@@ -545,7 +545,7 @@ export default function ChatPage() {
               onClick={() => setModelPickerOpen((v) => !v)}
               aria-expanded={modelPickerOpen}
               aria-haspopup="listbox"
-              className="flex min-h-[40px] items-center gap-2 rounded-lg border border-[color:var(--hairline-strong)] bg-white/5 px-3 text-[13px] text-ink/80 transition-colors duration-300 hover:border-[rgba(164,139,232,0.35)] hover:text-ink"
+              className="flex min-h-[40px] items-center gap-2 rounded-lg border border-[color:var(--hairline-strong)] bg-white/5 px-3 text-[13px] text-ink/80 transition-colors duration-300 hover:border-[rgba(184,161,232,0.35)] hover:text-ink"
             >
               <span
                 className={`rounded-full border px-1.5 py-px font-mono text-[9px] font-medium uppercase tracking-[0.14em] ${
@@ -576,7 +576,7 @@ export default function ChatPage() {
                         setModelPickerOpen(false);
                       }}
                       className={`flex w-full items-start gap-2.5 border-b border-[color:var(--hairline)] px-4 py-3 text-left transition-colors duration-300 last:border-b-0 hover:bg-ink/[0.04] ${
-                        isActive ? "bg-[rgba(164,139,232,0.06)]" : ""
+                        isActive ? "bg-[rgba(184,161,232,0.06)]" : ""
                       }`}
                     >
                       <span
@@ -735,7 +735,7 @@ export default function ChatPage() {
               <button
                 key={s}
                 onClick={() => handleSend(s)}
-                className="flex min-h-[40px] items-center gap-2.5 rounded-lg border border-[color:var(--hairline)] px-3.5 text-xs text-steel transition-colors duration-300 hover:border-[rgba(164,139,232,0.35)] hover:text-[color:var(--num-color)]"
+                className="flex min-h-[40px] items-center gap-2.5 rounded-lg border border-[color:var(--hairline)] px-3.5 text-xs text-steel transition-colors duration-300 hover:border-[rgba(184,161,232,0.35)] hover:text-[color:var(--num-color)]"
               >
                 <span className="pv-num text-[10px]">0{index + 1}</span>
                 {s}
@@ -756,7 +756,7 @@ export default function ChatPage() {
                   type="button"
                   onClick={() => setPendingAttachments((prev) => prev.filter((_, idx) => idx !== i))}
                   title="Retirer cette image"
-                  className="group relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-[rgba(164,139,232,0.28)] transition-colors duration-300 hover:border-err/60"
+                  className="group relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-[rgba(184,161,232,0.28)] transition-colors duration-300 hover:border-err/60"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={att.preview} alt="Image de référence" className="h-full w-full object-cover" />
@@ -780,7 +780,7 @@ export default function ChatPage() {
             </div>
           )}
 
-          <div className="flex items-end gap-1.5 rounded-xl border border-[color:var(--hairline-strong)] bg-abyss px-2 py-1.5 transition-[border-color,box-shadow] duration-300 focus-within:border-[rgba(164,139,232,0.5)] focus-within:shadow-[0_0_0_3px_rgba(164,139,232,0.12)]">
+          <div className="flex items-end gap-1.5 rounded-xl border border-[color:var(--hairline-strong)] bg-abyss px-2 py-1.5 transition-[border-color,box-shadow] duration-300 focus-within:border-[rgba(184,161,232,0.5)] focus-within:shadow-[0_0_0_3px_rgba(184,161,232,0.12)]">
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={pendingAttachments.length >= 4}
@@ -819,7 +819,7 @@ export default function ChatPage() {
                 }
                 title="Générer un visuel"
                 aria-label="Générer un visuel"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[color:var(--hairline-strong)] text-steel transition-colors duration-300 hover:border-[rgba(164,139,232,0.45)] hover:text-[color:var(--num-color)] disabled:opacity-30"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[color:var(--hairline-strong)] text-steel transition-colors duration-300 hover:border-[rgba(184,161,232,0.45)] hover:text-[color:var(--num-color)] disabled:opacity-30"
               >
                 <ImageIcon size={14} />
               </button>

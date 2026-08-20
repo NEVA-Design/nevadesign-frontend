@@ -138,7 +138,7 @@ export default async function AdminOverviewPage() {
                 <div aria-hidden className="absolute inset-0 rounded-full bg-white/[0.06]" />
                 {/* barre spectrale */}
                 <div
-                  className="absolute inset-x-0 bottom-0 rounded-full bg-[linear-gradient(180deg,#A48BE8,#EFB894)] opacity-80 transition-opacity duration-300 group-hover:opacity-100"
+                  className="absolute inset-x-0 bottom-0 rounded-full bg-[linear-gradient(180deg,#B8A1E8,#F0C5A8)] opacity-80 transition-opacity duration-300 group-hover:opacity-100"
                   style={{ height: `${Math.max(4, (entry.value / maxSeries) * 100)}%` }}
                 />
               </div>

@@ -81,7 +81,7 @@ const LayerCanvas = forwardRef<HTMLDivElement, LayerCanvasProps>(function LayerC
         if (layer.hidden) return null;
         const selected = selectedId === layer.id;
         const outline = selected
-          ? { outline: "1.5px solid rgba(164,139,232,0.95)", outlineOffset: "2px" }
+          ? { outline: "1.5px solid rgba(184,161,232,0.95)", outlineOffset: "2px" }
           : undefined;
 
         const url = logoUrlForVariant(layer, logoUrls);

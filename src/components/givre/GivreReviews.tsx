@@ -41,11 +41,15 @@ function initials(pseudo: string) {
   return (a + b).toUpperCase();
 }
 
-/* Avatar — tente /avatars/<slug>.webp, retombe sur les initiales
-   sur disque dégradé aurore. */
+/* Avatar — initiales sur disque dégradé aurore. Passer
+   AVATAR_FILES_READY à true quand /public/avatars/<slug>.webp
+   existeront (fournis par Sami) : en attendant, aucune requête
+   réseau (le dossier n'existe pas → 9 × 404 par affichage). */
+const AVATAR_FILES_READY = false;
+
 function Avatar({ review, size = 32 }: { review: Review; size?: number }) {
   const [failed, setFailed] = useState(false);
-  if (failed) {
+  if (!AVATAR_FILES_READY || failed) {
     return (
       <span
         aria-hidden
@@ -203,6 +207,7 @@ export default function GivreReviews() {
                     <li key={review.slug} className="border-b border-[color:var(--hairline)]">
                       <button
                         type="button"
+                        data-qa="avis-ligne"
                         onClick={() => setActive(i)}
                         aria-pressed={isActive}
                         className={

@@ -5,7 +5,7 @@
   <line x1="40" y1="188" x2="640" y2="188" stroke="#0A0A0A" stroke-width="1.2"/>
   <!-- folio mono -->
   <text x="40" y="42" font-family="Consolas, 'Courier New', monospace" font-size="12" letter-spacing="4" fill="#0A0A0A">01</text>
-  <text x="640" y="42" text-anchor="end" font-family="Consolas, 'Courier New', monospace" font-size="12" letter-spacing="4" fill="#0A0A0A">DISCORD — 680×240</text>
+  <text x="640" y="42" text-anchor="end" font-family="Consolas, 'Courier New', monospace" font-size="12" letter-spacing="4" fill="#0A0A0A">DISCORD OFFICIEL</text>
   <!-- le nom, encre pure -->
   <text x="340" y="142" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="92" font-weight="300" letter-spacing="30" fill="#0A0A0A">NEVA</text>
   <!-- point d'encre -->

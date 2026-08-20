@@ -147,7 +147,7 @@ export default function NewProjectWizard() {
         </div>
         <div className="mt-4 h-[3px] overflow-hidden rounded-full bg-ink/[0.07]">
           <motion.div
-            className="h-full rounded-full bg-[linear-gradient(90deg,#7C6BD4,#A48BE8,#C9B8F5)]"
+            className="h-full rounded-full bg-[linear-gradient(90deg,#7C6BD4,#B8A1E8,#C9B8F5)]"
             animate={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
             transition={{ type: "spring", stiffness: 240, damping: 30 }}
           />
@@ -179,7 +179,7 @@ export default function NewProjectWizard() {
                 onKeyDown={(e) => { if (e.key === "Enter" && canContinue) go(1); }}
                 placeholder="Horizon RP"
                 maxLength={60}
-                className="pv-glass mt-8 w-full rounded-2xl border border-[color:var(--hairline-strong)] px-6 py-5 text-[clamp(1.3rem,2.4vw,1.8rem)] font-medium tracking-[-0.01em] text-ink outline-none transition-shadow placeholder:text-mist focus:shadow-[0_0_0_2px_rgba(164,139,232,0.35)]"
+                className="pv-glass mt-8 w-full rounded-2xl border border-[color:var(--hairline-strong)] px-6 py-5 text-[clamp(1.3rem,2.4vw,1.8rem)] font-medium tracking-[-0.01em] text-ink outline-none transition-shadow placeholder:text-mist focus:shadow-[0_0_0_2px_rgba(184,161,232,0.35)]"
               />
               <p className="mt-3 font-mono text-[10px] tracking-[0.1em] text-dusk">
                 {name.trim().length}/60 — 2 caractères minimum
@@ -207,8 +207,8 @@ export default function NewProjectWizard() {
                       className={cn(
                         "group flex items-start gap-3.5 rounded-2xl border p-4 text-left transition-all duration-300",
                         selected
-                          ? "border-[rgba(164,139,232,0.65)] bg-white/5 shadow-[0_0_0_1px_rgba(164,139,232,0.4),0_14px_36px_rgba(0,0,0,0.48)]"
-                          : "border-[color:var(--hairline-strong)] hover:border-[rgba(164,139,232,0.4)]"
+                          ? "border-[rgba(184,161,232,0.65)] bg-white/5 shadow-[0_0_0_1px_rgba(184,161,232,0.4),0_14px_36px_rgba(0,0,0,0.48)]"
+                          : "border-[color:var(--hairline-strong)] hover:border-[rgba(184,161,232,0.4)]"
                       )}
                     >
                       {/* Picto dessiné — jamais une image générée */}
@@ -347,7 +347,7 @@ export default function NewProjectWizard() {
                     "flex h-14 items-center gap-2 rounded-full border-2 px-5 text-[13px] font-medium transition-all duration-200",
                     couleur === "surprise"
                       ? "scale-105 border-ink bg-white/5 text-ink shadow-[0_6px_18px_rgba(0,0,0,0.55)]"
-                      : "border-[color:var(--hairline-strong)] text-steel hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
+                      : "border-[color:var(--hairline-strong)] text-steel hover:border-[rgba(184,161,232,0.5)] hover:text-ink"
                   )}
                 >
                   <Sparkles size={15} className="text-[color:var(--num-color)]" />
@@ -385,7 +385,7 @@ export default function NewProjectWizard() {
                     type="button"
                     disabled={uploading}
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex h-20 w-20 items-center justify-center rounded-xl border border-dashed border-[color:var(--hairline-strong)] text-dusk transition-colors hover:border-[rgba(164,139,232,0.5)] hover:text-ink"
+                    className="flex h-20 w-20 items-center justify-center rounded-xl border border-dashed border-[color:var(--hairline-strong)] text-dusk transition-colors hover:border-[rgba(184,161,232,0.5)] hover:text-ink"
                     aria-label="Ajouter une référence"
                   >
                     {uploading ? <Loader2 size={16} className="animate-spin" /> : <ImagePlus size={16} />}

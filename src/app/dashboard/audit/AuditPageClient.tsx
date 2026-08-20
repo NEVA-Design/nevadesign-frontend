@@ -152,7 +152,7 @@ export default function AuditPageClient() {
         eyebrow="Neva Audit"
         title="Découvrez ce qui empêche votre design d'avoir plus d'impact"
         description="Déposez un visuel. Obtenez un score, un verdict et les corrections prioritaires."
-        accent="#A48BE8"
+        accent="#B8A1E8"
         meta="1 création · +2 avec correction"
         activeStep={activeStep}
         steps={[
@@ -169,13 +169,13 @@ export default function AuditPageClient() {
             type="button"
             onClick={() => inputRef.current?.click()}
             aria-label="Téléverser le visuel à auditer"
-            className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-[rgba(246,243,238,0.22)] bg-abyss text-left transition-colors duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] hover:border-[rgba(164,139,232,0.45)]"
+            className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-[rgba(246,243,238,0.22)] bg-abyss text-left transition-colors duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] hover:border-[rgba(184,161,232,0.45)]"
           >
             {sourceImage ? (
               <Image src={sourceImage.preview} alt="Visuel téléversé" fill sizes="380px" className="object-contain" />
             ) : (
               <span className="flex flex-col items-center gap-3 text-center">
-                <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-violet/25 bg-[rgba(164,139,232,0.08)] text-[color:var(--num-color)]">
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-violet/25 bg-[rgba(184,161,232,0.08)] text-[color:var(--num-color)]">
                   <Upload size={16} />
                 </span>
                 <span className="text-sm font-medium text-ink/80">Téléverser le visuel</span>
@@ -201,7 +201,7 @@ export default function AuditPageClient() {
                   onClick={() => setAssetType(type.id)}
                   className={`min-h-[40px] rounded-lg border px-3 py-2 text-[13px] transition-colors duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] ${
                     assetType === type.id
-                      ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
+                      ? "border-[color:var(--color-ink)] bg-[rgba(184,161,232,0.12)] text-ink"
                       : "border-[color:var(--hairline)] text-steel hover:border-[#4A4A4A] hover:text-ink"
                   }`}
                 >
@@ -221,7 +221,7 @@ export default function AuditPageClient() {
                   onClick={() => setReportLanguage(language.id)}
                   className={`min-h-[40px] rounded-lg border px-3 py-2 text-[13px] transition-colors duration-300 ease-[cubic-bezier(0.65,0,0.35,1)] ${
                     reportLanguage === language.id
-                      ? "border-[color:var(--color-ink)] bg-[rgba(164,139,232,0.12)] text-ink"
+                      ? "border-[color:var(--color-ink)] bg-[rgba(184,161,232,0.12)] text-ink"
                       : "border-[color:var(--hairline)] text-steel hover:border-[#4A4A4A] hover:text-ink"
                   }`}
                 >
@@ -354,7 +354,7 @@ export default function AuditPageClient() {
 
               {/* Version corrigée */}
               {improvedImage && (
-                <div className="mt-10 rounded-xl border border-violet/25 bg-[rgba(164,139,232,0.05)] p-5">
+                <div className="mt-10 rounded-xl border border-violet/25 bg-[rgba(184,161,232,0.05)] p-5">
                   <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <p className="pv-label text-[color:var(--num-color)]">Version corrigée</p>

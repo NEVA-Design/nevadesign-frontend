@@ -176,7 +176,7 @@ function BillingContent() {
                 }
               >
                 {featured ? (
-                  <span className="absolute -top-3 left-6 rounded-full bg-[linear-gradient(100deg,#A48BE8,#EFB894)] px-2.5 py-[3px] font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-ink">
+                  <span className="absolute -top-3 left-6 rounded-full bg-[linear-gradient(100deg,#B8A1E8,#F0C5A8)] px-2.5 py-[3px] font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-ink">
                     Le plus choisi
                   </span>
                 ) : null}

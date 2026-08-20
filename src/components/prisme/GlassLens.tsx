@@ -63,7 +63,7 @@ export default function GlassLens({
               width: "40%",
               height: "36%",
               background:
-                "radial-gradient(50% 50% at 50% 50%, rgba(164,139,232,0.5) 0%, rgba(239,184,148,0.34) 48%, rgba(239,184,148,0) 100%)",
+                "radial-gradient(50% 50% at 50% 50%, rgba(184,161,232,0.5) 0%, rgba(240,197,168,0.34) 48%, rgba(240,197,168,0) 100%)",
               filter: "blur(6px)",
             }}
           />

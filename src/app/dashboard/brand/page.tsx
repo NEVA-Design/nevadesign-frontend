@@ -25,7 +25,7 @@ const deliverables = [
 ];
 
 /* Palette d'exemple — teintes d'une identité serveur */
-const paletteSwatches = ["#A48BE8", "#EFB894", "#A48BE8", "#F3EFE6", "#161310", "#070605"];
+const paletteSwatches = ["#B8A1E8", "#F0C5A8", "#B8A1E8", "#F3EFE6", "#161310", "#070605"];
 
 export default function BrandPage() {
   return (
@@ -45,7 +45,7 @@ export default function BrandPage() {
         eyebrow="Neva Brand"
         title="Une identité de marque complète pour votre serveur"
         description="Confiez votre brief à Neva Brand : logo, palette, typographies et règles d'utilisation, livrés comme un système cohérent."
-        accent="#A48BE8"
+        accent="#B8A1E8"
         meta="3 créations / identité"
         activeStep={0}
         steps={[
@@ -109,7 +109,7 @@ export default function BrandPage() {
 
           <div className="relative flex h-36 items-center justify-center overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-abyss">
             <div aria-hidden className="pv-halo--violet pv-halo h-40 w-40" />
-            <div className="pv-display relative flex h-16 w-16 items-center justify-center rounded-xl border border-[rgba(164,139,232,0.3)] bg-[rgba(164,139,232,0.08)] text-3xl text-[color:var(--num-color)]">
+            <div className="pv-display relative flex h-16 w-16 items-center justify-center rounded-xl border border-[rgba(184,161,232,0.3)] bg-[rgba(184,161,232,0.08)] text-3xl text-[color:var(--num-color)]">
               N
             </div>
           </div>

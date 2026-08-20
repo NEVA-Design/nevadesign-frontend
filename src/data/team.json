@@ -1,6 +1,30 @@
 [
-  { "id": "g1", "pseudo": "TODO_PSEUDO_1", "role": "Direction artistique", "avatar": null },
-  { "id": "g2", "pseudo": "TODO_PSEUDO_2", "role": "Graphiste logos & identités", "avatar": null },
-  { "id": "g3", "pseudo": "TODO_PSEUDO_3", "role": "Graphiste packs FiveM", "avatar": null },
-  { "id": "g4", "pseudo": "TODO_PSEUDO_4", "role": "Motion & overlays de stream", "avatar": null }
+  {
+    "id": "g1",
+    "pseudo": null,
+    "role": "Direction artistique",
+    "mission": "La ligne, la lumière, le verdict final sur chaque pièce.",
+    "avatar": null
+  },
+  {
+    "id": "g2",
+    "pseudo": null,
+    "role": "Logos & identités",
+    "mission": "Monogrammes, wordmarks, déclinaisons — l'identité des serveurs.",
+    "avatar": null
+  },
+  {
+    "id": "g3",
+    "pseudo": null,
+    "role": "Packs FiveM",
+    "mission": "Bannières, affiches, loading screens : le pack complet, cohérent.",
+    "avatar": null
+  },
+  {
+    "id": "g4",
+    "pseudo": null,
+    "role": "Motion & overlays",
+    "mission": "Alertes, transitions, habillages de stream — l'identité en mouvement.",
+    "avatar": null
+  }
 ]
