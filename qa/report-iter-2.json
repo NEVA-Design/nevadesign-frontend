@@ -1,14 +1,27 @@
 {
   "iter": "2",
   "base": "http://localhost:3001",
-  "startedAt": "2026-08-20T20:26:10.254Z",
-  "media": {},
-  "fps": null,
-  "rotation": null,
-  "load": {
-    "framesCaptured": 37,
-    "dir": "load-frames/"
+  "startedAt": "2026-08-20T20:28:03.922Z",
+  "media": {
+    "requests-390": [],
+    "requests-768": [],
+    "requests-1440": [],
+    "requests-2560": [],
+    "dom": {},
+    "network": [],
+    "verdict": "PASS"
   },
-  "errors": [],
-  "finishedAt": "2026-08-20T20:26:22.852Z"
+  "fps": {
+    "avgMs": 244.99,
+    "fps": 4.1,
+    "frames": 10
+  },
+  "rotation": {
+    "degPerSec": 11.38
+  },
+  "load": null,
+  "errors": [
+    "hover tuile-marquee: locator.scrollIntoViewIfNeeded: Timeout 29778.552000000025ms exceeded."
+  ],
+  "finishedAt": "2026-08-20T20:39:32.400Z"
 }

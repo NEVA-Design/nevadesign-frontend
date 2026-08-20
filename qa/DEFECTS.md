@@ -35,7 +35,8 @@ Captures : `../captures/qa/iter-<N>/`. Rapport auto : `qa/report-iter-<N>.json`.
 | D20 | modèles Discord | « 680×240 » écrit dans minimal-ink.svg (G3) | « DISCORD OFFICIEL » | CORRIGÉ |
 | D21 | home CTA final | sphère « coupée », lueurs brunes | sphère en fait ENTIÈRE (artefact de tranche compressée) ; teintes migrées | NON REPRO / CORRIGÉ |
 | D22 | home §07 | panneau brief gris béton, mockups délavés | brief + bulle en verre sombre ; carte Character conservée (seul accent clair du bento) | CORRIGÉ |
-| D23 | harnais | 4 cibles hover introuvables | `data-qa` posés (cta ×2, marquee-tuile, avis-ligne, modele-carte) | CORRIGÉ (re-run iter-2) |
+| D23 | harnais | 4 cibles hover introuvables | `data-qa` posés (cta ×2, marquee-tuile, avis-ligne, modele-carte) ; 6/7 capturés iter-2, tuile-marquee = scroll à la section (l'animation empêchait scrollIntoView) | CORRIGÉ |
+| D24 | home 390 (audit iter-2) | sphère + bille en lévitation ET sommet du monogramme mordaient le paragraphe du hero mobile | mobile < 600 px : sphère POSÉE au sol derrière l'épaule (figure du CTA final), bille redescendue, pose caméra 390 reculée/relevée (z 13,2→14,6, look.y 0,45→0,95) ; posters re-bakés (le tore recentré l'exigeait aussi en desktop) | CORRIGÉ (preuve mobile-hero-d24-v3) |
 
 ## Transverse
 - Palette verrouillée : 239 occurrences des vieilles teintes aurore (#A48BE8/#EFB894 et rgba 164,139,232 / 239,184,148) migrées vers #B8A1E8/#F0C5A8 dans 46 fichiers.

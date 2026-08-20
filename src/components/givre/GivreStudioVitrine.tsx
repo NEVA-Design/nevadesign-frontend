@@ -167,7 +167,7 @@ export default function GivreStudioVitrine() {
                           "linear-gradient(135deg, rgba(184,161,232,0.30), rgba(240,197,168,0.26))",
                       }}
                     >
-                      {initials(m.pseudo ?? m.role)}
+                      {initials(m.pseudo ?? t(`studio.team.${m.id}.role`, m.role))}
                     </span>
                   )}
                   <p className="mt-4 text-[15px] font-medium text-ink">

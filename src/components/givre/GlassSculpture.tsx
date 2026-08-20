@@ -175,8 +175,10 @@ const POSES: { min: number; pose: Pose }[] = [
      sculpture à l'écran, la garde au sol visible autour) */
   { min: 600, pose: { pos: [1.0, 0.95, 12.6], fov: 36, look: [1.0, 0.52, 0] } },
   /* aligné sur le monogramme (MONO_X = 1.4) : la pièce reste
-     centrée et ENTIÈRE dans le cadre à toutes les largeurs */
-  { min: 390, pose: { pos: [1.35, 0.9, 13.2], fov: 40, look: [1.35, 0.45, 0] } },
+     centrée et ENTIÈRE dans le cadre à toutes les largeurs.
+     QA 20/08 (D24) : recul + visée relevée — le sommet du mono
+     mordait les deux dernières lignes du paragraphe à 390. */
+  { min: 390, pose: { pos: [1.35, 0.9, 14.6], fov: 40, look: [1.35, 0.95, 0] } },
   /* très petits écrans (360×780) : le bloc texte mange plus de
      hauteur — la caméra recule et vise haut pour poser la
      sculpture plus bas, sous le sous-texte, entière */
@@ -336,6 +338,17 @@ const RING_Z = 0.5 - (VIEW.wide ? 0.9 : 0) - VIEW.spread * 0.25;
 const SPHERE_X = SCULPT_X - 0.52 - VIEW.spread * 0.6;
 const SPHERE_Z = -0.5;
 const BEAD_X = SCULPT_X + 1.55 + VIEW.spread * 1.15;
+/* QA 20/08 (D24, spec §3 composition) : en mobile (< 600 px), la
+   composition empile texte → fenêtre sculpture → CTA ; la sphère
+   et la bille en lévitation haute montaient dans le paragraphe
+   (mesuré sur capture 390). En mobile la sphère se POSE au sol
+   derrière l'épaule gauche du monogramme (la figure du CTA final)
+   et la bille redescend au niveau du sommet du mono : plus aucun
+   objet sous une ligne de texte, la sculpture entière dans sa
+   fenêtre. Desktop inchangé. */
+const SAT_MOBILE = VIEW.vw < 600;
+const SPHERE_BASE_Y = SAT_MOBILE ? FLOOR_Y + 0.42 : FLOOR_Y + 2.52;
+const BEAD_BASE_Y = SAT_MOBILE ? FLOOR_Y + 1.95 : FLOOR_Y + 3.28;
 /* Mur virtuel derrière la caméra : le fallback des rayons
    réfractés qui repartent vers l'avant (tore incliné, chanfreins).
    Sans lui, ils sortiraient du monde et liraient un bord de
@@ -2089,14 +2102,17 @@ function Sculpture({ mid }: { mid: boolean }) {
       const arrive = easeOutCubic(progress(t, 0.85, 2.0));
       sphere.current.position.x =
         SPHERE_X + (1 - arrive) * 0.35 + 0.05 * Math.sin((t * Math.PI * 2) / 11);
-      sphere.current.position.y =
-        FLOOR_Y + 2.52 + (1 - arrive) * 0.95 + 0.06 * Math.sin((t * Math.PI * 2) / 5.6);
+      /* posée au sol en mobile : ni chute d'arrivée ni grand
+         flottement (elle glisserait sous le sol) — une respiration */
+      sphere.current.position.y = SAT_MOBILE
+        ? SPHERE_BASE_Y + 0.02 * Math.sin((t * Math.PI * 2) / 5.6)
+        : SPHERE_BASE_Y + (1 - arrive) * 0.95 + 0.06 * Math.sin((t * Math.PI * 2) / 5.6);
     }
     if (bead.current) {
       const arrive = easeOutCubic(progress(t, 1.15, 2.0));
       bead.current.position.x = BEAD_X + 0.05 * Math.sin((t * Math.PI * 2) / 12 + 1.2);
       bead.current.position.y =
-        FLOOR_Y + 3.28 + (1 - arrive) * 0.6 + 0.065 * Math.sin((t * Math.PI * 2) / 4.6);
+        BEAD_BASE_Y + (1 - arrive) * 0.6 + 0.065 * Math.sin((t * Math.PI * 2) / 4.6);
     }
     /* précession : l'axe de l'anneau tangue pendant que le tore
        tourne sur lui-même — orientation ABSOLUE f(t), jamais

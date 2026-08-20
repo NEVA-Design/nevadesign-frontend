@@ -268,7 +268,14 @@ async function runHovers(browser, statePath) {
       }
       const el = page.locator(t.selector).first();
       if ((await el.count()) === 0) { report.errors.push(`hover ${t.name}: sélecteur introuvable (${t.selector})`); continue; }
-      await el.scrollIntoViewIfNeeded();
+      // les tuiles du marquee défilent en continu : scrollIntoViewIfNeeded
+      // n'arrive jamais à les stabiliser — on scrolle à la section, le
+      // survol lui-même met l'animation en pause (.pv-marquee:hover)
+      if (t.name === "tuile-marquee") {
+        await page.evaluate(() => document.getElementById("creations")?.scrollIntoView({ block: "center" }));
+      } else {
+        await el.scrollIntoViewIfNeeded();
+      }
       await page.waitForTimeout(400);
       await el.hover({ force: true });
       await page.waitForTimeout(450); // transitions 180-220ms + marge
