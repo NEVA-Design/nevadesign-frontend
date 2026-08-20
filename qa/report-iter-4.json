@@ -1,0 +1,28 @@
+{
+  "iter": "4",
+  "base": "http://localhost:3001",
+  "startedAt": "2026-08-20T21:44:37.131Z",
+  "media": {
+    "requests-390": [],
+    "requests-768": [],
+    "requests-1440": [],
+    "requests-2560": [],
+    "dom": {},
+    "network": [],
+    "verdict": "PASS"
+  },
+  "fps": {
+    "avgMs": 251.84,
+    "fps": 4,
+    "frames": 9
+  },
+  "rotation": {
+    "degPerSec": 11.32
+  },
+  "load": {
+    "framesCaptured": 37,
+    "dir": "load-frames/"
+  },
+  "errors": [],
+  "finishedAt": "2026-08-20T21:52:33.036Z"
+}

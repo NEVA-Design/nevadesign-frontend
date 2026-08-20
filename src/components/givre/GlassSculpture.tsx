@@ -174,7 +174,7 @@ const POSES: { min: number; pose: Pose }[] = [
      titre et les CTA — jamais tronqué. QA 20/08 (R5) : à 768 la
      sculpture montait sous la pastille et les CTA — recul + visée
      relevée, même remède que la pose 390. */
-  { min: 600, pose: { pos: [1.0, 0.95, 14.2], fov: 36, look: [1.0, 1.0, 0] } },
+  { min: 600, pose: { pos: [1.0, 0.95, 14.2], fov: 36, look: [1.0, 0.82, 0] } },
   /* aligné sur le monogramme (MONO_X = 1.4) : la pièce reste
      centrée et ENTIÈRE dans le cadre à toutes les largeurs.
      QA 20/08 (D24) : recul + visée relevée — le sommet du mono
