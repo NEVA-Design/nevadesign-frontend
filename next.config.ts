@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  /* QA : QA_DIST=1 isole le build dans .next-qa — on peut builder et
+     mesurer (Lighthouse) sans toucher au .next que sert la prod. */
+  distDir: process.env.QA_DIST ? ".next-qa" : ".next",
   transpilePackages: ["three"],
   images: {
     formats: ["image/avif", "image/webp"],

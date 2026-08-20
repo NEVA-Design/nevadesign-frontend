@@ -268,16 +268,25 @@ async function runHovers(browser, statePath) {
       }
       const el = page.locator(t.selector).first();
       if ((await el.count()) === 0) { report.errors.push(`hover ${t.name}: sélecteur introuvable (${t.selector})`); continue; }
-      // les tuiles du marquee défilent en continu : scrollIntoViewIfNeeded
-      // n'arrive jamais à les stabiliser — on scrolle à la section, le
-      // survol lui-même met l'animation en pause (.pv-marquee:hover)
+      // les tuiles du marquee défilent en continu : on scrolle à la
+      // section puis on survole LA TUILE VISIBLE au centre (la strip
+      // avance — la première peut être hors champ) ; le survol met
+      // l'animation en pause (.pv-marquee:hover)
+      let target = el;
       if (t.name === "tuile-marquee") {
         await page.evaluate(() => document.getElementById("creations")?.scrollIntoView({ block: "center" }));
+        await page.waitForTimeout(500);
+        const tiles = page.locator(t.selector);
+        const n = await tiles.count();
+        for (let i = 0; i < n; i++) {
+          const box = await tiles.nth(i).boundingBox();
+          if (box && box.x > 100 && box.x + box.width < 1300) { target = tiles.nth(i); break; }
+        }
       } else {
         await el.scrollIntoViewIfNeeded();
       }
       await page.waitForTimeout(400);
-      await el.hover({ force: true });
+      await target.hover({ force: true });
       await page.waitForTimeout(450); // transitions 180-220ms + marge
       await page.screenshot({ path: join(OUT, `hover-${t.name}.png`) });
       log(`hover ${t.name} ok`);

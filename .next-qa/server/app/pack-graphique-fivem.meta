@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/pack-graphique-fivem/layout,_N_T_/pack-graphique-fivem/page,_N_T_/pack-graphique-fivem"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/pack-graphique-fivem/__PAGE__",
+    "/pack-graphique-fivem",
+    "/_index",
+    "/_head"
+  ]
+}

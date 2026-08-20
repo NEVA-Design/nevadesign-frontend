@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<url>
+<loc>https://nevadesign.fr</loc>
+<image:image>
+<image:loc>https://nevadesign.fr/brand/og.jpg</image:loc>
+</image:image>
+<lastmod>2026-08-20T20:53:38.392Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>1</priority>
+</url>
+<url>
+<loc>https://nevadesign.fr/neva-design</loc>
+<image:image>
+<image:loc>https://nevadesign.fr/brand/og.jpg</image:loc>
+</image:image>
+<lastmod>2026-08-20T20:53:38.392Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.9</priority>
+</url>
+<url>
+<loc>https://nevadesign.fr/graphiste-fivem</loc>
+<xhtml:link rel="alternate" hreflang="fr" href="https://nevadesign.fr/graphiste-fivem" />
+<xhtml:link rel="alternate" hreflang="en" href="https://nevadesign.fr/en/fivem-graphic-designer" />
+<lastmod>2026-08-20T20:53:38.392Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.9</priority>
+</url>
+<url>
+<loc>https://nevadesign.fr/logo-fivem</loc>
+<xhtml:link rel="alternate" hreflang="fr" href="https://nevadesign.fr/logo-fivem" />
+<xhtml:link rel="alternate" hreflang="en" href="https://nevadesign.fr/en/fivem-logo-maker" />
+<lastmod>2026-08-20T20:53:38.392Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://nevadesign.fr/banniere-discord-fivem</loc>
+<lastmod>2026-08-20T20:53:38.392Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://nevadesign.fr/loading-screen-fivem</loc>
+<lastmod>2026-08-20T20:53:38.392Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://nevadesign.fr/pack-graphique-fivem</loc>
+<lastmod>2026-08-20T20:53:38.392Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://nevadesign.fr/affiche-serveur-fivem</loc>
+<lastmod>2026-08-20T20:53:38.392Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://nevadesign.fr/en/fivem-graphic-designer</loc>
+<xhtml:link rel="alternate" hreflang="fr" href="https://nevadesign.fr/graphiste-fivem" />
+<xhtml:link rel="alternate" hreflang="en" href="https://nevadesign.fr/en/fivem-graphic-designer" />
+<lastmod>2026-08-20T20:53:38.392Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://nevadesign.fr/en/fivem-logo-maker</loc>
+<xhtml:link rel="alternate" hreflang="fr" href="https://nevadesign.fr/logo-fivem" />
+<xhtml:link rel="alternate" hreflang="en" href="https://nevadesign.fr/en/fivem-logo-maker" />
+<lastmod>2026-08-20T20:53:38.392Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://nevadesign.fr/signup</loc>
+<lastmod>2026-08-20T20:53:38.392Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.4</priority>
+</url>
+<url>
+<loc>https://nevadesign.fr/privacy</loc>
+<lastmod>2026-08-20T20:53:38.392Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.1</priority>
+</url>
+<url>
+<loc>https://nevadesign.fr/terms</loc>
+<lastmod>2026-08-20T20:53:38.392Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.1</priority>
+</url>
+<url>
+<loc>https://nevadesign.fr/cookies</loc>
+<lastmod>2026-08-20T20:53:38.392Z</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.1</priority>
+</url>
+</urlset>

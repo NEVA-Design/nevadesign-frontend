@@ -14,7 +14,7 @@ _(rempli au fil des vérifications ; version finale après la critique adversari
 | G6 | rotation ≥ 10 °/s, parallax < 400 ms | 🟢 | tore mesuré 15,2 °/s (smoke) et 11,38 °/s (harnais iter-2) ; parallax lerp τ = 90 ms (< 400 ms de convergence) |
 | G7 | hovers conformes | 🟢 | 7 captures hover iter-2/3 : aucun déplacement de layout, effets par type cohérents |
 | G8 | auth conformes Phase 4 | 🟢 | `full-login/signup/forgot-*.png` iter-2 : fond calme, carte spec, sphère entière, zéro cadre |
-| G9 | fps ≥ 55 + Lighthouse ≥ actuel | 🟢 fps · LH : à mesurer | 100 fps headed (p95 10,1 ms) ; Lighthouse mobile : réf 79 → **[à remplir]** |
+| G9 | fps ≥ 55 + Lighthouse ≥ actuel | 🟢 | 100 fps headed (p95 10,1 ms) ; Lighthouse mobile mesuré dans les mêmes conditions : prod actuelle (état run 8, port 3000) = **58**, ce run (build isolé .next-qa) = **59**, Speed Index 5,4 s → 4,4 s — aucune régression (`qa/lh-mobile-qa.json` / `qa/lh-mobile-ref3000.json` ; le « 79 » de la mémoire datait d'avant la soie du run 8) |
 | G10 | 390/768/1440/2560 sans casse | 🟢 | full-* iter-2 aux 4 viewports ; D24 (chevauchement hero mobile) corrigé + posters re-bakés |
 
 ## Avant / après (DEFECTS)

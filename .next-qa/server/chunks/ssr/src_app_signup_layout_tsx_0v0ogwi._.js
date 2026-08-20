@@ -1,0 +1,3 @@
+module.exports=[65769,a=>{"use strict";a.s(["default",0,function({children:a}){return a},"metadata",0,{title:"Créer un compte — Neva Design",description:"Créez votre compte Neva Design gratuitement, sans carte bancaire. Miniatures, logos, identités et assets gaming en quelques minutes.",alternates:{canonical:"/signup"}}])},31532,a=>{a.n(a.i(65769))}];
+
+//# sourceMappingURL=src_app_signup_layout_tsx_0v0ogwi._.js.map

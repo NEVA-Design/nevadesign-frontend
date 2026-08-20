@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/graphiste-fivem/layout,_N_T_/graphiste-fivem/page,_N_T_/graphiste-fivem"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/graphiste-fivem/__PAGE__",
+    "/graphiste-fivem",
+    "/_index",
+    "/_head"
+  ]
+}
