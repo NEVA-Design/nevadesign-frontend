@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { BrandMark } from "@/components/prisme/Brand";
+import SatinSphere from "@/components/givre/SatinSphere";
 import { Button } from "@/components/ui/button";
 import { Input, Label, FormMessage } from "@/components/ui/field";
 import { backendFetch } from "@/lib/api/backend-client";
@@ -46,32 +47,10 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="pv-scene relative min-h-[100svh] text-ink">
-      <div aria-hidden className="pv-scene-bg--dawn-calm absolute inset-0" />
-      <div aria-hidden className="pv-caustics" />
-      <div aria-hidden className="pv-windowlight absolute inset-0 opacity-60" />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(36% 44% at 34% 26%, rgba(184,161,232,0.21) 0%, rgba(184,161,232,0) 70%), radial-gradient(32% 40% at 68% 68%, rgba(240,197,168,0.2) 0%, rgba(240,197,168,0) 72%)",
-        }}
-      />
+      {/* La scène — même grammaire que /login (Phase 4 QA 20/08) */}
+      <div aria-hidden className="pv-auth-bg" />
 
-      <div
-        aria-hidden
-        className="pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.14)]"
-        style={{ inset: "var(--frame-inset)" }}
-      />
-
-      <header
-        className="absolute z-20 flex items-center justify-between"
-        style={{
-          top: "calc(var(--frame-inset) + 18px)",
-          left: "calc(var(--frame-inset) + 22px)",
-          right: "calc(var(--frame-inset) + 22px)",
-        }}
-      >
+      <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-6 py-7 sm:px-10">
         <Link
           href="/login"
           className="inline-flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist transition-colors hover:text-ink"
@@ -86,7 +65,13 @@ export default function ForgotPasswordPage() {
 
       <main className="relative z-10 flex min-h-[100svh] items-center justify-center px-6 py-24 sm:px-8">
         <div className="relative w-full max-w-[420px]">
-          <section className="pv-glass pv-glass--strong pv-edge pv-shadow-mauve pv-fade-up px-6 py-8 sm:px-9 sm:py-10">
+          {/* La sphère satinée — la même pièce que /login et
+              /signup : la famille auth partage sa composition (D17) */}
+          <SatinSphere
+            size={150}
+            className="pointer-events-none absolute -top-[24px] right-[-186px] hidden lg:block"
+          />
+          <section className="pv-auth-card pv-fade-up px-6 py-8 sm:px-9 sm:py-10">
             <Link href="/" aria-label="Neva Design — accueil" className="inline-flex">
               <BrandMark size={24} tone="white" />
             </Link>

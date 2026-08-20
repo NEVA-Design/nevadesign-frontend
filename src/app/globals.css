@@ -1255,33 +1255,65 @@ html {
 
 /* ═══ Champs ═════════════════════════════════════════════════ */
 
+/* QA 20/08 (Phase 4.3) : spec unifiée — fond blanc 3 %, bordure
+   blanc 10 %, focus = ring aurore 2 px. Un même champ a le même
+   rendu partout (auth comprise, où nv-field était inerte). */
 .pv-field {
   width: 100%;
-  background: var(--field-bg);
-  border: 1px solid var(--hairline);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: var(--radius-xs);
   color: var(--surface-text);
   font-family: var(--font-sans);
   font-size: 14px;
   padding: 11px 14px;
-  transition: border-color 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth),
-    background-color 0.3s var(--ease-smooth);
+  transition: border-color 0.2s var(--ease-smooth), box-shadow 0.2s var(--ease-smooth),
+    background-color 0.2s var(--ease-smooth);
 }
 .pv-field::placeholder {
   color: var(--ink-45);
 }
 .pv-field:hover {
-  border-color: var(--hairline-strong);
+  border-color: rgba(255, 255, 255, 0.16);
 }
 .pv-field:focus {
   outline: none;
-  border-color: rgba(242, 242, 240, 0.40);
-  box-shadow: 0 0 0 3px rgba(184, 161, 232, 0.22);
-  background: var(--field-bg-focus);
+  border-color: rgba(184, 161, 232, 0.55);
+  box-shadow: 0 0 0 2px rgba(184, 161, 232, 0.35);
+  background: rgba(255, 255, 255, 0.05);
 }
 .pv-field:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ═══ Pages auth (Phase 4 — QA 20/08) ════════════════════════
+   Le fond = l'atmosphère du site au repos : base #060606, le satin
+   assagi sous un voile à 72 %, UN champ aurore lilas→pêche 5-7 %
+   propre (gradient généré — jamais d'image sur-floutée), le grain
+   film global fait le reste. Zéro caustique, zéro rai, zéro halo
+   à 20 % : c'était la dérive marron-violet mesurée au calibrage. */
+.pv-auth-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(56% 48% at 30% 20%, rgba(184, 161, 232, 0.062) 0%, rgba(184, 161, 232, 0) 70%),
+    radial-gradient(50% 44% at 72% 78%, rgba(240, 197, 168, 0.05) 0%, rgba(240, 197, 168, 0) 72%),
+    linear-gradient(180deg, rgba(6, 6, 6, 0.72), rgba(6, 6, 6, 0.72));
+}
+
+/* La carte porteuse — spec exacte : blanc 4 %, bordure blanc 12 %,
+   top-light 1 px. L'ombre reste la recette mauve du site. */
+.pv-auth-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(20px) saturate(1.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    0 18px 46px rgba(16, 12, 36, 0.42);
 }
 
 /* Jauge — le spectre mesure */

@@ -63,36 +63,12 @@ export default function SignupPage() {
 
   return (
     <div className="pv-scene relative min-h-[100svh] text-ink">
-      {/* La scène — aube calme, caustiques, rais de fenêtre discrets */}
-      <div aria-hidden className="pv-scene-bg--dawn-calm absolute inset-0" />
-      <div aria-hidden className="pv-caustics" />
-      <div aria-hidden className="pv-windowlight absolute inset-0 opacity-60" />
-      {/* Le halo aurore de l'atelier, à 60 % du gain du hero (D17) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(36% 44% at 34% 26%, rgba(184,161,232,0.21) 0%, rgba(184,161,232,0) 70%), radial-gradient(32% 40% at 68% 68%, rgba(240,197,168,0.2) 0%, rgba(240,197,168,0) 72%)",
-        }}
-      />
+      {/* La scène — le satin assagi sous UN champ aurore propre
+          (Phase 4 QA 20/08, même grammaire que /login) */}
+      <div aria-hidden className="pv-auth-bg" />
 
-      {/* Cadre éditorial — la page comme objet imprimé */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute rounded-[24px] border border-[rgba(255,255,255,0.14)]"
-        style={{ inset: "var(--frame-inset)" }}
-      />
-
-      {/* Coins du cadre — retour discret, registre de page */}
-      <header
-        className="absolute z-20 flex items-center justify-between"
-        style={{
-          top: "calc(var(--frame-inset) + 18px)",
-          left: "calc(var(--frame-inset) + 22px)",
-          right: "calc(var(--frame-inset) + 22px)",
-        }}
-      >
+      {/* Coins de page — retour discret, registre */}
+      <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-6 py-7 sm:px-10">
         <Link
           href="/"
           className="inline-flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist transition-colors hover:text-ink"
@@ -107,12 +83,14 @@ export default function SignupPage() {
 
       <main className="relative z-10 flex min-h-[100svh] items-center justify-center px-6 py-24 sm:px-8">
         <div className="relative w-full max-w-[420px]">
+          {/* La sphère satinée — ENTIÈRE, à droite au-dessus de la
+              carte (Phase 4.4) */}
           <SatinSphere
             size={150}
-            className="pointer-events-none absolute -right-[104px] -top-[70px] hidden lg:block"
+            className="pointer-events-none absolute -top-[24px] right-[-186px] hidden lg:block"
           />
-          {/* La carte porteuse — verre fort, arête allumée, ombre mauve */}
-          <section className="pv-glass pv-glass--strong pv-edge pv-shadow-mauve pv-fade-up px-6 py-8 sm:px-9 sm:py-10">
+          {/* La carte porteuse — spec Phase 4.2 */}
+          <section className="pv-auth-card pv-fade-up px-6 py-8 sm:px-9 sm:py-10">
             <Link href="/" aria-label="Neva Design — accueil" className="inline-flex">
               <BrandMark size={24} tone="white" />
             </Link>
