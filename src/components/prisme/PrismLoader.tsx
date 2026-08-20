@@ -425,7 +425,10 @@ var k=document.readyState==='loading'?0:1;
    entry, en gardant le plafond 60 (la part reseau). */
 var t=Math.min(60,(d/Math.max(4,r.length+2))*46+k*14);
 var a=60*(1-Math.exp(-performance.now()/5200));
-var g=Math.min(60,Math.max(t,a));
+/* melange 75/25 (et non max) : la part ressources sature a ~57
+   des 4 s sur reseau lent — l'asymptote maintient ~1,4 pt/s de
+   mouvement continu jusqu'a la levee, plafond 60 intact */
+var g=Math.min(60,t*0.75+a*0.25);
 s=Math.min(Math.max(s,g),s+1.2);
 c.textContent=('00'+Math.round(s)).slice(-3)+' \\u2014 100';
 requestAnimationFrame(f);}
