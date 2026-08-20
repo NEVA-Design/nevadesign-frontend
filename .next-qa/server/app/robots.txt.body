@@ -1,9 +1,0 @@
-User-Agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /api/
-Disallow: /dashboard/
-Disallow: /auth/
-
-Host: https://nevadesign.fr
-Sitemap: https://nevadesign.fr/sitemap.xml
