@@ -166,10 +166,14 @@ const POSES: { min: number; pose: Pose }[] = [
   { min: 1920, pose: { pos: [0.5, 0.97, 7.35], fov: 29, look: [0.8, 0.09, 0] } },
   /* palier de transition : entre la home validée (39 %) et la
      cible grands écrans (58 %) — ~48 % à 1680-1919 */
-  { min: 1680, pose: { pos: [0.4, 1.0, 8.9], fov: 29, look: [0.85, 0.25, 0] } },
-  { min: 1360, pose: { pos: [0.22, 1.0, 10.9], fov: 31, look: [0.85, 0.44, 0] } },
-  { min: 1152, pose: { pos: [0.18, 0.98, 10.6], fov: 32, look: [0.83, 0.42, 0] } },
-  { min: 1024, pose: { pos: [0.3, 0.96, 10.9], fov: 33, look: [0.62, 0.4, 0] } },
+  /* Refonte 50k : le titre monumental (H1 148 px) occupe la moitié
+     gauche — le cadre glisse de ~0,35 u vers la gauche (pos+look
+     ensemble) pour poser la sculpture au tiers droit, dégagée du
+     mot d'accent. */
+  { min: 1680, pose: { pos: [0.05, 1.0, 8.9], fov: 29, look: [0.5, 0.25, 0] } },
+  { min: 1360, pose: { pos: [-0.13, 1.0, 10.9], fov: 31, look: [0.5, 0.44, 0] } },
+  { min: 1152, pose: { pos: [-0.17, 0.98, 10.6], fov: 32, look: [0.48, 0.42, 0] } },
+  { min: 1024, pose: { pos: [0.0, 0.96, 10.9], fov: 33, look: [0.32, 0.4, 0] } },
   /* < lg : le monogramme est cadré ENTIER dans la fenêtre entre le
      titre et les CTA — jamais tronqué. QA 20/08 (R5) : à 768 la
      sculpture montait sous la pastille et les CTA — recul + visée
@@ -618,11 +622,14 @@ const LILAC: readonly number[] = [0.755, 0.702, 0.918];
    rayons réfractés traversent était noir (test d en échec). Ce
    cœur ivoire-lilas n'existe que dans le monde réfracté
    (MUR_PEINT=false) : le verre s'allume, la page reste nuit. */
+/* Refonte 50k : le cœur monte et s'élargit — le HAUT du Λ/V
+   réfractait du noir (verre « charbon » mesuré en capture p2-v1) ;
+   le plan lumineux couvre désormais toute la hauteur de la pièce. */
 const LOBE_CORE = {
   cx: MONO_X + 0.2,
-  cy: 1.45,
-  rx: 2.4 * HS,
-  ry: 2.1 * HS,
+  cy: 1.75,
+  rx: 2.6 * HS,
+  ry: 2.9 * HS,
 };
 const CORE_TINT: readonly number[] = [0.86, 0.82, 0.94];
 
@@ -645,9 +652,9 @@ function auroraWall(wx: number, wy: number): [number, number, number] {
   const gp = lobe(wx, wy, LOBE_PEACH);
   const gc = lobe(wx, wy, LOBE_CORE);
   if (gl + gp + gc <= 0.002) return [0, 0, 0];
-  const wl = gl * 0.58;
-  const wp = gp * 0.62;
-  const wc = gc * 0.72;
+  const wl = gl * 0.7;
+  const wp = gp * 0.72;
+  const wc = gc * 0.85;
   return [
     LILAC[0] * wl + PEACH[0] * wp + CORE_TINT[0] * wc,
     LILAC[1] * wl + PEACH[1] * wp + CORE_TINT[1] * wc,
@@ -657,9 +664,9 @@ function auroraWall(wx: number, wy: number): [number, number, number] {
 /* Poids du halo (0–1) au même point — pour fondre le noir dessous */
 function auroraMask(wx: number, wy: number): number {
   return clamp01(
-    lobe(wx, wy, LOBE_LILAC) * 0.58 +
-      lobe(wx, wy, LOBE_PEACH) * 0.62 +
-      lobe(wx, wy, LOBE_CORE) * 0.72
+    lobe(wx, wy, LOBE_LILAC) * 0.7 +
+      lobe(wx, wy, LOBE_PEACH) * 0.72 +
+      lobe(wx, wy, LOBE_CORE) * 0.85
   );
 }
 
@@ -1848,7 +1855,12 @@ const glassCacheKey = () => "dawn-glass-18-lumen";
    l'extrude = coords de forme → pas de fil = 1/(8·repeat) unité
    monde (~0,04 : calibre commun à toutes les pièces). Repasser à
    "verre" pour rouvrir l'ancienne matière (Glass conservé). */
-const SCULPT_MATTER: "tissu" | "verre" = "tissu";
+/* REFONTE 50k (§ phase 2) : le VERRE revient — pièce de joaillerie,
+   pas glassmorphisme : transmission limpide, arêtes précises, la
+   couleur vient de la lumière aurore qu'il réfracte. Le rejet
+   opérateur du 21/08 visait le rendu laiteux — la nouvelle recette
+   est limpide (roughness 0.08, iridescence en appoint). */
+const SCULPT_MATTER: "tissu" | "verre" = "verre";
 
 type TissuProps = {
   color?: string;
@@ -2127,18 +2139,19 @@ function Monogram({ mid }: { mid: boolean }) {
     >
       {SCULPT_MATTER === "verre" ? (
         <Glass
-          thickness={1.2}
+          thickness={1.4}
           ior={1.5}
-          /* dispersion 0,2-0,35 (brief P2.3) : arêtes irisées effet
-             joaillerie — le 0,95 délavait tout en arc-en-ciel flou */
+          /* dispersion 0,2-0,35 (recette calibrée run 8) : arêtes
+             irisées effet joaillerie — le 0,95 délavait tout */
           dispersion={mid ? 0 : 0.32}
           roughness={0.08}
-          attenuationDistance={2.4}
-          attenuationColor="#d9cdf2"
-          envMapIntensity={2.2}
-          iridescence={0.16}
+          attenuationDistance={3.4}
+          attenuationColor="#e4dbf5"
+          /* §phase 2 : envMapIntensity dans la fourchette 1.2-1.8 */
+          envMapIntensity={1.8}
+          iridescence={0.14}
           clearcoat={1.0}
-          clearcoatRoughness={0.05}
+          clearcoatRoughness={0.08}
         />
       ) : (
         /* le monogramme : la pièce maîtresse — serge fine (~0,024
@@ -2404,7 +2417,7 @@ function SceneLights() {
             noir (le monogramme lisait « plastique charbon ») */}
         <Lightformer
           form="rect"
-          intensity={0.8}
+          intensity={1.35}
           position={[0.6, 2.2, 10]}
           scale={[9, 5, 1]}
           target={[0.8, 0.6, 0]}

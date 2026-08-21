@@ -30,10 +30,12 @@ const FIELD_ITEMS = [
   { key: "fields.ia.kicker", fallback: "04 — IA générative", active: false },
 ];
 
-/* « 01 — Miniatures YouTube » → « Miniatures YouTube » */
+/* « 01 — Packs FiveM » ou « ( 01 ) Packs FiveM » → « Packs FiveM »
+   (l'index de la colonne porte déjà le numéro) */
 function fieldLabel(kicker: string) {
-  const parts = kicker.split("—");
-  return (parts[1] ?? kicker).trim();
+  const afterDash = kicker.split("—")[1];
+  const base = (afterDash ?? kicker).trim();
+  return base.replace(/^\(\s*\d+\s*\)\s*/, "").trim();
 }
 
 export default function GivreHero() {
@@ -295,12 +297,15 @@ export default function GivreHero() {
           lilas→pêche en dérive 26 s + deux light streaks à 22°,
           ≤ 8 % perçus : discret à l'œil, mais le verre le PLIE —
           c'est la référence qui fait lire la réfraction. */}
+      {/* Refonte 50k : LA seule couleur de la page — le plan
+          lumineux aurore derrière le monogramme, renforcé pour que
+          le verre ait une lumière à plier (recalé B9A7DA/E9C6A2). */}
       <div
         aria-hidden
         className="pv-hero-aurora pv-hero-layer pointer-events-none absolute inset-[-4%]"
         style={{
           background:
-            "radial-gradient(30% 42% at 58% 30%, rgba(184,161,232,0.085) 0%, rgba(184,161,232,0) 70%), radial-gradient(27% 38% at 74% 64%, rgba(240,197,168,0.075) 0%, rgba(240,197,168,0) 72%)",
+            "radial-gradient(32% 46% at 60% 32%, rgba(185,167,218,0.15) 0%, rgba(185,167,218,0) 70%), radial-gradient(29% 42% at 76% 62%, rgba(233,198,162,0.13) 0%, rgba(233,198,162,0) 72%)",
         }}
       />
       <div
@@ -413,14 +418,16 @@ export default function GivreHero() {
               </a>
             </div>
 
-            {/* La preuve sociale — la note des avis clients */}
+            {/* La preuve sociale — une ligne mono nue (plus de
+                pilule bordurée : liste noire №3) */}
             <a
               href="#avis"
-              className="gh-price pv-pill mt-5 hidden font-mono text-[10px] uppercase tracking-[0.14em] text-slate transition-colors duration-300 hover:text-ink lg:inline-flex"
+              className="gh-price group mt-6 hidden items-baseline gap-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-mist transition-colors duration-300 hover:text-ink lg:inline-flex"
             >
               <span className="font-display text-[15px] font-medium normal-case tracking-normal text-ink">
                 5/5
               </span>
+              <span aria-hidden className="inline-block h-px w-6 self-center bg-[color:var(--color-ligne-2)] transition-colors duration-300 group-hover:bg-[color:var(--color-argent)]" />
               {t("hero.proof", "Avis clients vérifiés")}
             </a>
           </div>
@@ -437,7 +444,9 @@ export default function GivreHero() {
         {/* Bloc bas — mobile : preuve en pilule + CTA pleine
             largeur, cibles tactiles ≥ 48px */}
         <div className="lg:hidden">
-          <p className="gh-price pv-pill flex w-full items-center justify-center whitespace-nowrap px-4 py-2 text-center font-mono text-[9.5px] uppercase tracking-[0.13em] text-slate">
+          <p className="gh-price flex w-full items-baseline justify-center gap-2.5 whitespace-nowrap text-center font-mono text-[10px] uppercase tracking-[0.13em] text-mist">
+            <span className="font-display text-[14px] font-medium normal-case tracking-normal text-ink">5/5</span>
+            <span aria-hidden className="inline-block h-px w-5 self-center bg-[color:var(--color-ligne-2)]" />
             {t("hero.proof", "Avis clients vérifiés")}
           </p>
           <div className="mt-3 flex flex-col gap-3">
@@ -465,23 +474,29 @@ export default function GivreHero() {
           <p className="gh-side-item font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
             {t("fields.label", "Terrains")}
           </p>
-          <ul className="mt-5 flex flex-col gap-[18px]">
-            {FIELD_ITEMS.map((item) => {
+          {/* Refonte 50k : index mono resserré — numéros en colonne,
+              filet argent sur l'entrée active */}
+          <ul className="mt-4 flex flex-col">
+            {FIELD_ITEMS.map((item, i) => {
               const label = fieldLabel(t(item.key, item.fallback));
               return (
-                <li key={item.key} className="gh-side-item">
+                <li key={item.key} className="gh-side-item border-b border-[color:var(--color-ligne)] first:border-t">
                   <a
                     href="#terrains"
                     className={
-                      item.active
-                        ? "flex items-center gap-3 text-[14.5px] font-medium text-ink"
-                        : "block text-[13.5px] text-mist transition-colors duration-300 hover:text-slate"
+                      "group flex items-baseline gap-3 py-[11px] font-mono text-[11px] uppercase tracking-[0.1em] transition-colors duration-300 " +
+                      (item.active ? "text-ink" : "text-mist hover:text-slate")
                     }
                   >
+                    <span className={item.active ? "text-ink" : "text-[color:var(--ink-28)]"}>
+                      0{i + 1}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate normal-case tracking-normal font-sans text-[13px]">
+                      {label}
+                    </span>
                     {item.active ? (
-                      <span className="h-px w-5 bg-[rgba(242,242,240,0.55)]" aria-hidden />
+                      <span className="h-px w-5 self-center bg-[color:var(--color-argent)]" aria-hidden />
                     ) : null}
-                    {label}
                   </a>
                 </li>
               );

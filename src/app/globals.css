@@ -1904,14 +1904,11 @@ select.pv-field {
   font-size: clamp(3.4rem, 12vw, 10rem);
 }
 .gh-title {
-  font-size: clamp(44px, 12.5vw, 64px);
+  /* §4.2 verrouillé : 64 px est le plancher du H1, à 390 compris —
+     les lignes wrappent naturellement (cliquer. seul sur la 3e) */
+  font-size: clamp(64px, 9vw, 148px);
   letter-spacing: -0.03em;
   line-height: 0.95;
-}
-@media (min-width: 640px) {
-  .gh-title {
-    font-size: clamp(64px, 9vw, 148px);
-  }
 }
 /* Les deux voix du titre hero — le contraste est dimensionnel */
 .gh-line-calm {
