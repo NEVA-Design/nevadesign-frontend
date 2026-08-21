@@ -1,12 +1,13 @@
 "use client";
 
 /*
- * La vue de paiement — même cimaise que /login : satin vivant nu,
- * carte d'ENCRE MATE pour le récap, panneau IVOIRE pour le
- * Checkout Stripe (l'iframe est claire : on lui donne un cadre
- * assumé plutôt qu'un choc noir/blanc). Mobile : récap compact
- * au-dessus, checkout dessous. États designés : chargement,
- * session expirée/introuvable, déjà payée, erreur.
+ * La vue de paiement v2 — le pattern des checkouts premium :
+ * SPLIT PLEINE HAUTEUR. À gauche, le panneau de MARQUE (noir
+ * profond, l'œuvre du studio voilée en toile de fond, facture
+ * détaillée, réassurances, badges cartes) ; à droite, la colonne
+ * CLAIRE pleine hauteur du formulaire Stripe — pas de cartes qui
+ * flottent, deux mondes soudés par une hairline. Mobile : marque
+ * compacte en haut, formulaire plein écran dessous.
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -31,9 +32,32 @@ function euro(cents: number) {
 
 const nf = (n: number) => `#${String(n).padStart(4, "0")}`;
 
+/* ── Badges cartes — épurés, dessinés en code ───────────────── */
+
+function BadgesCartes() {
+  const base =
+    "flex h-7 min-w-[44px] items-center justify-center rounded-[6px] border border-[rgba(255,255,255,0.14)] bg-white/[0.05] px-2";
+  return (
+    <span className="flex items-center gap-2" aria-label="Visa, Mastercard, Carte Bancaire">
+      <span className={base}>
+        <span className="text-[10px] font-bold italic tracking-tight text-[#F2EFE9]">VISA</span>
+      </span>
+      <span className={base} aria-hidden>
+        <span className="relative flex items-center">
+          <span className="h-3.5 w-3.5 rounded-full bg-[#EB001B]/85" />
+          <span className="-ml-1.5 h-3.5 w-3.5 rounded-full bg-[#F79E1B]/85" />
+        </span>
+      </span>
+      <span className={base}>
+        <span className="text-[10px] font-bold tracking-tight text-[#F2EFE9]">CB</span>
+      </span>
+    </span>
+  );
+}
+
 /* ── Le Checkout embarqué ───────────────────────────────────── */
 
-function CheckoutStripe({ clientSecret, fake }: { clientSecret: string | null; fake: boolean }) {
+function CheckoutStripe({ clientSecret, fake, montant }: { clientSecret: string | null; fake: boolean; montant: string }) {
   const hote = useRef<HTMLDivElement>(null);
   const [etat, setEtat] = useState<"chargement" | "pret" | "erreur">("chargement");
 
@@ -63,37 +87,56 @@ function CheckoutStripe({ clientSecret, fake }: { clientSecret: string | null; f
   }, [clientSecret, fake]);
 
   if (fake) {
-    /* recette visuelle sans Stripe : silhouette du checkout */
+    /* recette visuelle sans Stripe : maquette réaliste du formulaire */
+    const label = "mb-1.5 block text-[11px] font-medium tracking-[0.02em] text-black/55";
+    const champ = "h-11 rounded-[8px] border border-black/[0.14] bg-white shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]";
     return (
-      <div className="flex h-full min-h-[420px] flex-col gap-4 p-7" aria-hidden>
-        <div className="h-4 w-40 rounded bg-black/10" />
-        <div className="h-11 rounded-[10px] border border-black/10 bg-black/[0.04]" />
-        <div className="h-4 w-24 rounded bg-black/10" />
-        <div className="h-11 rounded-[10px] border border-black/10 bg-black/[0.04]" />
-        <div className="grid grid-cols-2 gap-3">
-          <div className="h-11 rounded-[10px] border border-black/10 bg-black/[0.04]" />
-          <div className="h-11 rounded-[10px] border border-black/10 bg-black/[0.04]" />
+      <div className="flex flex-col gap-4" aria-hidden>
+        <div>
+          <span className={label}>Adresse e-mail</span>
+          <div className={champ} />
         </div>
-        <div className="mt-auto h-12 rounded-[12px] bg-[#0A0A0A]" />
-        <p className="text-center font-mono text-[10px] uppercase tracking-[0.14em] text-black/40">
-          Aperçu — le formulaire Stripe se charge ici
+        <div>
+          <span className={label}>Informations de la carte</span>
+          <div className="overflow-hidden rounded-[8px] border border-black/[0.14] bg-white shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]">
+            <div className="flex h-11 items-center justify-between border-b border-black/[0.08] px-3">
+              <span className="text-[13px] text-black/35">1234 1234 1234 1234</span>
+              <BadgesCartesClair />
+            </div>
+            <div className="grid grid-cols-2">
+              <div className="flex h-11 items-center border-r border-black/[0.08] px-3 text-[13px] text-black/35">MM / AA</div>
+              <div className="flex h-11 items-center px-3 text-[13px] text-black/35">CVC</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <span className={label}>Nom du titulaire</span>
+          <div className={champ} />
+        </div>
+        <button className="mt-2 h-12 rounded-[10px] bg-[#0A0A0A] text-[14.5px] font-medium text-[#F2EFE9]" tabIndex={-1}>
+          Payer {montant}
+        </button>
+        <p className="text-center font-mono text-[9.5px] uppercase tracking-[0.16em] text-black/35">
+          Aperçu — le formulaire Stripe réel se charge ici
         </p>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-[420px]">
+    <div className="relative min-h-[440px]">
       {etat === "chargement" ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-black/50">
-          <span className="pv-spinner h-6 w-6 border-black/30 border-t-black/70" aria-hidden />
+          <span className="pv-spinner h-6 w-6 border-black/25 border-t-black/70" aria-hidden />
           <p className="font-mono text-[10.5px] uppercase tracking-[0.16em]">Ouverture du paiement…</p>
         </div>
       ) : null}
       {etat === "erreur" ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-8 text-center">
           <p className="text-[15px] font-medium text-black/80">Le formulaire n&apos;a pas pu se charger.</p>
-          <p className="text-[13px] text-black/50">Recharge la page — si ça persiste, préviens l&apos;équipe dans ton ticket Discord.</p>
+          <p className="text-[13px] text-black/50">
+            Recharge la page — si ça persiste, préviens l&apos;équipe dans ton ticket Discord.
+          </p>
         </div>
       ) : null}
       <div ref={hote} className={etat === "pret" ? "" : "invisible"} />
@@ -101,21 +144,42 @@ function CheckoutStripe({ clientSecret, fake }: { clientSecret: string | null; f
   );
 }
 
+function BadgesCartesClair() {
+  return (
+    <span className="flex items-center gap-1.5" aria-hidden>
+      <span className="flex h-5 items-center rounded-[4px] border border-black/10 px-1 text-[8px] font-bold italic text-black/60">VISA</span>
+      <span className="relative flex items-center">
+        <span className="h-3 w-3 rounded-full bg-[#EB001B]/70" />
+        <span className="-ml-1 h-3 w-3 rounded-full bg-[#F79E1B]/70" />
+      </span>
+    </span>
+  );
+}
+
 /* ── États pleine carte (expirée / introuvable / payée) ─────── */
 
 function EtatSeul({ emoji, titre, texte, lien }: { emoji: string; titre: string; texte: string; lien?: { href: string; label: string } }) {
   return (
-    <div className="mx-auto w-full max-w-[430px]">
-      <section className="pv-auth-card pv-fade-up px-8 py-10 text-center">
-        <p aria-hidden className="text-[40px] leading-none">{emoji}</p>
-        <h1 className="pv-display mt-5 text-[clamp(1.6rem,5vw,2rem)] leading-[1.15]">{titre}</h1>
-        <p className="mt-3 text-sm leading-relaxed text-slate">{texte}</p>
-        {lien ? (
-          <a href={lien.href} className="pv-btn mt-7 w-full">
-            {lien.label}
-          </a>
-        ) : null}
-      </section>
+    <div className="pv-scene relative min-h-[100svh] text-ink">
+      <div aria-hidden className="pv-auth-bg" />
+      <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-6 py-7 sm:px-10">
+        <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">ΛV Neva Design</span>
+        <span className="hidden font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist sm:block">Paiement</span>
+      </header>
+      <main className="relative z-10 flex min-h-[100svh] items-center justify-center px-6 py-24">
+        <div className="w-full max-w-[430px]">
+          <section className="pv-auth-card pv-fade-up px-8 py-10 text-center">
+            <p aria-hidden className="text-[40px] leading-none">{emoji}</p>
+            <h1 className="pv-display mt-5 text-[clamp(1.6rem,5vw,2rem)] leading-[1.15]">{titre}</h1>
+            <p className="mt-3 text-sm leading-relaxed text-slate">{texte}</p>
+            {lien ? (
+              <a href={lien.href} className="pv-btn mt-7 w-full">
+                {lien.label}
+              </a>
+            ) : null}
+          </section>
+        </div>
+      </main>
     </div>
   );
 }
@@ -123,117 +187,145 @@ function EtatSeul({ emoji, titre, texte, lien }: { emoji: string; titre: string;
 /* ── La page ────────────────────────────────────────────────── */
 
 export default function PayView({ commande }: { commande: PayData | null }) {
-  const contenu = (() => {
-    if (!commande) {
-      return (
-        <EtatSeul
-          emoji="🔎"
-          titre="Commande introuvable."
-          texte="Ce lien de paiement ne correspond à aucune commande — il a peut-être été remplacé. Retourne dans ton ticket Discord : le lien le plus récent s'y trouve."
-        />
-      );
-    }
-    if (commande.statut === "paid") {
-      return (
-        <EtatSeul
-          emoji="✅"
-          titre="Déjà réglée."
-          texte={`La commande ${nf(commande.numero)} est payée — l'équipe est déjà sur ta création.`}
-          lien={{ href: commande.retour_discord, label: "Retour au ticket" }}
-        />
-      );
-    }
-    if (commande.statut !== "pending" || !commande.client_secret) {
-      return (
-        <EtatSeul
-          emoji="⏰"
-          titre="Session expirée."
-          texte={`Le lien de la commande ${nf(commande.numero)} n'est plus valable. Demande à l'équipe d'en générer un nouveau dans ton ticket Discord — un clic leur suffit.`}
-          lien={{ href: commande.retour_discord, label: "Retour au ticket" }}
-        />
-      );
-    }
-
-    const p = commande.produit;
+  if (!commande) {
     return (
-      <div className="grid w-full items-stretch gap-8 lg:grid-cols-[400px_minmax(0,1fr)] lg:gap-12">
-        {/* Récap — carte encre */}
-        <section className="pv-auth-card pv-fade-up flex flex-col px-7 py-8 sm:px-8">
-          <BrandMark size={24} tone="white" />
-          <p className="mt-6 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
-            Commande {nf(commande.numero)}
-          </p>
+      <EtatSeul
+        emoji="🔎"
+        titre="Commande introuvable."
+        texte="Ce lien de paiement ne correspond à aucune commande — il a peut-être été remplacé. Retourne dans ton ticket Discord : le lien le plus récent s'y trouve."
+      />
+    );
+  }
+  if (commande.statut === "paid") {
+    return (
+      <EtatSeul
+        emoji="✅"
+        titre="Déjà réglée."
+        texte={`La commande ${nf(commande.numero)} est payée — l'équipe est déjà sur ta création.`}
+        lien={{ href: commande.retour_discord, label: "Retour au ticket" }}
+      />
+    );
+  }
+  if (commande.statut !== "pending" || !commande.client_secret) {
+    return (
+      <EtatSeul
+        emoji="⏰"
+        titre="Session expirée."
+        texte={`Le lien de la commande ${nf(commande.numero)} n'est plus valable. Demande à l'équipe d'en générer un nouveau dans ton ticket Discord — un clic leur suffit.`}
+        lien={{ href: commande.retour_discord, label: "Retour au ticket" }}
+      />
+    );
+  }
 
-          <div className="mt-5 flex items-start gap-4">
-            {p.image_url ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={p.image_url}
-                alt=""
-                className="h-16 w-16 shrink-0 rounded-[12px] border border-[rgba(255,255,255,0.12)] object-cover"
-              />
-            ) : (
-              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[12px] border border-[rgba(255,255,255,0.12)] bg-white/[0.04] text-[26px]" aria-hidden>
-                {p.emoji}
-              </span>
-            )}
-            <div className="min-w-0">
-              <h1 className="text-[17px] font-medium leading-snug text-ink">{p.nom}</h1>
-              {p.description ? (
-                <p className="mt-1 text-[13px] leading-relaxed text-slate">{p.description}</p>
-              ) : null}
+  const p = commande.produit;
+  const montant = euro(commande.prix_cents);
+
+  return (
+    <div className="relative min-h-[100svh] bg-[#060606] text-ink lg:grid lg:grid-cols-[minmax(460px,46%)_minmax(0,1fr)]">
+      {/* ═══ Panneau de marque — noir, l'œuvre en toile de fond ═══ */}
+      <section className="relative flex flex-col overflow-hidden">
+        {/* l'œuvre du studio — la sculpture vit dans la moitié BASSE
+            du panneau (le texte occupe le haut) : masque montant,
+            léger voile pour garder les réassurances lisibles */}
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/scene/low/hero-poster-1440.avif"
+            alt=""
+            className="h-full w-full object-cover opacity-[0.6]"
+            style={{
+              objectPosition: "64% 50%",
+              maskImage: "linear-gradient(0deg, black 0%, rgba(0,0,0,0.8) 42%, rgba(0,0,0,0.25) 68%, transparent 88%)",
+              WebkitMaskImage: "linear-gradient(0deg, black 0%, rgba(0,0,0,0.8) 42%, rgba(0,0,0,0.25) 68%, transparent 88%)",
+            }}
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,6,6,0.35)_0%,rgba(6,6,6,0.55)_45%,rgba(6,6,6,0.35)_100%)]" />
+        </div>
+
+        <div className="relative z-10 mx-auto flex w-full max-w-[480px] flex-1 flex-col px-6 py-8 sm:px-10 lg:py-12">
+          <header className="flex items-center justify-between">
+            <BrandMark size={26} tone="white" />
+            <a
+              href={commande.retour_discord}
+              className="font-mono text-[10px] uppercase tracking-[0.18em] text-mist transition-colors hover:text-ink"
+            >
+              ← Retour au ticket
+            </a>
+          </header>
+
+          <div className="mt-10 lg:mt-16">
+            <p className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
+              Commande {nf(commande.numero)} — Neva Design Studio
+            </p>
+            <h1 className="pv-display mt-4 flex items-center gap-3 text-[clamp(1.5rem,3.2vw,2rem)] leading-[1.15]">
+              {p.image_url ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={p.image_url} alt="" className="h-12 w-12 rounded-[10px] border border-[rgba(255,255,255,0.14)] object-cover" />
+              ) : (
+                <span aria-hidden className="text-[30px] leading-none">{p.emoji}</span>
+              )}
+              <span>{p.nom}</span>
+            </h1>
+            {p.description ? (
+              <p className="mt-3 max-w-[400px] text-[13.5px] leading-relaxed text-slate">{p.description}</p>
+            ) : null}
+          </div>
+
+          {/* La facture — le sérieux d'un vrai document */}
+          <div className="mt-9 rounded-[14px] border border-[rgba(255,255,255,0.1)] bg-white/[0.03]">
+            <div className="flex items-baseline justify-between px-5 py-3.5 text-[13.5px]">
+              <span className="text-slate">{p.nom}</span>
+              <span className="font-mono text-[13px] text-ink">{montant}</span>
+            </div>
+            <div className="flex items-baseline justify-between border-t border-[rgba(255,255,255,0.08)] px-5 py-3.5 text-[13.5px]">
+              <span className="text-slate">Prestation de service — TVA non applicable</span>
+              <span className="font-mono text-[13px] text-mist">—</span>
+            </div>
+            <div className="flex items-baseline justify-between border-t border-[rgba(255,255,255,0.12)] px-5 py-4">
+              <span className="text-[13.5px] font-medium text-ink">Total à régler</span>
+              <span className="pv-display text-[24px] leading-none text-ink">{montant}</span>
             </div>
           </div>
 
-          <p className="pv-display mt-7 text-[clamp(2rem,6vw,2.6rem)] leading-none text-ink">
-            {euro(commande.prix_cents)}
-          </p>
-          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-mist">
-            TTC · paiement unique
-          </p>
+          {/* Réassurances — ce qui se passe après le clic */}
+          <ul className="mt-8 flex flex-col gap-3 text-[13px] leading-snug text-slate">
+            {[
+              "Confirmation instantanée dans ton ticket Discord",
+              "L'équipe démarre ta création dès le paiement — suivi en direct",
+              "Reçu Stripe envoyé par e-mail · paiement unique, sans abonnement",
+            ].map((l) => (
+              <li key={l} className="flex items-start gap-3">
+                <span aria-hidden className="mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[rgba(242,239,233,0.35)] text-[9px] text-[#F2EFE9]">
+                  ✓
+                </span>
+                {l}
+              </li>
+            ))}
+          </ul>
 
-          <div className="mt-8 border-t border-[rgba(255,255,255,0.08)] pt-5 lg:mt-auto">
-            <p className="inline-flex items-center gap-2 rounded-[10px] border border-[rgba(255,255,255,0.12)] bg-white/[0.03] px-3 py-[6px] font-mono text-[10px] uppercase tracking-[0.14em] text-slate">
-              🔒 Paiement sécurisé par Stripe
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-[rgba(255,255,255,0.1)] pt-6 lg:mt-auto">
+            <p className="font-mono text-[9.5px] uppercase leading-relaxed tracking-[0.14em] text-mist">
+              🔒 Chiffré SSL — traité par Stripe.
+              <br />
+              Le studio ne voit jamais ta carte.
             </p>
-            <p className="mt-3 text-[12px] leading-relaxed text-mist">
-              Ta carte n&apos;est jamais vue par le studio. Reçu envoyé par e-mail, confirmation
-              instantanée dans ton ticket Discord.
-            </p>
+            <BadgesCartes />
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Checkout — panneau ivoire */}
-        <section className="pv-fade-up overflow-hidden rounded-[20px] border border-[rgba(255,255,255,0.12)] bg-[#F5F2EC] shadow-[0_24px_60px_rgba(0,0,0,0.5)]" style={{ animationDelay: "0.1s" }}>
-          <CheckoutStripe clientSecret={commande.client_secret} fake={Boolean(commande.fake)} />
-        </section>
-      </div>
-    );
-  })();
-
-  return (
-    <div className="pv-scene relative min-h-[100svh] text-ink">
-      <div aria-hidden className="pv-auth-bg" />
-
-      <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-6 py-7 sm:px-10">
-        {commande?.retour_discord ? (
-          <a
-            href={commande.retour_discord}
-            className="inline-flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist transition-colors hover:text-ink"
-          >
-            ← Retour au ticket
-          </a>
-        ) : (
-          <span />
-        )}
-        <span className="hidden font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist sm:block">
-          Paiement
-        </span>
-      </header>
-
-      <main className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1180px] items-center px-5 py-24 sm:px-8">
-        {contenu}
-      </main>
+      {/* ═══ Colonne formulaire — claire, pleine hauteur ═══ */}
+      <section className="relative flex min-h-[560px] flex-col border-t border-[rgba(255,255,255,0.12)] bg-[#F7F5F0] lg:min-h-0 lg:border-l lg:border-t-0">
+        <div className="mx-auto flex w-full max-w-[540px] flex-1 flex-col px-5 py-10 sm:px-10 lg:justify-center lg:py-16">
+          <p className="mb-6 font-mono text-[10.5px] uppercase tracking-[0.2em] text-black/45">
+            Régler {montant}
+          </p>
+          <CheckoutStripe clientSecret={commande.client_secret} fake={Boolean(commande.fake)} montant={montant} />
+          <p className="mt-8 text-center font-mono text-[9.5px] uppercase tracking-[0.16em] text-black/35">
+            Propulsé par <span className="font-bold not-italic text-black/55">Stripe</span> — leader mondial du paiement en ligne
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
