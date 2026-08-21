@@ -30,11 +30,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             // Variantes
             "pv-btn-sheen bg-[image:var(--btn-primary-bg)] text-[color:var(--btn-primary-text)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.35),inset_0_1px_0_rgba(255,255,255,0.55),0_1px_2px_rgba(0,0,0,0.45),0_10px_30px_rgba(0,0,0,0.55)] hover:-translate-y-px hover:brightness-[1.04] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.40),inset_0_1px_0_rgba(255,255,255,0.60),0_2px_4px_rgba(0,0,0,0.45),0_16px_40px_rgba(0,0,0,0.60)] active:translate-y-[1px] active:brightness-[0.99] disabled:bg-[image:none] disabled:bg-carte disabled:text-[rgba(242,242,240,0.28)] disabled:border disabled:border-carte-brd disabled:shadow-[0_1px_2px_rgba(0,0,0,0.40)]":
               variant === "primary" || variant === "gradient",
-            "border border-carte-brd bg-carte text-[color:var(--surface-text)] shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_1px_2px_rgba(0,0,0,0.40)] hover:border-[color:var(--color-violet)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_2px_4px_rgba(0,0,0,0.40),0_12px_28px_rgba(0,0,0,0.50)] active:translate-y-[1px] disabled:opacity-45":
+            "border border-carte-brd bg-carte text-[color:var(--surface-text)] shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_1px_2px_rgba(0,0,0,0.40)] hover:border-[rgba(255,255,255,0.28)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_2px_4px_rgba(0,0,0,0.40),0_12px_28px_rgba(0,0,0,0.50)] active:translate-y-[1px] disabled:opacity-45":
               variant === "secondary",
             "text-slate hover:bg-ink/5 hover:text-ink active:scale-[0.99] disabled:opacity-45":
               variant === "ghost",
-            "border border-[color:var(--hairline-strong)] text-ink hover:border-[color:var(--color-violet)] hover:shadow-[0_0_16px_rgba(184,161,232,0.22)] active:scale-[0.99] disabled:opacity-45":
+            "border border-[color:var(--hairline-strong)] text-ink hover:border-[rgba(255,255,255,0.32)] active:scale-[0.99] disabled:opacity-45":
               variant === "outline",
           },
           className
