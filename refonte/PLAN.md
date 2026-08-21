@@ -5,9 +5,9 @@ Reprise après interruption : lire ce fichier + NOTES.md, vérifier la phase en 
 ## Phase 0 — Recon & baseline
 - [x] Digest des skills écrit dans NOTES.md (ui-ux-pro-max + frontend-design + AGENTS/CLAUDE.md repo)
 - [x] Stack identifiée (NOTES.md) — aucune lib à ajouter
-- [ ] Branche `refonte-50k` + commit de l'état pré-refonte
-- [ ] Baseline : toutes pages × 390/768/1440/2560 → refonte/baseline/
-- [ ] Inventaire des patterns bannis (liste de démolition ci-dessous)
+- [x] Branche `refonte-50k` + commit de l'état pré-refonte
+- [x] Baseline : toutes pages × 390/768/1440/2560 → ../captures/qa/iter-baseline/ (copie → refonte/baseline/ à la fin de la capture)
+- [x] Inventaire des patterns bannis (NOTES.md — inventaire visuel + greps)
 
 ## Phase 1 — Fondations (35 min)
 - [ ] Tokens verrouillés §4.1 (palette --noir-*, --ligne, --ivoire, --gris, --argent, --aurore-a/b)

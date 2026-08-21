@@ -25,6 +25,18 @@
 - Serveurs : front dev :3001, backend :4000 (DEV_LOCAL_MODE=1, déjà lancé).
 - **Aucune lib à ajouter** a priori : GSAP + Lenis + R3F + Tailwind couvrent tout le protocole. (Si dispersion verre indisponible dans three 0.185 → post légère, pas de lib.)
 
+## Inventaire visuel baseline (phase 0 — captures regardées)
+
+Vu sur `../captures/qa/iter-baseline/full-home-1440.png` (crops t00/t01) :
+1. **Hero** : titre Outfit light gris ~84px — mou, sans tension ; monogramme ΛV en TISSU ivoire monochrome (aucune couleur dans la page, l'aurore ≤ 8 % est invisible) ; pilule bordurée « 5/5 avis ».
+2. **02 Studio** : 7 pills bordurées en rafale (services) ; 4 cartes équipe identiques avec pastilles d'initiales DA/LI/PF/MO sur disque dégradé ; process en 4 boîtes grises accolées. → Les 3 patterns bannis majeurs, concentrés dans une section.
+3. **Vide ~350 px** entre le CTA Discord (02) et le folio 03 — au-dessus de la limite 220 px.
+4. **CTA final** : sphère satinée décorative CSS à droite (GivreFooter l.97-121) — à supprimer (liste noire №9).
+5. **Avis** : étoiles SVG fines stroke pêche = aurore posée sur un glyphe UI → à passer argent.
+6. **Marquee logos clients (08)** : 2 copies avec keyframe −33,33 % calibré 3 copies → boucle discontinue (bug hérité, cf. mémoire run 5).
+7. ★ texte restant : src/app/avis/page.tsx:63 (page /avis, hors home).
+8. FAQ : q2 « plan gratuit » et q4 « Creative Director » décrivent l'offre d'avant le pivot studio — signalé dans RAPPORT.md (contenu, pas mon appel).
+
 ## Décisions de session
 
 - Branche de travail : `refonte-50k` ; premier commit = état pré-refonte (modifs cookies run 12 en cours, non mêlées aux phases).
