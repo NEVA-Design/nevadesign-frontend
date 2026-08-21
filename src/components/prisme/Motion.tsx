@@ -138,9 +138,10 @@ export function RevealMedia({
         }
       );
       if (inner) {
+        /* §phase 4 : images en scale 1.06 → 1 dans leur masque */
         gsap.fromTo(
           inner,
-          { scale: 1.12 },
+          { scale: 1.06 },
           {
             scale: 1,
             duration: 1.5,

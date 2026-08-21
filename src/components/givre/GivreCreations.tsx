@@ -12,7 +12,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useTranslations } from "@/components/LanguageProvider";
-import { RevealBlock } from "@/components/prisme/Motion";
+import { RevealBlock, RevealMask } from "@/components/prisme/Motion";
 import CreationsMarquee from "@/components/prisme/CreationsMarquee";
 
 export default function GivreCreations() {
@@ -50,12 +50,12 @@ export default function GivreCreations() {
           }}
         >
           <div>
-            <h2 className="font-display pv-t-creations font-light leading-[1.1] tracking-[-0.015em] text-slate">
-              {t("wall.title.a", "Les créations sortent")}{" "}
-              <span className="font-medium text-ink">
-                {t("wall.title.b", "d'ici.")}
-              </span>
-            </h2>
+            <RevealMask>
+              <h2 className="pv-display pv-t-creations">
+                {t("wall.title.a", "Les créations sortent")}{" "}
+                <b>{t("wall.title.b", "d'ici.")}</b>
+              </h2>
+            </RevealMask>
             <p className="mt-4 flex items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
               <span
                 aria-hidden

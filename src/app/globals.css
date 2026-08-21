@@ -1684,6 +1684,29 @@ select.pv-field {
   to { height: 0; opacity: 0; }
 }
 
+/* ══ Voile de transition de pages (§phase 4) ══════════════════
+   Balayage noir : monte du bas (in, 300 ms), se retire vers le
+   haut (out, 300 ms). Compositor only. */
+@keyframes pv-veil-in {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+@keyframes pv-veil-out {
+  from { transform: scaleY(1); }
+  to   { transform: scaleY(0); }
+}
+.pv-veil-page--in {
+  transform-origin: bottom center;
+  animation: pv-veil-in 0.3s var(--ease-inout) both;
+}
+.pv-veil-page--out {
+  transform-origin: top center;
+  animation: pv-veil-out 0.3s var(--ease-inout) 0.12s both;
+}
+.pv-veil-page--in > svg {
+  animation: pv-overture-fill-in 0.25s ease-out 0.18s both;
+}
+
 /* Respiration d'un halo */
 @keyframes pv-breathe {
   0%, 100% { opacity: 0.65; transform: scale(1); }

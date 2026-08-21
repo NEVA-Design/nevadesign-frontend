@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { archivo, geistMono } from "./fonts";
 import LanguageProvider from "@/components/LanguageProvider";
+import PageVeil from "@/components/prisme/PageVeil";
 import SoieNoire from "@/components/prisme/SoieNoire";
 import { ConfirmDialogProvider } from "@/components/ui/confirm-dialog";
 import { defaultSeo, siteName, siteUrl } from "@/lib/seo";
@@ -89,6 +90,8 @@ export default function RootLayout({
         <LanguageProvider>
           <ConfirmDialogProvider>{children}</ConfirmDialogProvider>
         </LanguageProvider>
+        {/* Transition de pages marketing — balayage + monogramme */}
+        <PageVeil />
       </body>
     </html>
   );

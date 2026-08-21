@@ -28,12 +28,36 @@ export default function GivreNavbar() {
   const { t } = useTranslations();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  /* §phase 4 — l'état ACTIF de la nav : la section visible allume
+     son lien (filet argent). Observateur léger, jamais de scroll
+     handler par lien. */
+  const [activeHash, setActiveHash] = useState("");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 32);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const ids = NAV_LINKS.map((l) => l.href)
+      .filter((h) => h.startsWith("#"))
+      .map((h) => h.slice(1));
+    const sections = ids
+      .map((id) => document.getElementById(id))
+      .filter(Boolean) as HTMLElement[];
+    if (!sections.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveHash(`#${entry.target.id}`);
+        }
+      },
+      { rootMargin: "-32% 0px -58% 0px" }
+    );
+    sections.forEach((s) => io.observe(s));
+    return () => io.disconnect();
   }, []);
 
   useEffect(() => {
@@ -61,17 +85,33 @@ export default function GivreNavbar() {
       >
         <Brand size={19} tone="white" />
 
-        {/* Desktop — capitales espacées, le vocabulaire du cadre */}
+        {/* Desktop — capitales espacées ; le lien de la section
+            visible porte un filet argent (état actif, §phase 4) */}
         <div className="hidden items-center gap-8 lg:flex">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="font-mono text-[11px] uppercase tracking-[0.18em] text-slate transition-colors duration-300 hover:text-ink"
-            >
-              {t(link.key, link.fallback)}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const isActive = link.href === activeHash;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={isActive ? "true" : undefined}
+                className={cn(
+                  "relative font-mono text-[11px] uppercase tracking-[0.18em] transition-colors duration-300 hover:text-ink",
+                  isActive ? "text-ink" : "text-slate"
+                )}
+              >
+                {t(link.key, link.fallback)}
+                <span
+                  aria-hidden
+                  className={cn(
+                    "absolute -bottom-[9px] left-0 right-0 h-px bg-[color:var(--color-argent)] transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                    isActive ? "scale-x-100 opacity-80" : "scale-x-0 opacity-0"
+                  )}
+                  style={{ transformOrigin: "left center" }}
+                />
+              </Link>
+            );
+          })}
         </div>
         <div className="hidden items-center gap-6 lg:flex">
           <LanguageSelector />

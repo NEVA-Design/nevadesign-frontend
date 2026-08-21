@@ -23,7 +23,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { RevealBlock } from "@/components/prisme/Motion";
+import { RevealBlock, RevealMask } from "@/components/prisme/Motion";
 import { useTranslations } from "@/components/LanguageProvider";
 import models from "@/data/models.json";
 import { BANNIERES_IA_SOON } from "@/lib/feature-flags";
@@ -295,12 +295,12 @@ export default function GivreGenerative() {
               {t("generative.eyebrow", "Neva Generative — deux formules d'abonnement")}
             </p>
           </RevealBlock>
-          <RevealBlock delay={0.12}>
-            <h2 className="pv-display pv-section-title mt-4 max-w-[720px]">
+          <RevealMask delay={0.12} className="mt-4">
+            <h2 className="pv-display pv-section-title max-w-[900px]">
               {t("generative.title.a", "L'IA du studio,")}{" "}
               <b>{t("generative.title.beam", "en abonnement.")}</b>
             </h2>
-          </RevealBlock>
+          </RevealMask>
 
           {/* ── Formule 3A — Scènes GTA ─────────────────────────── */}
           <div className="mt-16 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8">
