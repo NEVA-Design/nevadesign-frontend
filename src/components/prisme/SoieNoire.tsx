@@ -34,23 +34,23 @@ import { useEffect, useRef } from "react";
 /* Réglages artistiques — le pupitre calibré de l'agence (preset B,
    itéré sur captures). Ne pas retoucher « de tête ».
    MAJ 21/08 (retour opérateur « le fond ne bouge plus ») : les
-   vitesses du preset B lisaient comme une image fixe (mesuré :
-   1,5 niveau de gris de variation moyenne en 2,5 s — un premier
-   essai ×3,5 ne donnait que 2,1, toujours illisible sur les zones
-   calmes). fold/warp ×6/×5 : la matière se recompose visiblement
-   quand on la regarde ; drift ×2,5 seulement (une dérive, jamais
-   une « photo qui bouge ») ; sway ×2,8 (la lumière respire). */
+   vitesses du preset B lisaient comme une image fixe. Poussées à
+   ×6 → « trop vite » (2e retour) : posées à ~×2,5 de l'original —
+   la matière respire visiblement quand on la regarde, sans jamais
+   distraire d'un texte. Crêtes +25 % (voir PALETTE) pour que le
+   mouvement soit LISIBLE (l'ancien champ, même décorrélé, ne
+   variait que de ~2 niveaux de gris). */
 const ART = {
   angle: -0.52,
   aniso: 2.5,
   scale: 0.34,
   warp: 1.15,
   foldPow: 2.1,
-  foldSpeed: 0.075,
-  warpSpeed: 0.028,
-  driftX: 0.009,
-  driftY: -0.0056,
-  lightSway: 0.22,
+  foldSpeed: 0.03,
+  warpSpeed: 0.012,
+  driftX: 0.005,
+  driftY: -0.003,
+  lightSway: 0.12,
   relief: 20.0,
   specPow: 26.0,
   specAmp: 0.14,

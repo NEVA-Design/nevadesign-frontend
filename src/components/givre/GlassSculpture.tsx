@@ -1837,6 +1837,50 @@ function patchGlassShader(
 }
 const glassCacheKey = () => "dawn-glass-18-lumen";
 
+/* ── Matière de la sculpture (21/08) ───────────────────────────
+   Retour opérateur : « enlève l'effet glass » puis « mets-les en
+   blanc, DA un peu mate, pro ». La sculpture passe du cristal
+   transmissif à la PORCELAINE IVOIRE MATE : blanc cassé du site,
+   fini satiné à peine lustré — les softbox modèlent les volumes en
+   dégradés doux, la silhouette claire se détache du drapé noir
+   comme une pièce de galerie. Repasser à "verre" pour rouvrir
+   l'ancienne matière (Glass + patch de shader conservés). */
+const SCULPT_MATTER: "porcelaine" | "verre" = "porcelaine";
+
+type PorcelaineProps = {
+  color?: string;
+  roughness?: number;
+  envMapIntensity?: number;
+  clearcoat?: number;
+  clearcoatRoughness?: number;
+};
+
+function Porcelaine({
+  color = "#E9E6DF",
+  roughness = 0.5,
+  envMapIntensity = 1.15,
+  /* un vernis LÉGER et diffus : le « un peu mat » — la surface a
+     un lustre de biscuit émaillé, jamais un miroir */
+  clearcoat = 0.28,
+  clearcoatRoughness = 0.32,
+}: PorcelaineProps) {
+  const material = useMemo(
+    () =>
+      new THREE.MeshPhysicalMaterial({
+        color,
+        metalness: 0,
+        roughness,
+        clearcoat,
+        clearcoatRoughness,
+        envMapIntensity,
+        specularIntensity: 0.9,
+      }),
+    [color, roughness, clearcoat, clearcoatRoughness, envMapIntensity]
+  );
+  useEffect(() => () => material.dispose(), [material]);
+  return <primitive object={material} attach="material" />;
+}
+
 type GlassProps = {
   thickness?: number;
   ior?: number;
@@ -2052,25 +2096,27 @@ function Monogram({ mid }: { mid: boolean }) {
       position={[MONO_X, MONO_REST_Y, 0]}
       rotation={[0, -0.34, 0]}
     >
-      <Glass
-        thickness={1.2}
-        ior={1.5}
-        /* dispersion 0,2-0,35 (brief P2.3) : arêtes irisées effet
-           joaillerie — le 0,95 délavait tout en arc-en-ciel flou */
-        dispersion={mid ? 0 : 0.32}
-        /* QA 20/08 (G4) : le mono lisait graphite — moins
-           d'absorption sombre (attenuation 1,6 → 2,4, teinte plus
-           claire), reflets plus présents (env 1,7 → 2,2, roughness
-           0,08) et le film irisé un cran plus lisible : le verre
-           existe par ses liserés, plus par sa masse. */
-        roughness={0.08}
-        attenuationDistance={2.4}
-        attenuationColor="#d9cdf2"
-        envMapIntensity={2.2}
-        iridescence={0.16}
-        clearcoat={1.0}
-        clearcoatRoughness={0.05}
-      />
+      {SCULPT_MATTER === "verre" ? (
+        <Glass
+          thickness={1.2}
+          ior={1.5}
+          /* dispersion 0,2-0,35 (brief P2.3) : arêtes irisées effet
+             joaillerie — le 0,95 délavait tout en arc-en-ciel flou */
+          dispersion={mid ? 0 : 0.32}
+          roughness={0.08}
+          attenuationDistance={2.4}
+          attenuationColor="#d9cdf2"
+          envMapIntensity={2.2}
+          iridescence={0.16}
+          clearcoat={1.0}
+          clearcoatRoughness={0.05}
+        />
+      ) : (
+        /* le monogramme : la pièce maîtresse — un cran moins mate
+           que les satellites, chaque facette du chanfrein tient
+           son propre niveau d'ivoire */
+        <Porcelaine roughness={0.46} envMapIntensity={1.25} />
+      )}
     </mesh>
   );
 }
@@ -2146,17 +2192,21 @@ function Sculpture({ mid }: { mid: boolean }) {
         rotation={[Math.PI / 2 - 1.32, 0, 0.3]}
       >
         <torusGeometry args={[0.42, 0.185, 64, 160]} />
-        <Glass
-          thickness={0.6}
-          ior={1.5}
-          dispersion={mid ? 0 : 0.35}
-          roughness={0.06}
-          attenuationDistance={1.2}
-          attenuationColor="#cfc2ee"
-          envMapIntensity={1.8}
-          iridescence={0.12}
-          bend={0.5}
-        />
+        {SCULPT_MATTER === "verre" ? (
+          <Glass
+            thickness={0.6}
+            ior={1.5}
+            dispersion={mid ? 0 : 0.35}
+            roughness={0.06}
+            attenuationDistance={1.2}
+            attenuationColor="#cfc2ee"
+            envMapIntensity={1.8}
+            iridescence={0.12}
+            bend={0.5}
+          />
+        ) : (
+          <Porcelaine roughness={0.52} />
+        )}
       </mesh>
 
       {/* La sphère — en lévitation au-dessus de l'épaule gauche du
@@ -2164,29 +2214,37 @@ function Sculpture({ mid }: { mid: boolean }) {
           reflet net des softbox fenêtre */}
       <mesh ref={sphere} position={[SPHERE_X, FLOOR_Y + 2.52, SPHERE_Z]}>
         <sphereGeometry args={[0.4, 64, 64]} />
-        <Glass
-          thickness={0.8}
-          ior={1.5}
-          dispersion={mid ? 0 : 0.2}
-          /* verre CLAIR (le 0,17 en faisait une bille laiteuse) */
-          roughness={0.06}
-          attenuationDistance={2.0}
-          attenuationColor="#cfc2ee"
-          envMapIntensity={1.6}
-          bend={0.5}
-        />
+        {SCULPT_MATTER === "verre" ? (
+          <Glass
+            thickness={0.8}
+            ior={1.5}
+            dispersion={mid ? 0 : 0.2}
+            roughness={0.06}
+            attenuationDistance={2.0}
+            attenuationColor="#cfc2ee"
+            envMapIntensity={1.6}
+            bend={0.5}
+          />
+        ) : (
+          /* la sphère : l'émail le plus lustré de la scène */
+          <Porcelaine roughness={0.38} clearcoat={0.4} clearcoatRoughness={0.25} />
+        )}
       </mesh>
 
       {/* La bille — en lévitation haute à droite, la respiration
           de la scène */}
       <mesh ref={bead} position={[BEAD_X, FLOOR_Y + 3.28, -0.7]}>
         <sphereGeometry args={[0.14, 48, 48]} />
-        <Glass
-          thickness={0.28}
-          roughness={0.06}
-          dispersion={mid ? 0 : 0.35}
-          bend={0.45}
-        />
+        {SCULPT_MATTER === "verre" ? (
+          <Glass
+            thickness={0.28}
+            roughness={0.06}
+            dispersion={mid ? 0 : 0.35}
+            bend={0.45}
+          />
+        ) : (
+          <Porcelaine roughness={0.4} />
+        )}
       </mesh>
     </group>
   );
@@ -2207,7 +2265,10 @@ function SceneLights() {
           le verre sur la nuit. Jamais de blob sombre. */}
       <ambientLight intensity={0.22} />
       <directionalLight position={[-4, 7, 5]} intensity={0.55} color="#fff6f2" />
-      <directionalLight position={[5.5, 2.2, -4.5]} intensity={2.2} color="#cfc7f2" />
+      {/* 21/08 : lavande #cfc7f2 → gris froid neutre — sur la
+          porcelaine ivoire, la teinte peignait les faces en mauve
+          (invisible du temps du verre transmissif) */}
+      <directionalLight position={[5.5, 2.2, -4.5]} intensity={2.2} color="#e2e3e8" />
       <directionalLight position={[-5.2, 3.4, -4.2]} intensity={1.6} color="#e8d9c8" />
       {/* budget documenté GIVRE §4 : 256 (le 512 était un écart) —
           cubemap rendu une seule fois, reflets doux */}
