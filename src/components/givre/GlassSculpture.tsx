@@ -2141,10 +2141,10 @@ function Monogram({ mid }: { mid: boolean }) {
           clearcoatRoughness={0.05}
         />
       ) : (
-        /* le monogramme : la pièce maîtresse — trame à ~0,05 unité
-           (repeat 2,6 sur des UV en coords de forme), relief
-           appuyé : la texture doit se LIRE, pas se deviner */
-        <TissuIvoire roughness={0.55} envMapIntensity={1.25} repeat={[2.6, 2.6]} normalScale={1.15} />
+        /* le monogramme : la pièce maîtresse — serge fine (~0,024
+           unité par fil, repeat 2,6 sur des UV en coords de forme),
+           relief posé : l'étoffe se lit sans jamais crier */
+        <TissuIvoire roughness={0.55} envMapIntensity={1.25} repeat={[2.6, 2.6]} normalScale={0.8} />
       )}
     </mesh>
   );
