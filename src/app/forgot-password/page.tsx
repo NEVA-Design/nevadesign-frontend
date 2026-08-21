@@ -4,8 +4,6 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { BrandMark } from "@/components/prisme/Brand";
-import SatinSphere from "@/components/givre/SatinSphere";
-import { Button } from "@/components/ui/button";
 import { Input, Label, FormMessage } from "@/components/ui/field";
 import { backendFetch } from "@/lib/api/backend-client";
 
@@ -64,13 +62,9 @@ export default function ForgotPasswordPage() {
       </header>
 
       <main className="relative z-10 flex min-h-[100svh] items-center justify-center px-6 py-24 sm:px-8">
-        <div className="relative w-full max-w-[420px]">
-          {/* La sphère satinée — la même pièce que /login et
-              /signup : la famille auth partage sa composition (D17) */}
-          <SatinSphere
-            size={150}
-            className="pointer-events-none absolute -top-[24px] right-[-186px] hidden lg:block"
-          />
+        <div className="relative w-full max-w-[430px]">
+          {/* Un seul geste : la carte d'encre centrée, sans cimaise
+              — le couloir entre /login et la boîte mail */}
           <section className="pv-auth-card pv-fade-up px-6 py-8 sm:px-9 sm:py-10">
             <Link href="/" aria-label="Neva Design — accueil" className="inline-flex">
               <BrandMark size={24} tone="white" />
@@ -111,13 +105,8 @@ export default function ForgotPasswordPage() {
                     required
                   />
                 </div>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="lg"
-                  className="pv-btn mt-1 w-full"
-                  disabled={loading}
-                >
+                {/* bouton pv-btn nu : radius 14 de la charte */}
+                <button type="submit" className="pv-btn mt-1 w-full" disabled={loading}>
                   {loading ? (
                     <>
                       <span aria-hidden className="pv-spinner h-4 w-4" />
@@ -126,7 +115,7 @@ export default function ForgotPasswordPage() {
                   ) : (
                     "Recevoir le lien"
                   )}
-                </Button>
+                </button>
               </form>
             )}
 

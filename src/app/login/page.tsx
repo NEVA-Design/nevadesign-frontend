@@ -7,15 +7,15 @@ import { useRouter } from "next/navigation";
 import { storeSession } from "@/lib/session";
 import { backendFetch } from "@/lib/api/backend-client";
 import { BrandMark } from "@/components/prisme/Brand";
-import SatinSphere from "@/components/givre/SatinSphere";
-import { Button } from "@/components/ui/button";
 import { Input, Label, FormMessage } from "@/components/ui/field";
 
 /*
- * Connexion — la déclinaison calme du hero Givre. La scène d'aube
- * diluée respire derrière un cadre éditorial d'un pixel ; une seule
- * carte de verre dépoli porte le monogramme et le formulaire.
- * L'UI chuchote, la lumière fait le reste.
+ * Connexion — redesign 21/08 : la cimaise de galerie. Deux
+ * panneaux sur le satin vivant : à gauche la carte d'ENCRE MATE
+ * (opaque — plus de verre) qui porte le formulaire, à droite
+ * l'ŒUVRE — la scène porcelaine du studio, encadrée avec sa
+ * légende d'exposition. Plus de sphère décorative, plus d'aurore
+ * violette : le drapé fait l'atmosphère.
  */
 
 export default function LoginPage() {
@@ -84,17 +84,10 @@ export default function LoginPage() {
         </span>
       </header>
 
-      <main className="relative z-10 flex min-h-[100svh] items-center justify-center px-6 py-24 sm:px-8">
-        <div className="relative w-full max-w-[420px]">
-          {/* La sphère satinée — ENTIÈRE, posée à droite au-dessus
-              de la carte : elle équilibre la composition, plus
-              jamais recouverte (Phase 4.4) */}
-          <SatinSphere
-            size={150}
-            className="pointer-events-none absolute -top-[24px] right-[-186px] hidden lg:block"
-          />
-          {/* La carte porteuse — spec Phase 4.2 : blanc 4 %,
-              bordure 12 %, top-light */}
+      <main className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1180px] items-center px-6 py-24 sm:px-8">
+        <div className="grid w-full items-center gap-10 lg:grid-cols-[430px_minmax(0,1fr)] lg:gap-14">
+          <div className="mx-auto w-full max-w-[430px]">
+          {/* La carte porteuse — encre mate opaque, top-light */}
           <section className="pv-auth-card pv-fade-up px-6 py-8 sm:px-9 sm:py-10">
             <Link href="/" aria-label="Neva Design — accueil" className="inline-flex">
               <BrandMark size={24} tone="white" />
@@ -150,13 +143,9 @@ export default function LoginPage() {
                   required
                 />
               </div>
-              <Button
-                type="submit"
-                variant="primary"
-                size="lg"
-                className="pv-btn mt-1 w-full"
-                disabled={loading}
-              >
+              {/* bouton pv-btn nu : radius 14 de la charte (le
+                  composant Button imposait sa pilule rounded-full) */}
+              <button type="submit" className="pv-btn mt-1 w-full" disabled={loading}>
                 {loading ? (
                   <>
                     <span aria-hidden className="pv-spinner h-4 w-4" />
@@ -165,19 +154,44 @@ export default function LoginPage() {
                 ) : (
                   "Se connecter"
                 )}
-              </Button>
+              </button>
             </form>
-          </section>
 
-          <p
-            className="pv-fade-up mt-7 text-center text-[13px] text-slate"
-            style={{ animationDelay: "0.2s" }}
+            {/* Pied de carte — le second chemin, relié par un filet */}
+            <p className="mt-8 border-t border-[rgba(255,255,255,0.08)] pt-5 text-[13px] text-slate">
+              Pas encore de compte ?{" "}
+              <Link href="/signup" className="pv-link">
+                Créez-le gratuitement
+              </Link>
+            </p>
+          </section>
+          </div>
+
+          {/* L'œuvre — la scène porcelaine du studio, en cimaise.
+              La légende dit vrai : c'est le rendu temps réel de
+              l'accueil, bake par pose caméra. */}
+          <figure
+            className="pv-auth-art pv-fade-up hidden h-[min(74vh,700px)] lg:block"
+            style={{ animationDelay: "0.12s" }}
+            aria-hidden
           >
-            Pas encore de compte ?{" "}
-            <Link href="/signup" className="pv-link">
-              Créez-le gratuitement
-            </Link>
-          </p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/scene/low/hero-poster-1440.avif"
+              alt=""
+              loading="lazy"
+              decoding="async"
+              style={{ objectPosition: "70% 44%" }}
+            />
+            <figcaption>
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink">
+                Monogramme AV — porcelaine &amp; satin
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-mist">
+                La scène du studio
+              </span>
+            </figcaption>
+          </figure>
         </div>
       </main>
     </div>
