@@ -1,37 +1,22 @@
 "use client";
 
-import { clearSession, getAccessToken, getRefreshToken, storeSession } from "@/lib/session";
-
-// The Elysia backend (nevadesign-backend) lives on its own origin now that
-// front and back are split — no more same-origin Next.js API routes, and
-// the front never talks to Supabase directly: only this backend does.
+// Le backend Elysia (nevadesign-backend) vit sur sa propre origine. La session
+// voyage en cookies HttpOnly (`credentials: 'include'`) — le JS ne lit ni ne
+// pose jamais de token (FRONT-001). Sur 401, on tente un refresh silencieux :
+// le backend lit le refresh cookie et repose les cookies de session.
 export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000";
 
 let refreshInFlight: Promise<boolean> | null = null;
 
 async function refreshSession(): Promise<boolean> {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) return false;
-
   if (!refreshInFlight) {
     refreshInFlight = (async () => {
       try {
         const res = await fetch(`${BACKEND_URL}/auth/refresh`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refresh_token: refreshToken }),
+          credentials: "include",
         });
-        if (!res.ok) {
-          clearSession();
-          return false;
-        }
-        const data = await res.json();
-        if (!data.session) {
-          clearSession();
-          return false;
-        }
-        storeSession(data.session);
-        return true;
+        return res.ok;
       } catch {
         return false;
       } finally {
@@ -39,32 +24,31 @@ async function refreshSession(): Promise<boolean> {
       }
     })();
   }
-
   return refreshInFlight;
 }
 
-function withAuthHeaders(init: RequestInit): RequestInit {
-  const token = getAccessToken();
+function withDefaults(init: RequestInit): RequestInit {
   const headers = new Headers(init.headers);
-  if (token) headers.set("Authorization", `Bearer ${token}`);
   if (init.body && !(init.body instanceof FormData) && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
-  return { ...init, headers };
+  // credentials:'include' — indispensable pour ENVOYER et STOCKER les cookies
+  // de session cross-origin (front → API).
+  return { ...init, headers, credentials: "include" };
 }
 
 /**
- * Drop-in replacement for `fetch()` against the backend: attaches the
- * current session as a Bearer token from cookies, and silently refreshes
- * once and retries if the token turned out to be expired (401).
+ * Drop-in replacement pour `fetch()` contre le backend : joint automatiquement
+ * les cookies de session, et retente une fois après un refresh silencieux si
+ * le token avait expiré (401).
  */
 export async function backendFetch(path: string, init: RequestInit = {}): Promise<Response> {
-  const res = await fetch(`${BACKEND_URL}${path}`, withAuthHeaders(init));
+  const res = await fetch(`${BACKEND_URL}${path}`, withDefaults(init));
 
-  if (res.status === 401 && getRefreshToken()) {
+  if (res.status === 401) {
     const refreshed = await refreshSession();
     if (refreshed) {
-      return fetch(`${BACKEND_URL}${path}`, withAuthHeaders(init));
+      return fetch(`${BACKEND_URL}${path}`, withDefaults(init));
     }
   }
 

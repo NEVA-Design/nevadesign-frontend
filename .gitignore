@@ -45,3 +45,7 @@ next-env.d.ts
 
 *.zip
 .next-qa/
+
+# refonte 50k : captures hors git (convention repo)
+refonte/baseline/
+refonte/final/

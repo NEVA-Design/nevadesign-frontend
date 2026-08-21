@@ -18,7 +18,8 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { clearSession } from "@/lib/session";
+import { clearLegacyCookies } from "@/lib/session";
+import { backendFetch } from "@/lib/api/backend-client";
 import { COMING_SOON } from "@/lib/feature-flags";
 import { Gauge } from "@/components/ui/gauge";
 import { cn } from "@/lib/utils";
@@ -90,8 +91,14 @@ export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?
   const isActive = (href: string) =>
     href === "/dashboard" ? pathname === href : pathname.startsWith(href);
 
-  function handleLogout() {
-    clearSession();
+  async function handleLogout() {
+    // Les cookies HttpOnly ne sont supprimables que par le backend (FRONT-001).
+    try {
+      await backendFetch("/auth/logout", { method: "POST" });
+    } catch {
+      // best-effort : on redirige quoi qu'il arrive
+    }
+    clearLegacyCookies();
     router.push("/");
     router.refresh();
   }

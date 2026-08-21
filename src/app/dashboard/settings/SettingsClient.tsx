@@ -8,7 +8,6 @@ import { FormMessage, Input, Label, Textarea } from "@/components/ui/field"
 import { Switch } from "@/components/ui/switch"
 import { readApiResponse } from "@/lib/api/client"
 import { backendFetch, BACKEND_URL } from "@/lib/api/backend-client"
-import { getAccessToken } from "@/lib/session"
 
 /*
  * Paramètres — navigation d'onglets en filets, panneaux éditoriaux.
@@ -92,6 +91,8 @@ export default function SettingsClient({
   // Security state
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [pwCode, setPwCode] = useState("")
   const [secSaving, setSecSaving] = useState(false)
   const [secStatus, setSecStatus] = useState<Status>(null)
 
@@ -136,10 +137,22 @@ export default function SettingsClient({
 
   // ── Discord ───────────────────────────────────────────────────────────────────
 
-  const connectDiscord = () => {
-    const token = getAccessToken()
-    if (!token) return
-    window.location.href = `${BACKEND_URL}/profile/discord/link?token=${encodeURIComponent(token)}`
+  const connectDiscord = async () => {
+    // BACK-006 : on échange la session (cookie) contre un ticket court à usage
+    // unique, passé dans l'URL à la place du JWT. Aucun token en clair dans
+    // l'URL de navigation.
+    setDiscordStatus(null)
+    try {
+      const res = await backendFetch('/profile/discord/link-ticket', { method: 'POST' })
+      const data = await readApiResponse<{ ticket?: string }>(res)
+      if (!data.ticket) {
+        setDiscordStatus({ type: 'error', message: 'Impossible de démarrer la liaison Discord.' })
+        return
+      }
+      window.location.href = `${BACKEND_URL}/profile/discord/link?ticket=${encodeURIComponent(data.ticket)}`
+    } catch (e: unknown) {
+      setDiscordStatus({ type: 'error', message: (e as Error).message ?? 'Impossible de démarrer la liaison Discord.' })
+    }
   }
 
   const disconnectDiscord = async () => {
@@ -233,13 +246,21 @@ export default function SettingsClient({
     setSecSaving(true)
     setSecStatus(null)
     try {
+      const body: Record<string, string> = { password: newPassword }
+      if (mfaEnabled) {
+        body.code = pwCode
+      } else {
+        body.currentPassword = currentPassword
+      }
       const res = await backendFetch('/profile/password', {
         method: 'POST',
-        body: JSON.stringify({ password: newPassword }),
+        body: JSON.stringify(body),
       })
       await readApiResponse<{ success: boolean }>(res)
       setNewPassword('')
       setConfirmPassword('')
+      setCurrentPassword('')
+      setPwCode('')
       setSecStatus({ type: 'success', message: 'Mot de passe mis à jour.' })
     } catch (e: unknown) {
       setSecStatus({ type: 'error', message: (e as Error).message ?? 'Erreur' })
@@ -785,7 +806,33 @@ export default function SettingsClient({
               <p className="mt-2 max-w-lg text-sm leading-relaxed text-steel">
                 Six caractères minimum. La modification prend effet immédiatement.
               </p>
-              <div className="mt-7 grid gap-5 sm:grid-cols-2">
+              <div className="mt-7 max-w-xs">
+                {mfaEnabled ? (
+                  <>
+                    <Label htmlFor="pw-code">Code d&apos;authentification (A2F)</Label>
+                    <Input
+                      id="pw-code"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      value={pwCode}
+                      onChange={(e) => setPwCode(e.target.value)}
+                      placeholder="123456"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Label htmlFor="pw-current">Mot de passe actuel</Label>
+                    <Input
+                      id="pw-current"
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="••••••••"
+                    />
+                  </>
+                )}
+              </div>
+              <div className="mt-5 grid gap-5 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="new-password">Nouveau mot de passe</Label>
                   <Input
@@ -812,7 +859,7 @@ export default function SettingsClient({
               <div className="mt-6 flex justify-end">
                 <Button
                   onClick={changePassword}
-                  disabled={secSaving || !newPassword || !confirmPassword}
+                  disabled={secSaving || !newPassword || !confirmPassword || (mfaEnabled ? !pwCode : !currentPassword)}
                 >
                   {secSaving ? (
                     <><Loader2 size={13} className="animate-spin" />Mise à jour…</>

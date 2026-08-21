@@ -4,7 +4,6 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { storeSession } from "@/lib/session";
 import { backendFetch } from "@/lib/api/backend-client";
 import { BrandMark } from "@/components/prisme/Brand";
 import { Input, Label, FormMessage } from "@/components/ui/field";
@@ -53,8 +52,8 @@ export default function LoginPage() {
         return
       }
 
-      storeSession(data.session)
-
+      // La session est posée en cookies HttpOnly par le backend (FRONT-001) —
+      // plus rien à stocker côté JS.
       router.push("/dashboard")
       router.refresh()
     } catch {

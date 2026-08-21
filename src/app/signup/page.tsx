@@ -4,7 +4,6 @@ import Link from "next/link";
 import { ArrowLeft, MailCheck } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { storeSession } from "@/lib/session";
 import { backendFetch } from "@/lib/api/backend-client";
 import { BrandMark } from "@/components/prisme/Brand";
 import { Input, Label, FormMessage } from "@/components/ui/field";
@@ -45,8 +44,9 @@ export default function SignupPage() {
         return
       }
 
-      if (data.session) {
-        storeSession(data.session)
+      // Session immédiate (email auto-confirmé) : les cookies HttpOnly sont
+      // déjà posés par le backend (FRONT-001) → droit au dashboard.
+      if (data.authenticated) {
         router.push("/dashboard")
         router.refresh()
         return

@@ -1340,6 +1340,24 @@ html {
     0 24px 60px rgba(0, 0, 0, 0.55);
 }
 
+/* Mur d'avis (/avis) — carte d'encre mate, léger relief au survol. */
+.pv-avis-card {
+  position: relative;
+  background: linear-gradient(180deg, #101014 0%, #0b0b0e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top-color: rgba(255, 255, 255, 0.13);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 2px 8px rgba(0, 0, 0, 0.32);
+  transition:
+    transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1),
+    border-color 0.45s ease;
+}
+.pv-avis-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.17);
+}
+
 /* Le panneau-œuvre — la scène du studio encadrée comme en galerie,
    légende d'exposition en pied. lg+ seulement. */
 .pv-auth-art {

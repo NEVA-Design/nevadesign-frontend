@@ -2,8 +2,21 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { storeSession } from "@/lib/session";
 import { backendFetch } from "@/lib/api/backend-client";
+
+// Résout un `next` non fiable en chemin interne SÛR : on le parse contre
+// l'origine courante et on n'accepte que si l'origine résultante est la même
+// (bloque "//host", "/\host", "https://host", etc.).
+function safeInternalPath(raw: string | null): string {
+  if (!raw) return "/dashboard";
+  try {
+    const u = new URL(raw, window.location.origin);
+    if (u.origin !== window.location.origin) return "/dashboard";
+    return u.pathname + u.search + u.hash;
+  } catch {
+    return "/dashboard";
+  }
+}
 
 /*
  * Retour d'authentification — atterrit ici après confirmation d'e-mail ou
@@ -23,7 +36,11 @@ export default function AuthCallbackPage() {
     const hashError = hash.get("error_description") ?? hash.get("error");
 
     const search = new URLSearchParams(window.location.search);
-    const next = search.get("next") ?? "/dashboard";
+    // Anti open-redirect : résoudre `next` contre l'origine courante et
+    // n'accepter QUE si l'origine résultante est identique. Couvre les
+    // contournements "//host", "/\host" (backslash normalisé par le
+    // navigateur) et les URL absolues.
+    const next = safeInternalPath(search.get("next"));
 
     if (hashError) {
       router.replace(`/login?error=auth_callback_failed&message=${encodeURIComponent(hashError)}`);
@@ -35,13 +52,15 @@ export default function AuthCallbackPage() {
       return;
     }
 
-    storeSession({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-      expires_in: expiresIn ? Number(expiresIn) : undefined,
-    });
-
-    backendFetch("/auth/oauth-complete", { method: "POST" })
+    // FRONT-001 : on ne stocke plus les tokens en JS. On les remet au backend
+    // qui les pose en cookies HttpOnly (et fait le contrôle de sécurité
+    // signup). `expiresIn` est ignoré : le backend fixe lui-même le TTL du
+    // cookie access.
+    void expiresIn;
+    backendFetch("/auth/oauth-complete", {
+      method: "POST",
+      body: JSON.stringify({ access_token: accessToken, refresh_token: refreshToken }),
+    })
       .catch(() => {})
       .finally(() => {
         router.replace(next);
