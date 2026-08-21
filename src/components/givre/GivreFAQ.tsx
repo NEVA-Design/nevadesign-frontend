@@ -1,7 +1,6 @@
 "use client";
 
 import * as Accordion from "@radix-ui/react-accordion";
-import { ChevronDown } from "lucide-react";
 import { useTranslations } from "@/components/LanguageProvider";
 import { DISCORD_URL } from "@/lib/links";
 import { RevealBlock, RevealMask } from "@/components/prisme/Motion";
@@ -114,15 +113,20 @@ export default function GivreFAQ() {
                     <span className="flex-1 text-[16px] font-medium leading-snug text-ink">
                       {item.q}
                     </span>
-                    <ChevronDown
-                      size={16}
-                      strokeWidth={1.6}
-                      className="shrink-0 self-center text-slate transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-data-[state=open]:rotate-180"
-                    />
+                    {/* Croix fine — tourne à 45° à l'ouverture (§10) */}
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 15 15"
+                      aria-hidden
+                      className="shrink-0 self-center text-slate transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-data-[state=open]:rotate-45"
+                    >
+                      <path d="M7.5 1v13M1 7.5h13" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                    </svg>
                   </Accordion.Trigger>
                 </Accordion.Header>
                 <Accordion.Content className="overflow-hidden data-[state=closed]:animate-[pv-accordion-up_0.25s_cubic-bezier(0.16,1,0.3,1)] data-[state=open]:animate-[pv-accordion-down_0.3s_cubic-bezier(0.16,1,0.3,1)]">
-                  <p className="pb-6 pl-12 pr-10 text-[14px] leading-[1.7] text-slate sm:pl-14">
+                  <p className="max-w-[65ch] pb-6 pl-12 pr-10 text-[14px] leading-[1.7] text-slate sm:pl-14">
                     {item.a}
                   </p>
                 </Accordion.Content>

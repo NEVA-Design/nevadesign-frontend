@@ -310,7 +310,7 @@ export default function PrismLoader() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(30% 38% at 40% 34%, rgba(184,161,232,0.16) 0%, rgba(184,161,232,0) 70%), radial-gradient(26% 34% at 60% 62%, rgba(240,197,168,0.15) 0%, rgba(240,197,168,0) 72%)",
+            "radial-gradient(30% 38% at 40% 34%, rgba(185,167,218,0.16) 0%, rgba(185,167,218,0) 70%), radial-gradient(26% 34% at 60% 62%, rgba(233,198,162,0.15) 0%, rgba(233,198,162,0) 72%)",
         }}
       />
       {/* le grain de l'atelier — 2 octaves, comme chaque scène */}
@@ -330,9 +330,9 @@ export default function PrismLoader() {
         <svg viewBox="0 0 1441 1120" className="w-[120px]">
           <defs>
             <linearGradient id="pvGlassFill" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="rgba(184,161,232,0.28)" />
+              <stop offset="0%" stopColor="rgba(185,167,218,0.28)" />
               <stop offset="55%" stopColor="rgba(246,243,238,0.30)" />
-              <stop offset="100%" stopColor="rgba(240,197,168,0.30)" />
+              <stop offset="100%" stopColor="rgba(233,198,162,0.30)" />
             </linearGradient>
             <clipPath id="pvMonoClip">
               <path d="M440.2 0 L864.6 1000 L694.6 1000 L441 379 L180.1 1000 L0 1000 Z" />

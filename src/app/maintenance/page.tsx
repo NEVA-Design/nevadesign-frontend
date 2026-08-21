@@ -63,7 +63,7 @@ export default async function MaintenancePage() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'radial-gradient(34% 42% at 36% 28%, rgba(184,161,232,0.22) 0%, rgba(184,161,232,0) 70%), radial-gradient(30% 38% at 64% 66%, rgba(240,197,168,0.2) 0%, rgba(240,197,168,0) 72%)',
+            'radial-gradient(34% 42% at 36% 28%, rgba(185,167,218,0.22) 0%, rgba(185,167,218,0) 70%), radial-gradient(30% 38% at 64% 66%, rgba(233,198,162,0.2) 0%, rgba(233,198,162,0) 72%)',
         }}
       />
       <SatinSphere

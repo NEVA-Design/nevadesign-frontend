@@ -247,8 +247,8 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
     return (
       <div className="mx-auto flex w-full max-w-[860px] flex-1 flex-col items-center justify-center px-4 py-16 text-center">
         <div className="relative h-16 w-16">
-          <span className="absolute inset-0 animate-ping rounded-full bg-[rgba(184,161,232,0.25)]" />
-          <span className="relative flex h-16 w-16 items-center justify-center rounded-full border border-[rgba(184,161,232,0.5)] bg-white/5">
+          <span className="absolute inset-0 animate-ping rounded-full bg-[rgba(185,167,218,0.25)]" />
+          <span className="relative flex h-16 w-16 items-center justify-center rounded-full border border-[rgba(185,167,218,0.5)] bg-white/5">
             <Wand2 size={22} className="text-[color:var(--num-color)]" />
           </span>
         </div>
@@ -268,7 +268,7 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
         </AnimatePresence>
         <div className="mt-8 h-[3px] w-64 overflow-hidden rounded-full bg-ink/[0.07]">
           <motion.div
-            className="h-full w-1/3 rounded-full bg-[linear-gradient(90deg,#7C6BD4,#B8A1E8,#C9B8F5)]"
+            className="h-full w-1/3 rounded-full bg-[linear-gradient(90deg,#7C6BD4,#B9A7DA,#C9B8F5)]"
             animate={{ x: ["-100%", "300%"] }}
             transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
           />
@@ -291,7 +291,7 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
         </div>
         <div className="mt-4 h-[3px] overflow-hidden rounded-full bg-ink/[0.07]">
           <motion.div
-            className="h-full rounded-full bg-[linear-gradient(90deg,#7C6BD4,#B8A1E8,#C9B8F5)]"
+            className="h-full rounded-full bg-[linear-gradient(90deg,#7C6BD4,#B9A7DA,#C9B8F5)]"
             animate={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
             transition={{ type: "spring", stiffness: 240, damping: 30 }}
           />
@@ -330,8 +330,8 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
                       className={cn(
                         "group overflow-hidden rounded-2xl border text-left transition-all duration-300",
                         selected
-                          ? "border-[rgba(184,161,232,0.65)] shadow-[0_0_0_1px_rgba(184,161,232,0.4),0_18px_44px_rgba(0,0,0,0.52)]"
-                          : "border-[color:var(--hairline-strong)] hover:border-[rgba(184,161,232,0.4)]"
+                          ? "border-[rgba(185,167,218,0.65)] shadow-[0_0_0_1px_rgba(185,167,218,0.4),0_18px_44px_rgba(0,0,0,0.52)]"
+                          : "border-[color:var(--hairline-strong)] hover:border-[rgba(185,167,218,0.4)]"
                       )}
                     >
                       {/* Glyphe dessiné (SVG) — plus aucune vignette générée par IA */}
@@ -360,8 +360,8 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
                   className={cn(
                     "group flex flex-col items-center justify-center gap-3 rounded-2xl border p-6 text-center transition-all duration-300",
                     custom
-                      ? "border-[rgba(184,161,232,0.65)] bg-white/5 shadow-[0_0_0_1px_rgba(184,161,232,0.4)]"
-                      : "border-dashed border-[color:var(--hairline-strong)] hover:border-[rgba(184,161,232,0.4)]"
+                      ? "border-[rgba(185,167,218,0.65)] bg-white/5 shadow-[0_0_0_1px_rgba(185,167,218,0.4)]"
+                      : "border-dashed border-[color:var(--hairline-strong)] hover:border-[rgba(185,167,218,0.4)]"
                   )}
                 >
                   <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] text-dusk">
@@ -392,8 +392,8 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
                       className={cn(
                         "group overflow-hidden rounded-2xl border text-left transition-all duration-300",
                         selected
-                          ? "border-[rgba(184,161,232,0.65)] shadow-[0_0_0_1px_rgba(184,161,232,0.4),0_14px_36px_rgba(0,0,0,0.5)]"
-                          : "border-[color:var(--hairline-strong)] hover:border-[rgba(184,161,232,0.4)]"
+                          ? "border-[rgba(185,167,218,0.65)] shadow-[0_0_0_1px_rgba(185,167,218,0.4),0_14px_36px_rgba(0,0,0,0.5)]"
+                          : "border-[color:var(--hairline-strong)] hover:border-[rgba(185,167,218,0.4)]"
                       )}
                     >
                       <div className="relative h-[86px]" style={{ background: item.gradient }}>
@@ -438,7 +438,7 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
                       onChange={(e) => field.set(e.target.value)}
                       placeholder={field.placeholder}
                       maxLength={field.max}
-                      className="pv-glass mt-2 w-full rounded-xl border border-[color:var(--hairline-strong)] px-4 py-3 text-[14px] text-ink outline-none transition-shadow placeholder:text-mist focus:shadow-[0_0_0_2px_rgba(184,161,232,0.35)]"
+                      className="pv-glass mt-2 w-full rounded-xl border border-[color:var(--hairline-strong)] px-4 py-3 text-[14px] text-ink outline-none transition-shadow placeholder:text-mist focus:shadow-[0_0_0_2px_rgba(185,167,218,0.35)]"
                     />
                   </label>
                 ))}
@@ -450,7 +450,7 @@ export default function SceneWizard({ projectId, projectName, category }: Props)
                   className={cn(
                     "flex items-center gap-2.5 self-start rounded-xl border px-3.5 py-2.5 text-left text-[13px] transition-colors",
                     logoInScene
-                      ? "border-[rgba(184,161,232,0.55)] bg-[rgba(184,161,232,0.06)] text-ink"
+                      ? "border-[rgba(185,167,218,0.55)] bg-[rgba(185,167,218,0.06)] text-ink"
                       : "border-[color:var(--hairline-strong)] text-steel"
                   )}
                 >

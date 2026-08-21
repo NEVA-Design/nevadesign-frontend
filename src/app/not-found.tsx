@@ -19,7 +19,7 @@ export default function NotFound() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(34% 42% at 40% 30%, rgba(184,161,232,0.22) 0%, rgba(184,161,232,0) 70%), radial-gradient(30% 38% at 62% 64%, rgba(240,197,168,0.2) 0%, rgba(240,197,168,0) 72%)",
+            "radial-gradient(34% 42% at 40% 30%, rgba(185,167,218,0.22) 0%, rgba(185,167,218,0) 70%), radial-gradient(30% 38% at 62% 64%, rgba(233,198,162,0.2) 0%, rgba(233,198,162,0) 72%)",
         }}
       />
 

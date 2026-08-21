@@ -66,7 +66,7 @@ export function ModuleHeader({
               key={step.label}
               className={`relative flex items-baseline gap-3 py-4 pr-6 ${
                 isActive
-                  ? "-mt-px border-t-2 border-t-transparent [border-image:linear-gradient(90deg,#B8A1E8,#F0C5A8)_1]"
+                  ? "-mt-px border-t-2 border-t-transparent [border-image:linear-gradient(90deg,#B9A7DA,#E9C6A2)_1]"
                   : ""
               }`}
             >

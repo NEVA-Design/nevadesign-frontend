@@ -308,7 +308,7 @@ export function AdminMaintenanceClient({
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    "radial-gradient(40% 50% at 34% 24%, rgba(184,161,232,0.2) 0%, rgba(184,161,232,0) 70%), radial-gradient(36% 46% at 68% 70%, rgba(240,197,168,0.18) 0%, rgba(240,197,168,0) 72%)",
+                    "radial-gradient(40% 50% at 34% 24%, rgba(185,167,218,0.2) 0%, rgba(185,167,218,0) 70%), radial-gradient(36% 46% at 68% 70%, rgba(233,198,162,0.18) 0%, rgba(233,198,162,0) 72%)",
                 }}
               />
               <div className="relative flex flex-col items-center">

@@ -27,7 +27,7 @@ export default function GivreStats() {
       <div aria-hidden className="pv-scene-bg pv-scene-bg--dawn-calm" />
       <div aria-hidden className="pv-caustics" />
 
-      <div className="relative mx-auto pv-container px-5 py-16 sm:px-8 lg:py-20">
+      <div className="pv-section--tight relative mx-auto pv-container px-5 sm:px-8">
         {/* Pagination discrète, label en regard — la ligne d'en-tête */}
         <RevealBlock>
           <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
@@ -55,11 +55,13 @@ export default function GivreStats() {
                     i > 1 ? "border-t border-[rgba(255,255,255,0.14)] lg:border-t-0" : "",
                   ].join(" ")}
                 >
-                  <p className="font-display text-[36px] font-light leading-none text-ink sm:text-[44px]">
+                  {/* Refonte 50k : le chiffre est un DISPLAY massif
+                      expanded — la voix d'accent d'Archivo */}
+                  <p className="font-display text-[clamp(44px,4.6vw,76px)] font-[640] leading-none tracking-[-0.015em] text-ink [font-stretch:122%] tabular-nums">
                     <CountUp value={stat.value} />
-                    <span className="text-mist">{stat.suffix}</span>
+                    <span className="font-[300] text-mist [font-stretch:82%]">{stat.suffix}</span>
                   </p>
-                  <p className="mt-3 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
+                  <p className="mt-3.5 pv-label !text-[color:var(--color-mist)]">
                     {stat.label}
                   </p>
                 </div>
@@ -83,27 +85,27 @@ export default function GivreStats() {
               className="pv-marquee"
               style={{ "--marquee-duration": "38s" } as React.CSSProperties}
             >
-              {[false, true].map((hidden) => (
+              {/* TROIS copies (le keyframe pv-marquee translate
+                  d'exactement 1/3 — deux copies laissaient un saut
+                  de boucle, bug hérité run 5) ; opacité 50 % → 100 %
+                  au survol (protocole 08). */}
+              {[0, 1, 2].map((copy) => (
                 <div
-                  key={hidden ? "b" : "a"}
-                  aria-hidden={hidden}
+                  key={copy}
+                  aria-hidden={copy > 0}
                   className="flex shrink-0 items-center gap-10 pr-10 sm:gap-14 sm:pr-14"
                 >
                   {CLIENT_LOGOS.map((logo) => (
-                    /* encombrement FIXE par logo (h-7 × w-20, logo
-                       contain centré) : le rythme du marquee reste
-                       régulier quelles que soient les proportions ;
-                       opacité 45 % → 70 % au survol (hover system) */
                     <span
-                      key={`${logo.src}-${hidden ? "b" : "a"}`}
+                      key={`${logo.src}-${copy}`}
                       className="flex h-7 w-20 shrink-0 items-center justify-center"
                     >
                       <Image
                         src={logo.src}
-                        alt={hidden ? "" : logo.alt}
+                        alt={copy > 0 ? "" : logo.alt}
                         width={88}
                         height={22}
-                        className="max-h-[22px] w-auto object-contain opacity-45 transition-opacity duration-200 hover:opacity-70"
+                        className="max-h-[22px] w-auto object-contain opacity-50 transition-opacity duration-300 hover:opacity-100"
                       />
                     </span>
                   ))}

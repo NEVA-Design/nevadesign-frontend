@@ -34,6 +34,9 @@ export default function GivreEnhance() {
   const pos = useRef(50);
   const raf = useRef(0);
   const dragging = useRef(false);
+  /* Refonte 50k : auto-balayage lent (sinus 35-65 %) tant que le
+     visiteur n'a pas saisi la poignée — la démo vit toute seule. */
+  const interacted = useRef(false);
 
   const paint = useCallback(() => {
     raf.current = 0;
@@ -56,6 +59,20 @@ export default function GivreEnhance() {
 
   useEffect(() => () => cancelAnimationFrame(raf.current), []);
 
+  useEffect(() => {
+    let sweep = 0;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      if (interacted.current) return;
+      /* période 9 s, amplitude 35-65 % — assez lent pour se lire
+         comme une respiration, jamais comme un bug */
+      setPos(50 + 15 * Math.sin(((now - t0) / 9000) * Math.PI * 2));
+      sweep = requestAnimationFrame(tick);
+    };
+    sweep = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(sweep);
+  }, [setPos]);
+
   const posFromEvent = useCallback((e: React.PointerEvent) => {
     const rect = frameRef.current?.getBoundingClientRect();
     if (!rect) return 50;
@@ -65,6 +82,7 @@ export default function GivreEnhance() {
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
       dragging.current = true;
+      interacted.current = true;
       setPos(posFromEvent(e));
       try {
         frameRef.current?.setPointerCapture(e.pointerId);
@@ -94,6 +112,7 @@ export default function GivreEnhance() {
 
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
+      interacted.current = true;
       if (e.key === "ArrowLeft") setPos(pos.current - 4);
       else if (e.key === "ArrowRight") setPos(pos.current + 4);
       else if (e.key === "Home") setPos(4);
@@ -109,14 +128,14 @@ export default function GivreEnhance() {
   );
 
   return (
-    <section id="enhance" className="pv-scene pb-16 pt-20 sm:pb-24 sm:pt-24">
+    <section id="enhance" className="pv-scene pv-section--tight">
       <div aria-hidden className="pv-scene-bg--dawn-calm absolute inset-0" />
       <div aria-hidden className="pv-caustics" />
 
       <div className="relative z-10 mx-auto w-full pv-container px-5 sm:px-8">
         {/* En-tête éditorial centré — la symétrie est l'identité
             de cette section, à rebours des deux voisines */}
-        <div className="mx-auto max-w-[640px] text-center">
+        <div className="mx-auto max-w-[760px] text-center">
           <RevealBlock>
             <div className="pv-page-num justify-center [&>b]:text-[44px]">
               <b>05</b>
@@ -124,26 +143,17 @@ export default function GivreEnhance() {
             </div>
           </RevealBlock>
           <RevealBlock delay={0.06}>
-            <p className="mt-7 flex items-center justify-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
-              {t("enhance.label", "Enhance")}
-              {/* Pivot 20/08 : le module est « À venir » — la démo
-                  reste, l'accès est désactivé */}
-              <span
-                title={t("comingSoon.tooltip", "Disponible prochainement")}
-                className="rounded-full border border-[rgba(184,161,232,0.55)] bg-[rgba(184,161,232,0.14)] px-2.5 py-[3px] font-mono text-[9px] uppercase tracking-[0.12em] text-ink"
-              >
+            <p className="mt-7 flex items-center justify-center gap-4">
+              <span className="pv-label">{t("enhance.label", "Enhance")}</span>
+              <span className="pv-soon-badge" title={t("comingSoon.tooltip", "Disponible prochainement")}>
                 {t("comingSoon.badge", "À venir")}
               </span>
             </p>
           </RevealBlock>
           <RevealMask className="mt-4">
-            <h2 className="font-display pv-section-title leading-[1.1] tracking-[-0.015em]">
-              <span className="block font-light text-slate">{titleLead}</span>
-              {titleAccent ? (
-                <span className="block font-medium text-ink">
-                  {titleAccent}
-                </span>
-              ) : null}
+            <h2 className="pv-display pv-section-title">
+              <span className="block">{titleLead}</span>
+              {titleAccent ? <b className="block">{titleAccent}</b> : null}
             </h2>
           </RevealMask>
           <RevealBlock delay={0.12}>
@@ -156,12 +166,14 @@ export default function GivreEnhance() {
           </RevealBlock>
         </div>
 
-        {/* Le comparateur — dans son panneau de verre à arête chrome */}
+        {/* Le comparateur — cadre AFFINÉ : un hairline, un radius
+            sec, l'image fait le spectacle (fini le panneau verre
+            à arête chrome) */}
         <RevealBlock delay={0.1}>
-          <div className="pv-glass pv-chrome-edge mt-10 rounded-[22px] p-[10px] shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_2px_6px_rgba(0,0,0,0.40),0_16px_40px_rgba(0,0,0,0.50)] sm:mt-14">
+          <div className="mt-10 rounded-[8px] border border-[color:var(--color-ligne-2)] p-[6px] sm:mt-14">
             <div
               ref={frameRef}
-              className="relative h-[50vh] min-h-[360px] w-full touch-none select-none overflow-hidden rounded-[10px] bg-pearl sm:h-[56vh] sm:max-h-[600px]"
+              className="relative h-[50vh] min-h-[360px] w-full touch-none select-none overflow-hidden rounded-[6px] bg-pearl sm:h-[56vh] sm:max-h-[600px]"
               style={{ cursor: "ew-resize" }}
               onPointerDown={onPointerDown}
               onPointerMove={onPointerMove}
@@ -201,8 +213,8 @@ export default function GivreEnhance() {
                 <div className="absolute inset-0 bg-[rgba(28,23,55,0.18)]" />
               </div>
 
-              {/* La poignée — pilule de verre sur son fil de lumière,
-                  elle porte les deux cartels */}
+              {/* La poignée — LIGNE argent + PASTILLE argent (§05).
+                  Les cartels AVANT / APRÈS vivent aux coins bas. */}
               <div
                 ref={handleRef}
                 role="slider"
@@ -216,21 +228,26 @@ export default function GivreEnhance() {
               >
                 <span
                   aria-hidden
-                  className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[linear-gradient(180deg,transparent,rgba(184,161,232,0.95)_22%,rgba(240,197,168,0.95)_78%,transparent)] shadow-[0_0_22px_rgba(184,161,232,0.6)]"
+                  className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[color:var(--color-argent)] opacity-90 shadow-[0_0_14px_rgba(200,203,208,0.45)]"
                 />
-                <span className="pv-pill absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 gap-3 whitespace-nowrap px-4">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink">
-                    {t("enhance.before", "Avant")}
-                  </span>
-                  <span aria-hidden className="flex items-center text-slate">
-                    <ChevronLeft size={12} strokeWidth={2.2} />
-                    <ChevronRight size={12} strokeWidth={2.2} className="-ml-[3px]" />
-                  </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink">
-                    {t("enhance.after", "Après · 8K")}
+                <span
+                  aria-hidden
+                  className="absolute left-1/2 top-1/2 flex h-[30px] w-[30px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-[color:var(--color-argent)] bg-[rgba(6,6,6,0.55)]"
+                >
+                  <span className="flex items-center text-[color:var(--color-argent)]">
+                    <ChevronLeft size={11} strokeWidth={2} />
+                    <ChevronRight size={11} strokeWidth={2} className="-ml-[3px]" />
                   </span>
                 </span>
               </div>
+
+              {/* Cartels — coins bas, mono nu sur voile noir */}
+              <span className="pointer-events-none absolute bottom-3 left-3 z-10 rounded-[4px] bg-[rgba(6,6,6,0.55)] px-2.5 py-1 font-mono text-[9.5px] uppercase tracking-[0.14em] text-ink">
+                {t("enhance.before", "Avant")}
+              </span>
+              <span className="pointer-events-none absolute bottom-3 right-3 z-10 rounded-[4px] bg-[rgba(6,6,6,0.55)] px-2.5 py-1 font-mono text-[9.5px] uppercase tracking-[0.14em] text-ink">
+                {t("enhance.after", "Après · 8K")}
+              </span>
             </div>
           </div>
         </RevealBlock>

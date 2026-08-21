@@ -353,11 +353,16 @@ html {
    Padding de section 140-180 px ; aucun vide > 220 px entre deux
    contenus (les jonctions se comblent par une transition, jamais
    par du noir). Marges latérales clamp(24px, 5vw, 96px). */
+/* Asymétrique : l'air principal vit AVANT le folio de section, la
+   sortie est courte — la somme des deux côtés d'une jonction reste
+   ≤ 214 px (mesure protocole : jamais 220 px de vide). */
 .pv-section {
-  padding-block: clamp(140px, 11vw, 180px);
+  padding-top: clamp(120px, 9vw, 148px);
+  padding-bottom: clamp(56px, 4.5vw, 66px);
 }
 .pv-section--tight {
-  padding-block: clamp(96px, 8vw, 128px);
+  padding-top: clamp(104px, 8vw, 132px);
+  padding-bottom: clamp(48px, 4vw, 64px);
 }
 .pv-gutter {
   padding-left: clamp(24px, 5vw, 96px);
@@ -1117,6 +1122,8 @@ html {
   line-height: 1.02;
   letter-spacing: -0.02em;
   color: var(--text-2);
+  /* les lignes d'un titre se répartissent sans orphelin */
+  text-wrap: balance;
 }
 
 .pv-display-strong {
@@ -1127,9 +1134,11 @@ html {
 }
 
 /* Compat : les <b>/<strong> des titres existants prennent la voix
-   d'accent expanded. */
+   d'accent expanded. inline-block : le segment passe à la ligne
+   EN ENTIER — plus jamais de mot d'accent orphelin en fin de ligne. */
 .pv-display b,
 .pv-display strong {
+  display: inline-block;
   font-weight: 640;
   font-stretch: 122%;
   letter-spacing: -0.015em;
@@ -1185,6 +1194,28 @@ html {
 }
 .pv-row:hover {
   background-color: var(--surface-hover);
+}
+
+/* ══ Badge « À venir » — LE seul style de badge du site ═══════
+   Mono discret, un point argent, aucune pilule colorée. */
+.pv-soon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.pv-soon-badge::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--color-argent);
+  opacity: 0.85;
 }
 
 /* ══ Rangée de tags mono — REFONTE 50k ════════════════════════
@@ -1545,6 +1576,22 @@ select.pv-field {
 }
 .pv-marquee--reverse {
   animation-name: pv-marquee-reverse;
+}
+
+/* Marquee VERTICAL (registre des avis) — DEUX copies du contenu,
+   le cycle translate d'exactement une copie (−50 %). */
+@keyframes pv-marquee-v {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(0, -50%, 0); }
+}
+.pv-marquee-v {
+  display: flex;
+  flex-direction: column;
+  animation: pv-marquee-v var(--marquee-duration, 46s) linear infinite;
+  will-change: transform;
+}
+.pv-marquee-v:hover {
+  animation-play-state: paused;
 }
 
 /* ═══ Ouverture pré-hydratation (QA 20/08) ═══════════════════
@@ -2206,7 +2253,10 @@ html[data-prism-seen="1"] .pv-overture-core {
     transform: none;
   }
 }
+/* SANS fill (D02) : l'état de repos est PLEIN — si le navigateur
+   diffère l'animation (onglet en arrière-plan), la citation reste
+   visible au lieu de rester gelée à opacity 0. */
 .pv-quote-in {
-  animation: pv-quote-in 300ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: pv-quote-in 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 

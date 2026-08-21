@@ -38,7 +38,7 @@ type ProjectDetail = {
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
   draft: { label: "Brouillon", className: "text-steel border-[color:var(--hairline-strong)]" },
   ready: { label: "Prête", className: "text-[#6FBF9F] border-[rgba(111,191,159,0.40)]" },
-  exported: { label: "Exportée", className: "text-[color:var(--num-color)] border-[rgba(184,161,232,0.4)]" },
+  exported: { label: "Exportée", className: "text-[color:var(--num-color)] border-[rgba(185,167,218,0.4)]" },
 };
 
 function timeAgo(date: string) {
@@ -95,7 +95,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
               className="pointer-events-none absolute inset-0"
               style={{
                 background:
-                  "radial-gradient(50% 60% at 50% 45%, rgba(184,161,232,0.06), transparent 70%)",
+                  "radial-gradient(50% 60% at 50% 45%, rgba(185,167,218,0.06), transparent 70%)",
               }}
             />
             {project.logo_master?.url ? (
@@ -165,7 +165,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         <section className="nv-card relative mt-10 overflow-hidden">
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-20 right-10 h-56 w-[420px] rounded-full bg-[radial-gradient(closest-side,rgba(184,161,232,0.16),transparent_70%)]"
+            className="pointer-events-none absolute -top-20 right-10 h-56 w-[420px] rounded-full bg-[radial-gradient(closest-side,rgba(185,167,218,0.16),transparent_70%)]"
           />
           <div className="relative flex flex-col gap-6 p-8 sm:p-10 md:flex-row md:items-center md:justify-between">
             <div className="max-w-xl">
@@ -205,7 +205,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
           <div className="nv-card relative mt-12 overflow-hidden px-6 py-14 text-center">
             <div
               aria-hidden
-              className="pointer-events-none absolute left-1/2 top-0 h-32 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(184,161,232,0.12),transparent_70%)]"
+              className="pointer-events-none absolute left-1/2 top-0 h-32 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(185,167,218,0.12),transparent_70%)]"
             />
             <p className="text-lg font-semibold text-ink/85">Le logo est en place — à vous de jouer.</p>
             <p className="mt-3 font-mono text-xs tracking-[0.06em] text-mist">
@@ -237,7 +237,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                         className="group"
                       >
                         <div
-                          className="relative overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-abyss transition-colors duration-500 group-hover:border-[rgba(184,161,232,0.45)]"
+                          className="relative overflow-hidden rounded-xl border border-[color:var(--hairline)] bg-abyss transition-colors duration-500 group-hover:border-[rgba(185,167,218,0.45)]"
                           style={{ aspectRatio: `${asset.width} / ${asset.height}` }}
                         >
                           {asset.preview_url ? (

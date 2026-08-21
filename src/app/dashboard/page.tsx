@@ -225,7 +225,7 @@ export default async function DashboardPage() {
           <div className="nv-card relative overflow-hidden">
             <div
               aria-hidden
-              className="pointer-events-none absolute -top-24 left-1/3 h-64 w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(184,161,232,0.16),transparent_70%)]"
+              className="pointer-events-none absolute -top-24 left-1/3 h-64 w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(185,167,218,0.16),transparent_70%)]"
             />
             <div className="relative grid items-center gap-10 p-8 sm:p-12 lg:grid-cols-2">
               <div>
@@ -339,7 +339,7 @@ export default async function DashboardPage() {
                 href="/dashboard/projects/new"
                 className="nv-card nv-card--lift group flex min-h-[150px] flex-col items-center justify-center gap-3 text-mist hover:text-ink"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] transition-colors duration-200 group-hover:border-[rgba(184,161,232,0.5)]">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] transition-colors duration-200 group-hover:border-[rgba(185,167,218,0.5)]">
                   <Plus size={16} strokeWidth={1.5} />
                 </span>
                 <span className="text-[13px] font-medium">Nouveau projet</span>
@@ -359,7 +359,7 @@ export default async function DashboardPage() {
           <div className="nv-card relative overflow-hidden px-6 py-12 text-center">
             <div
               aria-hidden
-              className="pointer-events-none absolute left-1/2 top-0 h-32 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(184,161,232,0.12),transparent_70%)]"
+              className="pointer-events-none absolute left-1/2 top-0 h-32 w-64 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(185,167,218,0.12),transparent_70%)]"
             />
             <p className="text-lg font-semibold text-ink/85">Le registre est encore vierge.</p>
             <p className="mt-3 font-mono text-xs tracking-[0.06em] text-mist">

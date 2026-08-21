@@ -37,13 +37,14 @@ function Tile({
     <article
       title={soon ? "Disponible prochainement" : undefined}
       className={cn(
-        "pv-glass pv-glass--still group relative flex flex-col overflow-hidden !rounded-[16px]",
-        soon ? "cursor-default opacity-55" : "pv-ignite",
+        "pv-glass pv-glass--still group relative flex flex-col overflow-hidden !rounded-[10px]",
+        soon ? "cursor-default opacity-70" : "pv-ignite",
         className
       )}
     >
       {soon ? (
-        <span className="absolute right-3 top-3 z-10 rounded-full border border-[rgba(184,161,232,0.55)] bg-[rgba(184,161,232,0.14)] px-2.5 py-[3px] font-mono text-[9px] uppercase tracking-[0.12em] text-ink">
+        /* LE badge du site — mono discret, coin haut droit (§07) */
+        <span className="pv-soon-badge absolute right-4 top-3.5 z-10 rounded-[4px] bg-[rgba(6,6,6,0.55)] px-2 py-1">
           {comingSoonBadge}
         </span>
       ) : null}
@@ -105,7 +106,7 @@ function DesignStudioScene() {
 /* ── Tuile 2 : Brand — l'identité en construction ──────────────── */
 function BrandScene() {
   const { t } = useTranslations();
-  const palette = ["#B8A1E8", "#F0C5A8", "#F2EFE9", "#2E2E30", "#0B0B0B"];
+  const palette = ["#B9A7DA", "#E9C6A2", "#F2EFE9", "#2E2E30", "#0B0B0B"];
   return (
     <div className="flex h-full flex-col gap-4 p-6">
       {/* La planche logo posée sur la grille de construction */}
@@ -157,13 +158,13 @@ function EnhanceScene() {
           <Image src="/jetski.webp" alt="" fill sizes="(max-width: 1024px) 40vw, 16vw" className="object-cover" />
           <span
             aria-hidden
-            className="absolute left-[40%] top-[16%] z-[1] h-[42%] w-[26%] rounded-[10px] border border-[rgba(184,161,232,0.85)] shadow-[0_0_16px_rgba(184,161,232,0.45)]"
+            className="absolute left-[40%] top-[16%] z-[1] h-[42%] w-[26%] rounded-[10px] border border-[rgba(185,167,218,0.85)] shadow-[0_0_16px_rgba(185,167,218,0.45)]"
           />
           <figcaption className="absolute bottom-3 left-3 z-[1] font-mono text-[9px] uppercase tracking-[0.14em] text-white/75">
             {t("bento.enhance.source", "Source")}
           </figcaption>
         </figure>
-        <figure className="pv-media border-[rgba(184,161,232,0.35)]">
+        <figure className="pv-media border-[rgba(185,167,218,0.35)]">
           <Image
             src="/jetski.webp"
             alt=""
@@ -198,7 +199,7 @@ function DirectorScene() {
       <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-md border border-[rgba(255,255,255,0.10)] bg-white/[0.07] px-4 py-3 text-[12.5px] leading-[1.6] text-slate shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
         {t("bento.director.user", "Il me faut une identité pour mon serveur RP.")}
       </div>
-      <div className="mr-auto max-w-[94%] rounded-2xl rounded-bl-md border border-[rgba(184,161,232,0.3)] bg-[rgba(184,161,232,0.06)] px-4 py-3 text-[12.5px] leading-[1.6] text-slate">
+      <div className="mr-auto max-w-[94%] rounded-2xl rounded-bl-md border border-[rgba(185,167,218,0.3)] bg-[rgba(185,167,218,0.06)] px-4 py-3 text-[12.5px] leading-[1.6] text-slate">
         {t(
           "bento.director.answer",
           "Trois pistes, moodboards à l'appui. Je compose la première ?"
@@ -305,7 +306,7 @@ function AuditScene() {
         </figcaption>
       </figure>
       <p className="flex items-baseline gap-2 md:flex-col md:items-center md:gap-1 md:border-x md:border-[rgba(255,255,255,0.10)] md:px-10">
-        <span className="font-display text-[56px] font-light leading-none text-ink md:text-[64px]">
+        <span className="font-display text-[56px] font-[640] leading-none tracking-[-0.015em] text-ink [font-stretch:122%] tabular-nums md:text-[64px]">
           <CountUp value={84} />
         </span>
         <span className="font-mono text-[12px] text-mist">/100</span>
@@ -339,7 +340,7 @@ export default function GivreModules() {
     <section id="modules" className="pv-scene">
       <div aria-hidden className="pv-scene-bg pv-scene-bg--glacier" />
       <div aria-hidden className="pv-caustics" />
-      <div className="relative mx-auto pv-container px-5 py-20 sm:px-8 lg:py-24">
+      <div className="pv-section--tight relative mx-auto pv-container px-5 sm:px-8">
         {/* En-tête latéral droit — le miroir du hero : la pagination
             et le titre se rangent contre le filet droit du cadre */}
         <div className="flex flex-col items-end text-right">
@@ -348,13 +349,22 @@ export default function GivreModules() {
               <b>07</b>
               <span>/10</span>
             </div>
-            <p className="mt-6 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
+            <p className="pv-label mt-6">
               {t("bento.label", "Modules")}
             </p>
           </RevealBlock>
           <RevealMask className="mt-4">
-            <h2 className="max-w-[720px] font-display pv-t-mid font-light leading-[1.12] tracking-[-0.015em] text-slate">
-              {t("bento.title", "Six modules. Une seule direction artistique.")}
+            <h2 className="pv-display pv-t-mid max-w-[820px]">
+              {(() => {
+                const raw = t("bento.title", "Six modules. Une seule direction artistique.");
+                const cut = raw.indexOf(". ");
+                if (cut === -1) return raw;
+                return (
+                  <>
+                    {raw.slice(0, cut + 1)} <b>{raw.slice(cut + 2)}</b>
+                  </>
+                );
+              })()}
             </h2>
           </RevealMask>
           <RevealBlock delay={0.12}>
@@ -370,8 +380,10 @@ export default function GivreModules() {
         {/* Filet blanc — l'en-tête se détache de la grille */}
         <div aria-hidden className="mt-12 h-px w-full bg-[rgba(255,255,255,0.55)]" />
 
+        {/* Discipline refonte : DEUX tailles de cartes (8 / 4),
+            hauteurs alignées par rangée, bandeau audit en 12. */}
         <div className="mt-8 grid gap-4 lg:grid-cols-12">
-          <RevealBlock className="lg:col-span-7">
+          <RevealBlock className="lg:col-span-8">
             <Tile
               className="h-full"
               comingSoonBadge={t("comingSoon.badge", "À venir")}
@@ -384,7 +396,7 @@ export default function GivreModules() {
               <DesignStudioScene />
             </Tile>
           </RevealBlock>
-          <RevealBlock delay={0.08} className="lg:col-span-5">
+          <RevealBlock delay={0.08} className="lg:col-span-4">
             <Tile
               className="h-full"
               comingSoonBadge={t("comingSoon.badge", "À venir")}

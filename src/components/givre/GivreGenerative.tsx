@@ -172,7 +172,7 @@ function ModelPreview({ model }: { model: BannerModel }) {
         style={{
           aspectRatio: "680/240",
           background:
-            "linear-gradient(120deg, rgba(184,161,232,0.14), rgba(255,255,255,0.03) 55%, rgba(240,197,168,0.12))",
+            "linear-gradient(120deg, rgba(185,167,218,0.14), rgba(255,255,255,0.03) 55%, rgba(233,198,162,0.12))",
         }}
       >
         <span className="font-display text-[22px] font-medium tracking-[0.08em] text-ink">
@@ -213,35 +213,43 @@ function PriceCard({
   t: (key: string, fallback?: string) => string;
 }) {
   const pending = price === "—";
+  /* Refonte 50k — colonne tarifaire ÉDITORIALE : filet haut fort,
+     prix en display expanded (ou « Prix à l'ouverture » en mono),
+     UN badge accès anticipé, features en lignes à filets (jamais
+     de puces), CTA pleine largeur. Aucune carte de verre. */
   return (
-    <div className="pv-glass pv-glass--card flex h-full flex-col px-7 py-7">
-      <p className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">{title}</p>
-      <p className="mt-4 flex items-baseline gap-2">
-        <span className="font-display text-[34px] font-medium leading-none text-ink">
-          {price}
-        </span>
-        <span className="font-mono text-[11px] text-mist">
-          {t("generative.perMonth", "€ / mois")}
-        </span>
-      </p>
+    <div className="flex h-full flex-col border-t-2 border-[color:var(--color-ligne-2)] pt-6">
+      <p className="pv-label">{title}</p>
       {pending ? (
-        <p className="mt-3 inline-flex w-fit items-center gap-2 rounded-[10px] border border-[rgba(184,161,232,0.4)] bg-[rgba(184,161,232,0.08)] px-2.5 py-[4px] font-mono text-[9.5px] uppercase tracking-[0.12em] text-ink">
-          <span aria-hidden className="h-1 w-1 rounded-full bg-[#B8A1E8]" />
-          {t("generative.earlyAccess", "Accès anticipé — prix bientôt")}
+        <>
+          <p className="mt-5 font-mono text-[13px] uppercase tracking-[0.14em] text-ink">
+            {t("generative.priceSoon", "Prix à l'ouverture")}
+          </p>
+          <p className="pv-soon-badge mt-3">
+            {t("generative.earlyAccess", "Accès anticipé")}
+          </p>
+        </>
+      ) : (
+        <p className="mt-4 flex items-baseline gap-2.5">
+          <span className="font-display text-[clamp(40px,3.4vw,56px)] font-[640] leading-none tracking-[-0.015em] text-ink [font-stretch:122%] tabular-nums">
+            {price}
+          </span>
+          <span className="font-mono text-[11px] text-mist">
+            {t("generative.perMonth", "€ / mois")}
+          </span>
         </p>
-      ) : null}
-      <ul className="mt-5 flex flex-1 flex-col gap-2.5">
+      )}
+      <ul className="mt-7 flex flex-1 flex-col">
         {features.map((f) => (
-          <li key={f} className="flex items-start gap-2.5 text-[13.5px] leading-[1.55] text-slate">
-            <span
-              aria-hidden
-              className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-[color:var(--color-violet)]"
-            />
+          <li
+            key={f}
+            className="border-t border-[color:var(--color-ligne)] py-3 text-[13.5px] leading-[1.55] text-slate last:border-b"
+          >
             {f}
           </li>
         ))}
       </ul>
-      <Link href="/signup" className="pv-btn mt-6 w-full">
+      <Link href="/signup" className="pv-btn mt-7 w-full">
         {t("generative.subscribe", "S'abonner")}
       </Link>
     </div>
@@ -259,7 +267,7 @@ export default function GivreGenerative() {
   const list = models as BannerModel[];
 
   return (
-    <section id="generative" className="pv-scene pb-24 pt-16 sm:pb-32 sm:pt-20">
+    <section id="generative" className="pv-scene pv-section--tight">
       <div aria-hidden className="pv-scene-bg--dawn absolute inset-0" />
       <div aria-hidden className="pv-windowlight" />
       {/* Glows aurore derrière les cartes tarifaires */}
@@ -395,15 +403,10 @@ export default function GivreGenerative() {
 
               {BANNIERES_IA_SOON ? (
                 <RevealBlock delay={0.08}>
-                  <div className="mt-8 flex w-fit items-center gap-3 rounded-[14px] border border-[color:var(--hairline)] bg-white/[0.03] px-5 py-4">
-                    <span
-                      aria-hidden
-                      className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#F0C5A8]"
-                    />
-                    <p className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-ink">
+                  <div className="mt-8 flex w-fit items-baseline gap-4 border-t border-[color:var(--color-ligne)] pt-4">
+                    <p className="pv-soon-badge !text-[color:var(--color-ink)]">
                       {t("generative.banner.soon.badge", "Très prochainement")}
                     </p>
-                    <span aria-hidden className="h-4 w-px bg-[color:var(--hairline)]" />
                     <p className="text-[13px] leading-[1.5] text-slate">
                       {t(
                         "generative.banner.soon.text",

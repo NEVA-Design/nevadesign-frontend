@@ -80,47 +80,16 @@ export default function GivreFooter() {
         <div aria-hidden className="pv-windowlight" />
         <div aria-hidden className="pv-caustics" />
 
-        {/* Le halo aurore de la finale — les deux lobes du hero,
-            revenus au calme derrière le titre (D07) */}
+        {/* Refonte 50k — l'APOTHÉOSE AURORE : la sphère décorative
+            est morte (liste noire №9). La finale est le moment de
+            lumière le plus intense de la page — les deux lobes du
+            hero convergent derrière l'appel, en respiration lente. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0"
+          className="pv-breathe pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(34% 42% at 38% 30%, rgba(184,161,232,0.16) 0%, rgba(184,161,232,0) 70%), radial-gradient(30% 38% at 64% 62%, rgba(240,197,168,0.14) 0%, rgba(240,197,168,0) 72%)",
-          }}
-        />
-
-        {/* La sphère satinée — en périphérie de l'appel, elle
-            attrape les deux lobes ; ombre de contact dessous.
-            CSS pur : la matière du hero, au poids d'un gradient. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute hidden lg:block"
-          style={{
-            right: "7%",
-            top: "11%",
-            width: 168,
-            height: 168,
-            borderRadius: "999px",
-            background:
-              "radial-gradient(58% 52% at 33% 26%, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0) 62%), radial-gradient(70% 66% at 68% 74%, rgba(240,197,168,0.28) 0%, rgba(240,197,168,0) 74%), radial-gradient(80% 76% at 26% 62%, rgba(184,161,232,0.24) 0%, rgba(184,161,232,0) 76%), radial-gradient(120% 120% at 50% 40%, #1E1E1E 0%, #121212 78%, #0C0C0C 100%)",
-            boxShadow:
-              "inset 0 1px 1px rgba(255,255,255,0.22), inset 0 -14px 26px rgba(0,0,0,0.45), 0 26px 40px -18px rgba(0,0,0,0.60)",
-          }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute hidden lg:block"
-          style={{
-            right: "6.4%",
-            top: "calc(11% + 160px)",
-            width: 186,
-            height: 40,
-            borderRadius: "50%",
-            background:
-              "radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 70%)",
-            filter: "blur(10px)",
+              "radial-gradient(44% 52% at 44% 34%, rgba(185,167,218,0.22) 0%, rgba(185,167,218,0) 70%), radial-gradient(40% 46% at 60% 58%, rgba(233,198,162,0.19) 0%, rgba(233,198,162,0) 72%)",
           }}
         />
 
@@ -146,11 +115,9 @@ export default function GivreFooter() {
           </RevealBlock>
 
           <RevealMask className="mt-7">
-            <h2 className="mx-auto max-w-[900px] font-display pv-t-colophon font-light leading-[1.08] tracking-[-0.015em] text-slate">
+            <h2 className="pv-display pv-t-colophon mx-auto max-w-[1080px]">
               {t("footer.cta.title.a", "Publiez quelque chose dont votre communauté")}{" "}
-              <span className="font-medium text-ink">
-                {t("footer.cta.title.beam", "sera fière.")}
-              </span>
+              <b>{t("footer.cta.title.beam", "sera fière.")}</b>
             </h2>
           </RevealMask>
 
@@ -187,14 +154,14 @@ export default function GivreFooter() {
 
       {/* ── Le registre — marque et colonnes, voile sur le satin ── */}
       <div className="relative overflow-hidden border-t border-[rgba(255,255,255,0.07)] bg-[rgba(8,8,8,0.45)]">
-        {/* Filigrane ΛV géant en ligne de base (D08) — le gaufrage
-            de la maison, coupé par le bord bas comme une marque à
-            chaud. Ink 0,04 : présence, jamais salissure. */}
+        {/* Filigrane ΛV — refonte 50k : le gaufrage passe AU TRAIT
+            (contour subtil, jamais de gris moyen en masse) — la
+            marque gravée, coupée par le bord bas. */}
         <svg
           aria-hidden
           viewBox="0 0 1441 1000"
-          className="pointer-events-none absolute left-1/2 w-[min(860px,86vw)] -translate-x-1/2 fill-[rgba(255,255,255,0.04)]"
-          style={{ bottom: "-34%" }}
+          className="pointer-events-none absolute left-1/2 w-[min(860px,86vw)] -translate-x-1/2 fill-none stroke-[rgba(255,255,255,0.07)]"
+          style={{ bottom: "-34%", strokeWidth: 1.5 }}
         >
           <path d="M440.2 0 L864.6 1000 L694.6 1000 L441 379 L180.1 1000 L0 1000 Z" />
           <path d="M439.5 710 L559.2 1000 L320 1000 Z" />

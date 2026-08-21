@@ -28,7 +28,7 @@ export function Switch({
       className={cn(
         "relative h-6 w-11 shrink-0 cursor-pointer rounded-full border transition-colors duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--focus-ring)] disabled:cursor-not-allowed disabled:opacity-40",
         checked
-          ? "border-transparent bg-[linear-gradient(115deg,rgba(184,161,232,0.8),rgba(240,197,168,0.8))]"
+          ? "border-transparent bg-[linear-gradient(115deg,rgba(185,167,218,0.8),rgba(233,198,162,0.8))]"
           : "border-[color:var(--hairline-strong)] bg-ink/8",
         className
       )}

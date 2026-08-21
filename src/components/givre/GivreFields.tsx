@@ -14,7 +14,10 @@ import { RevealBlock, RevealMask, RevealMedia } from "@/components/prisme/Motion
  * carte blanche opaque : les œuvres restent la couleur de la page.
  */
 
+/* Refonte 50k : ( 01 ) s'affirme en display, un FILET VERTICAL
+   sépare texte et média, la légende mono vit SOUS le visuel. */
 function FieldRow({
+  num,
   kicker,
   title,
   desc,
@@ -22,6 +25,7 @@ function FieldRow({
   reversed = false,
   children,
 }: {
+  num: string;
   kicker: string;
   title: string;
   desc: string;
@@ -30,25 +34,35 @@ function FieldRow({
   children: React.ReactNode;
 }) {
   return (
-    <article className="pv-row group grid items-center gap-x-12 gap-y-8 py-10 sm:py-12 lg:grid-cols-12">
-      <div className={`lg:col-span-5 ${reversed ? "lg:order-2 lg:pl-2" : "lg:pr-2"}`}>
+    <article className="pv-row group grid items-center gap-x-0 gap-y-8 py-10 sm:py-12 lg:grid-cols-12">
+      <div
+        className={`lg:col-span-5 ${
+          reversed
+            ? "lg:order-2 lg:border-l lg:border-[color:var(--color-ligne)] lg:pl-12"
+            : "lg:border-r lg:border-[color:var(--color-ligne)] lg:pr-12"
+        }`}
+      >
         <RevealBlock>
-          <p className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
-            {kicker}
+          <p className="flex items-baseline gap-3">
+            <span className="pv-display text-[clamp(28px,2.6vw,40px)] !leading-none !text-[color:var(--ink-28)]">
+              ( {num} )
+            </span>
+            <span className="pv-label !text-[color:var(--color-mist)]">{kicker}</span>
           </p>
-          <h3 className="mt-4 font-display pv-t-field-card font-normal leading-[1.15] tracking-[-0.012em] text-ink">
+          <h3 className="mt-5 pv-display pv-t-field-card !text-[color:var(--color-ink)]">
             {title}
           </h3>
-          <p className="mt-3 max-w-[420px] text-[14.5px] leading-[1.7] text-slate">
+          <p className="mt-3 max-w-[46ch] text-[14.5px] leading-[1.7] text-slate">
             {desc}
-          </p>
-          <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-mist">
-            {meta}
           </p>
         </RevealBlock>
       </div>
-      <div className={`lg:col-span-7 ${reversed ? "lg:order-1" : ""}`}>
+      <div className={`lg:col-span-7 ${reversed ? "lg:order-1 lg:pr-12" : "lg:pl-12"}`}>
         {children}
+        {/* légende mono — sous le visuel, alignée au cadre */}
+        <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-mist">
+          {meta}
+        </p>
       </div>
     </article>
   );
@@ -72,7 +86,7 @@ export default function GivreFields() {
       <div aria-hidden className="pv-scene-bg pv-scene-bg--dawn-calm" />
       <div aria-hidden className="pv-caustics" />
 
-      <div className="relative mx-auto pv-container px-5 pb-24 pt-24 sm:px-8 sm:pb-32 sm:pt-28">
+      <div className="pv-section--tight relative mx-auto pv-container px-5 sm:px-8">
         {/* En-tête paginé — tout à gauche, l'UI chuchote */}
         <header className="max-w-[760px]">
           <RevealBlock>
@@ -87,11 +101,9 @@ export default function GivreFields() {
             </p>
           </RevealBlock>
           <RevealMask delay={0.12} className="mt-4">
-            <h2 className="font-display pv-t-fields font-light leading-[1.08] tracking-[-0.015em] text-slate">
+            <h2 className="pv-display pv-t-fields">
               {titleHead}
-              {titleTail ? (
-                <span className="font-medium text-ink">{titleTail}</span>
-              ) : null}
+              {titleTail ? <b>{titleTail}</b> : null}
             </h2>
           </RevealMask>
           <RevealBlock delay={0.2}>
@@ -110,7 +122,8 @@ export default function GivreFields() {
         <div className="mt-14 sm:mt-16">
           {/* ── 01 · Packs FiveM — le pack complet + deux tuiles ── */}
           <FieldRow
-            kicker={t("fields.packs.kicker", "( 01 ) Packs FiveM")}
+            num="01"
+            kicker={t("fields.packs.kicker", "( 01 ) Packs FiveM").replace(/^\(\s*\d+\s*\)\s*/, "")}
             title={t("fields.packs.title", "L'identité complète du serveur.")}
             desc={t(
               "fields.packs.desc",
@@ -158,7 +171,8 @@ export default function GivreFields() {
           {/* ── 02 · Bannières — le kit Discord, média à gauche ── */}
           <FieldRow
             reversed
-            kicker={t("fields.banners.kicker", "( 02 ) Bannières Discord & réseaux")}
+            num="02"
+            kicker={t("fields.banners.kicker", "( 02 ) Bannières Discord & réseaux").replace(/^\(\s*\d+\s*\)\s*/, "")}
             title={t("fields.banners.title", "La première image de votre serveur.")}
             desc={t(
               "fields.banners.desc",
@@ -181,7 +195,8 @@ export default function GivreFields() {
 
           {/* ── 03 · Affiches & loading screens ── */}
           <FieldRow
-            kicker={t("fields.posters.kicker", "( 03 ) Affiches & loading screens")}
+            num="03"
+            kicker={t("fields.posters.kicker", "( 03 ) Affiches & loading screens").replace(/^\(\s*\d+\s*\)\s*/, "")}
             title={t("fields.posters.title", "L'événement, en grand format.")}
             desc={t(
               "fields.posters.desc",
@@ -229,7 +244,8 @@ export default function GivreFields() {
           {/* ── 04 · IA générative — la scène GTA, média à gauche ── */}
           <FieldRow
             reversed
-            kicker={t("fields.ia.kicker", "( 04 ) IA générative")}
+            num="04"
+            kicker={t("fields.ia.kicker", "( 04 ) IA générative").replace(/^\(\s*\d+\s*\)\s*/, "")}
             title={t("fields.ia.title", "Des scènes GTA photoréalistes.")}
             desc={t(
               "fields.ia.desc",

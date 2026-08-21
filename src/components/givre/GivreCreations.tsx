@@ -19,7 +19,7 @@ export default function GivreCreations() {
   const { t } = useTranslations();
 
   return (
-    <section id="creations" className="pv-scene pb-20 pt-20 sm:pb-24 sm:pt-24">
+    <section id="creations" className="pv-scene pv-section--tight">
       <div aria-hidden className="pv-scene-bg--dawn-calm absolute inset-0" />
       <div aria-hidden className="pv-caustics" />
       {/* La seule des trois sections à recevoir les rais — discrets,
@@ -77,10 +77,12 @@ export default function GivreCreations() {
         </div>
       </RevealBlock>
 
-      {/* Pagination à droite — miroir du hero qui la porte à gauche */}
+      {/* Pagination à droite — miroir du hero qui la porte à gauche.
+          Refonte 50k : resserrée (le trou noir au-dessus du bandeau
+          est comblé). */}
       <RevealBlock delay={0.06}>
         <div
-          className="relative z-10 mt-12 flex justify-end sm:mt-14"
+          className="relative z-10 mt-8 flex justify-end"
           style={{ paddingRight: "calc(var(--frame-inset) + 24px)" }}
         >
           <div className="pv-page-num [&>b]:text-[44px]">
@@ -92,7 +94,7 @@ export default function GivreCreations() {
 
       {/* Le bandeau — pleine largeur, serti de deux filets blancs */}
       <RevealBlock delay={0.12}>
-        <div className="relative z-10 mt-6">
+        <div className="relative z-10 mt-5">
           <div aria-hidden className="h-px w-full bg-[rgba(255,255,255,0.14)]" />
           <div className="py-4">
             <CreationsMarquee />

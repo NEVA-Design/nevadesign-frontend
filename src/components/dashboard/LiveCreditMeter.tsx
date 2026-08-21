@@ -70,8 +70,8 @@ export default function LiveCreditMeter({
       >
         <defs>
           <linearGradient id="nv-ring-aurore" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#B8A1E8" />
-            <stop offset="100%" stopColor="#F0C5A8" />
+            <stop offset="0%" stopColor="#B9A7DA" />
+            <stop offset="100%" stopColor="#E9C6A2" />
           </linearGradient>
         </defs>
         <circle

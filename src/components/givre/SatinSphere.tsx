@@ -24,7 +24,7 @@ export default function SatinSphere({
           height: size,
           borderRadius: "999px",
           background:
-            "radial-gradient(46% 38% at 33% 24%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 58%), radial-gradient(48% 42% at 67% 77%, rgba(240,197,168,0.55) 0%, rgba(240,197,168,0) 72%), radial-gradient(54% 50% at 27% 63%, rgba(184,161,232,0.5) 0%, rgba(184,161,232,0) 74%), radial-gradient(closest-side at 50% 50%, rgba(255,255,255,0) 72%, rgba(255,255,255,0.10) 87%, rgba(255,255,255,0.26) 96%, rgba(255,255,255,0.08) 100%), radial-gradient(120% 120% at 50% 40%, #221F2B 0%, #121016 76%, #0B0A0E 100%)",
+            "radial-gradient(46% 38% at 33% 24%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 58%), radial-gradient(48% 42% at 67% 77%, rgba(233,198,162,0.55) 0%, rgba(233,198,162,0) 72%), radial-gradient(54% 50% at 27% 63%, rgba(185,167,218,0.5) 0%, rgba(185,167,218,0) 74%), radial-gradient(closest-side at 50% 50%, rgba(255,255,255,0) 72%, rgba(255,255,255,0.10) 87%, rgba(255,255,255,0.26) 96%, rgba(255,255,255,0.08) 100%), radial-gradient(120% 120% at 50% 40%, #221F2B 0%, #121016 76%, #0B0A0E 100%)",
           boxShadow:
             "inset 0 1px 1px rgba(255,255,255,0.14), inset 0 -16px 28px rgba(0,0,0,0.4), 0 26px 40px -18px rgba(0,0,0,0.6)",
         }}

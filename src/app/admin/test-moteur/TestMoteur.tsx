@@ -408,7 +408,7 @@ export default function TestMoteur() {
                               key={d.label}
                               href={d.url}
                               download={d.file}
-                              className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--hairline-strong)] px-3 py-1 text-[11px] text-ink transition-colors hover:border-[rgba(184,161,232,0.5)]"
+                              className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--hairline-strong)] px-3 py-1 text-[11px] text-ink transition-colors hover:border-[rgba(185,167,218,0.5)]"
                             >
                               <Download size={11} />
                               {d.label}

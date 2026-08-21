@@ -134,7 +134,7 @@ export function SecurityAlertsClient({ initialAlerts }: { initialAlerts: SignupS
             onClick={() => setFilter(status)}
             className={`h-10 rounded-full border px-4 font-mono text-[10px] font-medium uppercase tracking-[0.12em] transition-colors duration-300 ${
               filter === status
-                ? "border-[rgba(184,161,232,0.35)] bg-[rgba(184,161,232,0.08)] text-[color:var(--num-color)]"
+                ? "border-[rgba(185,167,218,0.35)] bg-[rgba(185,167,218,0.08)] text-[color:var(--num-color)]"
                 : "border-[color:var(--hairline)] text-steel hover:text-ink"
             }`}
           >

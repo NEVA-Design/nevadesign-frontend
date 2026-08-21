@@ -19,11 +19,11 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
         {
           "border border-[color:var(--hairline)] bg-linen text-slate":
             variant === "default",
-          "border border-[rgba(184,161,232,0.45)] bg-[rgba(184,161,232,0.1)] text-[color:var(--surface-text)]":
+          "border border-[rgba(185,167,218,0.45)] bg-[rgba(185,167,218,0.1)] text-[color:var(--surface-text)]":
             variant === "neva",
           "border border-[color:var(--hairline)] bg-[rgba(255,255,255,0.05)] text-mist": variant === "subtle",
           /* plus d'aplat aurore sur le noir : fond lilas 14 % + liseré */
-          "border border-[rgba(184,161,232,0.55)] bg-[rgba(184,161,232,0.14)] font-semibold text-[color:var(--surface-text)]":
+          "border border-[rgba(185,167,218,0.55)] bg-[rgba(185,167,218,0.14)] font-semibold text-[color:var(--surface-text)]":
             variant === "popular",
         },
         className

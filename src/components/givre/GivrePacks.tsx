@@ -140,7 +140,7 @@ export default function GivrePacks() {
                       </h3>
                     </div>
                     {pack.badge ? (
-                      <span className="rounded-full bg-[linear-gradient(100deg,#B8A1E8,#F0C5A8)] px-3 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[color:var(--surface-text)]">
+                      <span className="rounded-full bg-[linear-gradient(100deg,#B9A7DA,#E9C6A2)] px-3 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[color:var(--surface-text)]">
                         {t("resources.badge.complete", "Le plus complet")}
                       </span>
                     ) : null}

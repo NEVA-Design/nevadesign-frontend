@@ -300,7 +300,7 @@ export default function AppMockup({ className }: { className?: string }) {
                   {label}
                   <span
                     data-demo-dot
-                    className="ml-auto h-1.5 w-1.5 rounded-full bg-[linear-gradient(100deg,#B8A1E8,#F0C5A8)] transition-opacity duration-500"
+                    className="ml-auto h-1.5 w-1.5 rounded-full bg-[linear-gradient(100deg,#B9A7DA,#E9C6A2)] transition-opacity duration-500"
                     style={{ opacity: i === 0 ? 1 : 0 }}
                   />
                 </span>
