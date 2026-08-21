@@ -1838,46 +1838,75 @@ function patchGlassShader(
 const glassCacheKey = () => "dawn-glass-18-lumen";
 
 /* ── Matière de la sculpture (21/08) ───────────────────────────
-   Retour opérateur : « enlève l'effet glass » puis « mets-les en
-   blanc, DA un peu mate, pro ». La sculpture passe du cristal
-   transmissif à la PORCELAINE IVOIRE MATE : blanc cassé du site,
-   fini satiné à peine lustré — les softbox modèlent les volumes en
-   dégradés doux, la silhouette claire se détache du drapé noir
-   comme une pièce de galerie. Repasser à "verre" pour rouvrir
-   l'ancienne matière (Glass + patch de shader conservés). */
-const SCULPT_MATTER: "porcelaine" | "verre" = "porcelaine";
+   Retours opérateur en cascade : « enlève l'effet glass » →
+   « mets-les en blanc, mate, pro » → « mets de la texture, thème
+   carbone ou tissu ». Verdict : le TISSU IVOIRE — l'armure
+   taffetas générée en code (public/textures/tissage-normal.png,
+   outillage/gen-tissage.mjs : 8 fils par tuile + fibres) posée en
+   normal map, et le SHEEN velours qui allume les bords rasants.
+   L'objet tissé répond au drapé de satin du fond. Les UV de
+   l'extrude = coords de forme → pas de fil = 1/(8·repeat) unité
+   monde (~0,04 : calibre commun à toutes les pièces). Repasser à
+   "verre" pour rouvrir l'ancienne matière (Glass conservé). */
+const SCULPT_MATTER: "tissu" | "verre" = "tissu";
 
-type PorcelaineProps = {
+type TissuProps = {
   color?: string;
   roughness?: number;
   envMapIntensity?: number;
-  clearcoat?: number;
-  clearcoatRoughness?: number;
+  repeat?: [number, number];
+  normalScale?: number;
 };
 
-function Porcelaine({
+function TissuIvoire({
   color = "#E9E6DF",
-  roughness = 0.5,
+  roughness = 0.58,
   envMapIntensity = 1.15,
-  /* un vernis LÉGER et diffus : le « un peu mat » — la surface a
-     un lustre de biscuit émaillé, jamais un miroir */
-  clearcoat = 0.28,
-  clearcoatRoughness = 0.32,
-}: PorcelaineProps) {
-  const material = useMemo(
-    () =>
-      new THREE.MeshPhysicalMaterial({
-        color,
-        metalness: 0,
-        roughness,
-        clearcoat,
-        clearcoatRoughness,
-        envMapIntensity,
-        specularIntensity: 0.9,
-      }),
-    [color, roughness, clearcoat, clearcoatRoughness, envMapIntensity]
+  repeat = [3.2, 3.2],
+  normalScale = 0.8,
+}: TissuProps) {
+  const material = useMemo(() => {
+    /* chaque matériau charge SES textures (le PNG sort du cache
+       navigateur) : un clone d'une texture pas encore chargée ne
+       recevrait jamais son image */
+    const loader = new THREE.TextureLoader();
+    const setup = (t: THREE.Texture) => {
+      t.wrapS = THREE.RepeatWrapping;
+      t.wrapT = THREE.RepeatWrapping;
+      t.repeat.set(repeat[0], repeat[1]);
+      t.anisotropy = 8;
+      return t;
+    };
+    const n = setup(loader.load("/textures/tissage-normal.png"));
+    /* l'albédo garde la trame lisible en lumière FRONTALE (la
+       normal map seule s'éteint face caméra) */
+    const a = setup(loader.load("/textures/tissage-albedo.png"));
+    a.colorSpace = THREE.SRGBColorSpace;
+    return new THREE.MeshPhysicalMaterial({
+      color,
+      map: a,
+      metalness: 0,
+      roughness,
+      normalMap: n,
+      normalScale: new THREE.Vector2(normalScale, normalScale),
+      /* le velours : l'éclat doux des fibres en lumière rasante —
+         c'est lui qui rend le tissu VIVANT sur la nuit */
+      sheen: 0.6,
+      sheenRoughness: 0.42,
+      sheenColor: new THREE.Color("#fffdf6"),
+      envMapIntensity,
+      specularIntensity: 0.85,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [color, roughness, envMapIntensity, repeat[0], repeat[1], normalScale]);
+  useEffect(
+    () => () => {
+      material.normalMap?.dispose();
+      material.map?.dispose();
+      material.dispose();
+    },
+    [material]
   );
-  useEffect(() => () => material.dispose(), [material]);
   return <primitive object={material} attach="material" />;
 }
 
@@ -2112,10 +2141,10 @@ function Monogram({ mid }: { mid: boolean }) {
           clearcoatRoughness={0.05}
         />
       ) : (
-        /* le monogramme : la pièce maîtresse — un cran moins mate
-           que les satellites, chaque facette du chanfrein tient
-           son propre niveau d'ivoire */
-        <Porcelaine roughness={0.46} envMapIntensity={1.25} />
+        /* le monogramme : la pièce maîtresse — trame à ~0,05 unité
+           (repeat 2,6 sur des UV en coords de forme), relief
+           appuyé : la texture doit se LIRE, pas se deviner */
+        <TissuIvoire roughness={0.55} envMapIntensity={1.25} repeat={[2.6, 2.6]} normalScale={1.15} />
       )}
     </mesh>
   );
@@ -2205,7 +2234,8 @@ function Sculpture({ mid }: { mid: boolean }) {
             bend={0.5}
           />
         ) : (
-          <Porcelaine roughness={0.52} />
+          /* tore : UV 0-1 sur 2,64 / 1,16 unités de circonférence */
+          <TissuIvoire roughness={0.6} repeat={[8, 4]} normalScale={0.7} />
         )}
       </mesh>
 
@@ -2226,8 +2256,8 @@ function Sculpture({ mid }: { mid: boolean }) {
             bend={0.5}
           />
         ) : (
-          /* la sphère : l'émail le plus lustré de la scène */
-          <Porcelaine roughness={0.38} clearcoat={0.4} clearcoatRoughness={0.25} />
+          /* la sphère : une pelote au fil un peu plus serré */
+          <TissuIvoire roughness={0.52} repeat={[8, 4]} normalScale={0.7} />
         )}
       </mesh>
 
@@ -2243,7 +2273,7 @@ function Sculpture({ mid }: { mid: boolean }) {
             bend={0.45}
           />
         ) : (
-          <Porcelaine roughness={0.4} />
+          <TissuIvoire roughness={0.52} repeat={[3, 1.5]} normalScale={0.6} />
         )}
       </mesh>
     </group>

@@ -185,7 +185,7 @@ export default function LoginPage() {
             />
             <figcaption>
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink">
-                Monogramme AV — porcelaine &amp; satin
+                Monogramme AV — tissé ivoire &amp; satin
               </span>
               <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-mist">
                 La scène du studio
