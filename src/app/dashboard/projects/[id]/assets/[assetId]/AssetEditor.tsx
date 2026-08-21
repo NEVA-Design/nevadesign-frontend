@@ -684,7 +684,7 @@ export default function AssetEditor({ project, initialAsset }: { project: Projec
                 if (!eraserOn) setSelectedId(id);
               }}
               onPointerDownLayer={(e, layer) => beginGesture(e, layer, "move")}
-              className="rounded-xl border border-[color:var(--hairline)] shadow-[0_24px_64px_rgba(0,0,0,0.55)]"
+              className="nv-corner-marks rounded-[10px] border border-[color:var(--hairline)] shadow-[0_24px_64px_rgba(0,0,0,0.55)]"
             >
               {/* Canvas vide : le damier alpha annonce la transparence
                   — une table lumineuse, pas un rectangle mort */}

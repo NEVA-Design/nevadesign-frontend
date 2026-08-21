@@ -10,14 +10,8 @@ import { cn } from "@/lib/utils";
 
 const Label = React.forwardRef<HTMLLabelElement, React.LabelHTMLAttributes<HTMLLabelElement>>(
   ({ className, ...props }, ref) => (
-    <label
-      ref={ref}
-      className={cn(
-        "mb-2 block font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-[color:var(--text-2)]",
-        className
-      )}
-      {...props}
-    />
+    /* refonte 50k : LA voix label du site (mono 11, tracking .14) */
+    <label ref={ref} className={cn("pv-field-label", className)} {...props} />
   )
 );
 Label.displayName = "Label";

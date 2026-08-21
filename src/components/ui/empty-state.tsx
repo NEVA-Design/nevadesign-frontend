@@ -1,5 +1,4 @@
 import * as React from "react";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 /*
@@ -30,14 +29,21 @@ export function EmptyState({
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-0 h-40 w-72 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(185,167,218,0.10),transparent_70%)]"
       />
-      <Image
-        src="/brand/logo-blanc.png"
-        alt=""
+      {/* refonte 50k : l'illustration FILAIRE ΛV — le trait de la
+          maison, jamais un aplat */}
+      <svg
+        viewBox="0 0 1441 1000"
         aria-hidden
-        width={46}
-        height={32}
-        className="relative mb-5 opacity-20"
-      />
+        className="relative mb-5 h-8 w-auto"
+        fill="none"
+        stroke="rgba(244,242,238,0.28)"
+        strokeWidth="22"
+      >
+        <path d="M440.2 0 L864.6 1000 L694.6 1000 L441 379 L180.1 1000 L0 1000 Z" />
+        <path d="M439.5 710 L559.2 1000 L320 1000 Z" />
+        <path d="M575 0 L755.1 0 L1013 618 L1266.6 0 L1438.1 0 L1015.2 990 Z" />
+        <path d="M893.4 0 L1134.1 0 L1013.7 292 Z" />
+      </svg>
       <p className="relative max-w-sm text-lg font-semibold tracking-[-0.01em] text-ink/90">{title}</p>
       {hint ? (
         <p className="relative mt-3 max-w-xs font-mono text-xs leading-relaxed tracking-[0.04em] text-mist">

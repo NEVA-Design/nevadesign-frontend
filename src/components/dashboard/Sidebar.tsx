@@ -234,10 +234,11 @@ export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?
         ))}
       </nav>
 
-      {/* Utilisateur */}
+      {/* Utilisateur — refonte 50k : plus d'avatar-lettres (liste
+          noire №1) — le monogramme filaire signe le compte. */}
       <div className="border-t border-[rgba(255,255,255,0.06)] p-3">
-        <div className="flex items-center gap-3 rounded-[20px] border border-[color:var(--hairline-glass)] bg-white/5 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_8px_20px_rgba(0,0,0,0.40)]">
-          <div className="h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-ink">
+        <div className="flex items-center gap-3 rounded-[12px] border border-[color:var(--hairline-glass)] bg-white/5 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_8px_20px_rgba(0,0,0,0.40)]">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[8px] bg-[color:var(--color-noir-2)]">
             {user.avatarUrl ? (
               <Image
                 src={user.avatarUrl}
@@ -247,9 +248,10 @@ export default function Sidebar({ user, onClose }: { user: UserProfile; onClose?
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center font-mono text-[11px] font-semibold text-[#060606]">
-                {user.initials}
-              </div>
+              <svg viewBox="0 0 1441 1000" className="h-4 w-auto" fill="none" stroke="rgba(244,242,238,0.6)" strokeWidth="40" aria-hidden>
+                <path d="M440.2 0 L864.6 1000 L694.6 1000 L441 379 L180.1 1000 L0 1000 Z" />
+                <path d="M575 0 L755.1 0 L1013 618 L1266.6 0 L1438.1 0 L1015.2 990 Z" />
+              </svg>
             )}
           </div>
           <div className="min-w-0 flex-1">

@@ -1434,6 +1434,16 @@ html {
 select.pv-field {
   appearance: none;
 }
+/* autofill : Chrome peint un fond bleu système — on le recouvre
+   (box-shadow inset opaque) et on garde le texte ivoire */
+.pv-field:-webkit-autofill,
+.pv-field:-webkit-autofill:hover,
+.pv-field:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-ink);
+  -webkit-box-shadow: 0 0 0 1000px #101012 inset;
+  transition: background-color 9999s ease-out 0s;
+  caret-color: var(--color-ink);
+}
 
 /* Label mono au-dessus du champ */
 .pv-field-label {

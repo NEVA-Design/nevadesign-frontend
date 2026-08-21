@@ -280,7 +280,7 @@ export default async function DashboardPage() {
                 className="nv-card nv-card--lift group flex flex-col p-5"
               >
                 <div className="flex items-center gap-4">
-                  <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-[12px] bg-white/[0.04] p-[10px]">
+                  <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-white/[0.04] p-[10px]">
                     {project.logo_master?.url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -288,10 +288,30 @@ export default async function DashboardPage() {
                         alt=""
                         className="h-full w-full object-contain"
                       />
+                    ) : project.palette.length > 0 ? (
+                      /* refonte 50k : fallback = MOTIF de la palette
+                         du projet (bandes diagonales) — jamais
+                         d'initiales (liste noire №1) */
+                      <span
+                        aria-hidden
+                        className="absolute inset-0"
+                        style={{
+                          background: `linear-gradient(135deg, ${project.palette
+                            .slice(0, 4)
+                            .map(
+                              (c, i, arr) =>
+                                `${c} ${(i / arr.length) * 100}%, ${c} ${((i + 1) / arr.length) * 100}%`
+                            )
+                            .join(", ")})`,
+                          opacity: 0.85,
+                        }}
+                      />
                     ) : (
-                      <span className="pv-display text-lg text-ink">
-                        {project.name.slice(0, 2).toUpperCase()}
-                      </span>
+                      /* sans palette : le monogramme filaire ΛV */
+                      <svg viewBox="0 0 1441 1000" className="h-6 w-auto" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="34" aria-hidden>
+                        <path d="M440.2 0 L864.6 1000 L694.6 1000 L441 379 L180.1 1000 L0 1000 Z" />
+                        <path d="M575 0 L755.1 0 L1013 618 L1266.6 0 L1438.1 0 L1015.2 990 Z" />
+                      </svg>
                     )}
                   </span>
                   <span className="min-w-0">
@@ -339,7 +359,7 @@ export default async function DashboardPage() {
                 href="/dashboard/projects/new"
                 className="nv-card nv-card--lift group flex min-h-[150px] flex-col items-center justify-center gap-3 text-mist hover:text-ink"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] transition-colors duration-200 group-hover:border-[rgba(185,167,218,0.5)]">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] transition-colors duration-200 group-hover:border-[color:var(--color-argent)]">
                   <Plus size={16} strokeWidth={1.5} />
                 </span>
                 <span className="text-[13px] font-medium">Nouveau projet</span>

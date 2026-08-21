@@ -83,8 +83,9 @@ export default function LoginPage() {
         </span>
       </header>
 
-      <main className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1180px] items-center px-6 py-24 sm:px-8">
-        <div className="grid w-full items-center gap-10 lg:grid-cols-[430px_minmax(0,1fr)] lg:gap-14">
+      <main className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1240px] items-center px-6 py-24 sm:px-8">
+        {/* §phase 6 : split 50/50 — formulaire éditorial / panneau matière */}
+        <div className="grid w-full items-center gap-10 lg:grid-cols-2 lg:gap-14">
           <div className="mx-auto w-full max-w-[430px]">
           {/* La carte porteuse — encre mate opaque, top-light */}
           <section className="pv-auth-card pv-fade-up px-6 py-8 sm:px-9 sm:py-10">
@@ -182,9 +183,18 @@ export default function LoginPage() {
               decoding="async"
               style={{ objectPosition: "70% 44%" }}
             />
+            {/* la lumière aurore du panneau — la seule couleur */}
+            <span
+              aria-hidden
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(42% 52% at 56% 30%, rgba(185,167,218,0.16) 0%, rgba(185,167,218,0) 70%), radial-gradient(38% 46% at 72% 66%, rgba(233,198,162,0.13) 0%, rgba(233,198,162,0) 72%)",
+              }}
+            />
             <figcaption>
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink">
-                Monogramme AV — tissé ivoire &amp; satin
+                Monogramme AV — verre &amp; lumière aurore
               </span>
               <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-mist">
                 La scène du studio

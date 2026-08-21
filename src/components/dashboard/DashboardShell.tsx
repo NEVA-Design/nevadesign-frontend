@@ -65,11 +65,11 @@ export default function DashboardShell({
 
   const reviewMessage = useMemo(() => {
     if (user.creditReviewStatus === "pending_review") {
-      return "Votre compte est en cours de vérification avant l'activation des créations offertes.";
+      return "Votre compte est en cours de vérification. L’accès aux créations s’active juste après.";
     }
 
     if (user.creditReviewStatus === "blocked" || user.creditReviewStatus === "rejected_by_admin") {
-      return "Les créations offertes ne sont pas disponibles sur ce compte. Vous pouvez utiliser Neva Design avec un abonnement ou un pack de créations.";
+      return "Ce compte ne dispose pas de créations incluses. Vous pouvez utiliser Neva Design avec un abonnement ou un pack de créations.";
     }
 
     return null;

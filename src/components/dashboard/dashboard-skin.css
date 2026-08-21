@@ -36,17 +36,11 @@
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
-@media (prefers-reduced-motion: reduce) {
-  .nv-card--lift,
-  .nv-card--lift:hover {
-    transition: none;
-    transform: none;
-  }
-}
+/* (refonte 50k : le motion est une décision produit — aucune
+   branche reduced-motion ne le coupe, règle §2.3) */
 
-/* ── Sidebar : le tick aurore de l'item actif ────────────────────
-   Barre verticale 2 px, dégradé lilas → pêche. La seule lumière
-   vive de la navigation — plus jamais de pilule blanche pleine. */
+/* ── Sidebar : le filet ARGENT de l'item actif (refonte 50k —
+   l'aurore est une lumière, jamais un accent UI) ─────────────── */
 .nv-tick {
   position: absolute;
   left: 0;
@@ -54,17 +48,17 @@
   bottom: 7px;
   width: 2px;
   border-radius: 1px;
-  background: linear-gradient(180deg, #B9A7DA, #E9C6A2);
+  background: var(--color-argent);
+  opacity: 0.9;
   pointer-events: none;
 }
 
-/* ── Badge « À venir » / « Bientôt » — un filet, pas une pilule ── */
+/* ── Badge « À venir » / « Bientôt » — LE badge du site (mono +
+   point argent, jamais de pilule bordurée) ─────────────────────── */
 .nv-badge-soon {
   display: inline-flex;
   align-items: center;
-  padding: 2px 6px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 6px;
+  gap: 6px;
   font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 500;
@@ -72,6 +66,14 @@
   letter-spacing: 0.12em;
   color: var(--color-mist);
   white-space: nowrap;
+}
+.nv-badge-soon::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--color-argent);
+  opacity: 0.85;
 }
 
 /* ── Pastilles de palette — superposées, cernées de nuit ─────────
@@ -92,22 +94,9 @@
   margin-left: -3px;
 }
 
-/* ── Champs (dashboard + admin) — verre creusé, focus aurore ─────
-   Posé PAR-DESSUS .pv-field (spécificité 0,2,0 hors layer). */
-.pv-field.nv-field {
-  background-color: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-.pv-field.nv-field:hover {
-  border-color: rgba(255, 255, 255, 0.16);
-}
-.pv-field.nv-field:focus {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
-  border-color: rgba(255, 255, 255, 0.14);
-  box-shadow: none;
-  background-color: rgba(255, 255, 255, 0.04);
-}
+/* ── Champs : UN SEUL style d'input sur tout le site (refonte
+   50k) — la primitive .pv-field (ligne basse, focus argent) fait
+   loi, l'ancienne surcharge « verre creusé » est retirée. ─────── */
 
 /* ── Bouton compact — pv-btn taillé pour une barre d'outils ───── */
 .pv-btn.nv-btn-sm {
@@ -121,27 +110,56 @@
   border-radius: 10px;
 }
 
-/* ── Damier alpha de l'éditeur — carrés 12 px, blanc 3 % ─────────
-   Le canvas vide n'est plus un rectangle mort : il annonce la
-   transparence, comme une table lumineuse. */
+/* ── Damier alpha de l'éditeur — refonte 50k : plus SOMBRE et plus
+   FIN (8 px, blanc 2 %) : la table lumineuse chuchote. */
+/* Repères de coins du plan de travail (refonte 50k) — 4 « L »
+   argent discrets, la table de découpe du studio. */
+.nv-corner-marks::before,
+.nv-corner-marks::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  z-index: 5;
+  pointer-events: none;
+  background-repeat: no-repeat;
+}
+.nv-corner-marks::before {
+  background-image:
+    linear-gradient(rgba(200, 203, 208, 0.45), rgba(200, 203, 208, 0.45)),
+    linear-gradient(rgba(200, 203, 208, 0.45), rgba(200, 203, 208, 0.45)),
+    linear-gradient(rgba(200, 203, 208, 0.45), rgba(200, 203, 208, 0.45)),
+    linear-gradient(rgba(200, 203, 208, 0.45), rgba(200, 203, 208, 0.45));
+  background-size: 12px 1px, 1px 12px, 12px 1px, 1px 12px;
+  background-position: left top, left top, right top, right top;
+}
+.nv-corner-marks::after {
+  background-image:
+    linear-gradient(rgba(200, 203, 208, 0.45), rgba(200, 203, 208, 0.45)),
+    linear-gradient(rgba(200, 203, 208, 0.45), rgba(200, 203, 208, 0.45)),
+    linear-gradient(rgba(200, 203, 208, 0.45), rgba(200, 203, 208, 0.45)),
+    linear-gradient(rgba(200, 203, 208, 0.45), rgba(200, 203, 208, 0.45));
+  background-size: 12px 1px, 1px 12px, 12px 1px, 1px 12px;
+  background-position: left bottom, left bottom, right bottom, right bottom;
+}
+
 .nv-checker {
   background-image:
     linear-gradient(
       45deg,
-      rgba(255, 255, 255, 0.03) 25%,
+      rgba(255, 255, 255, 0.02) 25%,
       transparent 25%,
       transparent 75%,
-      rgba(255, 255, 255, 0.03) 75%
+      rgba(255, 255, 255, 0.02) 75%
     ),
     linear-gradient(
       45deg,
-      rgba(255, 255, 255, 0.03) 25%,
+      rgba(255, 255, 255, 0.02) 25%,
       transparent 25%,
       transparent 75%,
-      rgba(255, 255, 255, 0.03) 75%
+      rgba(255, 255, 255, 0.02) 75%
     );
   background-position:
     0 0,
-    12px 12px;
-  background-size: 24px 24px;
+    8px 8px;
+  background-size: 16px 16px;
 }

@@ -10,8 +10,10 @@ import { useEffect, useMemo, useState } from "react";
  * (déclenché dans le même onglet après chaque génération).
  */
 
+/* refonte 50k : anneau FIN (2 px) et ARGENT — l'aurore est une
+   lumière, jamais un accent UI */
 const RING_SIZE = 72;
-const RING_STROKE = 3;
+const RING_STROKE = 2;
 const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
 const RING_CIRC = 2 * Math.PI * RING_RADIUS;
 
@@ -68,12 +70,6 @@ export default function LiveCreditMeter({
         role="img"
         aria-label={`${remainingPct} % de créations disponibles`}
       >
-        <defs>
-          <linearGradient id="nv-ring-aurore" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#B9A7DA" />
-            <stop offset="100%" stopColor="#E9C6A2" />
-          </linearGradient>
-        </defs>
         <circle
           cx={RING_SIZE / 2}
           cy={RING_SIZE / 2}
@@ -87,7 +83,7 @@ export default function LiveCreditMeter({
           cy={RING_SIZE / 2}
           r={RING_RADIUS}
           fill="none"
-          stroke="url(#nv-ring-aurore)"
+          stroke="#C8CBD0"
           strokeWidth={RING_STROKE}
           strokeLinecap="round"
           strokeDasharray={RING_CIRC}

@@ -75,7 +75,7 @@ export const LANDINGS: Record<string, Landing> = {
         a: "Comptez 5 à 6 créations : logo, loading screen, bannière Discord, splash d’invitation et deux affiches. La formule Créateur (24 €/mois, 12 créations) couvre un lancement confortablement ; le Pack lancement à 49 € est pensé exactement pour ce scénario, itérations comprises.",
       }],
     ctaText: "Votre serveur mérite mieux qu’un logo bricolé en cinq minutes sur un téléphone : décrivez-le, et jugez sur pièce.",
-    ctaLabel: "Créer mes 3 visuels offerts",
+    ctaLabel: "Découvrir Neva Generative",
     related: ["logo-fivem", "pack-graphique-fivem", "affiche-serveur-fivem", "banniere-discord-fivem", "loading-screen-fivem"],
     altLocaleSlug: "en/fivem-graphic-designer",
   },
