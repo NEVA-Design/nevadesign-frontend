@@ -54,9 +54,9 @@ export default async function PaySuccessPage({
             </h1>
             <p className="mt-3 text-sm leading-relaxed text-slate">
               {infos
-                ? `Merci ! La commande #${String(infos.numero).padStart(4, "0")} — ${infos.produit.emoji} ${infos.produit.nom} — est réglée.`
-                : "Merci ! Ton paiement est bien enregistré."}{" "}
-              La confirmation vient d&apos;arriver dans ton ticket, l&apos;équipe enchaîne sur ta création.
+                ? `La commande #${String(infos.numero).padStart(4, "0")} — ${infos.produit.emoji} ${infos.produit.nom} — est réglée.`
+                : "Votre paiement a bien été enregistré."}{" "}
+              La confirmation vient d&apos;être publiée dans votre ticket Discord ; l&apos;équipe prend votre commande en charge.
             </p>
             {infos?.retour_discord ? (
               <a href={infos.retour_discord} className="pv-btn mt-8 w-full">
@@ -64,11 +64,11 @@ export default async function PaySuccessPage({
               </a>
             ) : (
               <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.14em] text-mist">
-                Retrouve l&apos;équipe dans ton ticket Discord
+                Retrouvez l&apos;équipe dans votre ticket Discord
               </p>
             )}
             <p className="mt-6 border-t border-[rgba(255,255,255,0.08)] pt-4 font-mono text-[10px] uppercase tracking-[0.14em] text-mist">
-              🔒 Reçu Stripe envoyé par e-mail
+              🔒 Reçu détaillé envoyé par e-mail
             </p>
           </section>
         </div>

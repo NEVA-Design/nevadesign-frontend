@@ -117,7 +117,7 @@ function CheckoutStripe({ clientSecret, fake, montant }: { clientSecret: string 
           Payer {montant}
         </button>
         <p className="text-center font-mono text-[9.5px] uppercase tracking-[0.16em] text-black/35">
-          Aperçu — le formulaire Stripe réel se charge ici
+          Aperçu de démonstration — le formulaire sécurisé Stripe s&apos;affiche ici
         </p>
       </div>
     );
@@ -135,7 +135,7 @@ function CheckoutStripe({ clientSecret, fake, montant }: { clientSecret: string 
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-8 text-center">
           <p className="text-[15px] font-medium text-black/80">Le formulaire n&apos;a pas pu se charger.</p>
           <p className="text-[13px] text-black/50">
-            Recharge la page — si ça persiste, préviens l&apos;équipe dans ton ticket Discord.
+            Rechargez la page. Si le problème persiste, contactez l&apos;équipe dans votre ticket Discord.
           </p>
         </div>
       ) : null}
@@ -192,7 +192,7 @@ export default function PayView({ commande }: { commande: PayData | null }) {
       <EtatSeul
         emoji="🔎"
         titre="Commande introuvable."
-        texte="Ce lien de paiement ne correspond à aucune commande — il a peut-être été remplacé. Retourne dans ton ticket Discord : le lien le plus récent s'y trouve."
+        texte="Ce lien de paiement ne correspond à aucune commande — il a peut-être été remplacé. Retournez dans votre ticket Discord : le lien le plus récent s'y trouve."
       />
     );
   }
@@ -200,8 +200,8 @@ export default function PayView({ commande }: { commande: PayData | null }) {
     return (
       <EtatSeul
         emoji="✅"
-        titre="Déjà réglée."
-        texte={`La commande ${nf(commande.numero)} est payée — l'équipe est déjà sur ta création.`}
+        titre="Commande déjà réglée."
+        texte={`Le paiement de la commande ${nf(commande.numero)} a bien été enregistré — l'équipe l'a prise en charge.`}
         lien={{ href: commande.retour_discord, label: "Retour au ticket" }}
       />
     );
@@ -211,7 +211,7 @@ export default function PayView({ commande }: { commande: PayData | null }) {
       <EtatSeul
         emoji="⏰"
         titre="Session expirée."
-        texte={`Le lien de la commande ${nf(commande.numero)} n'est plus valable. Demande à l'équipe d'en générer un nouveau dans ton ticket Discord — un clic leur suffit.`}
+        texte={`Le lien de paiement de la commande ${nf(commande.numero)} n'est plus valable. Demandez à l'équipe d'en générer un nouveau depuis votre ticket Discord.`}
         lien={{ href: commande.retour_discord, label: "Retour au ticket" }}
       />
     );
@@ -221,26 +221,11 @@ export default function PayView({ commande }: { commande: PayData | null }) {
   const montant = euro(commande.prix_cents);
 
   return (
-    <div className="relative min-h-[100svh] bg-[#060606] text-ink lg:grid lg:grid-cols-[minmax(460px,46%)_minmax(0,1fr)]">
-      {/* ═══ Panneau de marque — noir, l'œuvre en toile de fond ═══ */}
+    <div className="relative min-h-[100svh] text-ink lg:grid lg:grid-cols-[minmax(460px,46%)_minmax(0,1fr)]">
+      {/* ═══ Panneau de marque — noir sobre (le satin du site
+          respire derrière, aucun ornement : registre de facture) ═══ */}
       <section className="relative flex flex-col overflow-hidden">
-        {/* l'œuvre du studio — la sculpture vit dans la moitié BASSE
-            du panneau (le texte occupe le haut) : masque montant,
-            léger voile pour garder les réassurances lisibles */}
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/scene/low/hero-poster-1440.avif"
-            alt=""
-            className="h-full w-full object-cover opacity-[0.6]"
-            style={{
-              objectPosition: "64% 50%",
-              maskImage: "linear-gradient(0deg, black 0%, rgba(0,0,0,0.8) 42%, rgba(0,0,0,0.25) 68%, transparent 88%)",
-              WebkitMaskImage: "linear-gradient(0deg, black 0%, rgba(0,0,0,0.8) 42%, rgba(0,0,0,0.25) 68%, transparent 88%)",
-            }}
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,6,6,0.35)_0%,rgba(6,6,6,0.55)_45%,rgba(6,6,6,0.35)_100%)]" />
-        </div>
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(6,6,6,0.5)_0%,rgba(6,6,6,0.72)_100%)]" />
 
         <div className="relative z-10 mx-auto flex w-full max-w-[480px] flex-1 flex-col px-6 py-8 sm:px-10 lg:py-12">
           <header className="flex items-center justify-between">
@@ -278,21 +263,21 @@ export default function PayView({ commande }: { commande: PayData | null }) {
               <span className="font-mono text-[13px] text-ink">{montant}</span>
             </div>
             <div className="flex items-baseline justify-between border-t border-[rgba(255,255,255,0.08)] px-5 py-3.5 text-[13.5px]">
-              <span className="text-slate">Prestation de service — TVA non applicable</span>
-              <span className="font-mono text-[13px] text-mist">—</span>
+              <span className="text-slate">Prestation de services numériques</span>
+              <span className="font-mono text-[13px] text-mist">Prix TTC</span>
             </div>
             <div className="flex items-baseline justify-between border-t border-[rgba(255,255,255,0.12)] px-5 py-4">
-              <span className="text-[13.5px] font-medium text-ink">Total à régler</span>
+              <span className="text-[13.5px] font-medium text-ink">Total</span>
               <span className="pv-display text-[24px] leading-none text-ink">{montant}</span>
             </div>
           </div>
 
-          {/* Réassurances — ce qui se passe après le clic */}
+          {/* Réassurances — factuelles, registre professionnel */}
           <ul className="mt-8 flex flex-col gap-3 text-[13px] leading-snug text-slate">
             {[
-              "Confirmation instantanée dans ton ticket Discord",
-              "L'équipe démarre ta création dès le paiement — suivi en direct",
-              "Reçu Stripe envoyé par e-mail · paiement unique, sans abonnement",
+              "Confirmation immédiate de la commande dans votre ticket Discord",
+              "Prise en charge par l'équipe dès réception du règlement",
+              "Reçu détaillé envoyé par e-mail — paiement unique, sans abonnement",
             ].map((l) => (
               <li key={l} className="flex items-start gap-3">
                 <span aria-hidden className="mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[rgba(242,239,233,0.35)] text-[9px] text-[#F2EFE9]">
@@ -305,9 +290,9 @@ export default function PayView({ commande }: { commande: PayData | null }) {
 
           <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-[rgba(255,255,255,0.1)] pt-6 lg:mt-auto">
             <p className="font-mono text-[9.5px] uppercase leading-relaxed tracking-[0.14em] text-mist">
-              🔒 Chiffré SSL — traité par Stripe.
+              🔒 Paiement sécurisé — chiffrement SSL
               <br />
-              Le studio ne voit jamais ta carte.
+              Données bancaires traitées exclusivement par Stripe
             </p>
             <BadgesCartes />
           </div>
@@ -318,11 +303,11 @@ export default function PayView({ commande }: { commande: PayData | null }) {
       <section className="relative flex min-h-[560px] flex-col border-t border-[rgba(255,255,255,0.12)] bg-[#F7F5F0] lg:min-h-0 lg:border-l lg:border-t-0">
         <div className="mx-auto flex w-full max-w-[540px] flex-1 flex-col px-5 py-10 sm:px-10 lg:justify-center lg:py-16">
           <p className="mb-6 font-mono text-[10.5px] uppercase tracking-[0.2em] text-black/45">
-            Régler {montant}
+            Règlement — {montant}
           </p>
           <CheckoutStripe clientSecret={commande.client_secret} fake={Boolean(commande.fake)} montant={montant} />
           <p className="mt-8 text-center font-mono text-[9.5px] uppercase tracking-[0.16em] text-black/35">
-            Propulsé par <span className="font-bold not-italic text-black/55">Stripe</span> — leader mondial du paiement en ligne
+            Transactions sécurisées et traitées par <span className="font-bold text-black/55">Stripe</span>
           </p>
         </div>
       </section>
