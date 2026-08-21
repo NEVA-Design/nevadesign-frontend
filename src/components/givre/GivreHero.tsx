@@ -283,7 +283,7 @@ export default function GivreHero() {
           alt=""
           aria-hidden
           fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="pv-hero-layer absolute inset-0 h-full w-full object-cover"
         />
       </picture>
 
@@ -297,7 +297,7 @@ export default function GivreHero() {
           c'est la référence qui fait lire la réfraction. */}
       <div
         aria-hidden
-        className="pv-hero-aurora pointer-events-none absolute inset-[-4%]"
+        className="pv-hero-aurora pv-hero-layer pointer-events-none absolute inset-[-4%]"
         style={{
           background:
             "radial-gradient(30% 42% at 58% 30%, rgba(184,161,232,0.085) 0%, rgba(184,161,232,0) 70%), radial-gradient(27% 38% at 74% 64%, rgba(240,197,168,0.075) 0%, rgba(240,197,168,0) 72%)",
@@ -305,7 +305,7 @@ export default function GivreHero() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-[-2%] right-0 hidden w-[58%] lg:block"
+        className="pv-hero-layer pointer-events-none absolute inset-y-[-2%] right-0 hidden w-[58%] lg:block"
         style={{
           background:
             "linear-gradient(112deg, transparent 40%, rgba(255,255,255,0.05) 44.5%, transparent 49%), linear-gradient(112deg, transparent 62%, rgba(255,255,255,0.032) 65%, transparent 68%)",
@@ -315,7 +315,7 @@ export default function GivreHero() {
       {tier === "high" || tier === "mid" ? (
         <GlassSculpture
           key={`scene-${sceneEpoch}`}
-          className="absolute inset-0"
+          className="pv-hero-layer absolute inset-0"
           tier={tier}
           onReady={() => setSceneReady(true)}
           onDemote={(to, fps) => {
@@ -329,20 +329,12 @@ export default function GivreHero() {
       {/* Aucun cadre au-dessus de la scène : le canvas est nu, seule
           la vraie interface (texte, boutons, rails) se pose dessus. */}
 
-      {/* Fondu de raccord (G2 — QA 20/08) : le cyclorama peint
-          s'arrêtait NET au bas de la section (marche mesurée sur
-          toute la largeur). 220 px de rampe vers le noir de page à
-          92 % — le drapé s'éteint, la section suivante monte depuis
-          le satin nu. Au-dessus du canvas ET du poster, sous le
-          contenu. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-[220px]"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(6,6,6,0) 0%, rgba(6,6,6,0.5) 52%, rgba(6,6,6,0.92) 100%)",
-        }}
-      />
+      {/* Fondu de raccord (G2 — QA 21/08) : plus de voile noir posé
+          par-dessus (sa rampe → 92 % dessinait sa propre marche au
+          bord de section, satin nu juste dessous). Le raccord est
+          porté par le masque .pv-hero-layer sur chaque couche de
+          scène : le drapé du cyclorama fond au transparent et la
+          section suivante monte depuis le MÊME satin site-wide. */}
 
       {/* Le rail de sections vit désormais en fixed (SectionRail,
           monté par la page) : synchronisé au scroll, cliquable.

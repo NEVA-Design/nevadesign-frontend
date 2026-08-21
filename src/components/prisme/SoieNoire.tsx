@@ -14,7 +14,13 @@
  *   - canvas FIXE plein viewport derrière tout le site (z -1) —
  *     les fonds de section sont des voiles translucides au-dessus ;
  *   - mobile tactile : UNE frame statique (même règle que la scène
- *     3D du hero — zéro rAF, zéro batterie) ; reduced-motion idem ;
+ *     3D du hero — zéro rAF, zéro batterie) ;
+ *   - reduced-motion NE fige PLUS la soie (21/08) : « Effets
+ *     d'animation » désactivé côté Windows (préréglage perf des PC
+ *     gaming — le public cible) le déclenchait, alors que GSAP,
+ *     marquee, caustiques et 3D l'ignorent — le fond était la seule
+ *     couche morte du site. Une passe reduced-motion COHÉRENTE
+ *     (toutes les couches à la fois) reste à faire ;
  *   - WebGL absent / contexte perdu : le canvas disparaît, le
  *     body #060606 reste — jamais un site mort.
  *
@@ -26,18 +32,25 @@
 import { useEffect, useRef } from "react";
 
 /* Réglages artistiques — le pupitre calibré de l'agence (preset B,
-   itéré sur captures). Ne pas retoucher « de tête ». */
+   itéré sur captures). Ne pas retoucher « de tête ».
+   MAJ 21/08 (retour opérateur « le fond ne bouge plus ») : les
+   vitesses du preset B lisaient comme une image fixe (mesuré :
+   1,5 niveau de gris de variation moyenne en 2,5 s — un premier
+   essai ×3,5 ne donnait que 2,1, toujours illisible sur les zones
+   calmes). fold/warp ×6/×5 : la matière se recompose visiblement
+   quand on la regarde ; drift ×2,5 seulement (une dérive, jamais
+   une « photo qui bouge ») ; sway ×2,8 (la lumière respire). */
 const ART = {
   angle: -0.52,
   aniso: 2.5,
   scale: 0.34,
   warp: 1.15,
   foldPow: 2.1,
-  foldSpeed: 0.012,
-  warpSpeed: 0.0055,
-  driftX: 0.0036,
-  driftY: -0.0022,
-  lightSway: 0.078,
+  foldSpeed: 0.075,
+  warpSpeed: 0.028,
+  driftX: 0.009,
+  driftY: -0.0056,
+  lightSway: 0.22,
   relief: 20.0,
   specPow: 26.0,
   specAmp: 0.14,
@@ -53,15 +66,20 @@ const ART = {
 
 /* Palette noire NEUTRE — mapping tonal du velours de l'agence
    (ambient bas + crêtes vives minoritaires), teintes neutralisées. */
+/* MAJ 21/08 : crêtes relevées (+25 %) — mesuré : avec high 40 /
+   spec 55, deux états du champ complètement décorrélés ne
+   différaient que de ~2 niveaux de gris moyens (mouvement
+   invisible même animé). Toujours neutre (écart R/G/B ≤ 2),
+   toujours des crêtes minoritaires. */
 const PALETTE = {
   base: [7, 7, 8],
-  high: [40, 40, 42],
-  spec: [55, 55, 57],
-  specGain: 0.6,
+  high: [50, 50, 52],
+  spec: [68, 68, 70],
+  specGain: 0.7,
   rest: [7, 7, 8],
   presence: 0.9,
   ambient: 0.14,
-  diffuse: 0.5,
+  diffuse: 0.58,
 };
 
 const VERT = `
@@ -298,16 +316,15 @@ export default function SoieNoire() {
     if (!canvas) return;
 
     let isMobile = false;
-    let reduced = false;
     try {
       isMobile =
         window.matchMedia("(pointer: coarse) and (hover: none)").matches &&
         window.innerWidth < 1024;
-      reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     } catch {
       /* matchMedia indisponible */
     }
-    const statique = isMobile || reduced;
+    /* voir l'en-tête : reduced-motion ne fige plus la soie */
+    const statique = isMobile;
 
     const engine = createEngine(canvas, isMobile ? 3 : 4);
     if (!engine) {
