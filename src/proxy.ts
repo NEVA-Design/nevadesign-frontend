@@ -43,6 +43,10 @@ function isAlwaysMaintenanceBypassed(pathname: string) {
   return (
     pathname === '/maintenance' ||
     pathname.startsWith('/admin/maintenance') ||
+    /* /pay — page de paiement des commandes Discord (bot Neva) :
+       un client au moment de payer ne doit JAMAIS tomber sur la
+       maintenance ; la page ne dépend ni du backend ni de Supabase. */
+    pathname.startsWith('/pay') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon') ||
     pathname.startsWith('/robots') ||
