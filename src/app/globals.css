@@ -12,49 +12,64 @@
    ════════════════════════════════════════════════════════════════════ */
 
 @theme {
-  /* ── Fonds — noirs NEUTRES uniquement (écart R/G/B ≤ 2) :
-     base #060606, sections alternées #0A0A0A max. ───────────── */
-  --color-frost: #060606;       /* base de page — noir neutre */
-  --color-pearl: #0A0A0A;       /* creux des scènes, noir posé */
-  --color-lavender: #0A0A0A;    /* ex-pôle lavande — neutralisé (l'aurore ne vit qu'en glow) */
-  --color-periwinkle: #0A0A0A;  /* ex-pôle froid — neutralisé */
-  --color-glacier: #0A0A0A;     /* ex-hautes lumières — neutralisé */
-  --color-aurora: #0A0A0A;      /* ex-aurore rosée — neutralisé */
-  --color-blush: #0A0A0A;       /* ex-rose des bords — neutralisé */
+  /* ══ REFONTE 50k — TOKENS VERROUILLÉS (§4.1) ═════════════════
+     Toute couleur du site provient d'ici. Les noms legacy des ~90
+     fichiers existants sont conservés mais RECALÉS sur la palette
+     verrouillée : une seule vérité, zéro valeur magique. */
 
-  /* Alias legacy (composants existants) — remappés noir */
-  --color-paper: #060606;       /* = frost */
-  --color-porcelain: #101010;   /* surfaces posées (cartes-tirages) */
-  --color-linen: #0A0A0A;       /* = pearl */
-  --color-atelier: #060606;     /* fond produit — même noir que le marketing */
+  /* ── Palette officielle ───────────────────────────────────── */
+  --color-noir-0: #060606;      /* fond global */
+  --color-noir-1: #0B0B0C;      /* surfaces */
+  --color-noir-2: #121213;      /* surfaces hautes */
+  --color-ligne: rgba(255, 255, 255, 0.08);
+  --color-ligne-2: rgba(255, 255, 255, 0.16);  /* actif / hover */
+  --color-ivoire: #F4F2EE;      /* texte principal — 17,6:1 sur noir-0 */
+  --color-gris: #9A9A96;        /* texte secondaire — 7,0:1 */
+  --color-argent: #C8CBD0;      /* accent UI : hovers, filets actifs, curseurs */
+  --color-aurore-a: #B9A7DA;    /* lilas  — LUMIÈRE uniquement (halos, 3D) */
+  --color-aurore-b: #E9C6A2;    /* pêche — LUMIÈRE uniquement */
 
-  /* ── Textes — titres #F2F2F0, secondaire #9A9A9A (AA min) ─── */
-  --color-ink: #F2F2F0;         /* titres, wordmark, nav — 17,9:1 sur #060606 */
-  --color-slate: #B4B4B2;       /* texte courant — 9,7:1 */
-  --color-mist: #9A9A9A;        /* tertiaire, métadonnées — 7,1:1 */
+  /* ── Alias legacy recalés (fonds — noirs neutres R/G/B ≤ 2) ── */
+  --color-frost: #060606;       /* = noir-0 */
+  --color-pearl: #0B0B0C;       /* = noir-1 */
+  --color-lavender: #0B0B0C;
+  --color-periwinkle: #0B0B0C;
+  --color-glacier: #0B0B0C;
+  --color-aurora: #0B0B0C;
+  --color-blush: #0B0B0C;
+  --color-paper: #060606;
+  --color-porcelain: #121213;   /* = noir-2 */
+  --color-linen: #0B0B0C;
+  --color-atelier: #060606;
 
-  /* ── Chrome — matière, pas couleur ────────────────────────── */
-  --color-silver: #C7CAD9;      /* creux des rubans */
-  --color-chrome-low: #989DB4;  /* ombre chromée */
+  /* ── Textes (alias recalés) ───────────────────────────────── */
+  --color-ink: #F4F2EE;         /* = ivoire */
+  --color-slate: #B5B3AF;       /* voix intermédiaire — 9,5:1 */
+  --color-mist: #9A9A96;        /* = gris */
 
-  /* ── Surfaces de relief — un cran au-dessus du fond ───────── */
-  --color-void: #101010;        /* panneaux, lightbox (ex-encre #241F45) */
-  --color-abyss: #101010;       /* alias historique — même surface */
-  --color-encre-relief: #1A1A1A;/* relief éclairci du panneau */
+  /* ── Argent (ex-chrome) — matière UI, pas couleur ─────────── */
+  --color-silver: #C8CBD0;      /* = argent */
+  --color-chrome-low: #9DA0A6;
 
-  /* ── Aurore — uniquement en glow derrière le verre ─────────── */
-  --color-violet: #B8A1E8;      /* lilas */
-  --color-cyan: #F0C5A8;        /* pêche (alias historique du pôle) */
-  --color-magenta: #F0C5A8;
+  /* ── Surfaces de relief ───────────────────────────────────── */
+  --color-void: #121213;        /* = noir-2 */
+  --color-abyss: #121213;
+  --color-encre-relief: #1A1A1B;
 
-  /* ── Surface carte — glass léger : fond blanc 4 %, bord 8 % ── */
+  /* ── Aurore (alias legacy) — halos et éclairage 3D SEULEMENT :
+     jamais en aplat UI, jamais sur du texte, jamais en bordure. */
+  --color-violet: #B9A7DA;
+  --color-cyan: #E9C6A2;
+  --color-magenta: #E9C6A2;
+
+  /* ── Surface carte ────────────────────────────────────────── */
   --color-carte: rgba(255, 255, 255, 0.04);
   --color-carte-brd: rgba(255, 255, 255, 0.08);
   --color-sauge: #6FBF9F;       /* unique couleur de validation — 9,8:1 */
 
-  /* ── Texte secondaire produit — gris neutres ────────────────── */
-  --color-steel: #9A9A9A;       /* secondaire — 7,1:1 sur #060606 */
-  --color-dusk: #8C8C8C;        /* métadonnées décor — 5,9:1 */
+  /* ── Texte secondaire produit ─────────────────────────────── */
+  --color-steel: #9A9A96;
+  --color-dusk: #8C8C8A;
 
   /* ── États système (fond noir) — AA ≥ 4,5:1 sur #060606 ────── */
   --color-ok: #6FBF9F;
@@ -62,30 +77,38 @@
   --color-warn: #D9B24A;
   --color-info: #7FAAD0;
 
-  /* ── Rayons — 10 / 16 / 22, pilules full (resserrés 13/08 :
-     les grands rayons donnaient des cards lourdes) ─────────── */
-  --radius-xs: 10px;
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 16px;
-  --radius-xl: 22px;
+  /* ── Rayons — resserrés refonte : l'éditorial est sec. Images
+     et cadres ≤ 6 px, panneaux 10-14, boutons 14 (décision
+     opérateur run 8, conservée). ───────────────────────────── */
+  --radius-xs: 6px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
 
-  /* ── Courbes ──────────────────────────────────────────────── */
+  /* ── Motion system (§ phase 4) — LES tokens du site ─────────── */
+  --dur-1: 0.5s;
+  --dur-2: 0.8s;
+  --dur-3: 1.2s;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-inout: cubic-bezier(0.65, 0.05, 0.36, 1);
+
+  /* Courbes/durées legacy (composants existants) */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-smooth: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-smooth: cubic-bezier(0.65, 0.05, 0.36, 1);
   --ease-reveal: cubic-bezier(0.625, 0.05, 0, 1);
-
-  /* ── Durées ───────────────────────────────────────────────── */
   --dur-fast: 150ms;
   --dur-base: 300ms;
   --dur-slow: 450ms;
 }
 
 @theme inline {
-  /* Plus aucun serif nulle part. Outfit porte le display en
-     light/medium — la géométrique ronde de la ref, jamais grasse. */
-  --font-display: var(--font-outfit), var(--font-geist-sans), system-ui, sans-serif;
-  --font-sans: var(--font-geist-sans), "Inter", system-ui, sans-serif;
+  /* Refonte 50k — DEUX familles, trois voix. Archivo variable
+     (wght × wdth 62-125) porte display ET body ; les titres
+     jouent largeur + graisse, jamais la couleur. Geist Mono
+     reste la voix technique. */
+  --font-display: var(--font-archivo), system-ui, sans-serif;
+  --font-sans: var(--font-archivo), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "JetBrains Mono", monospace;
 
   /* Ombres paramétrées par la peau active */
@@ -135,14 +158,14 @@
   --ink-45: rgba(242, 242, 240, 0.48);
   --ink-28: rgba(242, 242, 240, 0.30);
 
-  --beam: linear-gradient(100deg, #B8A1E8 0%, #F0C5A8 100%);
-  --beam-ink: linear-gradient(100deg, #B8A1E8 0%, #F0C5A8 100%);
-  --beam-soft: linear-gradient(100deg, rgba(184, 161, 232, 0.55), rgba(240, 197, 168, 0.55));
+  --beam: linear-gradient(100deg, #B9A7DA 0%, #E9C6A2 100%);
+  --beam-ink: linear-gradient(100deg, #B9A7DA 0%, #E9C6A2 100%);
+  --beam-soft: linear-gradient(100deg, rgba(185, 167, 218, 0.55), rgba(233, 198, 162, 0.55));
   /* Halos aurore : glow derrière le verre — assez présents pour
      que le noir vive et que le blur du verre ait une matière. */
-  --halo-violet: rgba(184, 161, 232, 0.20);
-  --halo-cyan: rgba(240, 197, 168, 0.16);
-  --halo-magenta: rgba(240, 197, 168, 0.08);
+  --halo-violet: rgba(185, 167, 218, 0.20);
+  --halo-cyan: rgba(233, 198, 162, 0.16);
+  --halo-magenta: rgba(233, 198, 162, 0.08);
 
   /* Chrome froid — gradients perpendiculaires à la course */
   --chrome: linear-gradient(90deg, #FFFFFF 0%, #DDE0EA 16%, #A4A9BE 36%, #FCFCFE 52%, #C7CAD9 72%, #EDEEF4 100%);
@@ -152,7 +175,7 @@
   --sh-glass: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.03), 0 1px 4px rgba(0, 0, 0, 0.45), 0 18px 44px rgba(0, 0, 0, 0.55);
   --sh-float: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 2px 6px rgba(0, 0, 0, 0.50), 0 26px 64px rgba(0, 0, 0, 0.60);
   --sh-modal: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 6px 14px rgba(0, 0, 0, 0.55), 0 52px 120px rgba(0, 0, 0, 0.70);
-  --sh-beam: 0 0 0 1px rgba(184, 161, 232, 0.28), 0 4px 20px rgba(184, 161, 232, 0.18), 0 1px 2px rgba(0, 0, 0, 0.45);
+  --sh-beam: 0 0 0 1px rgba(185, 167, 218, 0.28), 0 4px 20px rgba(185, 167, 218, 0.18), 0 1px 2px rgba(0, 0, 0, 0.45);
   --sh-print: 0 1px 3px rgba(0, 0, 0, 0.40), 0 18px 44px rgba(0, 0, 0, 0.45);
   --sh-print-lift: 0 3px 6px rgba(0, 0, 0, 0.45), 0 32px 72px rgba(0, 0, 0, 0.55);
 
@@ -182,11 +205,11 @@
   --scrollbar-track: var(--color-frost);
   --scrollbar-thumb: #2E2E2E;
   --scrollbar-thumb-hover: #3C3C3C;
-  --selection-bg: rgba(184, 161, 232, 0.35);
+  --selection-bg: rgba(200, 203, 208, 0.28);
   --selection-text: var(--color-ink);
-  /* Passe whaou P3.4 — focus visible AURORE partout : ring 2 px,
-     offset 2 px (le blanc se perdait sur les surfaces claires) */
-  --focus-ring: rgba(184, 161, 232, 0.9);
+  /* Refonte 50k — focus visible ARGENT partout (l'aurore est de la
+     lumière, jamais un accent UI) : ring 2 px, offset 2 px. */
+  --focus-ring: rgba(200, 203, 208, 0.9);
 }
 
 /* ── Surface encre — lightbox, panneaux de sortie, aperçus nuit ─
@@ -205,8 +228,8 @@
   --ink-70: rgba(255, 255, 255, 0.72);
   --ink-45: rgba(255, 255, 255, 0.48);
   --ink-28: rgba(255, 255, 255, 0.3);
-  --halo-violet: rgba(184, 161, 232, 0.18);
-  --halo-cyan: rgba(240, 197, 168, 0.14);
+  --halo-violet: rgba(185, 167, 218, 0.18);
+  --halo-cyan: rgba(233, 198, 162, 0.14);
 
   --sh-glass: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 18px 46px rgba(16, 12, 36, 0.42);
   --sh-float: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 30px 80px rgba(16, 12, 36, 0.55);
@@ -225,7 +248,7 @@
   --field-bg: rgba(255, 255, 255, 0.05);
   --field-bg-focus: rgba(255, 255, 255, 0.07);
   --gauge-track: rgba(255, 255, 255, 0.09);
-  --num-color: #B8A1E8;
+  --num-color: var(--color-argent);
   --link-color: #F6F3EE;
   --link-hover: #F6F3EE;
 
@@ -269,7 +292,8 @@ body {
   background-color: var(--color-frost);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-size: 15px;
+  /* §4.2 — body 16-17 px / 1.6 */
+  font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -325,6 +349,21 @@ html {
   contain: layout paint;
 }
 
+/* ══ Rythme vertical — REFONTE 50k (§4.3) ═════════════════════
+   Padding de section 140-180 px ; aucun vide > 220 px entre deux
+   contenus (les jonctions se comblent par une transition, jamais
+   par du noir). Marges latérales clamp(24px, 5vw, 96px). */
+.pv-section {
+  padding-block: clamp(140px, 11vw, 180px);
+}
+.pv-section--tight {
+  padding-block: clamp(96px, 8vw, 128px);
+}
+.pv-gutter {
+  padding-left: clamp(24px, 5vw, 96px);
+  padding-right: clamp(24px, 5vw, 96px);
+}
+
 /* MAJ soie (20/08) — les fonds de section sont des VOILES
    translucides posés sur le satin noir temps réel (SoieNoire,
    fixe derrière tout le site) : le drapé respire à travers,
@@ -336,15 +375,15 @@ html {
    sur les sections < 840 px (stops croisés → marche à mi-hauteur,
    la bande RECRUTEZ mesurée) et s'arrêtaient net à leur plateau
    (bande de Mach). Le champ de lumière de section = radiaux aurore
-   lilas #B8A1E8 / pêche #F0C5A8 à 4-7 %, position variable par
+   lilas #B9A7DA / pêche #E9C6A2 à 4-7 %, position variable par
    variante. */
 .pv-scene-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(52% 44% at 12% 38%, rgba(184, 161, 232, 0.065) 0%, rgba(184, 161, 232, 0) 70%),
-    radial-gradient(48% 42% at 90% 72%, rgba(240, 197, 168, 0.055) 0%, rgba(240, 197, 168, 0) 72%),
+    radial-gradient(52% 44% at 12% 38%, rgba(185, 167, 218, 0.065) 0%, rgba(185, 167, 218, 0) 70%),
+    radial-gradient(48% 42% at 90% 72%, rgba(233, 198, 162, 0.055) 0%, rgba(233, 198, 162, 0) 72%),
     linear-gradient(180deg, rgba(6, 6, 6, 0.26), rgba(6, 6, 6, 0.26));
 }
 
@@ -352,8 +391,8 @@ html {
 .pv-scene-bg--calm,
 .pv-scene-bg.pv-scene-bg--calm {
   background:
-    radial-gradient(46% 40% at 84% 8%, rgba(184, 161, 232, 0.05) 0%, rgba(184, 161, 232, 0) 68%),
-    radial-gradient(40% 36% at 96% 26%, rgba(240, 197, 168, 0.04) 0%, rgba(240, 197, 168, 0) 66%),
+    radial-gradient(46% 40% at 84% 8%, rgba(185, 167, 218, 0.05) 0%, rgba(185, 167, 218, 0) 68%),
+    radial-gradient(40% 36% at 96% 26%, rgba(233, 198, 162, 0.04) 0%, rgba(233, 198, 162, 0) 66%),
     linear-gradient(180deg, rgba(6, 6, 6, 0.30), rgba(6, 6, 6, 0.30));
 }
 
@@ -361,8 +400,8 @@ html {
 .pv-scene-bg--glacier,
 .pv-scene-bg.pv-scene-bg--glacier {
   background:
-    radial-gradient(48% 42% at 10% 92%, rgba(184, 161, 232, 0.055) 0%, rgba(184, 161, 232, 0) 68%),
-    radial-gradient(40% 36% at 0% 70%, rgba(240, 197, 168, 0.042) 0%, rgba(240, 197, 168, 0) 66%),
+    radial-gradient(48% 42% at 10% 92%, rgba(185, 167, 218, 0.055) 0%, rgba(185, 167, 218, 0) 68%),
+    radial-gradient(40% 36% at 0% 70%, rgba(233, 198, 162, 0.042) 0%, rgba(233, 198, 162, 0) 66%),
     linear-gradient(180deg, rgba(6, 6, 6, 0.32), rgba(6, 6, 6, 0.32));
 }
 
@@ -729,7 +768,7 @@ html {
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(115deg, rgba(184, 161, 232, 0.55), rgba(240, 197, 168, 0.45));
+  background: linear-gradient(115deg, rgba(200, 203, 208, 0.5), rgba(200, 203, 208, 0.18));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -812,7 +851,7 @@ html {
   background: radial-gradient(
     50% 100% at 50% 0%,
     rgba(0, 0, 0, 0.55) 0%,
-    rgba(184, 161, 232, 0.06) 55%,
+    rgba(185, 167, 218, 0.06) 55%,
     transparent 100%
   );
   filter: blur(28px);
@@ -961,8 +1000,9 @@ html {
   border-radius: 14px;
 }
 
-/* Secondaire VERRE (P3.2) — fond blanc 4 %, bordure blanc 12 %,
-   top-light ; hover : bordure 24 %, fond 7 %. */
+/* Secondaire VERRE — refonte 50k : le hover n'est pas un simple
+   changement de couleur, un FOND GLISSE — un voile ivoire 8 % qui
+   monte du bas du bouton en 300 ms (compositor only). */
 .pv-btn--ghost {
   background: rgba(255, 255, 255, 0.04);
   color: var(--color-ink);
@@ -972,12 +1012,24 @@ html {
 .pv-btn--ghost::after {
   content: none;
 }
+.pv-btn--ghost::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.08);
+  transform: scaleY(0);
+  transform-origin: bottom center;
+  transition: transform 0.3s var(--ease-out);
+  pointer-events: none;
+}
 .pv-btn--ghost:hover {
   filter: none;
   transform: none;
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.26);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 2px 4px rgba(0, 0, 0, 0.40);
+}
+.pv-btn--ghost:hover::before {
+  transform: scaleY(1);
 }
 .pv-btn--ghost:active {
   filter: none;
@@ -1038,12 +1090,13 @@ html {
 
 /* ═══ Typographie ════════════════════════════════════════════ */
 
-/* Étiquette technique — mono, petites capitales espacées */
+/* Étiquette technique — mono, petites capitales espacées (§4.2 :
+   11-12 px, tracking 0.14em) */
 .pv-label {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-2);
 }
@@ -1052,40 +1105,45 @@ html {
   color: var(--ink-45);
 }
 
-/* Titre display — Outfit léger, encre ardoise-violet.
-   La graisse ne monte jamais au-dessus de medium : le luxe de la
-   ref vient de la légèreté, l'accent vient du CONTRASTE de graisse
-   (un segment .pv-display-strong en 500), jamais du gras. */
+/* ══ Titre display — REFONTE 50k ══════════════════════════════
+   Archivo variable : la voix calme est un condensé léger (wdth 72,
+   graisse 300) en gris, l'ACCENT est un expanded massif (wdth 122,
+   graisse 640) en ivoire — le contraste est dimensionnel, jamais
+   coloré. C'est la signature typographique du site. */
 .pv-display {
   font-family: var(--font-display);
   font-weight: 300;
-  line-height: 1.1;
-  letter-spacing: -0.015em;
+  font-stretch: 72%;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
   color: var(--text-2);
 }
 
 .pv-display-strong {
-  font-weight: 500;
+  font-weight: 640;
+  font-stretch: 122%;
+  letter-spacing: -0.015em;
   color: var(--surface-text);
 }
 
-/* Compat : les écrans produit qui montaient la graisse retombent
-   sur la voix display unique. */
+/* Compat : les <b>/<strong> des titres existants prennent la voix
+   d'accent expanded. */
 .pv-display b,
 .pv-display strong {
-  font-weight: 500;
+  font-weight: 640;
+  font-stretch: 122%;
+  letter-spacing: -0.015em;
   color: var(--surface-text);
 }
 
-/* Dégradé spectral encré sur un mot-clé (un par écran max) */
+/* Refonte 50k — l'aurore ne se pose JAMAIS sur du texte : l'accent
+   d'un mot-clé est un contraste de graisse/largeur en ivoire. La
+   classe reste pour les ~15 fichiers qui la posent. */
 .pv-beam-text {
-  background-image: var(--beam-ink);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--color-ink);
 }
 
-/* Souligné spectral fin */
+/* Souligné fin — filet argent (ex-spectral) */
 .pv-beam-underline {
   position: relative;
 }
@@ -1095,9 +1153,9 @@ html {
   left: 0;
   right: 0;
   bottom: -6px;
-  height: 2px;
-  border-radius: 1px;
-  background: var(--beam);
+  height: 1px;
+  background: var(--color-argent);
+  opacity: 0.6;
 }
 
 /* Numéro technique — mono spectral encré */
@@ -1129,6 +1187,27 @@ html {
   background-color: var(--surface-hover);
 }
 
+/* ══ Rangée de tags mono — REFONTE 50k ════════════════════════
+   Remplace les rafales de pills bordurées : une ligne de mots
+   mono uppercase séparés par « · ». Aucune bordure, aucun fond. */
+.pv-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  row-gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.pv-tag-row > *:not(:last-child)::after {
+  content: "·";
+  margin: 0 14px;
+  color: var(--ink-28);
+}
+
 /* Cadre média — les rendus s'affichent purs */
 .pv-media {
   position: relative;
@@ -1149,7 +1228,8 @@ html {
   transform: scale(1.04);
 }
 
-/* Lien — soulignement spectral qui se dessine */
+/* Lien — soulignement 1 px argent qui se dessine gauche→droite
+   en 0.3 s (primitive refonte §Phase 1) */
 .pv-link {
   position: relative;
   display: inline-block;
@@ -1164,10 +1244,10 @@ html {
   bottom: -3px;
   width: 100%;
   height: 1px;
-  background: var(--beam);
+  background: var(--color-argent);
   transform: scaleX(0);
   transform-origin: right;
-  transition: transform 0.4s var(--ease-smooth);
+  transition: transform 0.3s var(--ease-out);
 }
 .pv-link:hover {
   color: var(--link-hover);
@@ -1239,7 +1319,7 @@ html {
 .pv-rule--beam {
   height: 1px;
   border: none;
-  background: linear-gradient(90deg, transparent, rgba(184, 161, 232, 0.4) 30%, rgba(240, 197, 168, 0.4) 70%, transparent);
+  background: linear-gradient(90deg, transparent, rgba(200, 203, 208, 0.35) 50%, transparent);
 }
 
 /* ═══ Chips de réglage — l'état se lit sans effort (D26/D39) ══
@@ -1272,7 +1352,7 @@ html {
   cursor: not-allowed;
 }
 .pv-chip--on {
-  background: rgba(184, 161, 232, 0.12);
+  background: rgba(200, 203, 208, 0.1);
   border-color: var(--color-ink);
   color: var(--color-ink);
 }
@@ -1283,38 +1363,75 @@ html {
   color: var(--color-ink);
 }
 
-/* ═══ Champs ═════════════════════════════════════════════════ */
-
-/* QA 20/08 (Phase 4.3) : spec unifiée — fond blanc 3 %, bordure
-   blanc 10 %, focus = ring aurore 2 px. Un même champ a le même
-   rendu partout (auth comprise, où nv-field était inerte). */
+/* ═══ Champs — REFONTE 50k : LA primitive input du site ═══════
+   Une seule voix partout (auth, dashboard, admin, éditeur) :
+   ligne basse 1 px qui s'illumine ARGENT au focus, fond à peine
+   posé (2,5 %) pour tenir la zone, label mono au-dessus
+   (.pv-field-label), erreur en ligne sous le champ
+   (.pv-field-error). Zéro boîte bordurée, zéro radius. */
 .pv-field {
   width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.025);
+  border: none;
+  border-bottom: 1px solid var(--color-ligne-2);
+  border-radius: 0;
   color: var(--surface-text);
   font-family: var(--font-sans);
-  font-size: 14px;
-  padding: 11px 14px;
-  transition: border-color 0.2s var(--ease-smooth), box-shadow 0.2s var(--ease-smooth),
-    background-color 0.2s var(--ease-smooth);
+  font-size: 15px;
+  padding: 11px 12px 10px;
+  transition: border-color 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out),
+    background-color 0.25s var(--ease-out);
 }
 .pv-field::placeholder {
   color: var(--ink-45);
 }
 .pv-field:hover {
-  border-color: rgba(255, 255, 255, 0.16);
+  border-bottom-color: rgba(255, 255, 255, 0.28);
 }
 .pv-field:focus {
   outline: none;
-  border-color: rgba(184, 161, 232, 0.55);
-  box-shadow: 0 0 0 2px rgba(184, 161, 232, 0.35);
-  background: rgba(255, 255, 255, 0.05);
+  border-bottom-color: var(--color-argent);
+  /* la ligne s'illumine : 1 px net + une lueur courte dessous */
+  box-shadow: 0 1px 0 0 var(--color-argent), 0 6px 16px -6px rgba(200, 203, 208, 0.35);
+  background: rgba(255, 255, 255, 0.04);
 }
 .pv-field:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+/* select : même ligne basse, flèche préservée */
+select.pv-field {
+  appearance: none;
+}
+
+/* Label mono au-dessus du champ */
+.pv-field-label {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+/* Erreur en ligne — sous le champ concerné, jamais en haut de page */
+.pv-field-error {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 7px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-err);
+}
+.pv-field--invalid {
+  border-bottom-color: var(--color-err);
+}
+.pv-field--invalid:focus {
+  border-bottom-color: var(--color-err);
+  box-shadow: 0 1px 0 0 var(--color-err);
 }
 
 /* ═══ Pages auth (redesign 21/08) ════════════════════════════
@@ -1398,7 +1515,7 @@ html {
   position: absolute;
   inset: 0 auto 0 0;
   border-radius: 2px;
-  background: var(--beam);
+  background: var(--color-argent);
   transition: width 0.9s var(--ease-smooth);
 }
 
@@ -1474,8 +1591,8 @@ html {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 1.5px solid rgba(184, 161, 232, 0.25);
-  border-top-color: #B8A1E8;
+  border: 1.5px solid rgba(200, 203, 208, 0.22);
+  border-top-color: var(--color-argent);
   animation: pv-spin 0.8s linear infinite;
 }
 
@@ -1560,8 +1677,8 @@ html {
   background: conic-gradient(
     from var(--pv-ang),
     transparent 0 8%,
-    rgba(184, 161, 232, 0.9) 16%,
-    rgba(240, 197, 168, 0.9) 24%,
+    rgba(185, 167, 218, 0.9) 16%,
+    rgba(233, 198, 162, 0.9) 24%,
     transparent 32% 100%
   );
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -1626,14 +1743,14 @@ html {
 }
 .pv-veil-fallback::before {
   background:
-    radial-gradient(42% 54% at 26% 30%, var(--veil-a, rgba(184, 161, 232, 0.08)), transparent 70%),
-    radial-gradient(36% 48% at 74% 22%, var(--veil-b, rgba(240, 197, 168, 0.06)), transparent 72%);
+    radial-gradient(42% 54% at 26% 30%, var(--veil-a, rgba(185, 167, 218, 0.08)), transparent 70%),
+    radial-gradient(36% 48% at 74% 22%, var(--veil-b, rgba(233, 198, 162, 0.06)), transparent 72%);
   animation: pv-veil-drift 26s ease-in-out infinite;
 }
 .pv-veil-fallback::after {
   background:
-    radial-gradient(38% 50% at 62% 68%, var(--veil-a, rgba(184, 161, 232, 0.05)), transparent 70%),
-    radial-gradient(30% 42% at 18% 74%, var(--veil-b, rgba(240, 197, 168, 0.04)), transparent 72%);
+    radial-gradient(38% 50% at 62% 68%, var(--veil-a, rgba(185, 167, 218, 0.05)), transparent 70%),
+    radial-gradient(30% 42% at 18% 74%, var(--veil-b, rgba(233, 198, 162, 0.04)), transparent 72%);
   animation: pv-veil-drift-b 32s ease-in-out infinite;
 }
 
@@ -1646,8 +1763,8 @@ html {
 .pv-scene-bg--dawn,
 .pv-scene-bg.pv-scene-bg--dawn {
   background:
-    radial-gradient(46% 50% at 22% 12%, rgba(184, 161, 232, 0.07) 0%, rgba(184, 161, 232, 0) 68%),
-    radial-gradient(42% 46% at 72% 68%, rgba(240, 197, 168, 0.06) 0%, rgba(240, 197, 168, 0) 70%),
+    radial-gradient(46% 50% at 22% 12%, rgba(185, 167, 218, 0.07) 0%, rgba(185, 167, 218, 0) 68%),
+    radial-gradient(42% 46% at 72% 68%, rgba(233, 198, 162, 0.06) 0%, rgba(233, 198, 162, 0) 70%),
     linear-gradient(180deg, rgba(6, 6, 6, 0.24), rgba(6, 6, 6, 0.24));
 }
 
@@ -1655,8 +1772,8 @@ html {
 .pv-scene-bg--dawn-calm,
 .pv-scene-bg.pv-scene-bg--dawn-calm {
   background:
-    radial-gradient(50% 55% at 88% 86%, rgba(240, 197, 168, 0.055) 0%, rgba(240, 197, 168, 0) 68%),
-    radial-gradient(44% 48% at 4% 30%, rgba(184, 161, 232, 0.048) 0%, rgba(184, 161, 232, 0) 66%),
+    radial-gradient(50% 55% at 88% 86%, rgba(233, 198, 162, 0.055) 0%, rgba(233, 198, 162, 0) 68%),
+    radial-gradient(44% 48% at 4% 30%, rgba(185, 167, 218, 0.048) 0%, rgba(185, 167, 218, 0) 66%),
     linear-gradient(180deg, rgba(6, 6, 6, 0.28), rgba(6, 6, 6, 0.28));
 }
 
@@ -1761,71 +1878,76 @@ html {
   max-width: clamp(1200px, 76vw, 1760px);
 }
 
-/* Titres fluides — chaque voix garde sa formule du run 1 puis
-   continue de croître ≥ 1920 (×1,32 à 3440, continuité exacte à
-   1920). Le hero (.gh-title) croît dès 1680 avec ses poses caméra
-   (cible 96-112 px à 3440). */
-.pv-section-title {
-  font-size: clamp(2rem, 4.6vw, 3.4rem);
-}
-.pv-t-mid {
-  font-size: clamp(2rem, 4.4vw, 3.3rem);
+/* ══ Échelle typographique — REFONTE 50k (§4.2) ═══════════════
+   Hero H1  : clamp(64px, 9vw, 148px), tracking -0.03, lh 0.95
+   H2       : clamp(40px, 5vw, 76px)
+   H3       : clamp(24px, 2.4vw, 34px)
+   Le CTA final garde une voix d'apothéose entre H2 et H1.
+   ≥ 1920 : H2 continue de croître (jusqu'à ~100 px à 3440), le
+   hero reste plafonné 148 (verrouillé). */
+.pv-section-title,
+.pv-t-mid,
+.pv-t-fields {
+  font-size: clamp(40px, 5vw, 76px);
 }
 .pv-t-creations {
-  font-size: clamp(28px, 3.6vw, 44px);
-}
-.pv-t-fields {
-  font-size: clamp(34px, 4.5vw, 54px);
+  font-size: clamp(32px, 3.8vw, 56px);
 }
 .pv-t-field-card {
-  font-size: clamp(26px, 2.4vw, 30px);
+  font-size: clamp(24px, 2.4vw, 34px);
 }
-.pv-t-colophon {
-  font-size: clamp(2.4rem, 5.6vw, 4.6rem);
+.pv-t-colophon,
+.pv-t-showcase-cta {
+  font-size: clamp(48px, 6.5vw, 104px);
 }
 .pv-t-showcase-hero {
   font-size: clamp(3.4rem, 12vw, 10rem);
 }
-.pv-t-showcase-cta {
-  font-size: clamp(2.2rem, 5.6vw, 4.6rem);
-}
 .gh-title {
-  font-size: clamp(36px, 10.5vw, 48px);
+  font-size: clamp(44px, 12.5vw, 64px);
+  letter-spacing: -0.03em;
+  line-height: 0.95;
 }
 @media (min-width: 640px) {
   .gh-title {
-    font-size: clamp(40px, 6.2vw, 84px);
+    font-size: clamp(64px, 9vw, 148px);
   }
 }
-@media (min-width: 1680px) {
-  .gh-title {
-    font-size: clamp(84px, 1.3vw + 65.3px, 112px);
+/* Les deux voix du titre hero — le contraste est dimensionnel */
+.gh-line-calm {
+  font-weight: 300;
+  font-stretch: 72%;
+  color: var(--text-2);
+}
+.gh-line-hit {
+  font-weight: 640;
+  font-stretch: 108%;
+  letter-spacing: -0.015em;
+  color: var(--surface-text);
+}
+@media (min-width: 640px) {
+  .gh-line-hit {
+    font-stretch: 122%;
   }
 }
 @media (min-width: 1920px) {
-  .pv-section-title {
-    font-size: clamp(3.4rem, 1.43vw + 33.8px, 4.5rem);
-  }
-  .pv-t-mid {
-    font-size: clamp(3.3rem, 1.11vw + 31.5px, 4.36rem);
+  .pv-section-title,
+  .pv-t-mid,
+  .pv-t-fields {
+    font-size: clamp(76px, 1.6vw + 45.3px, 100px);
   }
   .pv-t-creations {
-    font-size: clamp(44px, 0.92vw + 26.3px, 58px);
-  }
-  .pv-t-fields {
-    font-size: clamp(54px, 1.14vw + 32.1px, 71px);
+    font-size: clamp(56px, 1.2vw + 33px, 74px);
   }
   .pv-t-field-card {
-    font-size: clamp(30px, 0.63vw + 17.9px, 39px);
+    font-size: clamp(34px, 0.7vw + 20.6px, 44px);
   }
-  .pv-t-colophon {
-    font-size: clamp(4.6rem, 1.55vw + 43.8px, 97px);
+  .pv-t-colophon,
+  .pv-t-showcase-cta {
+    font-size: clamp(104px, 2.1vw + 63.7px, 136px);
   }
   .pv-t-showcase-hero {
     font-size: clamp(10rem, 1.97vw + 122.2px, 190px);
-  }
-  .pv-t-showcase-cta {
-    font-size: clamp(4.6rem, 1.55vw + 43.8px, 97px);
   }
 }
 
@@ -1985,8 +2107,8 @@ html[data-prism-seen="1"] .pv-overture-core {
 }
 
 /* ═══ Passe whaou P2.2 — le backdrop à réfracter ══════════════
-   Derrière les objets verre : une nappe aurore (lilas #B8A1E8 →
-   pêche #F0C5A8, ≤ 8 % perçus) et deux light streaks fins à 22°
+   Derrière les objets verre : une nappe aurore (lilas #B9A7DA →
+   pêche #E9C6A2, ≤ 8 % perçus) et deux light streaks fins à 22°
    (l'angle SLANT de la scène), en dérive très lente. C'est la
    référence visuelle qui fait LIRE la réfraction : l'œil compare
    le fond nu au fond plié dans le verre. Compositor only. */
@@ -2006,7 +2128,7 @@ html[data-prism-seen="1"] .pv-overture-core {
 /* ═══ Passe whaou P1 — le système d'atmosphère ════════════════
    Toute page vit sur la même nuit : base #060606, sections ≤
    #0A0A0A (noirs neutres). Par section, UN champ de lumière —
-   grand radial aurore (lilas #B8A1E8 → pêche #F0C5A8) à 4-7 %,
+   grand radial aurore (lilas #B9A7DA → pêche #E9C6A2) à 4-7 %,
    1200-1800 px, position qui tourne d'une section à l'autre pour
    rythmer le scroll. Rendu en CSS gradient pur — JAMAIS de
    backdrop-filter généralisé. À poser en enfant absolu (aria-
@@ -2021,32 +2143,32 @@ html[data-prism-seen="1"] .pv-overture-core {
 /* haut-droit */
 .pv-field-light--tr {
   background:
-    radial-gradient(760px 590px at 82% 6%, rgba(184, 161, 232, 0.062) 0%, rgba(184, 161, 232, 0.028) 42%, transparent 70%),
-    radial-gradient(640px 500px at 94% 24%, rgba(240, 197, 168, 0.05) 0%, transparent 68%);
+    radial-gradient(760px 590px at 82% 6%, rgba(185, 167, 218, 0.062) 0%, rgba(185, 167, 218, 0.028) 42%, transparent 70%),
+    radial-gradient(640px 500px at 94% 24%, rgba(233, 198, 162, 0.05) 0%, transparent 68%);
 }
 /* bas-gauche */
 .pv-field-light--bl {
   background:
-    radial-gradient(780px 600px at 12% 96%, rgba(184, 161, 232, 0.058) 0%, rgba(184, 161, 232, 0.026) 44%, transparent 70%),
-    radial-gradient(620px 480px at 2% 74%, rgba(240, 197, 168, 0.048) 0%, transparent 66%);
+    radial-gradient(780px 600px at 12% 96%, rgba(185, 167, 218, 0.058) 0%, rgba(185, 167, 218, 0.026) 44%, transparent 70%),
+    radial-gradient(620px 480px at 2% 74%, rgba(233, 198, 162, 0.048) 0%, transparent 66%);
 }
 /* haut-gauche */
 .pv-field-light--tl {
   background:
-    radial-gradient(740px 580px at 14% 4%, rgba(240, 197, 168, 0.055) 0%, rgba(240, 197, 168, 0.024) 42%, transparent 68%),
-    radial-gradient(600px 470px at 2% 26%, rgba(184, 161, 232, 0.05) 0%, transparent 66%);
+    radial-gradient(740px 580px at 14% 4%, rgba(233, 198, 162, 0.055) 0%, rgba(233, 198, 162, 0.024) 42%, transparent 68%),
+    radial-gradient(600px 470px at 2% 26%, rgba(185, 167, 218, 0.05) 0%, transparent 66%);
 }
 /* bas-droit */
 .pv-field-light--br {
   background:
-    radial-gradient(760px 590px at 88% 94%, rgba(240, 197, 168, 0.06) 0%, rgba(240, 197, 168, 0.026) 44%, transparent 70%),
-    radial-gradient(620px 480px at 98% 72%, rgba(184, 161, 232, 0.048) 0%, transparent 66%);
+    radial-gradient(760px 590px at 88% 94%, rgba(233, 198, 162, 0.06) 0%, rgba(233, 198, 162, 0.026) 44%, transparent 70%),
+    radial-gradient(620px 480px at 98% 72%, rgba(185, 167, 218, 0.048) 0%, transparent 66%);
 }
 /* cœur (CTA final, pages centrées) */
 .pv-field-light--center {
   background:
-    radial-gradient(900px 640px at 50% 42%, rgba(184, 161, 232, 0.055) 0%, rgba(184, 161, 232, 0.024) 46%, transparent 72%),
-    radial-gradient(700px 520px at 58% 60%, rgba(240, 197, 168, 0.045) 0%, transparent 68%);
+    radial-gradient(900px 640px at 50% 42%, rgba(185, 167, 218, 0.055) 0%, rgba(185, 167, 218, 0.024) 46%, transparent 72%),
+    radial-gradient(700px 520px at 58% 60%, rgba(233, 198, 162, 0.045) 0%, transparent 68%);
 }
 
 /* Grain film statique — tuile 128 px (bruit déterministe, généré

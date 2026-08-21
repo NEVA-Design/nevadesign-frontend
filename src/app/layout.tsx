@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { geist, geistMono, outfit } from "./fonts";
+import { archivo, geistMono } from "./fonts";
 import LanguageProvider from "@/components/LanguageProvider";
 import SoieNoire from "@/components/prisme/SoieNoire";
 import { ConfirmDialogProvider } from "@/components/ui/confirm-dialog";
@@ -69,7 +69,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${geist.variable} ${geistMono.variable} ${outfit.variable} dark`}
+      className={`${archivo.variable} ${geistMono.variable} dark`}
       style={{ colorScheme: "dark" }}
       /* data-prism-seen est posé sur <html> par un script inline
          AVANT l'hydratation (anti-flash du micro-rideau) — même

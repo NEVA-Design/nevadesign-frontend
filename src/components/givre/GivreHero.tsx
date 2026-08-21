@@ -355,9 +355,9 @@ export default function GivreHero() {
         }}
       >
         <div className="w-full lg:pl-[108px] lg:pr-[40px]">
-          {/* ≥ 1680 : la mesure s'élargit à 640 px (brief §4 :
-              ≤ 640 px, ≤ 65 ch) — l'eyebrow tient sur sa ligne */}
-          <div className="max-w-[560px] min-[1680px]:max-w-[640px]">
+          {/* Refonte 50k : la mesure s'ouvre pour porter le titre
+              monumental (H1 §4.2, jusqu'à 148 px) */}
+          <div className="max-w-[560px] lg:max-w-[760px]">
             {/* Pagination — 8 moments réels sur la page */}
             <div className="gh-num pv-page-num">
               <b>01</b>
@@ -372,24 +372,23 @@ export default function GivreHero() {
               )}
             </p>
 
-            {/* Titre — Outfit léger, l'accent est un contraste de
-                graisse. L'identité vit dans la scène (le monogramme
-                de cristal) : aucun ornement dans la ligne. */}
-            <h1 className="mt-4 font-display gh-title leading-[1.06] tracking-[-0.015em] lg:mt-5">
+            {/* Titre — REFONTE 50k : Archivo variable, le jeu de
+                largeurs EST l'accent. Voix calme en condensé light
+                gris, la frappe en expanded massif ivoire — deux
+                lignes, tension maximale, zéro couleur. */}
+            <h1 className="mt-4 font-display gh-title lg:mt-5">
               <span className="gh-line block overflow-hidden">
-                <span className="block font-light text-slate">
+                <span className="gh-line-calm block">
                   {t("hero.line1", "Des visuels")}
                 </span>
               </span>
               <span className="gh-line block overflow-hidden">
-                <span className="block font-light text-slate">
-                  {t("hero.line2.pre", "qui font")}
-                </span>
-              </span>
-              <span className="gh-line block overflow-hidden">
-                <span className="block font-medium text-ink">
-                  {t("hero.line2.beam", "cliquer")}
-                  {t("hero.line2.post", ".")}
+                <span className="block">
+                  <span className="gh-line-calm">{t("hero.line2.pre", "qui font")}</span>{" "}
+                  <span className="gh-line-hit">
+                    {t("hero.line2.beam", "cliquer")}
+                    {t("hero.line2.post", ".")}
+                  </span>
                 </span>
               </span>
             </h1>

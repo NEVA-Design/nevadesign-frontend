@@ -37,6 +37,17 @@ Vu sur `../captures/qa/iter-baseline/full-home-1440.png` (crops t00/t01) :
 7. ★ texte restant : src/app/avis/page.tsx:63 (page /avis, hors home).
 8. FAQ : q2 « plan gratuit » et q4 « Creative Director » décrivent l'offre d'avant le pivot studio — signalé dans RAPPORT.md (contenu, pas mon appel).
 
+## Phase 1 — Choix display (test A/B/C capturé : dev-fontes-abc.png)
+
+**ARCHIVO retenue.** (1) Amplitude wdth réelle 62-125 : le contraste condensé-light / expanded-640 a une autorité d'affiche que Bricolage (wdth 75-100, jeu timide) ne peut pas donner ; (2) en body 400 elle est neutre et irréprochable là où Anybody (formes « maillot esport ») fatigue sur 4 lignes ; (3) c'est la moins déjà-vue — Bricolage est la fonte-réflexe des sites IA 2024-25. Bonus : chiffres expanded superbes pour les stats. Outfit ET Geist supprimées — 1 seule famille texte (Archivo variable) + Geist Mono. `font-stretch` (héritable) plutôt que font-variation-settings.
+
+**Doctrine appliquée** : aurore chassée de TOUS les usages UI (focus ring, selection, gauge, spinner, liserés, chips, beam-text → l'accent des titres est désormais un contraste graisse+largeur en ivoire). L'argent #C8CBD0 est le seul accent UI. Radius resserrés 6/6/10/14/18 (boutons 14 conservés — décision opérateur run 8).
+
+**Défauts trouvés en capture (phase 1) et traitement** :
+1. Titre hero à l'échelle 148px débordait du bloc 560px (4 lignes, CTA sous le pli) → recomposition : mesure 760px, titre en 2 lignes, voix .gh-line-calm/.gh-line-hit. CORRIGÉ (p1-hero-v2.png).
+2. « cliquer. » chevauche le monogramme 3D → arbitrage caméra/layout en phase 2 (noté).
+3. Pilule « 5/5 avis » bordurée + césure « à » orpheline du titre 02 → phase 3 (sections).
+
 ## Décisions de session
 
 - Branche de travail : `refonte-50k` ; premier commit = état pré-refonte (modifs cookies run 12 en cours, non mêlées aux phases).
