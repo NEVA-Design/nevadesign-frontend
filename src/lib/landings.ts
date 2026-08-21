@@ -12,7 +12,7 @@ export const LANDINGS: Record<string, Landing> = {
     h1: "Graphiste FiveM",
     kicker: "Solutions — FiveM & GTA RP",
     intro: [
-      "Trouver un graphiste FiveM disponible, fiable et abordable relève souvent du parcours du combattant : les bons profils affichent complet, les devis grimpent vite et l’ouverture de votre serveur n’attend pas. Neva Design prend le relais. Vous décrivez le visuel dont votre serveur RP a besoin — logo, loading screen, bannière Discord, affiche d’événement — et l’IA compose une image prête à publier, exportable jusqu’en 8K. Pas de logiciel à installer, pas de brief de dix pages : une description honnête de votre univers suffit. Le studio a déjà habillé des serveurs GTA RP, des équipes esport et des chaînes YouTube ; le portfolio public sur /neva-design montre des packs serveur réels, pas des maquettes théoriques. L’inscription est gratuite, sans carte bancaire : de quoi tester le studio avant de choisir une formule."],
+      "Trouver un graphiste FiveM disponible, fiable et abordable relève souvent du parcours du combattant : les bons profils affichent complet, les devis grimpent vite et l’ouverture de votre serveur n’attend pas. Neva Design prend le relais. Vous décrivez le visuel dont votre serveur RP a besoin — logo, loading screen, bannière Discord, affiche d’événement — et l’IA compose une image prête à publier, exportable jusqu’en 8K. Pas de logiciel à installer, pas de brief de dix pages : une description honnête de votre univers suffit. Le studio a déjà habillé des serveurs GTA RP, des équipes esport et des chaînes YouTube ; le portfolio public sur /neva-design montre des packs serveur réels, pas des maquettes théoriques. L’inscription est gratuite : de quoi tester le studio avant de choisir une formule."],
     examples: [
       { src: "/postergrandfivem2.webp", alt: "Affiche grand format pour serveur FiveM", ratio: "portrait" },
       { src: "/Prime_-_preview_serveur_pack_8.webp", alt: "Pack graphique complet de serveur RP", ratio: "video" },
@@ -87,7 +87,7 @@ export const LANDINGS: Record<string, Landing> = {
     h1: "Logo FiveM",
     kicker: "Solutions — FiveM & GTA RP",
     intro: [
-      "Un logo FiveM se joue en une fraction de seconde : c’est lui qu’un joueur voit dans la liste des serveurs, sur l’icône Discord et en haut du loading screen, avant même de lire votre présentation. Neva Design vous permet d’en créer un sans toucher Photoshop : vous décrivez votre ville, son époque et son ambiance, l’IA compose un emblème original, et vous l’ajustez jusqu’à ce qu’il vous ressemble. Export final jusqu’en 8K, utilisable sur Discord, votre site, vos overlays de stream et vos impressions. Le portfolio /neva-design montre des logos esport et serveur réellement livrés, pour vous faire une idée du niveau de finition. L’inscription est gratuite et sans carte bancaire ; les formules démarrent dès 24 €/mois pour comparer deux directions et trancher."],
+      "Un logo FiveM se joue en une fraction de seconde : c’est lui qu’un joueur voit dans la liste des serveurs, sur l’icône Discord et en haut du loading screen, avant même de lire votre présentation. Neva Design vous permet d’en créer un sans toucher Photoshop : vous décrivez votre ville, son époque et son ambiance, l’IA compose un emblème original, et vous l’ajustez jusqu’à ce qu’il vous ressemble. Export final jusqu’en 8K, utilisable sur Discord, votre site, vos overlays de stream et vos impressions. Le portfolio /neva-design montre des logos esport et serveur réellement livrés, pour vous faire une idée du niveau de finition. L’inscription est gratuite ; les formules démarrent dès 24 €/mois pour comparer deux directions et trancher."],
     examples: [
       { src: "/neva-design/logos/EFINAL.webp", alt: "Emblème esport E Final", ratio: "video" },
       { src: "/neva-design/logos/krlogo.webp", alt: "Monogramme chrome KR", ratio: "video" },
@@ -162,7 +162,7 @@ export const LANDINGS: Record<string, Landing> = {
     h1: "Bannière Discord FiveM",
     kicker: "Solutions — FiveM & GTA RP",
     intro: [
-      "Le Discord est la porte d’entrée de votre serveur : c’est là que passent les candidatures whitelist, les annonces et les nouveaux joueurs venus « juste regarder ». Une bannière Discord FiveM soignée change la première impression du tout au tout — et c’est précisément le genre de visuel que Neva Design produit bien : vous décrivez l’ambiance de votre ville, l’IA compose une image aux bonnes dimensions, cohérente avec votre logo et votre loading screen. Vous itérez jusqu’au rendu voulu, puis vous exportez en haute résolution, jusqu’en 8K si besoin. Pas de gabarit Canva vu mille fois, pas d’attente de trois jours pour un fichier de 960 × 540. L’inscription est gratuite et sans carte bancaire ; une formule active vous laisse générer la bannière, le splash d’invitation et l’icône assortie."],
+      "Le Discord est la porte d’entrée de votre serveur : c’est là que passent les candidatures whitelist, les annonces et les nouveaux joueurs venus « juste regarder ». Une bannière Discord FiveM soignée change la première impression du tout au tout — et c’est précisément le genre de visuel que Neva Design produit bien : vous décrivez l’ambiance de votre ville, l’IA compose une image aux bonnes dimensions, cohérente avec votre logo et votre loading screen. Vous itérez jusqu’au rendu voulu, puis vous exportez en haute résolution, jusqu’en 8K si besoin. Pas de gabarit Canva vu mille fois, pas d’attente de trois jours pour un fichier de 960 × 540. L’inscription est gratuite ; une formule active vous laisse générer la bannière, le splash d’invitation et l’icône assortie."],
     examples: [
       { src: "/postergrandfivem.webp", alt: "Bannière grand format serveur FiveM", ratio: "portrait" },
       { src: "/Prime_-_preview_serveur_pack_4.webp", alt: "Kit graphique serveur RP", ratio: "video" },
@@ -232,11 +232,11 @@ export const LANDINGS: Record<string, Landing> = {
     slug: "loading-screen-fivem",
     locale: "fr",
     title: "Loading screen FiveM : des visuels 16:9 qui marquent",
-    description: "Générez un loading screen FiveM net en 1920×1080, léger et lisible, décliné en série. Export jusqu’en 8K. Essai gratuit, sans carte bancaire.",
+    description: "Générez un loading screen FiveM net en 1920×1080, léger et lisible, décliné en série. Export jusqu’en 8K. Essai gratuit.",
     h1: "Loading screen FiveM",
     kicker: "Solutions — FiveM & GTA RP",
     intro: [
-      "Le loading screen FiveM est un moment étrange : le joueur n’a rien d’autre à regarder pendant que les ressources se téléchargent, parfois plusieurs minutes lors de la première connexion. C’est votre meilleure fenêtre d’ambiance — et souvent la plus négligée, remplie d’une capture d’écran floue prise à la va-vite. Neva Design génère des visuels d’écran de chargement composés pour ce format : une scène qui pose votre univers, votre logo bien placé, des zones calmes pour l’interface. Vous décrivez l’ambiance (« ruelle sous la pluie, enseignes néon, voiture de police au loin »), vous itérez, vous exportez en 1920 × 1080 ou plus, jusqu’en 8K pour les écrans 4K. L’inscription est gratuite et sans carte bancaire ; une formule active permet de produire une petite série rotative dès ce soir."],
+      "Le loading screen FiveM est un moment étrange : le joueur n’a rien d’autre à regarder pendant que les ressources se téléchargent, parfois plusieurs minutes lors de la première connexion. C’est votre meilleure fenêtre d’ambiance — et souvent la plus négligée, remplie d’une capture d’écran floue prise à la va-vite. Neva Design génère des visuels d’écran de chargement composés pour ce format : une scène qui pose votre univers, votre logo bien placé, des zones calmes pour l’interface. Vous décrivez l’ambiance (« ruelle sous la pluie, enseignes néon, voiture de police au loin »), vous itérez, vous exportez en 1920 × 1080 ou plus, jusqu’en 8K pour les écrans 4K. L’inscription est gratuite ; une formule active permet de produire une petite série rotative dès ce soir."],
     examples: [
       { src: "/bglanding.webp", alt: "Écran d’attente de serveur FiveM", ratio: "wide" },
       { src: "/plage.webp", alt: "Décor plage Los Santos retravaillé", ratio: "wide" },
@@ -310,7 +310,7 @@ export const LANDINGS: Record<string, Landing> = {
     h1: "Pack graphique FiveM",
     kicker: "Solutions — FiveM & GTA RP",
     intro: [
-      "Commander ses visuels un par un, à des moments différents, parfois à des personnes différentes : voilà comment un serveur se retrouve avec un logo bleu, un loading screen orange et des affiches qui semblent venir d’une autre ville. Un pack graphique FiveM règle le problème à la racine : tous les supports partent de la même charte et sortent ensemble. Avec Neva Design, vous décrivez une seule fois votre univers — époque, ambiance, couleurs — puis vous déclinez logo, écran de chargement, bannières Discord et affiches dans la foulée, avec des itérations illimitées dans votre quota et des exports jusqu’en 8K. Les packs one-shot démarrent à 19 €, et l’inscription reste gratuite et sans carte bancaire pour découvrir le studio avant d’engager quoi que ce soit."],
+      "Commander ses visuels un par un, à des moments différents, parfois à des personnes différentes : voilà comment un serveur se retrouve avec un logo bleu, un loading screen orange et des affiches qui semblent venir d’une autre ville. Un pack graphique FiveM règle le problème à la racine : tous les supports partent de la même charte et sortent ensemble. Avec Neva Design, vous décrivez une seule fois votre univers — époque, ambiance, couleurs — puis vous déclinez logo, écran de chargement, bannières Discord et affiches dans la foulée, avec des itérations illimitées dans votre quota et des exports jusqu’en 8K. Les packs one-shot démarrent à 19 €, et l’inscription reste gratuite pour découvrir le studio avant d’engager quoi que ce soit."],
     examples: [
       { src: "/Prime_-_preview_serveur_pack_8.webp", alt: "Pack graphique serveur, vue d’ensemble", ratio: "video" },
       { src: "/Prime_-_preview_serveur_pack_4.webp", alt: "Déclinaisons d’un pack serveur", ratio: "video" },
@@ -384,7 +384,7 @@ export const LANDINGS: Record<string, Landing> = {
     h1: "Affiche serveur FiveM",
     kicker: "Solutions — FiveM & GTA RP",
     intro: [
-      "Un événement RP sans affiche, c’est un salon Discord qui s’emballe deux heures puis retombe. Une affiche serveur FiveM bien faite transforme une annonce texte en rendez-vous : elle circule sur le Discord, se partage sur X et TikTok, et donne à votre soirée casino ou à votre salon de l’auto l’allure d’un vrai événement de ville. Neva Design en génère en quelques minutes : vous décrivez la scène, l’IA compose l’affiche dans le style de votre serveur, vous ajustez le texte et l’ambiance, puis vous exportez aux formats de chaque réseau — jusqu’en 8K pour l’impression éventuelle. Les affiches GTA RP du portfolio /neva-design donnent une idée du rendu. L’inscription est gratuite et sans carte bancaire : votre prochain événement peut être affiché dès ce soir."],
+      "Un événement RP sans affiche, c’est un salon Discord qui s’emballe deux heures puis retombe. Une affiche serveur FiveM bien faite transforme une annonce texte en rendez-vous : elle circule sur le Discord, se partage sur X et TikTok, et donne à votre soirée casino ou à votre salon de l’auto l’allure d’un vrai événement de ville. Neva Design en génère en quelques minutes : vous décrivez la scène, l’IA compose l’affiche dans le style de votre serveur, vous ajustez le texte et l’ambiance, puis vous exportez aux formats de chaque réseau — jusqu’en 8K pour l’impression éventuelle. Les affiches GTA RP du portfolio /neva-design donnent une idée du rendu. L’inscription est gratuite : votre prochain événement peut être affiché dès ce soir."],
     examples: [
       { src: "/affiche1.webp", alt: "Affiche de lancement de serveur", ratio: "portrait" },
       { src: "/affiche2.webp", alt: "Affiche d’événement RP", ratio: "portrait" },
@@ -454,11 +454,11 @@ export const LANDINGS: Record<string, Landing> = {
     slug: "en/fivem-graphic-designer",
     locale: "en",
     title: "FiveM Graphic Designer: Server Art in Minutes",
-    description: "Get logos, loading screens and Discord banners for your FiveM server in minutes, not weeks. No credit card required to sign up.",
+    description: "Get logos, loading screens and Discord banners for your FiveM server in minutes, not weeks. Signing up is free.",
     h1: "FiveM Graphic Designer",
     kicker: "Solutions",
     intro: [
-      "Every serious RP server eventually hits the same wall: you need a FiveM graphic designer, and the good ones are booked, the cheap ones disappear mid-project, and your launch date will not move. Neva Design works like an art department that answers instantly. You describe what your city needs — a crest for city hall, a loading screen that sets the mood, a Discord banner for allowlist applications — and the AI composes a publish-ready visual you can refine until it fits, then export at up to 8K. No design software, no back-and-forth emails spread over two weeks. The public portfolio at /neva-design shows real server packs, esports logos and GTA RP posters, so you can judge the output before spending anything. Signing up is free with no credit card, so you can explore the studio before choosing a plan."],
+      "Every serious RP server eventually hits the same wall: you need a FiveM graphic designer, and the good ones are booked, the cheap ones disappear mid-project, and your launch date will not move. Neva Design works like an art department that answers instantly. You describe what your city needs — a crest for city hall, a loading screen that sets the mood, a Discord banner for allowlist applications — and the AI composes a publish-ready visual you can refine until it fits, then export at up to 8K. No design software, no back-and-forth emails spread over two weeks. The public portfolio at /neva-design shows real server packs, esports logos and GTA RP posters, so you can judge the output before spending anything. Signing up is free, so you can explore the studio before choosing a plan."],
     examples: [
       { src: "/postergrandfivem2.webp", alt: "Affiche grand format pour serveur FiveM", ratio: "portrait" },
       { src: "/Prime_-_preview_serveur_pack_8.webp", alt: "Pack graphique complet de serveur RP", ratio: "video" },
@@ -529,11 +529,11 @@ export const LANDINGS: Record<string, Landing> = {
     slug: "en/fivem-logo-maker",
     locale: "en",
     title: "FiveM Logo Maker: Custom Server Emblems Fast",
-    description: "Design a custom FiveM server logo from a text description. Crest, mascot or neon styles, 8K export. No credit card required.",
+    description: "Design a custom FiveM server logo from a text description. Crest, mascot or neon styles, 8K export. Free to sign up.",
     h1: "FiveM Logo Maker",
     kicker: "Solutions",
     intro: [
-      "Most logo tools give FiveM owners the same dead end: generic gaming templates that have nothing to do with roleplay, or a wolf-head mascot already used by forty other communities. Neva Design is a FiveM logo maker built around description instead of templates. You explain your city — its era, its energy, the story your server tells — and the AI composes an emblem that belongs to it: a municipal crest, a chrome wordmark, a mascot with actual character. You refine by chatting, not by re-opening a ticket, and export at up to 8K for anything from a Discord icon to printed merch. Real delivered logos sit in the portfolio at /neva-design if you want proof before starting. Signing up costs nothing and needs no credit card, so you can compare two directions before picking a plan."],
+      "Most logo tools give FiveM owners the same dead end: generic gaming templates that have nothing to do with roleplay, or a wolf-head mascot already used by forty other communities. Neva Design is a FiveM logo maker built around description instead of templates. You explain your city — its era, its energy, the story your server tells — and the AI composes an emblem that belongs to it: a municipal crest, a chrome wordmark, a mascot with actual character. You refine by chatting, not by re-opening a ticket, and export at up to 8K for anything from a Discord icon to printed merch. Real delivered logos sit in the portfolio at /neva-design if you want proof before starting. Signing up costs nothing, so you can compare two directions before picking a plan."],
     examples: [
       { src: "/neva-design/logos/EFINAL.webp", alt: "Emblème esport E Final", ratio: "video" },
       { src: "/neva-design/logos/krlogo.webp", alt: "Monogramme chrome KR", ratio: "video" },

@@ -10,3 +10,10 @@ export const COMING_SOON = true;
 // code (GivrePricing, GivrePacks, billing, JSON-LD) mais n'est plus affichée : elle est
 // remplacée par les 2 formules Neva Generative. Repasser à true pour la restaurer.
 export const LEGACY_PRICING = false;
+
+// Décision opérateur 21/08 : la catégorie « Bannières IA » est masquée et
+// affichée « Très prochainement » — Formule 02 de la home (bibliothèque de
+// modèles + carte tarifaire), formats bannière/affiche du hub projet, et
+// route directe du wizard scène. Rien n'est supprimé : repasser à false
+// pour tout rouvrir.
+export const BANNIERES_IA_SOON = true;

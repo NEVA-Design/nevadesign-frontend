@@ -2,6 +2,7 @@ import { ArrowLeft, Check, Lock } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { backendGetJson } from "@/lib/api/backend-server";
+import { BANNIERES_IA_SOON } from "@/lib/feature-flags";
 import {
   CATEGORY_LABELS,
   CATEGORY_SPECS,
@@ -94,31 +95,39 @@ export default async function CreateHubPage({ params }: { params: Promise<{ id: 
           const spec = CATEGORY_SPECS[category];
           const isLogo = category === "logo";
           const logoDone = isLogo && hasLogo;
-          const locked = !isLogo && !hasLogo;
+          /* Décision 21/08 : tant que BANNIERES_IA_SOON, tous les
+             formats hors logo sont « Très prochainement » — inertes,
+             quel que soit l'état du logo. */
+          const soon = !isLogo && BANNIERES_IA_SOON;
+          const locked = !isLogo && !hasLogo && !soon;
 
           const card = (
             <div
               className={
-                locked || logoDone
+                locked || logoDone || soon
                   ? "flex items-center gap-5 rounded-2xl border border-[color:var(--hairline)] bg-white/5 p-5"
-                  : "pv-glass pv-edge pv-ignite group flex items-center gap-5 rounded-2xl p-5 transition-all duration-300 hover:border-[rgba(184,161,232,0.5)]"
+                  : "pv-glass pv-edge pv-ignite group flex items-center gap-5 rounded-2xl p-5 transition-all duration-300 hover:border-[rgba(255,255,255,0.3)]"
               }
             >
               <FormatShape category={category} />
               <div className="min-w-0 flex-1">
-                <span className={`block text-[15px] font-medium ${locked ? "text-mist" : "text-ink"}`}>
+                <span className={`block text-[15px] font-medium ${locked || soon ? "text-mist" : "text-ink"}`}>
                   {CATEGORY_LABELS[category]}
                 </span>
-                <span className={`mt-1 block text-xs leading-relaxed ${locked ? "text-mist" : "text-steel"}`}>
+                <span className={`mt-1 block text-xs leading-relaxed ${locked || soon ? "text-mist" : "text-steel"}`}>
                   {spec.usage}
                 </span>
-                <span className={`mt-2 block font-mono text-[10px] tracking-[0.1em] ${locked ? "text-mist" : "text-dusk"}`}>
+                <span className={`mt-2 block font-mono text-[10px] tracking-[0.1em] ${locked || soon ? "text-mist" : "text-dusk"}`}>
                   {spec.width} × {spec.height} px
                 </span>
               </div>
               {logoDone ? (
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[rgba(111,191,159,0.40)] text-[#6FBF9F]">
                   <Check size={14} />
+                </span>
+              ) : soon ? (
+                <span className="shrink-0 rounded-[10px] border border-[color:var(--hairline-strong)] px-2.5 py-[4px] font-mono text-[9px] uppercase tracking-[0.12em] text-mist">
+                  Très prochainement
                 </span>
               ) : locked ? (
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[color:var(--hairline-strong)] text-mist">
@@ -131,6 +140,13 @@ export default async function CreateHubPage({ params }: { params: Promise<{ id: 
           if (logoDone) {
             return (
               <div key={category} title="Le logo master est en place — il se compose, il ne se régénère pas.">
+                {card}
+              </div>
+            );
+          }
+          if (soon) {
+            return (
+              <div key={category} title="Ce format arrive très prochainement.">
                 {card}
               </div>
             );
@@ -150,7 +166,11 @@ export default async function CreateHubPage({ params }: { params: Promise<{ id: 
         })}
       </div>
 
-      {!hasLogo ? (
+      {BANNIERES_IA_SOON ? (
+        <p className="mt-6 font-mono text-[11px] tracking-[0.08em] text-dusk">
+          Les autres formats arrivent très prochainement — le logo d&apos;abord.
+        </p>
+      ) : !hasLogo ? (
         <p className="mt-6 font-mono text-[11px] tracking-[0.08em] text-dusk">
           Les autres formats se déverrouillent dès que le logo master est créé.
         </p>

@@ -26,6 +26,7 @@ import Link from "next/link";
 import { RevealBlock } from "@/components/prisme/Motion";
 import { useTranslations } from "@/components/LanguageProvider";
 import models from "@/data/models.json";
+import { BANNIERES_IA_SOON } from "@/lib/feature-flags";
 import {
   GENERATIVE_PRICING,
   formatGenerativePrice,
@@ -368,7 +369,16 @@ export default function GivreGenerative() {
           <hr className="pv-rule--beam my-16" />
 
           {/* ── Formule 3B — Bannières Discord IA ───────────────── */}
-          <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8">
+          {/* Décision 21/08 (BANNIERES_IA_SOON) : la bibliothèque est
+              masquée — état designé « Très prochainement », pas de
+              modèles, pas de prix, pas de CTA d'abonnement. */}
+          <div
+            className={
+              BANNIERES_IA_SOON
+                ? undefined
+                : "lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8"
+            }
+          >
             <div>
               <RevealBlock>
                 <p className="pv-num">{t("generative.banner.num", "Formule 02")}</p>
@@ -383,6 +393,27 @@ export default function GivreGenerative() {
                 </p>
               </RevealBlock>
 
+              {BANNIERES_IA_SOON ? (
+                <RevealBlock delay={0.08}>
+                  <div className="mt-8 flex w-fit items-center gap-3 rounded-[14px] border border-[color:var(--hairline)] bg-white/[0.03] px-5 py-4">
+                    <span
+                      aria-hidden
+                      className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#F0C5A8]"
+                    />
+                    <p className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-ink">
+                      {t("generative.banner.soon.badge", "Très prochainement")}
+                    </p>
+                    <span aria-hidden className="h-4 w-px bg-[color:var(--hairline)]" />
+                    <p className="text-[13px] leading-[1.5] text-slate">
+                      {t(
+                        "generative.banner.soon.text",
+                        "La bibliothèque de modèles est en préparation."
+                      )}
+                    </p>
+                  </div>
+                </RevealBlock>
+              ) : (
+                <>
               {/* Légende des 4 icônes — au-dessus de la grille */}
               <RevealBlock delay={0.08}>
                 <ul className="mt-7 flex flex-wrap gap-x-6 gap-y-3">
@@ -422,21 +453,25 @@ export default function GivreGenerative() {
                   </RevealBlock>
                 ))}
               </div>
+                </>
+              )}
             </div>
-            <RevealBlock delay={0.14}>
-              <div className="mt-8 lg:sticky lg:top-24 lg:mt-0">
-                <PriceCard
-                  title={t("generative.banner.title", "Bannières Discord IA")}
-                  price={formatGenerativePrice(GENERATIVE_PRICING.banner)}
-                  features={[
-                    t("generative.banner.f1", "Quota mensuel dévoilé à l'ouverture"),
-                    t("generative.banner.f2", "Accès à tous les modèles"),
-                    t("generative.banner.f3", "Personnalisation nom / thème / couleur"),
-                  ]}
-                  t={t}
-                />
-              </div>
-            </RevealBlock>
+            {BANNIERES_IA_SOON ? null : (
+              <RevealBlock delay={0.14}>
+                <div className="mt-8 lg:sticky lg:top-24 lg:mt-0">
+                  <PriceCard
+                    title={t("generative.banner.title", "Bannières Discord IA")}
+                    price={formatGenerativePrice(GENERATIVE_PRICING.banner)}
+                    features={[
+                      t("generative.banner.f1", "Quota mensuel dévoilé à l'ouverture"),
+                      t("generative.banner.f2", "Accès à tous les modèles"),
+                      t("generative.banner.f3", "Personnalisation nom / thème / couleur"),
+                    ]}
+                    t={t}
+                  />
+                </div>
+              </RevealBlock>
+            )}
           </div>
         </div>
       </div>

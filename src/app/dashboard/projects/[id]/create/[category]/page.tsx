@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { backendGetJson } from "@/lib/api/backend-server";
+import { BANNIERES_IA_SOON } from "@/lib/feature-flags";
 import { CATEGORY_SPECS, type AssetCategory } from "@/lib/projects-shared";
 import SceneWizard from "./SceneWizard";
 
@@ -32,6 +33,11 @@ export default async function SceneWizardPage({
   const { id, category } = await params;
   if (!SCENE_CATEGORIES.includes(category as AssetCategory) || !(category in CATEGORY_SPECS)) {
     notFound();
+  }
+  // Décision 21/08 : formats scène « Très prochainement » — les URL
+  // directes retombent sur le hub du projet.
+  if (BANNIERES_IA_SOON) {
+    redirect(`/dashboard/projects/${id}/create`);
   }
 
   const detail = await backendGetJson<ProjectDetail>(`/projects/${id}`);

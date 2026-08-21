@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Créer un compte — Neva Design",
   description:
-    "Créez votre compte Neva Design gratuitement, sans carte bancaire. Miniatures, logos, identités et assets gaming en quelques minutes.",
+    "Créez votre compte Neva Design gratuitement. Miniatures, logos, identités et assets gaming en quelques minutes.",
   alternates: {
     canonical: "/signup",
   },

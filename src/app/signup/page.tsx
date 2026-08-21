@@ -7,14 +7,13 @@ import { useRouter } from "next/navigation";
 import { storeSession } from "@/lib/session";
 import { backendFetch } from "@/lib/api/backend-client";
 import { BrandMark } from "@/components/prisme/Brand";
-import SatinSphere from "@/components/givre/SatinSphere";
-import { Button } from "@/components/ui/button";
 import { Input, Label, FormMessage } from "@/components/ui/field";
 
+
 /*
- * Inscription — la même déclinaison calme du hero Givre que la
- * connexion : scène d'aube diluée, cadre éditorial d'un pixel, une
- * carte de verre dépoli. Après création du compte, la même carte
+ * Inscription — même cimaise que /login (redesign 21/08) : carte
+ * d'encre mate à gauche, l'œuvre porcelaine encadrée à droite,
+ * satin vivant derrière. Après création du compte, la même carte
  * devient l'écran « Vérifiez vos e-mails ».
  */
 
@@ -81,15 +80,10 @@ export default function SignupPage() {
         </span>
       </header>
 
-      <main className="relative z-10 flex min-h-[100svh] items-center justify-center px-6 py-24 sm:px-8">
-        <div className="relative w-full max-w-[420px]">
-          {/* La sphère satinée — ENTIÈRE, à droite au-dessus de la
-              carte (Phase 4.4) */}
-          <SatinSphere
-            size={150}
-            className="pointer-events-none absolute -top-[24px] right-[-186px] hidden lg:block"
-          />
-          {/* La carte porteuse — spec Phase 4.2 */}
+      <main className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1180px] items-center px-6 py-24 sm:px-8">
+        <div className="grid w-full items-center gap-10 lg:grid-cols-[430px_minmax(0,1fr)] lg:gap-14">
+          <div className="mx-auto w-full max-w-[430px]">
+          {/* La carte porteuse — encre mate opaque, top-light */}
           <section className="pv-auth-card pv-fade-up px-6 py-8 sm:px-9 sm:py-10">
             <Link href="/" aria-label="Neva Design — accueil" className="inline-flex">
               <BrandMark size={24} tone="white" />
@@ -110,10 +104,8 @@ export default function SignupPage() {
                   Pensez aussi à vérifier les courriers indésirables. Une fois
                   l’adresse confirmée, vous pourrez vous connecter à votre espace.
                 </p>
-                <Link href="/login" className="mt-7 block">
-                  <Button type="button" variant="primary" size="lg" className="pv-btn w-full">
-                    Aller à la connexion
-                  </Button>
+                <Link href="/login" className="pv-btn mt-7 w-full">
+                  Aller à la connexion
                 </Link>
               </div>
             ) : (
@@ -128,9 +120,6 @@ export default function SignupPage() {
                 <p className="mt-3 max-w-[340px] text-sm leading-relaxed text-slate">
                   Le studio compose, vous publiez — affiches, logos et identités
                   complètes pour votre serveur.
-                </p>
-                <p className="pv-pill mt-4 font-mono text-[10px] uppercase tracking-[0.13em] text-slate">
-                  Sans carte bancaire
                 </p>
 
                 {error ? (
@@ -174,13 +163,8 @@ export default function SignupPage() {
                       minLength={6}
                     />
                   </div>
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    size="lg"
-                    className="pv-btn mt-1 w-full"
-                    disabled={loading}
-                  >
+                  {/* bouton pv-btn nu : radius 14 de la charte */}
+                  <button type="submit" className="pv-btn mt-1 w-full" disabled={loading}>
                     {loading ? (
                       <>
                         <span aria-hidden className="pv-spinner h-4 w-4" />
@@ -189,42 +173,63 @@ export default function SignupPage() {
                     ) : (
                       "Créer mon compte gratuit"
                     )}
-                  </Button>
+                  </button>
                 </form>
+
+                {/* Pied de carte — le second chemin + le légal */}
+                <div className="mt-8 border-t border-[rgba(255,255,255,0.08)] pt-5">
+                  <p className="text-[13px] text-slate">
+                    Déjà un compte ?{" "}
+                    <Link href="/login" className="pv-link">
+                      Connectez-vous
+                    </Link>
+                  </p>
+                  <p className="mt-3 text-[11px] leading-relaxed text-mist">
+                    En créant un compte, vous acceptez nos{" "}
+                    <Link
+                      href="/terms"
+                      className="underline decoration-[rgba(255,255,255,0.25)] underline-offset-2 transition-colors hover:text-ink"
+                    >
+                      Conditions d’utilisation
+                    </Link>{" "}
+                    et notre{" "}
+                    <Link
+                      href="/privacy"
+                      className="underline decoration-[rgba(255,255,255,0.25)] underline-offset-2 transition-colors hover:text-ink"
+                    >
+                      Politique de confidentialité
+                    </Link>
+                    .
+                  </p>
+                </div>
               </>
             )}
           </section>
+          </div>
 
-          {!success ? (
-            <div
-              className="pv-fade-up mt-7 text-center"
-              style={{ animationDelay: "0.2s" }}
-            >
-              <p className="text-[13px] text-slate">
-                Déjà un compte ?{" "}
-                <Link href="/login" className="pv-link">
-                  Connectez-vous
-                </Link>
-              </p>
-              <p className="mx-auto mt-3 max-w-[360px] text-[11px] leading-relaxed text-mist">
-                En créant un compte, vous acceptez nos{" "}
-                <Link
-                  href="/terms"
-                  className="underline decoration-[rgba(255,255,255,0.25)] underline-offset-2 transition-colors hover:text-ink"
-                >
-                  Conditions d’utilisation
-                </Link>{" "}
-                et notre{" "}
-                <Link
-                  href="/privacy"
-                  className="underline decoration-[rgba(255,255,255,0.25)] underline-offset-2 transition-colors hover:text-ink"
-                >
-                  Politique de confidentialité
-                </Link>
-                .
-              </p>
-            </div>
-          ) : null}
+          {/* L'œuvre — la scène porcelaine du studio, en cimaise */}
+          <figure
+            className="pv-auth-art pv-fade-up hidden h-[min(74vh,700px)] lg:block"
+            style={{ animationDelay: "0.12s" }}
+            aria-hidden
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/scene/low/hero-poster-1440.avif"
+              alt=""
+              loading="lazy"
+              decoding="async"
+              style={{ objectPosition: "70% 44%" }}
+            />
+            <figcaption>
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink">
+                Monogramme AV — porcelaine &amp; satin
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-mist">
+                La scène du studio
+              </span>
+            </figcaption>
+          </figure>
         </div>
       </main>
     </div>
