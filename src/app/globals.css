@@ -404,28 +404,29 @@ html {
 
 /* Le hero suit la même doctrine : ses couches de scène (poster,
    canvas 3D, aurora, streaks) fondent au transparent sur leurs
-   derniers 160 px — le raccord avec la section suivante se fait
+   derniers 120 px — le raccord avec la section suivante se fait
    sur le SATIN NU. L'ancien voile noir 92 % posé par-dessus
    dessinait sa propre marche au bord de section (satin nu à
    ~40 niveaux sous la ligne, hero éteint au-dessus). Rampe COURTE
-   (300 → 160 px, retour opérateur) : la version longue mordait le
+   (300 → 120 px, retour opérateur) : la version longue mordait le
    bas de la sculpture — le satin semblait passer PAR-DESSUS
-   l'objet 3D. Même courbe en S que le masque commun, côté bas. */
+   l'objet 3D (pointe du V mesurée à ~55 % d'opacité à 160 px).
+   Même courbe en S que le masque commun, côté bas. */
 .pv-hero-layer {
   -webkit-mask-image: linear-gradient(
     180deg,
     #000 0,
-    #000 calc(100% - 160px),
-    rgba(0, 0, 0, 0.82) calc(100% - 131px),
-    rgba(0, 0, 0, 0.38) calc(100% - 80px),
+    #000 calc(100% - 120px),
+    rgba(0, 0, 0, 0.82) calc(100% - 98px),
+    rgba(0, 0, 0, 0.38) calc(100% - 60px),
     transparent 100%
   );
   mask-image: linear-gradient(
     180deg,
     #000 0,
-    #000 calc(100% - 160px),
-    rgba(0, 0, 0, 0.82) calc(100% - 131px),
-    rgba(0, 0, 0, 0.38) calc(100% - 80px),
+    #000 calc(100% - 120px),
+    rgba(0, 0, 0, 0.82) calc(100% - 98px),
+    rgba(0, 0, 0, 0.38) calc(100% - 60px),
     transparent 100%
   );
 }
