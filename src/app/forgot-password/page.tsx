@@ -74,7 +74,7 @@ export default function ForgotPasswordPage() {
               Mot de passe oublié
             </p>
             <h1 className="pv-display mt-3 text-[clamp(1.8rem,5.6vw,2.25rem)] leading-[1.12]">
-              On vous renvoie <span className="font-medium text-ink">la clé</span>.
+              On vous renvoie <b>la clé</b>.
             </h1>
             <p className="mt-3 max-w-[320px] text-sm leading-relaxed text-slate">
               Saisissez l'adresse de votre compte : vous recevrez un lien

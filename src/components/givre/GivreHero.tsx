@@ -401,7 +401,7 @@ export default function GivreHero() {
             <p className="gh-sub mt-4 max-w-[400px] text-[15px] leading-[1.65] text-slate lg:mt-7 lg:leading-[1.7]">
               {t(
                 "hero.subtitle",
-                "Des graphistes pour vos logos, packs FiveM, bannières et affiches — et Neva Generative, l'IA qui compose des scènes GTA photoréalistes. Brief sur Discord, suivi en direct, livraison rapide."
+                "Des graphistes pour vos logos, packs FiveM, bannières et affiches — et Neva Generative, l’IA qui compose des scènes GTA photoréalistes. Brief sur Discord, suivi en direct, livraison rapide."
               )}
             </p>
 

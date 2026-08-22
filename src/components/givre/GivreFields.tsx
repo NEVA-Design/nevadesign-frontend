@@ -124,7 +124,7 @@ export default function GivreFields() {
           <FieldRow
             num="01"
             kicker={t("fields.packs.kicker", "( 01 ) Packs FiveM").replace(/^\(\s*\d+\s*\)\s*/, "")}
-            title={t("fields.packs.title", "L'identité complète du serveur.")}
+            title={t("fields.packs.title", "L’identité complète du serveur.")}
             desc={t(
               "fields.packs.desc",
               "Logo, bannière, affiches, loading screen : un pack cohérent, prêt à poser sur Discord et en jeu."
@@ -147,7 +147,7 @@ export default function GivreFields() {
                 <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
                   <Image
                     src="/Prime_-_preview_serveur_pack_7.webp"
-                    alt="Déclinaisons d'un pack serveur FiveM"
+                    alt="Déclinaisons d’un pack serveur FiveM"
                     fill
                     sizes="(max-width: 1024px) 45vw, 27vw"
                     className="object-cover group-hover:scale-[1.04]"
@@ -158,7 +158,7 @@ export default function GivreFields() {
                 <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
                   <Image
                     src="/Prime_-_preview_serveur_pack_15.webp"
-                    alt="Visuel boutique d'un pack serveur FiveM"
+                    alt="Visuel boutique d’un pack serveur FiveM"
                     fill
                     sizes="(max-width: 1024px) 45vw, 27vw"
                     className="object-cover group-hover:scale-[1.04]"
@@ -176,7 +176,7 @@ export default function GivreFields() {
             title={t("fields.banners.title", "La première image de votre serveur.")}
             desc={t(
               "fields.banners.desc",
-              "Bannières, avatars et boutiques aux formats exacts de Discord et des réseaux — nets à chaque taille d'affichage."
+              "Bannières, avatars et boutiques aux formats exacts de Discord et des réseaux — nets à chaque taille d’affichage."
             )}
             meta={t("fields.banners.meta", "960 × 540 · Discord & réseaux")}
           >
@@ -184,7 +184,7 @@ export default function GivreFields() {
               <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
                 <Image
                   src="/Prime_-_preview_serveur_pack_8.webp"
-                  alt="Kit de bannières Discord d'un serveur FiveM"
+                  alt="Kit de bannières Discord d’un serveur FiveM"
                   fill
                   sizes="(max-width: 1024px) 92vw, 55vw"
                   className="object-cover group-hover:scale-[1.04]"
@@ -197,10 +197,10 @@ export default function GivreFields() {
           <FieldRow
             num="03"
             kicker={t("fields.posters.kicker", "( 03 ) Affiches & loading screens").replace(/^\(\s*\d+\s*\)\s*/, "")}
-            title={t("fields.posters.title", "L'événement, en grand format.")}
+            title={t("fields.posters.title", "L’événement, en grand format.")}
             desc={t(
               "fields.posters.desc",
-              "Recrutements, ouvertures, soirées : des compositions qui tiennent l'écran de chargement comme l'impression."
+              "Recrutements, ouvertures, soirées : des compositions qui tiennent l’écran de chargement comme l’impression."
             )}
             meta={t("fields.posters.meta", "4K · écran & impression")}
           >
@@ -208,7 +208,7 @@ export default function GivreFields() {
               <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
                 <Image
                   src="/affiche3.webp"
-                  alt="Affiche d'événement pour serveur GTA RP"
+                  alt="Affiche d’événement pour serveur GTA RP"
                   fill
                   sizes="(max-width: 1024px) 92vw, 55vw"
                   className="object-cover group-hover:scale-[1.04]"
@@ -220,7 +220,7 @@ export default function GivreFields() {
                 <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
                   <Image
                     src="/posterlarya.webp"
-                    alt="Campagne d'affiches serveur GTA RP"
+                    alt="Campagne d’affiches serveur GTA RP"
                     fill
                     sizes="(max-width: 1024px) 45vw, 27vw"
                     className="object-cover group-hover:scale-[1.04]"
@@ -231,7 +231,7 @@ export default function GivreFields() {
                 <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">
                   <Image
                     src="/postergrandfivem2.webp"
-                    alt="Série d'affiches verticales pour serveur FiveM"
+                    alt="Série d’affiches verticales pour serveur FiveM"
                     fill
                     sizes="(max-width: 1024px) 45vw, 27vw"
                     className="object-cover group-hover:scale-[1.04]"
@@ -249,9 +249,9 @@ export default function GivreFields() {
             title={t("fields.ia.title", "Des scènes GTA photoréalistes.")}
             desc={t(
               "fields.ia.desc",
-              "Neva Generative compose vos mises en scène — personnages, lumière, ambiance — dans l'univers de votre serveur."
+              "Neva Generative compose vos mises en scène — personnages, lumière, ambiance — dans l’univers de votre serveur."
             )}
-            meta={t("fields.ia.meta", "photoréaliste · jusqu'au 8K")}
+            meta={t("fields.ia.meta", "photoréaliste · jusqu’au 8K")}
           >
             <RevealMedia>
               <figure className="pv-media pv-media--hover pv-shadow-mauve relative aspect-video">

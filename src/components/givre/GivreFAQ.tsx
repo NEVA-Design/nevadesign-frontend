@@ -17,7 +17,7 @@ export default function GivreFAQ() {
 
   const items = [
     {
-      q: t("faq.q1", "Neva Design, c'est quoi exactement ?"),
+      q: t("faq.q1", "Neva Design, c’est quoi exactement ?"),
       a: t(
         "faq.a1",
         "Un studio créatif complet piloté par IA : vous décrivez une intention, il compose packs FiveM, bannières, affiches et scènes GTA prêts à publier — avec une vraie direction artistique, pas une génération au hasard."
@@ -27,7 +27,7 @@ export default function GivreFAQ() {
       q: t("faq.q2", "Que vaut vraiment le plan gratuit ?"),
       a: t(
         "faq.a2",
-        "Le plan Découverte permet d'explorer le flux complet, brief compris, sans créditer de créations. Les formules débloquent les exports HD, l'usage commercial et la priorité de génération."
+        "Le plan Découverte permet d’explorer le flux complet, brief compris, sans créditer de créations. Les formules débloquent les exports HD, l’usage commercial et la priorité de génération."
       ),
     },
     {
@@ -45,17 +45,17 @@ export default function GivreFAQ() {
       ),
     },
     {
-      q: t("faq.q5", "Je ne sais pas designer. C'est un problème ?"),
+      q: t("faq.q5", "Je ne sais pas designer. C’est un problème ?"),
       a: t(
         "faq.a5",
-        "C'est exactement pour ça que Neva existe. Décrivez le résultat voulu ; la composition, la typographie et l'étalonnage sont pris en charge. Le module Audit vous dit même quoi améliorer."
+        "C’est exactement pour ça que Neva existe. Décrivez le résultat voulu ; la composition, la typographie et l’étalonnage sont pris en charge. Le module Audit vous dit même quoi améliorer."
       ),
     },
     {
       q: t("faq.q6", "Et si je veux arrêter ?"),
       a: t(
         "faq.a6",
-        "Deux clics depuis votre espace. Le plan reste actif jusqu'à la fin de la période en cours — rien de caché, rien de retenu."
+        "Deux clics depuis votre espace. Le plan reste actif jusqu’à la fin de la période en cours — rien de caché, rien de retenu."
       ),
     },
   ];
@@ -77,7 +77,7 @@ export default function GivreFAQ() {
               {t("faq.label", "Questions")}
             </p>
             <h2 className="mt-5 font-display pv-t-mid font-light leading-[1.12] tracking-[-0.015em] text-slate">
-              {t("faq.title.a", "Tout ce qu'on nous demande")}{" "}
+              {t("faq.title.a", "Tout ce qu’on nous demande")}{" "}
               <span className="font-medium text-ink">
                 {t("faq.title.beam", "avant de se lancer.")}
               </span>

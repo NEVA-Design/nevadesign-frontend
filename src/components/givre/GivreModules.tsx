@@ -202,7 +202,7 @@ function DirectorScene() {
       <div className="mr-auto max-w-[94%] rounded-2xl rounded-bl-md border border-[rgba(185,167,218,0.3)] bg-[rgba(185,167,218,0.06)] px-4 py-3 text-[12.5px] leading-[1.6] text-slate">
         {t(
           "bento.director.answer",
-          "Trois pistes, moodboards à l'appui. Je compose la première ?"
+          "Trois pistes, moodboards à l’appui. Je compose la première ?"
         )}
         <span className="mt-3 flex gap-2">
           {moods.map((mood) => (
@@ -403,7 +403,7 @@ export default function GivreModules() {
               title={t("bento.brand.title", "Brand")}
               description={t(
                 "bento.brand.desc",
-                "L'identité de votre serveur : palette, typographies, déclinaisons."
+                "L’identité de votre serveur : palette, typographies, déclinaisons."
               )}
             >
               <BrandScene />

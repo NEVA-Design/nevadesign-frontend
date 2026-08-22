@@ -41,7 +41,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!admin) redirect('/dashboard')
 
   const adminLabel = admin.displayName || admin.email
-  const adminInitial = adminLabel.charAt(0).toUpperCase()
 
   return (
     <div className="pv-light pv-atelier relative min-h-screen text-ink">
@@ -91,8 +90,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 {admin.avatarUrl ? (
                   <Image src={admin.avatarUrl} alt="" fill sizes="28px" className="object-cover" />
                 ) : (
-                  <span className="flex h-full w-full items-center justify-center text-[10px] font-semibold text-[#060606]">
-                    {adminInitial}
+                  <span className="flex h-full w-full items-center justify-center bg-[color:var(--color-noir-2)]">
+                    <svg viewBox="0 0 1441 1000" className="h-3 w-auto" fill="none" stroke="rgba(244,242,238,0.6)" strokeWidth="44" aria-hidden>
+                      <path d="M440.2 0 L864.6 1000 L694.6 1000 L441 379 L180.1 1000 L0 1000 Z" />
+                      <path d="M575 0 L755.1 0 L1013 618 L1266.6 0 L1438.1 0 L1015.2 990 Z" />
+                    </svg>
                   </span>
                 )}
               </span>

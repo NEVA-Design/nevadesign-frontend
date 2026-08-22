@@ -118,7 +118,7 @@ export default function GivreType() {
         <p className="relative mx-auto mt-7 max-w-[880px] px-5 text-center font-mono text-[11px] uppercase leading-[2] tracking-[0.18em] text-slate">
           {t(
             "typemoment.caption",
-            "Affiches de recrutement pensées pour l'impact — personnage, titre massif, contraste. Lisibles en un scroll."
+            "Affiches de recrutement pensées pour l’impact — personnage, titre massif, contraste. Lisibles en un scroll."
           )}
         </p>
       </RevealBlock>

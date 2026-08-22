@@ -40,7 +40,7 @@ export const TRANSLATIONS_FR: Record<string, string> = {
   "hero.line2.beam": "cliquer",
   "hero.line2.post": ".",
   "hero.subtitle":
-    "Des graphistes pour vos packs FiveM, bannières Discord, affiches et loading screens — et Neva Generative, l'IA qui compose des scènes GTA photoréalistes. Brief sur Discord, suivi en direct, livraison rapide.",
+    "Des graphistes pour vos packs FiveM, bannières Discord, affiches et loading screens — et Neva Generative, l’IA qui compose des scènes GTA photoréalistes. Brief sur Discord, suivi en direct, livraison rapide.",
   "hero.cta.primary": "Découvrir le studio",
   "hero.cta.secondary": "Neva Generative",
   "hero.proof": "Avis clients vérifiés",
@@ -89,7 +89,7 @@ export const TRANSLATIONS_FR: Record<string, string> = {
 
   "typemoment.word": "Recrutez",
   "typemoment.caption":
-    "Affiches de recrutement pensées pour l'impact — personnage, titre massif, contraste. Lisibles en un scroll.",
+    "Affiches de recrutement pensées pour l’impact — personnage, titre massif, contraste. Lisibles en un scroll.",
 
   "fields.label": "Terrains",
   "fields.title": "Un studio, quatre terrains de jeu.",
@@ -132,7 +132,7 @@ export const TRANSLATIONS_FR: Record<string, string> = {
   "bento.design.campaign": "Affiche livrée · 2304 × 4096",
   "bento.brand.title": "Brand",
   "bento.brand.desc":
-    "L'identité de votre serveur : palette, typographies, déclinaisons.",
+    "L’identité de votre serveur : palette, typographies, déclinaisons.",
   "bento.brand.wordmark": "Wordmark",
   "bento.brand.palette": "Palette",
   "bento.brand.usage": "Déclinaisons",
@@ -272,7 +272,7 @@ export const TRANSLATIONS_FR: Record<string, string> = {
     "Un studio créatif complet piloté par IA : vous décrivez une intention, il compose packs FiveM, bannières, affiches et scènes GTA prêts à publier — avec une vraie direction artistique, pas une génération au hasard.",
   "faq.q2": "Que vaut vraiment le plan gratuit ?",
   "faq.a2":
-    "Le plan Découverte permet d'explorer le flux complet, brief compris, sans créditer de créations. Les formules débloquent les exports HD, l’usage commercial et la priorité de génération",
+    "Le plan Découverte permet d’explorer le flux complet, brief compris, sans créditer de créations. Les formules débloquent les exports HD, l’usage commercial et la priorité de génération",
   "faq.q3": "Puis-je vendre ce que je crée ?",
   "faq.a3":
     "Oui. Dès le premier plan payant, chaque création vous appartient commercialement : serveur, boutique, réseaux, livrables clients.",
@@ -281,10 +281,10 @@ export const TRANSLATIONS_FR: Record<string, string> = {
     "Non. Il connaît vos références, votre historique et les codes de votre terrain — pack serveur, bannière Discord ou affiche GTA RP. Il propose des concepts, structure des briefs et peut lancer une génération depuis la conversation.",
   "faq.q5": "Je ne sais pas designer. C’est un problème ?",
   "faq.a5":
-    "C’est exactement pour ça que Neva existe. Décrivez le résultat voulu ; la composition, la typographie et l'étalonnage sont pris en charge. Le module Audit vous dit même quoi améliorer.",
+    "C’est exactement pour ça que Neva existe. Décrivez le résultat voulu ; la composition, la typographie et l’étalonnage sont pris en charge. Le module Audit vous dit même quoi améliorer.",
   "faq.q6": "Et si je veux arrêter ?",
   "faq.a6":
-    "Deux clics depuis votre espace. Le plan reste actif jusqu'à la fin de la période en cours — rien de caché, rien de retenu.",
+    "Deux clics depuis votre espace. Le plan reste actif jusqu’à la fin de la période en cours — rien de caché, rien de retenu.",
   "faq.cta": "Rejoindre le Discord",
 
   "footer.cta.title.a": "Publiez quelque chose dont votre communauté",
@@ -323,7 +323,7 @@ export const TRANSLATIONS_FR: Record<string, string> = {
   "studio.title.a": "Un studio de graphisme",
   "studio.title.beam": "à votre service.",
   "studio.pitch":
-    "Neva Design, c'est d'abord une équipe de graphistes. Identités, packs FiveM, bannières, affiches, loading screens, overlays — briefés sur Discord, suivis en vocal, livrés vite.",
+    "Neva Design, c’est d’abord une équipe de graphistes. Identités, packs FiveM, bannières, affiches, loading screens, overlays — briefés sur Discord, suivis en vocal, livrés vite.",
   "studio.service.1": "Logos & identités",
   "studio.service.2": "Packs FiveM complets",
   "studio.service.3": "Bannières Discord & réseaux",
@@ -331,15 +331,15 @@ export const TRANSLATIONS_FR: Record<string, string> = {
   "studio.service.5": "Loading screens",
   "studio.service.6": "Overlays de stream",
   "studio.service.7": "Créations sur mesure",
-  "studio.team.label": "L'équipe",
+  "studio.team.label": "L’équipe",
   "studio.team.g1.role": "Direction artistique",
   "studio.team.g1.mission": "La ligne, la lumière, le verdict final sur chaque pièce.",
   "studio.team.g2.role": "Logos & identités",
-  "studio.team.g2.mission": "Monogrammes, wordmarks, déclinaisons — l'identité des serveurs.",
+  "studio.team.g2.mission": "Monogrammes, wordmarks, déclinaisons — l’identité des serveurs.",
   "studio.team.g3.role": "Packs FiveM",
   "studio.team.g3.mission": "Bannières, affiches, loading screens : le pack complet, cohérent.",
   "studio.team.g4.role": "Motion & overlays",
-  "studio.team.g4.mission": "Alertes, transitions, habillages de stream — l'identité en mouvement.",
+  "studio.team.g4.mission": "Alertes, transitions, habillages de stream — l’identité en mouvement.",
   "studio.process.label": "Le process",
   "studio.process.1.title": "Brief",
   "studio.process.1.desc":
@@ -349,10 +349,10 @@ export const TRANSLATIONS_FR: Record<string, string> = {
     "Le graphiste travaille avec vous en vocal — vous voyez la création avancer.",
   "studio.process.3.title": "Révisions",
   "studio.process.3.desc":
-    "Les ajustements se font dans la foulée, jusqu'à la version validée.",
+    "Les ajustements se font dans la foulée, jusqu’à la version validée.",
   "studio.process.4.title": "Livraison rapide",
   "studio.process.4.desc":
-    "Fichiers finaux livrés dans les meilleurs délais, prêts à l'emploi.",
+    "Fichiers finaux livrés dans les meilleurs délais, prêts à l’emploi.",
   "studio.cta": "Commander sur Discord",
   "studio.cta.note": "Brief, suivi et livraison — tout se passe sur Discord",
 
@@ -363,16 +363,17 @@ export const TRANSLATIONS_FR: Record<string, string> = {
   "reviews.note": "5/5 — 9 avis",
 
   /* ── Pivot 20/08 — Neva Generative ───────────────────────────── */
-  "generative.eyebrow": "Neva Generative — deux formules d'abonnement",
-  "generative.title.a": "L'IA du studio,",
+  "generative.eyebrow": "Neva Generative — deux formules d’abonnement",
+  "generative.title.a": "L’IA du studio,",
   "generative.title.beam": "en abonnement.",
   "generative.perMonth": "€ / mois",
-  "generative.subscribe": "S'abonner",
-  "generative.earlyAccess": "Accès anticipé — prix bientôt",
+  "generative.subscribe": "S’abonner",
+  "generative.earlyAccess": "Accès anticipé",
+  "generative.priceSoon": "Prix à l’ouverture",
   "generative.gta.num": "Formule 01",
   "generative.gta.title": "Scènes GTA",
   "generative.gta.pitch":
-    "Des scènes GTA photoréalistes générées par IA — bannières, posters, visuels de serveurs et de réseaux. Pensé pour les graphistes et les serveurs FiveM : l'outil que beaucoup utiliseront pour leurs propres clients.",
+    "Des scènes GTA photoréalistes générées par IA — bannières, posters, visuels de serveurs et de réseaux. Pensé pour les graphistes et les serveurs FiveM : l’outil que beaucoup utiliseront pour leurs propres clients.",
   "generative.gta.f1": "Quota mensuel dévoilé à l’ouverture",
   "generative.gta.f2": "Formats bannière + poster",
   "generative.gta.f3": "Usage commercial autorisé",

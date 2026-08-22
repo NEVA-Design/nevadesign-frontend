@@ -160,7 +160,7 @@ export default function GivreEnhance() {
             <p className="mx-auto mt-5 max-w-[520px] text-[15px] leading-[1.7] text-slate">
               {t(
                 "enhance.subtitle",
-                "Saisissez la poignée et faites-la glisser : netteté, lumière, étalonnage — vos anciens visuels repassent au studio, jusqu'au 8K."
+                "Saisissez la poignée et faites-la glisser : netteté, lumière, étalonnage — vos anciens visuels repassent au studio, jusqu’au 8K."
               )}
             </p>
           </RevealBlock>

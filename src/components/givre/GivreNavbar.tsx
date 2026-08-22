@@ -34,7 +34,12 @@ export default function GivreNavbar() {
   const [activeHash, setActiveHash] = useState("");
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 32);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 32);
+      /* en haut de page (le hero), aucune section de nav n'est
+         active — l'observateur garderait la dernière visitée */
+      if (window.scrollY < window.innerHeight * 0.4) setActiveHash("");
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);

@@ -91,7 +91,7 @@ export default function SignupPage() {
 
             {success ? (
               <div className="pv-scale-in">
-                <span className="pv-pill mt-7 h-12 w-12 justify-center px-0">
+                <span className="mt-7 inline-flex h-12 w-12 items-center justify-center rounded-full border border-[color:var(--color-ligne-2)]">
                   <MailCheck size={22} strokeWidth={1.6} className="text-ok" />
                 </span>
                 <h1 className="pv-display mt-5 text-[clamp(1.7rem,5.2vw,2.1rem)] leading-[1.12]">
@@ -114,7 +114,7 @@ export default function SignupPage() {
                   Accès anticipé
                 </p>
                 <h1 className="pv-display mt-3 text-[clamp(1.7rem,5.2vw,2.1rem)] leading-[1.12]">
-                  Votre <span className="font-medium text-ink">première création</span>{" "}
+                  Votre <b>première création</b>{" "}
                   vous attend.
                 </h1>
                 <p className="mt-3 max-w-[340px] text-sm leading-relaxed text-slate">

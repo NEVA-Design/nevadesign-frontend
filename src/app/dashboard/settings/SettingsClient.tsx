@@ -114,7 +114,6 @@ export default function SettingsClient({
   const [mfaSaving, setMfaSaving] = useState(false)
   const [mfaStatus, setMfaStatus] = useState<Status>(null)
 
-  const initials = (displayName || email).charAt(0).toUpperCase()
 
   // ── Profil ────────────────────────────────────────────────────────────────────
 
@@ -435,8 +434,11 @@ export default function SettingsClient({
                   {avatarUrl ? (
                     <Image src={avatarUrl} alt="Photo de profil" fill sizes="64px" className="object-cover" />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-[rgba(185,167,218,0.08)]">
-                      <span className="pv-display text-2xl text-[color:var(--num-color)]">{initials}</span>
+                    <div className="flex h-full w-full items-center justify-center bg-[color:var(--color-noir-2)]">
+                      <svg viewBox="0 0 1441 1000" className="h-5 w-auto" fill="none" stroke="rgba(244,242,238,0.55)" strokeWidth="40" aria-hidden>
+                        <path d="M440.2 0 L864.6 1000 L694.6 1000 L441 379 L180.1 1000 L0 1000 Z" />
+                        <path d="M575 0 L755.1 0 L1013 618 L1266.6 0 L1438.1 0 L1015.2 990 Z" />
+                      </svg>
                     </div>
                   )}
                   {avatarUploading && (

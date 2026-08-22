@@ -155,7 +155,7 @@ const EN: Record<string, string> = {
 
   "wall.title.a": "The work ships",
   "wall.title.b": "from here.",
-  "wall.cta": "The studio's full portfolio",
+  "wall.cta": "The studio’s full portfolio",
 
   "stats.label": "The studio is already running",
   "stats.creators": "active creators",
@@ -167,7 +167,7 @@ const EN: Record<string, string> = {
   "pricing.title.a": "Cheaper than a logo.",
   "pricing.title.beam": "For a whole identity.",
   "pricing.subtitle":
-    "Move to a plan when you're ready to create — no commitment.",
+    "Move to a plan when you’re ready to create — no commitment.",
   "pricing.note":
     "No commitment · Cancel in two clicks · Creation top-ups from your workspace",
   "pricing.rules.retouches": "5 retouches included per creation — beyond that, 1 creation",
@@ -263,9 +263,9 @@ const EN: Record<string, string> = {
   "faq.q4": "The Creative Director — another chatbot?",
   "faq.a4":
     "No. It knows your references, your history and the codes of your field — server packs, Discord banners or GTA RP posters. It pitches concepts, structures briefs and can launch a generation right from the conversation.",
-  "faq.q5": "I can't design. Is that a problem?",
+  "faq.q5": "I can’t design. Is that a problem?",
   "faq.a5":
-    "That's exactly why Neva exists. Describe the result you want; composition, typography and grading are handled. The Audit module even tells you what to improve.",
+    "That’s exactly why Neva exists. Describe the result you want; composition, typography and grading are handled. The Audit module even tells you what to improve.",
   "faq.q6": "What if I want to stop?",
   "faq.a6":
     "Two clicks from your workspace. The plan stays active until the end of the current period — nothing hidden, nothing held back.",
@@ -348,11 +348,12 @@ const EN: Record<string, string> = {
 
   /* ── Pivot 20/08 — Neva Generative ───────────────────────────── */
   "generative.eyebrow": "Neva Generative — two subscription plans",
-  "generative.title.a": "The studio's AI,",
+  "generative.title.a": "The studio’s AI,",
   "generative.title.beam": "as a subscription.",
   "generative.perMonth": "€ / month",
   "generative.subscribe": "Subscribe",
-  "generative.earlyAccess": "Early access — pricing soon",
+  "generative.earlyAccess": "Early access",
+  "generative.priceSoon": "Pricing at launch",
   "generative.gta.num": "Plan 01",
   "generative.gta.title": "GTA Scenes",
   "generative.gta.pitch":

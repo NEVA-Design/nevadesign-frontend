@@ -36,8 +36,8 @@ type TeamMember = {
 /* Le visuel de chaque métier — des livrables réels du studio,
    déjà présents dans /public (aucun octet nouveau). */
 const CRAFT_VISUALS: Record<string, { src: string; alt: string }> = {
-  g1: { src: "/affiche3.webp", alt: "Affiche d'événement dirigée par la DA" },
-  g2: { src: "/Prime_-_preview_serveur_pack_4.webp", alt: "Identité complète d'un serveur" },
+  g1: { src: "/affiche3.webp", alt: "Affiche d’événement dirigée par la DA" },
+  g2: { src: "/Prime_-_preview_serveur_pack_4.webp", alt: "Identité complète d’un serveur" },
   g3: { src: "/Prime_-_preview_serveur_pack_7.webp", alt: "Pack graphique FiveM livré" },
   g4: { src: "/vice.webp", alt: "Scène animée pour habillage de stream" },
 };
@@ -66,12 +66,12 @@ const PROCESS = [
   {
     key: "studio.process.3",
     title: "Révisions",
-    desc: "Les ajustements se font dans la foulée, jusqu'à la version validée.",
+    desc: "Les ajustements se font dans la foulée, jusqu’à la version validée.",
   },
   {
     key: "studio.process.4",
     title: "Livraison rapide",
-    desc: "Fichiers finaux livrés dans les meilleurs délais, prêts à l'emploi.",
+    desc: "Fichiers finaux livrés dans les meilleurs délais, prêts à l’emploi.",
   },
 ];
 
@@ -305,7 +305,7 @@ export default function GivreStudioVitrine() {
               <p className="mt-6 max-w-[46ch] text-[15px] leading-[1.7] text-slate lg:mt-0">
                 {t(
                   "studio.pitch",
-                  "Neva Design, c'est d'abord une équipe de graphistes. Identités, packs FiveM, bannières, affiches, loading screens, overlays — briefés sur Discord, suivis en vocal, livrés vite."
+                  "Neva Design, c’est d’abord une équipe de graphistes. Identités, packs FiveM, bannières, affiches, loading screens, overlays — briefés sur Discord, suivis en vocal, livrés vite."
                 )}
               </p>
             </RevealBlock>
@@ -323,7 +323,7 @@ export default function GivreStudioVitrine() {
           {/* L'équipe — le registre des métiers */}
           <RevealBlock delay={0.1}>
             <p className="pv-label mt-20">
-              {t("studio.team.label", "L'équipe")}
+              {t("studio.team.label", "L’équipe")}
             </p>
           </RevealBlock>
           <div className="mt-6">

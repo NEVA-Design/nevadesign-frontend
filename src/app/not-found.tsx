@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import SatinSphere from "@/components/givre/SatinSphere";
 
 /*
  * 404 — la sphère satinée seule au centre du cyclorama, l'atelier
@@ -31,7 +30,19 @@ export default function NotFound() {
       />
 
       <main className="relative z-10 flex min-h-[100svh] flex-col items-center justify-center px-6 text-center">
-        <SatinSphere size={148} className="mx-auto flex flex-col items-center" />
+        <svg
+          viewBox="0 0 1441 1000"
+          aria-hidden
+          className="mx-auto h-20 w-auto"
+          fill="none"
+          stroke="rgba(244,242,238,0.3)"
+          strokeWidth="18"
+        >
+          <path d="M440.2 0 L864.6 1000 L694.6 1000 L441 379 L180.1 1000 L0 1000 Z" />
+          <path d="M439.5 710 L559.2 1000 L320 1000 Z" />
+          <path d="M575 0 L755.1 0 L1013 618 L1266.6 0 L1438.1 0 L1015.2 990 Z" />
+          <path d="M893.4 0 L1134.1 0 L1013.7 292 Z" />
+        </svg>
 
         <p className="mt-10 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
           404 — Page introuvable

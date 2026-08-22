@@ -12,56 +12,68 @@ import { BrandMark } from "@/components/prisme/Brand";
 export const metadata: Metadata = {
   title: "Avis clients — Neva Design Studio",
   description:
-    "Ce que disent les créateurs FiveM et communautés qui nous font confiance : design au top, service à l'écoute, livraison rapide. Note moyenne 4,9/5.",
+    "Ce que disent les créateurs FiveM et communautés qui nous font confiance : design au top, service à l’écoute, livraison rapide. Note moyenne 4,9/5.",
   alternates: { canonical: "/avis" },
 };
 
 type Avis = { nom: string; note: number; texte: string; tag?: string; produit?: string };
 
 const AVIS: Avis[] = [
-  { nom: "Nil", tag: "Client", note: 5, texte: "Direction artistique exceptionnelle, que ce soit pour le logo ou l'identité visuelle. Tout est pensé avec goût, cohérence et créativité. Ultra talentueux, à l'écoute et force de proposition. Je recommande à 100 %." },
-  { nom: "Zakall", tag: "Client Premium", note: 5, texte: "Super expérience ! Réponse rapide, très à l'écoute et travail fait exactement comme demandé. Service sérieux et efficace, je referai appel sans hésiter." },
+  { nom: "Nil", tag: "Client", note: 5, texte: "Direction artistique exceptionnelle, que ce soit pour le logo ou l’identité visuelle. Tout est pensé avec goût, cohérence et créativité. Ultra talentueux, à l’écoute et force de proposition. Je recommande à 100 %." },
+  { nom: "Zakall", tag: "Client Premium", note: 5, texte: "Super expérience ! Réponse rapide, très à l’écoute et travail fait exactement comme demandé. Service sérieux et efficace, je referai appel sans hésiter." },
   { nom: "Rifi", note: 5, texte: "Rien à dire, excellent. Il est resté plus de 6h en vocal avec moi et a fait le pack entier devant moi. Du sérieux." },
   { nom: "Yoza", tag: "Client Premium", note: 5, texte: "Excellent travail, très réactif sur les changements. Resté en vocal avec nous un bon moment pour répondre à nos demandes, et nous a même conseillés sur le logo." },
-  { nom: "izox", tag: "Client", note: 5, texte: "J'ai pris le pack à 32 €, il est juste magnifique, rapide et efficace. Je recommande à 200 %." },
+  { nom: "izox", tag: "Client", note: 5, texte: "J’ai pris le pack à 32 €, il est juste magnifique, rapide et efficace. Je recommande à 200 %." },
   { nom: "Erox", tag: "Client", note: 5, texte: "Travail sérieux, rapide et de qualité. Très content de ma commande. Je recommande !" },
-  { nom: "Miu", tag: "Client", note: 5, texte: "Excellent travail, une très bonne communication. Avoir le suivi du travail est génial. Très rapide et efficace, un staff très à l'écoute et de bon conseil." },
+  { nom: "Miu", tag: "Client", note: 5, texte: "Excellent travail, une très bonne communication. Avoir le suivi du travail est génial. Très rapide et efficace, un staff très à l’écoute et de bon conseil." },
   { nom: "wissox", produit: "Pack n°1 + Overlay TikTok", note: 5, texte: "Service très rapide, commande reçue en même pas 15h. La DA est très soignée, 0 imperfection. Le prix pour la qualité est totalement rentable, je recommande. Allez-y !" },
-  { nom: "Lukhas", note: 5, texte: "Je recommande fort. Comprend vraiment bien l'univers qu'on lui décrit. 10/10." },
-  { nom: "XProDz_Tv", tag: "Client Premium", note: 5, texte: "Service de qualité. Si vous cherchez quelqu'un de professionnel dans son métier, c'est ici que ça se passe." },
+  { nom: "Lukhas", note: 5, texte: "Je recommande fort. Comprend vraiment bien l’univers qu’on lui décrit. 10/10." },
+  { nom: "XProDz_Tv", tag: "Client Premium", note: 5, texte: "Service de qualité. Si vous cherchez quelqu’un de professionnel dans son métier, c’est ici que ça se passe." },
   { nom: "white", tag: "Client", note: 5, texte: "On sent vraiment le travail derrière, tout est propre et bien fait. Merci beaucoup." },
-  { nom: "Uminøx", tag: "Client", note: 5, texte: "Incroyable. Ils prennent le temps de comprendre ce qu'on veut et rendent un travail très bien fait. Travail sérieux, je recommande." },
-  { nom: "Kyiuu", tag: "Client", note: 5, texte: "Je recommande, il fait les modifications jusqu'à ce que le produit te plaise !" },
+  { nom: "Uminøx", tag: "Client", note: 5, texte: "Incroyable. Ils prennent le temps de comprendre ce qu’on veut et rendent un travail très bien fait. Travail sérieux, je recommande." },
+  { nom: "Kyiuu", tag: "Client", note: 5, texte: "Je recommande, il fait les modifications jusqu’à ce que le produit te plaise !" },
   { nom: "kawaazaki", tag: "Client", note: 5, texte: "Excellent travail, livraison en 1 heure." },
   { nom: "Naiko", tag: "Client", produit: "Sur-mesure (2 affiches)", note: 5, texte: "Tout est parfait ! La qualité est au rendez-vous et la rapidité de livraison est irréprochable. 10/10." },
   { nom: "LR_TOTO", tag: "Client", note: 5, texte: "Produit de qualité, personnes professionnelles. Je recommande x1000." },
-  { nom: "Marwane", tag: "Client", note: 5, texte: "Foncez, c'est très méchant ce qu'ils proposent." },
-  { nom: "C'Pirate", tag: "Client", produit: "Logo + loading screen", note: 5, texte: "Livraison rapide et conforme à mes attentes. Travail fait avec rapidité et sérieux, merci." },
+  { nom: "Marwane", tag: "Client", note: 5, texte: "Foncez, c’est très méchant ce qu’ils proposent." },
+  { nom: "C’Pirate", tag: "Client", produit: "Logo + loading screen", note: 5, texte: "Livraison rapide et conforme à mes attentes. Travail fait avec rapidité et sérieux, merci." },
   { nom: "French.off", note: 5, texte: "Travail sérieux, résultat magnifique, je recommande !" },
   { nom: "Butcher", tag: "Client Premium", note: 5, texte: "Excellent travail, je recommande." },
   { nom: "white", tag: "Client", note: 5, texte: "Incroyable travail pour la 3ᵉ fois sur plusieurs projets. Je suis satisfait, merci." },
   { nom: "Kzk", note: 5, texte: "Juste trop chaud, je vous recommande." },
-  { nom: "R3B", tag: "Client", produit: "Crédits Neva-AI", note: 5, texte: "Incroyable l'IA les brothers ! Ça va m'aider pour mes prochaines créations." },
+  { nom: "R3B", tag: "Client", produit: "Crédits Neva-AI", note: 5, texte: "Incroyable l’IA les brothers ! Ça va m’aider pour mes prochaines créations." },
   { nom: "tylerr", note: 5, texte: "Je recommande, design au top, servi rapidement." },
   { nom: "scarf", tag: "Client", note: 5, texte: "Travail propre et rapide, pas mal, je recommande !" },
   { nom: "Kayto", tag: "Client", note: 5, texte: "Incroyable, foncez !" },
-  { nom: "Nil", tag: "Client", note: 5, texte: "Les tenues staff sont tout simplement impeccables et dignes d'un service 5 étoiles." },
+  { nom: "Nil", tag: "Client", note: 5, texte: "Les tenues staff sont tout simplement impeccables et dignes d’un service 5 étoiles." },
   { nom: "Ryzco", tag: "Client", produit: "Logo + bannières", note: 5, texte: "Assets conformes aux attentes, propre et rapide." },
   { nom: "Marwane", tag: "Client", note: 5, texte: "Au top, comprend bien la demande et rapide, je recommande !" },
   { nom: "Zeydraxx", note: 5, texte: "Excellent travail, service de qualité, très efficace. 10/10." },
   { nom: "Naox", tag: "Client", produit: "Pack 3", note: 4, texte: "Service de qualité, rapide et sérieux. Il vous prend en vocal pour que vous présentiez votre projet." },
-  { nom: "Talpa", produit: "Logo", note: 5, texte: "Incroyable, il a fait en peu de temps et j'aime trop le résultat !" },
+  { nom: "Talpa", produit: "Logo", note: 5, texte: "Incroyable, il a fait en peu de temps et j’aime trop le résultat !" },
 ];
 
 const MOYENNE = "4,9";
 
+/* Refonte 50k : étoiles au TRAIT (jamais le caractère ★) — la
+   même voix fine que la section avis de la home. */
 function Etoiles({ note }: { note: number }) {
   return (
-    <span aria-label={`${note} étoiles sur 5`} className="inline-flex gap-[3px] text-[13px] leading-none">
+    <span aria-label={`${note} étoiles sur 5`} className="inline-flex gap-[3px]">
       {Array.from({ length: 5 }).map((_, i) => (
-        <span key={i} style={{ color: i < note ? "#F2EFE9" : "rgba(255,255,255,0.16)" }}>
-          ★
-        </span>
+        <svg
+          key={i}
+          width={13}
+          height={13}
+          viewBox="0 0 24 24"
+          fill={i < note ? "rgba(200,203,208,0.2)" : "none"}
+          stroke={i < note ? "#C8CBD0" : "rgba(255,255,255,0.22)"}
+          strokeWidth="1.2"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z" />
+        </svg>
       ))}
     </span>
   );

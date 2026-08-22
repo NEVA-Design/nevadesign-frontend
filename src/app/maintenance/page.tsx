@@ -66,11 +66,6 @@ export default async function MaintenancePage() {
             'radial-gradient(34% 42% at 36% 28%, rgba(185,167,218,0.22) 0%, rgba(185,167,218,0) 70%), radial-gradient(30% 38% at 64% 66%, rgba(233,198,162,0.2) 0%, rgba(233,198,162,0) 72%)',
         }}
       />
-      <SatinSphere
-        size={140}
-        className="pointer-events-none absolute right-[10%] top-[14%] hidden lg:block"
-      />
-
       {/* Cadre éditorial — la page comme objet imprimé */}
       <div
         aria-hidden

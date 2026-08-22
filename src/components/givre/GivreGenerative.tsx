@@ -223,7 +223,7 @@ function PriceCard({
       {pending ? (
         <>
           <p className="mt-5 font-mono text-[13px] uppercase tracking-[0.14em] text-ink">
-            {t("generative.priceSoon", "Prix à l'ouverture")}
+            {t("generative.priceSoon", "Prix à l’ouverture")}
           </p>
           <p className="pv-soon-badge mt-3">
             {t("generative.earlyAccess", "Accès anticipé")}
@@ -250,7 +250,7 @@ function PriceCard({
         ))}
       </ul>
       <Link href="/signup" className="pv-btn mt-7 w-full">
-        {t("generative.subscribe", "S'abonner")}
+        {t("generative.subscribe", "S’abonner")}
       </Link>
     </div>
   );
@@ -258,8 +258,8 @@ function PriceCard({
 
 const GALLERY = [
   { slug: "poser", alt: "Scène GTA générée — détente au bord de la piscine, Los Santos" },
-  { slug: "ordi", alt: "Scène GTA générée — personnage face à l'écran au coucher de soleil" },
-  { slug: "plage", alt: "Scène GTA générée — transat au bord de la piscine d'une villa" },
+  { slug: "ordi", alt: "Scène GTA générée — personnage face à l’écran au coucher de soleil" },
+  { slug: "plage", alt: "Scène GTA générée — transat au bord de la piscine d’une villa" },
 ];
 
 export default function GivreGenerative() {
@@ -292,12 +292,12 @@ export default function GivreGenerative() {
           </RevealBlock>
           <RevealBlock delay={0.06}>
             <p className="mt-8 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">
-              {t("generative.eyebrow", "Neva Generative — deux formules d'abonnement")}
+              {t("generative.eyebrow", "Neva Generative — deux formules d’abonnement")}
             </p>
           </RevealBlock>
           <RevealMask delay={0.12} className="mt-4">
             <h2 className="pv-display pv-section-title max-w-[900px]">
-              {t("generative.title.a", "L'IA du studio,")}{" "}
+              {t("generative.title.a", "L’IA du studio,")}{" "}
               <b>{t("generative.title.beam", "en abonnement.")}</b>
             </h2>
           </RevealMask>
@@ -313,7 +313,7 @@ export default function GivreGenerative() {
                 <p className="mt-4 max-w-[560px] text-[14.5px] leading-[1.7] text-slate">
                   {t(
                     "generative.gta.pitch",
-                    "Des scènes GTA photoréalistes générées par IA — bannières, posters, visuels de serveurs et de réseaux. Pensé pour les graphistes et les serveurs FiveM : l'outil que beaucoup utiliseront pour leurs propres clients."
+                    "Des scènes GTA photoréalistes générées par IA — bannières, posters, visuels de serveurs et de réseaux. Pensé pour les graphistes et les serveurs FiveM : l’outil que beaucoup utiliseront pour leurs propres clients."
                   )}
                 </p>
               </RevealBlock>
@@ -364,7 +364,7 @@ export default function GivreGenerative() {
                   title={t("generative.gta.title", "Scènes GTA")}
                   price={formatGenerativePrice(GENERATIVE_PRICING.gta)}
                   features={[
-                    t("generative.gta.f1", "Quota mensuel dévoilé à l'ouverture"),
+                    t("generative.gta.f1", "Quota mensuel dévoilé à l’ouverture"),
                     t("generative.gta.f2", "Formats bannière + poster"),
                     t("generative.gta.f3", "Usage commercial autorisé"),
                   ]}
@@ -466,7 +466,7 @@ export default function GivreGenerative() {
                     title={t("generative.banner.title", "Bannières Discord IA")}
                     price={formatGenerativePrice(GENERATIVE_PRICING.banner)}
                     features={[
-                      t("generative.banner.f1", "Quota mensuel dévoilé à l'ouverture"),
+                      t("generative.banner.f1", "Quota mensuel dévoilé à l’ouverture"),
                       t("generative.banner.f2", "Accès à tous les modèles"),
                       t("generative.banner.f3", "Personnalisation nom / thème / couleur"),
                     ]}

@@ -18,7 +18,7 @@ export default function GivreStats() {
   const stats = [
     { value: 2400, suffix: "+", label: t("stats.creators", "créateurs actifs") },
     { value: 6, suffix: "", label: t("stats.modules", "modules spécialisés") },
-    { value: 8, suffix: "K", label: t("stats.exports", "définition d'export max") },
+    { value: 8, suffix: "K", label: t("stats.exports", "définition d’export max") },
     { value: 12, suffix: " s", label: t("stats.speed", "du brief au rendu") },
   ];
 

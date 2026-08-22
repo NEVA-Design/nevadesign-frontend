@@ -53,7 +53,7 @@ export default function GivreCreations() {
             <RevealMask>
               <h2 className="pv-display pv-t-creations">
                 {t("wall.title.a", "Les créations sortent")}{" "}
-                <b>{t("wall.title.b", "d'ici.")}</b>
+                <b>{t("wall.title.b", "d’ici.")}</b>
               </h2>
             </RevealMask>
             <p className="mt-4 flex items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.2em] text-mist">

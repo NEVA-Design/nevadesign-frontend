@@ -1238,6 +1238,16 @@ html {
   margin: 0 14px;
   color: var(--ink-28);
 }
+/* en colonne (mobile), le séparateur n'a plus de sens : un point
+   pendouillant en fin de ligne est du bruit */
+@media (max-width: 639px) {
+  .pv-tag-row {
+    row-gap: 12px;
+  }
+  .pv-tag-row > *:not(:last-child)::after {
+    content: none;
+  }
+}
 
 /* Cadre média — les rendus s'affichent purs */
 .pv-media {

@@ -66,7 +66,7 @@ export default function GivreFooter() {
       title: t("footer.legal", "Légal"),
       links: [
         { label: t("footer.link.privacy", "Confidentialité"), href: "/privacy" },
-        { label: t("footer.link.terms", "Conditions d'utilisation"), href: "/terms" },
+        { label: t("footer.link.terms", "Conditions d’utilisation"), href: "/terms" },
         { label: t("footer.link.cookies", "Cookies"), href: "/cookies" },
       ],
     },

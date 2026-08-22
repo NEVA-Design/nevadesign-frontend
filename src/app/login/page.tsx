@@ -97,7 +97,7 @@ export default function LoginPage() {
               Espace créateur
             </p>
             <h1 className="pv-display mt-3 text-[clamp(1.8rem,5.6vw,2.25rem)] leading-[1.12]">
-              Reprenez <span className="font-medium text-ink">la lumière</span>.
+              Reprenez <b>la lumière</b>.
             </h1>
             <p className="mt-3 max-w-[320px] text-sm leading-relaxed text-slate">
               Vos créations et vos crédits vous attendent, exactement où vous
